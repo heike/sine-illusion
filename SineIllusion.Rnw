@@ -2,7 +2,7 @@
 \usepackage{natbib}
 \usepackage{fullpage}
 \usepackage{hyperref}
-\usepackage{wrapfig,float,subfigure}
+\usepackage{wrapfig,float,subfig}
 \usepackage{graphicx}
 \usepackage{amssymb}
 
@@ -206,9 +206,9 @@ The original authors \citep{day:1991} write in their abstract: The illusion is e
 \begin{figure}[h!tbp]\centering
 <<ribbon-illusion,echo=FALSE, include=FALSE, fig.width=5, fig.height=2.6>>=
 library(plyr)
-x <- seq(-pi, pi, .1)
-angle <- .08
-persp <- data.frame(xtop=(1-angle)*x, xbottom=(1+angle)*x, ytop = sin((1-angle)*x)+1/2, ybottom = sin(x*(1+angle))-1/2)
+angle <- .05
+x <- seq(-1*pi, 1*pi, .1)
+persp <- data.frame(xtop=(1-angle)*x + angle, xbottom=(1+angle)*x - angle, ytop = sin((1-angle)*x)+1/2, ybottom = sin(x*(1+angle))-1/2)
 persp$ell <- with(persp, sqrt((xbottom-xtop)^2 + (ybottom-ytop)^2))
 qplot(data=persp, x=xtop, xend=xbottom, y=ytop, yend=ybottom, geom="segment") + ggtitle("What the brain expects the data to look like") + 
   xlab("") + ylab("") + 
@@ -284,15 +284,15 @@ dframe1 <- adjY(dframe1)
 @
 
 \begin{figure}[htbp]\centering
-<<ytransform1-plot, echo=FALSE, fig=FALSE>>=
-qplot(x=xstart, xend=xend, y = ystart, yend=yend, colour=I("blue"), geom="segment", main="Transformed Length", data=dframe1) + ylim(c(-pi/2, pi/2))+ coord_fixed() + xlab("x") + ylab("y")
-qplot(x=xstart, xend=xend, y = ystart, yend=yend, colour=I("blue"), geom="segment", main="Transformed Length", data=dframe1) + ylim(c(-pi, pi))+ coord_fixed()+ xlab("x") + ylab("y")
-qplot(x=xstart, xend=xend, y = ystart, yend=yend, colour=I("blue"), geom="segment", main="Transformed Length", data=dframe1) + ylim(c(-2*pi, 2*pi))+ coord_fixed()+ xlab("x") + ylab("y")
+<<ytransform1-plot, echo=FALSE, include=FALSE, fig.width=4, fig.height=c(2, 4, 6)>>=
+qplot(x=xstart, xend=xend, y = ystart, yend=yend, colour=I("blue"), geom="segment", main="Transformed Length", data=dframe1) + ylim(c(-pi/2, pi/2))+ coord_fixed(ratio=1) + xlab("x") + ylab("y")
+qplot(x=xstart, xend=xend, y = ystart, yend=yend, colour=I("blue"), geom="segment", main="Transformed Length", data=dframe1) + ylim(c(-pi, pi))+ coord_fixed(ratio=1)+ xlab("x") + ylab("y")
+qplot(x=xstart, xend=xend, y = ystart, yend=yend, colour=I("blue"), geom="segment", main="Transformed Length", data=dframe1) + ylim(c(-2*pi, 2*pi))+ coord_fixed(ratio=1)+ xlab("x") + ylab("y")
 @
 
-\subfigure[]{\includegraphics[width=.32\linewidth,keepaspectratio=TRUE]{figure/fig-ytransform1-plot1}}
-\subfigure[]{\includegraphics[width=.32\linewidth,keepaspectratio=TRUE]{figure/fig-ytransform1-plot2}}
-\subfigure[]{\includegraphics[width=.32\linewidth,keepaspectratio=TRUE]{figure/fig-ytransform1-plot3}}
+\subfloat[Aspect Ratio of .5]{\includegraphics[width=.32\linewidth,keepaspectratio=TRUE]{figure/fig-ytransform1-plot1}}
+\subfloat[Aspect ratio of 1]{\includegraphics[width=.32\linewidth,keepaspectratio=TRUE]{figure/fig-ytransform1-plot2}}
+\subfloat[Aspect ratio of 2]{\includegraphics[width=.32\linewidth,keepaspectratio=TRUE]{figure/fig-ytransform1-plot3}}
 \caption{Changing aspect ratios changes the strength of the illusion and the effectiveness of the transformation}
 \end{figure}
 % 
