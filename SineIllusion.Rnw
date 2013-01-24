@@ -1,0 +1,660 @@
+\documentclass[11pt]{article}
+\usepackage{natbib}
+\usepackage{fullpage}
+\usepackage{hyperref}
+\usepackage{wrapfig,float,subfigure}
+\usepackage{graphicx}
+\usepackage{amssymb}
+
+% help with editing and coauthoring
+\usepackage{todonotes}
+
+\graphicspath{{figure/}}
+
+
+<<setup, include=FALSE, cache=FALSE, eval=TRUE>>=
+#rm(list=ls())
+options(replace.assign=TRUE,width=70)
+require(knitr)
+opts_chunk$set(fig.path='figure/fig-', cache.path='cache/', fig.align='center', fig.width=5, fig.height=5, fig.show='hold', par=TRUE, cache=TRUE, concordance=TRUE, autodep=TRUE)
+library(reshape2)
+suppressMessages(library(ggplot2))
+@
+
+\title{Signs of the Sine Illusion -- why we need to care}
+\author{Susan Vanderplas, Heike Hofmann, probably include Di and Xiaoyue}
+
+\begin{document}
+\maketitle
+\begin{abstract}
+The sine illusion, which is part of a set of optical illusions which occur based on a conflict between a stimuli and the real-world situation which can cause similar stimuli, has a notable impact on perception of time-series data with a seasonal component. In this paper, we discuss the reasons for the illusion and various strategies which might be useful to break the illusion or reduce its' strength, demonstrating the presence of the illusion in real-world and theoretical situations. We also present data from user studies which demonstrate the dramatic effect the sine illusion can have on conclusions drawn from displayed data.
+\end{abstract}
+\tableofcontents
+\section{Background and Introduction}
+\todo[inline]{this is where we need to introduce the sine-illusion
+
+and lay out the problem that we have with it from a statistical graphics side
+
+then we sketch out a remedy
+
+last paragraph is a sentence on the structure of the paper. 
+}
+
+
+In the perception literature, the phenomenon is known as part of a group of geometrical optical misperceptions classified as M\"uller-Lyer illusions \citep{day:1991}. Figure \ref{original} shows a reproduction of Bach's applet \citep{bach} displaying the sine illusion. The sine illusion is closely related to the line width phenomenon -- the line segments along the steepest slopes of the sine curve appear to be the shortest: ``The illusion is explained in terms of a perceptual compromise between the vertical extent and the greater overall dimensions of the section at the turn of the sine-wave figure and is thereby held to be the same in principle as the M\"uller-Lyer illusion." \citep{day:1991}.
+M Bach's applet  gives the option to compensate the line length manually for its perceived shortcoming. The amount of compensation chosen turns out to be highly dependent on both the length of the vertical line segments and the amplitude of the sine function. The amplitude directly affects the slope -- the steeper  the slope the more compensation is necessary, see section \ref{distortion}  for a more detailed discussion and some results from a user study  \todo{could we start with our own data for the user study? that way we don't need IRB approval for now. data is in the data folder. I don't see any clear relationship, though/}.
+
+<<data, echo=FALSE, eval=TRUE>>=
+f <- function(x) sin(x)
+fprime <- function (x) cos(x)
+
+createSine <- function(n=200, len=1, f=f, fprime=fprime) {
+  x <- seq(0, 2*pi, length=n)
+  l <- rep(len, length=length(x))
+  fx <- f(x)
+  ystart <- fx - .5*l
+  yend <- fx + .5*l
+  ell <- yend-ystart
+  # now correct for line illusion in vertical direction
+  dy <- diff(range(fx))
+  dx <- diff(range(x))
+# fprime works in framework of dx and dy, but we represent it in framework of dx and dy+len
+# needs to be fixed by factor a:  
+  a <- dy/(dy + len) 
+  ellx <- ell / cos(atan(abs(a*fprime(x))))
+  # make this a data frame - ggplot2 doesn't do well with floating vectors
+  dframe <- data.frame(x=x, xstart=x, xend=x, y=fx, ystart=ystart, yend=yend, ell=ell, ellx = ellx)
+  
+  dframe
+}
+@
+\begin{figure}[hbtp]
+\centering
+\begin{minipage}{.495\textwidth}
+<<original, echo=FALSE, fig=TRUE, results='asis', fig.width=5, fig.height=2.6>>=
+l <- 1
+qplot(x=x, xend=xend, y = ystart, yend=yend, geom="segment", data=createSine(40,1, f=f, fprime=fprime)) +
+  theme(panel.grid.major=element_blank(), panel.background = element_rect(fill = "white", 
+                colour = "black"),
+       panel.grid.minor=element_blank(), panel.background=element_blank(),
+       axis.title = element_blank(), axis.ticks = element_blank(), 
+       axis.text = element_blank()) + coord_equal(ratio=1)
+@
+\end{minipage}\begin{minipage}{.495\textwidth}
+<<original-redo, echo=FALSE, fig=FALSE, include=FALSE>>=
+cairo_pdf("./figure/fig-original-redo.pdf", width=5, height=2.6)
+l <- 1
+df1 <- createSine(20,1, f=f, fprime=fprime)
+df1$colour <- c(rep("A", 5), "A", rep("A", 13), "A")
+qplot(x=xstart, xend=xend, y = ystart, yend=yend, geom="segment", data=df1, colour=I("grey20")) +
+  theme(panel.grid.major=element_blank(), 
+        panel.background = element_rect(fill = "white", colour = "black"),
+        panel.grid.minor=element_blank(), panel.background=element_blank(),
+        axis.title = element_blank(), axis.ticks = element_blank(), 
+        axis.text = element_blank()) + coord_equal(ratio=1) + 
+  geom_segment(x=-pi/12, xend=2*pi+pi/12, y=0, yend=0, colour="grey", linetype=2)+
+  geom_segment(aes(x=x, xend=xend, y=y, yend=yend), colour="red", 
+               data=data.frame(x=c(df1$x[6],  mean(df1$x[5:6]), mean(df1$x[5:6])), 
+                               xend = c(mean(df1$x[5:6]), mean(df1$x[5:6]), df1$x[6]),
+                               y = c(df1$y[6], df1$y[6], 0), 
+                               yend = c(df1$y[6], 0, 0)), size=1) + 
+  geom_text(aes(x=df1$x[5], y=df1$y[6]/2, label="s"), hjust=1, vjust=.5, size=10, colour="red") + 
+  geom_segment(aes(x=x, xend=xend, y=y, yend=yend), colour="blue", 
+             data=data.frame(x=c(df1$x[20],  mean(df1$x[19:20]), mean(df1$x[19:20])), 
+                             xend = c(mean(df1$x[19:20]), mean(df1$x[19:20]), df1$x[20]),
+                             y = c(df1$ystart[20], df1$ystart[20], df1$yend[20]), 
+                             yend = c(df1$ystart[20], df1$yend[20], df1$yend[20])), size=1) +
+  geom_text(aes(x=df1$x[19], y=df1$y[20], label="\u2113"), hjust=1, vjust=.5, size=10, colour="blue")
+dev.off()
+@
+\includegraphics[keepaspectratio=true, width=\linewidth]{fig-original-redo.pdf}
+\end{minipage}
+\caption{\label{original}The original Sine Illusion. The regions of the graph in the peak and the valley appear to be composed of longer lines than the other regions. $s$ denotes the amplitude of the function, $\ell$ the length of the line segments.}
+\end{figure}
+
+\begin{figure}[hbtp]
+\centering
+<<originalgrid, dependson='data', echo=FALSE, fig=TRUE, results='asis',out.width=".5\\linewidth", fig.width=5, fig.height=2.6>>=
+dframe <- createSine(n = 40, len = 1, f=f, fprime=fprime)
+
+qplot(x=x, xend=xend, y = ystart*ell, yend=yend*ell, geom="segment", data=dframe) +
+  theme(panel.grid.major.y=element_line(colour="grey75"), 
+        panel.grid.minor.y=element_line(colour="grey85"), 
+        panel.grid.major.x=element_blank(),
+        panel.background = element_rect(fill = "white", 
+                colour = "black"),
+       panel.grid.minor.x=element_blank(), panel.background=element_blank(),
+       axis.title = element_blank(), axis.ticks = element_blank(), 
+       axis.text = element_blank()) + coord_equal(ratio=1)
+@
+\caption{\label{originalgrid} Horizontal grid lines do not help much in resolving the illusion, even though they provide a clear basis for comparison of line lengths.}
+\end{figure}
+
+\clearpage
+\subsection*{Discussion of Sine Illusion}
+Using the notation given in the applet, we assume a value $s$ for the sine amplitude, $\ell$ for the vertical length of line segments, and $\ell_c$ for the amount of compensation. 
+The sine curve is then given by function $f$, written as 
+\[
+f(x) = s/2 \sin(x)
+\]
+for $x$ in $[-\pi, \pi]$. The slope of the sine curve is the steepest in its reflection point at $x=0$. We can calculate the slope as $f^\prime(x) = s/2 \cos(x)$, which in $x=0$ yields a slope of $s/2$.
+
+These differences in the slope are the reason we perceive the lines to have different length, as we have an innate tendency to evaluate line or band widths orthogonally rather than vertically, as would be the mathematically correct way.
+
+Orthogonal $w_o$ and vertical $w_v$ line widths are related -- the orthogonal line width depends on the angle (or, equivalently, the slope) of the line:
+\begin{equation}\label{adjust}
+w_o = w_v \cos \theta,
+\end{equation}
+where $\theta$ is the angle of the line with respect to the horizontal line.
+\todo[inline]{Should we make the $w_o$ vs. b and $w_v$ vs. a terminology consistent?}
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=0.3\linewidth]{images/linewidth}
+\end{center}
+\caption{\label{fig:linewidth}Sketch of line width assessments: (a) is showing  vertical width, (b) shows  width orthogonal to the slope. From previous surveys (we could cite Marie's survey here) we know that  observers associate line width more with  orthogonal width (b) than vertical width (a).}
+\end{figure}
+% 
+% \todo[inline]{get the figures out of the knitr specification - you have much more control over the sizing that way.}
+
+\begin{figure}[htbp]
+\centering
+<<transform-illustration,echo=FALSE, include=FALSE>>=
+x <- seq(-pi, pi, length=200)
+y <- sin(x)
+deriv <- cos(0)*x
+df1 <- data.frame(x=x, y=y, deriv=deriv)
+x <- seq(-pi/2, pi/2, length=15)
+y <- sin(x)
+ystart <- y-1
+yend <- y+1
+df2 <- data.frame(xstart=x, xend=x, ystart=ystart, yend=yend)
+
+getSecantSegment <- function(x, l){
+  secSlope <- -cos(x)
+  temp <- seq(-pi, pi, .001) + x
+  leftend <- temp[which.min(abs(sin(temp) - secSlope*(temp) - l/2))]
+  rightend <- temp[which.min(abs(sin(temp) - secSlope*(temp) + l/2))]
+  yintercept = sin(x) -secSlope*x 
+  data.frame(xstart=leftend+x, xend=rightend+x, ystart=(yintercept + secSlope*(leftend+x)), yend = (yintercept + secSlope*(rightend+x)))
+}
+
+
+qplot(x=x, y=y, geom="line", data=df1, colour=I("red")) + theme_bw() + 
+  geom_line(aes(y=y+1), colour="red", linetype=4) + geom_line(aes(y=y-1), colour="red", linetype=4) +
+  geom_segment(data=df2[c(1, 3, 6, 8, 10, 13, 15),], aes(x=xstart, xend=xstart, y=ystart, yend=yend)) + 
+  geom_line(data=df1, aes(x=x, y=deriv), linetype=2) + 
+  geom_segment(aes(x=xstart, xend=xend, y=ystart, yend=yend), colour="blue", data=getSecantSegment(0, 2)) + 
+  geom_text(aes(x=xend-.1, y=yend+.1, label="Perceived\nwidth at\nx=0"), colour="blue", hjust=1, vjust=0, data=getSecantSegment(0, 2), inherit.aes=FALSE) + 
+  geom_text( x=-.15, y=.35, label="theta", parse=TRUE, size=4, hjust=.5, vjust=.5) + 
+  geom_line(aes(x=.6*cos(seq(3*pi/4, pi/2, length=20)), y=.6*sin(seq(3*pi/4, pi/2, length=20)))) + 
+  coord_equal(ratio=1) + xlim(c(-pi, pi)) + ylim(c(-2.25, 2.25))
+
+@
+\includegraphics[width=.5\linewidth, keepaspectratio=TRUE]{figure/fig-transform-illustration}
+\caption{The perceived width orthogonal to the slope differs from the length of the lines.}
+\end{figure}
+
+One way to correct for the sine illusion is to make all slopes the same (by transforming the $x$ axis), another approach is to make the lines appear to be of the same height, by adjusting their lengths to maintain a constant orthogonal width. This is the approach that we pursue when transforming the $Y$ values. 
+\clearpage
+\section{Correction Approaches to the Sine Illusion}
+
+Web Link: \url{http://www.michaelbach.de/ot/sze_sineIllusion/index.html}
+\begin{quote}
+The original authors \citep{day:1991} write in their abstract: The illusion is explained in terms of a perceptual compromise between the vertical extent and the greater overall dimensions of the section at the turn of the sine-wave figure and is thereby held to be the same in principle as the M\"uller-Lyer illusion.
+\end{quote}
+
+\begin{figure}[h!tbp]\centering
+<<ribbon-illusion,echo=FALSE, include=FALSE, fig.width=5, fig.height=2.6>>=
+library(plyr)
+x <- seq(-pi, pi, .1)
+angle <- .08
+persp <- data.frame(xtop=(1-angle)*x, xbottom=(1+angle)*x, ytop = sin((1-angle)*x)+1/2, ybottom = sin(x*(1+angle))-1/2)
+persp$ell <- with(persp, sqrt((xbottom-xtop)^2 + (ybottom-ytop)^2))
+qplot(data=persp, x=xtop, xend=xbottom, y=ytop, yend=ybottom, geom="segment") + ggtitle("What the brain expects the data to look like") + 
+  xlab("") + ylab("") + 
+  theme(panel.grid.major=element_blank(), 
+        panel.background = element_rect(fill = "white", colour = "black"),
+        panel.grid.minor=element_blank(), panel.background=element_blank(),
+        axis.title = element_blank(), axis.ticks = element_blank(), 
+        axis.text = element_blank()) + coord_equal(ratio=1)
+# 
+# ribbon <- ldply(x, function(i) data.frame(x = i, y = sin(i+seq(-1, 1, .01)), offset=seq(-1, 1, .01)))
+# ribbon2 <- ddply(ribbon, .(x), summarise, lb=min(y), ub=max(y))
+# ribbon2$center <- sin(x)
+# x <- seq(-pi/2, pi/2, length=10)
+# y <- sin(x)
+# ystart <- y-1
+# yend <- y+1
+# df2 <- data.frame(xstart=x, xend=x, ystart=ystart, yend=yend)
+# 
+# 
+# qplot(x=x, y=center, geom="line", data=ribbon2, colour=I("red")) + geom_ribbon(aes(ymax=ub, ymin=lb), colour="blue", alpha=.5) + ggtitle("What our brains expect the data to look like") + 
+#   geom_segment(data=df2, aes(x=xstart, xend=xend, y=ystart, yend=yend)) + 
+#   xlab("") + ylab("") + 
+#   theme(panel.grid.major=element_blank(), 
+#         panel.background = element_rect(fill = "white", colour = "black"),
+#         panel.grid.minor=element_blank(), panel.background=element_blank(),
+#         axis.title = element_blank(), axis.ticks = element_blank(), 
+#         axis.text = element_blank()) + coord_equal(ratio=1)
+@
+\includegraphics[width=.5\linewidth, keepaspectratio=TRUE]{figure/fig-ribbon-illusion}
+\caption{Experience with real-world objects suggests that the data are most similar to a slightly angled top view of a 3-dimensional strip such as a ribbon. Even though the sine illusion lines are not angled, the brain interprets the physiological stimuli within this context. This produces a conflict between past experience and the present perception that leads to the illusion.}
+\end{figure}
+
+As in the M\"uller-Lyer illusion, the perceptual experience is influenced by the context in which similar stimuli exist in real world situations. One other common illusion of this sort is the Ames Room illusion (\url{http://en.wikipedia.org/wiki/Ames_room}), where ambiguous stimuli are perceived as resulting from situations that occur in the real world, even when those perceptions are misleading. This is in general an optimal processing strategy, as the vast majority of visual stimuli conform to the brain's expectations, however, it does lead to certain visual ``bugs" that we must work around when designing graphics.
+ 
+\clearpage
+\begin{subsection}{Data Setup}
+\todo[inline]{Describe the setup of the data in words and leave out the code from the paper.}
+We begin with lines of length 2 evenly spaced along the x-axis, where the center of the vertical line is at $y = sin(x)$. For this example, the amplitude $s$ = 1 and the line length $\ell = 2$. Our goal is to break the sine illusion by transforming the line length, $f(\ell) = \ell + \ell_c$ so that the perceived width is constant. 
+
+\end{subsection}
+
+\begin{subsection}{Transformation of Y values}
+This approach aims to extend the orthogonal width, which onlookers generally evaluate,  to the amount of the vertical width, which we want to represent. 
+For that, we multiply the vertical width by a factor of $1/\cos\theta$, where $\theta$ is the angle under which the line is drawn. This angle is given by the slope of the function, mathematically we know that in position $x$ the angle $\theta(x)$ of function $f(x)$ is given as:
+\[
+\tan \theta (x) = f^\prime (x).
+\]
+We only distinguish the size, not the sign of the angle, which gives us an overall correction factor for the line width in vertical direction of 
+\begin{equation}\label{correction1}
+atan \left(\cos \left| f^\prime (x) \right|\right) ^{-1}
+\end{equation}
+
+
+<<ytransFcn, echo=FALSE>>=
+adjY <- function(df){
+  dx <- diff(df$x)
+  dy <- diff(df$y)
+  adj <- atan(dy/dx)
+  adj <- c(adj, rev(adj)[1])
+  adj <- 1/cos(abs(adj))
+  adj <- adj-mean(adj)+1
+  
+  df$ell <- df$ell*adj
+  df$ystart <- df$y - .5*df$ell
+  df$yend <- df$y + .5*df$ell
+  
+  df
+}
+@
+<<ytransform1, echo=FALSE>>=
+dframe1 <- createSine(n=40, len=1, f=f, fprime=fprime)
+dframe1 <- adjY(dframe1)
+@
+
+\begin{figure}[htbp]\centering
+<<ytransform1-plot, echo=FALSE, fig=FALSE>>=
+qplot(x=xstart, xend=xend, y = ystart, yend=yend, colour=I("blue"), geom="segment", main="Transformed Length", data=dframe1) + ylim(c(-pi/2, pi/2))+ coord_fixed() + xlab("x") + ylab("y")
+qplot(x=xstart, xend=xend, y = ystart, yend=yend, colour=I("blue"), geom="segment", main="Transformed Length", data=dframe1) + ylim(c(-pi, pi))+ coord_fixed()+ xlab("x") + ylab("y")
+qplot(x=xstart, xend=xend, y = ystart, yend=yend, colour=I("blue"), geom="segment", main="Transformed Length", data=dframe1) + ylim(c(-2*pi, 2*pi))+ coord_fixed()+ xlab("x") + ylab("y")
+@
+
+\subfigure[]{\includegraphics[width=.32\linewidth,keepaspectratio=TRUE]{figure/fig-ytransform1-plot1}}
+\subfigure[]{\includegraphics[width=.32\linewidth,keepaspectratio=TRUE]{figure/fig-ytransform1-plot2}}
+\subfigure[]{\includegraphics[width=.32\linewidth,keepaspectratio=TRUE]{figure/fig-ytransform1-plot3}}
+\caption{Changing aspect ratios changes the strength of the illusion and the effectiveness of the transformation}
+\end{figure}
+% 
+% <<echo=FALSE, fig=TRUE, results='asis',out.width=".48\\textwidth">>=
+% qplot(x=x, xend=x, y = y2start, yend=y2end, colour=I("blue"), geom="segment", main="Transformed Length") +
+%   #geom_line(aes(x=x, y=cos(2*x)), colour=I("red")) +
+%   #geom_segment(aes(x = 0, xend=2*pi, y=0, yend=0), colour="black") + 
+%   theme(plot.background=element_blank(), panel.grid.major=element_blank(), 
+%        panel.grid.minor=element_blank(), panel.background=element_blank())+ylim(c(-3, 3))
+% qplot(x=x, xend=x, y = y2start, yend=y2end, colour=I("blue"), geom="segment", main="Transformed Length") +
+%   #geom_line(aes(x=x, y=cos(2*x)), colour=I("red")) +
+%   #geom_segment(aes(x = 0, xend=2*pi, y=0, yend=0), colour="black") + 
+%   theme(plot.background=element_blank(), panel.grid.major=element_blank(), 
+%        panel.grid.minor=element_blank(), panel.background=element_blank())+ylim(c(-10, 10))
+% @
+% 
+% <<echo=FALSE, fig=TRUE, results='asis',out.width=".48\\textwidth">>=
+% qplot(x=x, xend=x, y = y2start-sin(x), yend=y2end-sin(x), colour=I("blue"), geom="segment", main="Transformed Length, mean=0") +
+%   #geom_line(aes(x=x, y=cos(2*x)), colour=I("red")) +
+%   #geom_segment(aes(x = 0, xend=2*pi, y=0, yend=0), colour="black") + 
+%   theme(plot.background=element_blank(), panel.grid.major=element_blank(), 
+%        panel.grid.minor=element_blank(), panel.background=element_blank())+ylim(c(-3, 3))
+% qplot(x=1:length(l), y=l1, geom="line", main="L vs L*") + 
+%   geom_segment(aes(x=0, xend=length(l), y=l[1], yend=l[1]), colour="black", linetype=2)
+% @
+
+
+\begin{figure}[hbtp]
+<<fixingit, dependson='data', echo=FALSE, fig=TRUE, results='asis',out.width='.49\\textwidth', fig.width=5, fig.height=3>>=
+dframe <- createSine(40,1, f=f, fprime=fprime)
+qplot(x=x, xend=xend, y = f(x) -ell/2, yend=f(x) +ell/2, geom="segment", data=dframe) +
+  theme(panel.grid.major=element_blank(), panel.background = element_rect(fill = "white", 
+                colour = "black"),
+       panel.grid.minor=element_blank(), panel.background=element_blank(),
+       axis.title = element_blank(), axis.ticks = element_blank(), 
+       axis.text = element_blank()) + coord_equal(ratio=1)
+
+qplot(x=x, xend=xend, y = f(x) -ellx/2, yend=f(x) +ellx/2, geom="segment", data=dframe) +
+  theme(panel.grid.major=element_blank(), panel.background = element_rect(fill = "white", 
+                colour = "black"),
+       panel.grid.minor=element_blank(), panel.background=element_blank(),
+       axis.title = element_blank(), axis.ticks = element_blank(), 
+       axis.text = element_blank()) + coord_equal(ratio=1)
+@
+\caption{\label{firstfix} First fix of the sine illusion by using the factor of $1/cos(atan(|f^\prime(x)|))$ for adjusting the vertical extent of the lines.}
+\end{figure}
+
+\begin{figure}
+\centering
+<<secondfix, dependson='data', echo=FALSE, out.width='0.49\\textwidth',  fig.width=5, fig.height=5>>=
+dframe <- createSine(40, 0.5, f, fprime)
+ar <- 2
+# dframe$ellx <- with(dframe, ell * ar/cos(abs(atan(fprime(x)))))
+qplot(x=x, xend=xend, y = f(x) -ell/2, yend=f(x) +ell/2, geom="segment", data=dframe) +
+  theme(panel.grid.major=element_blank(), panel.background = element_rect(fill = "white", 
+                colour = "black"),
+       panel.grid.minor=element_blank(), panel.background=element_blank(),
+       axis.title = element_blank(), axis.ticks = element_blank(), 
+       axis.text = element_blank()) + coord_equal(ratio=ar)
+
+qplot(x=x, xend=xend, y = f(x) -ellx/2, yend=f(x) +ellx/2, geom="segment", data=dframe) +
+  theme(panel.grid.major=element_blank(), panel.background = element_rect(fill = "white", 
+                colour = "black"),
+       panel.grid.minor=element_blank(), panel.background=element_blank(),
+       axis.title = element_blank(), axis.ticks = element_blank(), 
+       axis.text = element_blank()) + coord_equal(ratio=ar)
+
+@
+\caption{\label{secondfix} Aspect ratio seems to be a scalar in the correction factor.}
+\end{figure}
+
+\begin{figure}
+\centering
+<<thirdfix, dependson='data', echo=FALSE, out.width='0.49 \\textwidth'>>=
+g <- function(x) 5*sin(x)
+gprime <- function(x) 5*cos(x)
+dframe <- createSine(100, len=5, f=g, fprime=gprime)
+ar <- 1
+qplot(x=x, xend=xend, y = g(x) -ell/2, yend=g(x) +ell/2, geom="segment", data=dframe) +
+  theme(panel.grid.major=element_blank(), panel.background = element_rect(fill = "white", 
+                colour = "black"),
+       panel.grid.minor=element_blank(), panel.background=element_blank(),
+       axis.title = element_blank(), axis.ticks = element_blank(), 
+       axis.text = element_blank()) + coord_equal(ratio=ar)
+
+qplot(x=x, xend=xend, y = g(x) -ellx/2, yend=g(x) +ellx/2, geom="segment", data=dframe) +
+  theme(panel.grid.major=element_blank(), panel.background = element_rect(fill = "white", 
+                colour = "black"),
+       panel.grid.minor=element_blank(), panel.background=element_blank(),
+       axis.title = element_blank(), axis.ticks = element_blank(), 
+       axis.text = element_blank()) + coord_equal(ratio=ar)
+@
+\caption{\label{thirdfix} The ratio of the length of the line to amplitude of the function needs to be included in the correction. Here, the amplitude is still 1, but the length of the line is 5. The correction factor leads to a massive over correction that makes the function almost unrecognizable. The plot on the left is uncorrected, the plot on the right is `corrected'.}
+\end{figure}
+
+
+\end{subsection}\clearpage
+\section{Distortion} \label{distortion}
+place holder
+\section{Application: Simulation}
+<<sine>>=
+x <- rep(seq(0,2*pi*10, length=120), each=100)
+y <- rnorm(n=length(x), mean=sin(x), sd=0.2)
+qplot(x,y, geom="jitter")
+@
+
+<<sinetrend>>=
+x <- rep(seq(0,2*pi*10, length=120), each=100)
+y <- rnorm(n=length(x), mean=5*sin(x/20)+sin(x), sd=0.2)
+qplot(x,y, geom="jitter")
+@
+
+\section{Application: USHCN Data}
+<<readdata, echo=FALSE>>=
+ushcn <- na.omit(read.csv("data/ushcn.csv"))
+monthly <- read.csv("data/monthly-avgs.csv")
+suppressMessages(require(lubridate))
+suppressMessages(require(ggplot2))
+ushcn$Time <- as.Date(ushcn$Time)
+monthly$time <- as.Date(monthly$time)
+@
+
+\begin{figure}[hbtp]
+\centering
+<<rawtemp, dependson='readdata', echo=FALSE, echo=FALSE, fig.width=12, fig.height=4.5, out.width='\\textwidth',cache=TRUE>>=
+ggplot()  + geom_jitter(aes(Time, value/100), data=ushcn, size=1) + 
+  geom_line(aes(time, avg/100), data=monthly, colour="steelblue", size=1.5) + 
+  ylab("Temperature (in Celsius)")
+# ggsave(file="figure/monthly-temps.pdf", width=12, height=4.5)
+@
+% \includegraphics[width=\textwidth]{monthly-temps}
+\caption{\label{raw-temp}Raw monthly maximum temperatures (in Celsius) between 1980 and 2012 at 1218 stations across the US. The blue line shows fitted temperatures from a baseline model. The plot suggests that the model fails to capture the more extreme values in summer and winter. }
+\end{figure}
+\begin{figure}[hbtp]\centering
+<<boxtemp, dependson='readdata', echo=FALSE, echo=FALSE, fig.width=12, fig.height=4.5, out.width='\\textwidth',cache=TRUE>>=
+ggplot()  + geom_boxplot(aes(Time, value/100, group=interaction(Year, Month)), outlier.size=1, fill = "grey65", data=subset(ushcn, Year<1995)) + theme_bw() + 
+  #geom_line(aes(time, avg/100), data=subset(monthly, year(time)<1995), colour="steelblue", size=1.5, alpha=.5) + 
+  ylab("Temperature (in Celsius)")
+# ggsave(file="figure/monthly-temps.pdf", width=12, height=4.5)
+@
+
+\caption{\label{box-temp}Monthly boxplot of maximum temperatures (in Celsius) between 1980 and 1995 at 1218 stations across the US. The sine illusion is less powerful but still visible in three locations:  the box area of the boxes,  the whiskers, and in the outliers.}
+\end{figure}
+\begin{figure}[hbtp]
+\centering
+<<residtemp, dependson='rawtemp', echo=FALSE, echo=FALSE, fig.width=12, fig.height=4.5, out.width='\\textwidth'>>=
+ushcn <- merge(ushcn, monthly[,c("time", "avg")], by.x="Time", by.y="time")
+ushcn$resid <- with(ushcn, value-avg)
+ggplot()  + geom_jitter(aes(Time, resid/100), data=ushcn, size=1) + 
+  geom_hline(yintercept=0, colour="steelblue", size=1) + 
+  ylab("Residual temperature (in Celsius)")
+# ggsave(file="figure/monthly-resid-temps.pdf", width=12, height=4.5)
+@
+% \includegraphics[width=\textwidth]{monthly-resid-temps}
+\caption{\label{resid-temp}Residual monthly temperatures (in Celsius) from the baseline model fit. The original impression of smaller deviations during Spring and Fall is now almost gone: Winters have larger negative residuals, while Summers have larger positive ones. }
+\end{figure}
+
+Figures \ref{raw-temp} and \ref{resid-temp} show temperature data from 1218 stations across the US. The first plot shows raw temperatures, the second residuals from a `baseline' model. The caption for the raw temperature plot suggests that the baseline model is not quitable to capture all of the variability in summer and winter peaks. However, the model used is actually based on averages in each time point. This model is not  susceptible to shrinking values, and it is our perception of the plot rather than the data that makes us see any higher variability in the peaks. After removing the averages in figure \ref{resid-temp} the impression of higher variability in the peaks is gone with the exception of a few outliers.
+
+\bibliographystyle{asa}
+% argument is your BibTeX string definitions and bibliography database(s)
+\bibliography{references}
+
+\end{document}
+
+
+\begin{subsection}{Transformation of $X$ Values}
+\todo[inline]{Could you try to write the correction factor out in terms of a formula? - I still think that all of the lines should appear under the same slope, which means that the result would need to be an up/down triangle, like we had before. I'm a bit worried about the `fudge' factor $a$ -- let's first use a correction factor that we can derive mathematically from counteracting the line illusion and then allow some fudging. }
+In order to counteract the illusion of changing line length, we can slightly transform the $X$ values, narrowing the distance between values at the peak and trough of the curve and widening the distance between values at the inflection point. If we alter the $X$ axis such that $\triangle X^\ast = c*a(\cos(2x)+1)$, where $\triangle X = c$ is the distance between two evenly spaced $X$ points, the illusion's effect is broken and all $y$ values appear to be approximately the same length. Consistent with the hypothesis that the apparent line length is dependent on the slope of the tangent line, changing $\triangle x$ reduces the apparent length discrepancy $\triangle y$ significantly.
+\begin{figure}[H]\centering
+
+<<xtransform, echo=FALSE, include=TRUE, results='asis', out.width=".31\\textwidth">>=
+dframe <- createSine(80 , len=1, f=f, fprime=fprime)
+dframe$a <- max(diff(dframe$ystart))
+dframe$xtrans <- cumsum(diff(dframe$x)[1]*(dframe$a*cos(2*dframe$x)+1)) # Create transformed X axis
+dframe$xtrans <- dframe$xtrans-mean(dframe$xtrans-dframe$x) 
+
+qplot(x=xtrans, xend=xtrans, y = ystart, yend=yend, colour=I("blue"), geom="segment", main="Transformed X Axis", data=dframe) +
+  geom_segment(aes(x = 0, xend=2*pi, y=0, yend=0), colour="black") +
+  ylim(-3,3)
+qplot(x=xtrans, xend=xtrans, y = ystart, yend=yend, colour=I("blue"), geom="segment", main="Transformed X Axis", data=dframe) +
+  geom_segment(aes(x = 0, xend=2*pi, y=0, yend=0), colour="black") +
+  ylim(-10,10)
+#qplot(x=x, y=x1, geom="line", main="X vs. X*")
+@
+
+\end{figure}
+\end{subsection}
+
+\begin{subsection}{Exploration of Effect with Random Data}
+If we use randomly spaced x, does the effect still hold?
+<<echo=TRUE>>=
+library(ggplot2)
+
+x <- runif(100, 0, 2*pi)
+x <- x[order(x)]
+l <- rep(1, 100)
+ystart <- sin(x) - .5*l
+yend <- sin(x) + .5*l
+
+a2 <- max(diff(ystart)/diff(x)*(2*pi/100))
+l3 <- l+a2*cos(2*x)
+y3start <- sin(x) - .5*l3
+y3end <- sin(x) + .5*l3
+@
+<<echo=FALSE,include=TRUE,out.width=".48\\textwidth">>=
+qplot(x=x, xend=x, y=ystart, yend=yend, geom="segment")+ 
+  theme(plot.background=element_blank(), panel.grid.major=element_blank(), 
+       panel.grid.minor=element_blank(), panel.background=element_blank())+ylim(c(-2, 2))
+qplot(x=x, xend=x, y=y3start, yend=y3end, geom="segment")+ 
+  theme(plot.background=element_blank(), panel.grid.major=element_blank(), 
+       panel.grid.minor=element_blank(), panel.background=element_blank())+ylim(c(-2, 2))
+@
+
+If we use randomly varying line lengths, with evenly spaced x, does the effect hold?
+In particular, can we use an improvised (from the data) correction factor with uneven x spacing?
+<<echo=TRUE>>=
+x <- seq(0, 2*pi, length=100)
+l <- rep(1, 100)
+ystart <- sin(x) - .5*l
+yend <- sin(x) + .5*l
+a <- max(diff(ystart))
+sd1 <- .1
+l4 <- rnorm(100, 1, sd1)
+l5 <- l4+a*cos(2*x)
+y4start <- sin(x) - .5*l4
+y4end <- sin(x) + .5*l4
+y5start <- sin(x) - .5*l5
+y5end <- sin(x) + .5*l5
+@
+With sd=\Sexpr{sd1}, the illusion seems to hold and the correction (on the underlying sine distribution) does seem to mitigate the illusion to a small degree. 
+
+<<echo=FALSE,include=TRUE,out.width=".48\\textwidth">>=
+qplot(x=x, xend=x, y=y4start, yend=y4end, geom="segment")+ 
+  theme(plot.background=element_blank(), panel.grid.major=element_blank(), 
+       panel.grid.minor=element_blank(), panel.background=element_blank())+ylim(c(-2, 2))
+qplot(x=x, xend=x, y=y5start, yend=y5end, geom="segment")+ 
+  theme(plot.background=element_blank(), panel.grid.major=element_blank(), 
+       panel.grid.minor=element_blank(), panel.background=element_blank())+ylim(c(-2, 2))
+@
+
+<<echo=TRUE>>=
+sd2 <- .2
+l6 <- rnorm(100, 1, sd2)
+y6start <- sin(x) -.5*l6
+y6end <- sin(x) + .5*l6
+l7 <- l6+a*cos(2*x)
+y7start <- sin(x) - .5*l7
+y7end <- sin(x)+.5*l7
+@
+
+With sd=\Sexpr{sd2}, the illusion doesn't hold quite as strongly, and the correction (on the underlying sine distribution) similarly doesn't seem as effective. 
+
+<<echo=FALSE,include=TRUE,out.width=".48\\textwidth">>=
+qplot(x=x, xend=x, y=y6start, yend=y6end, geom="segment")+ 
+  theme(plot.background=element_blank(), panel.grid.major=element_blank(), 
+       panel.grid.minor=element_blank(), panel.background=element_blank())+ylim(c(-2, 2))
+qplot(x=x, xend=x, y=y7start, yend=y7end, geom="segment")+ 
+  theme(plot.background=element_blank(), panel.grid.major=element_blank(), 
+       panel.grid.minor=element_blank(), panel.background=element_blank())+ylim(c(-2, 2))
+@
+
+\paragraph{Points}
+Returning to the data presentation, does the sine illusion hold when data are presented as points instead of segments?
+<<>>=
+x <- seq(0, 2*pi, length=100)
+l <- rep(1, length(x))
+ystart <- sin(x) - .5*l
+yend <- sin(x) + .5*l
+a <- max(diff(ystart))
+l1 <- l+a*cos(2*x)
+y1start <- sin(x) - .5*l1
+y1end <- sin(x) + .5*l1
+
+@
+<<echo=FALSE,include=TRUE,out.width=".48\\textwidth">>=
+qplot(x=x, y=ystart, geom="point") + geom_point(aes(x=x, y=yend))+ 
+  theme(plot.background=element_blank(), panel.grid.major=element_blank(), 
+       panel.grid.minor=element_blank(), panel.background=element_blank())+ylim(c(-2, 2))
+qplot(x=x, y=y1start, geom="point") + geom_point(aes(x=x, y=y1end))+ 
+  theme(plot.background=element_blank(), panel.grid.major=element_blank(), 
+       panel.grid.minor=element_blank(), panel.background=element_blank())+ylim(c(-2, 2))
+@
+After trying \Sexpr{a}, $\pi\times$\Sexpr{a}, and  $2\pi\times$\Sexpr{a}, I cannot seem to find a transformation that removes the illusion for points without any connecting line. It may be that a transformation in both x and y (or just in x) is required, as there is no dominant visual cue as to in which direction distance should be measured.
+\paragraph{Line Graphs} The illusion also appears to hold for line graphs, but does not seem to be entirely mitigated by the correction factor.
+<<echo=FALSE>>=
+l2 <- l+2*a*cos(2*x)
+y2start <- sin(x) - .5*l2
+y2end <- sin(x) + .5*l2
+l3 <- l+3*a*cos(2*x)
+y3start <- sin(x) - .5*l3
+y3end <- sin(x) + .5*l3
+l4 <- l+4*a*cos(2*x)
+y4start <- sin(x) - .5*l4
+y4end <- sin(x) + .5*l4
+l5 <- l+5*a*cos(2*x)
+y5start <- sin(x) - .5*l5
+y5end <- sin(x) + .5*l5
+l.pi <- l+pi*a*cos(2*x)
+l.2pi <- l+2*pi*a*cos(2*x)
+ypistart <- sin(x) - .5*l.pi
+ypiend <- sin(x) + .5*l.pi
+y2pistart <- sin(x) - .5*l.2pi
+y2piend <- sin(x) + .5*l.2pi
+xcomb <- c(x, x)
+ycomb <- c(ystart, yend)
+y1comb <- c(y1start,y1end)
+y2comb <- c(y2start, y2end)
+y3comb <- c(y3start, y3end)
+y4comb <- c(y4start, y4end)
+y5comb <- c(y5start, y5end)
+ypicomb <- c(ypistart,ypiend)
+y2picomb <- c(y2pistart,y2piend)
+ycomb <- ycomb[order(xcomb)]
+y1comb <- y1comb[order(xcomb)]
+y2comb <- y2comb[order(xcomb)]
+y3comb <- y3comb[order(xcomb)]
+y4comb <- y4comb[order(xcomb)]
+y5comb <- y5comb[order(xcomb)]
+ypicomb <- ypicomb[order(xcomb)]
+y2picomb <- y2picomb[order(xcomb)]
+xcomb <- xcomb[order(xcomb)]
+@
+<<echo=FALSE,include=TRUE,out.width=".48\\textwidth">>=
+qplot(x=xcomb, y=ycomb, geom="line", main="Uncorrected")+ 
+  theme(plot.background=element_blank(), panel.grid.major=element_blank(), 
+       panel.grid.minor=element_blank(), panel.background=element_blank())+ylim(c(-2, 2))
+qplot(x=xcomb, y=y1comb, geom="line", main="Corrected by a")+ 
+  theme(plot.background=element_blank(), panel.grid.major=element_blank(), 
+       panel.grid.minor=element_blank(), panel.background=element_blank())+ylim(c(-2, 2))
+@
+<<echo=FALSE,include=TRUE,out.width=".48\\textwidth">>=
+qplot(x=xcomb, y=y2comb, geom="line", main="Corrected by 2a")+ 
+  theme(plot.background=element_blank(), panel.grid.major=element_blank(), 
+       panel.grid.minor=element_blank(), panel.background=element_blank())+ylim(c(-2, 2))
+qplot(x=xcomb, y=y3comb,geom="line", main="Corrected by 3a")+ 
+  theme(plot.background=element_blank(), panel.grid.major=element_blank(), 
+       panel.grid.minor=element_blank(), panel.background=element_blank())+ylim(c(-2, 2))
+@
+<<echo=FALSE,include=FALSE,out.width=".48\\textwidth">>=
+qplot(x=xcomb, y=y4comb, geom="line", main="Corrected by 4a")+ 
+  theme(plot.background=element_blank(), panel.grid.major=element_blank(), 
+       panel.grid.minor=element_blank(), panel.background=element_blank())+ylim(c(-2, 2))
+qplot(x=xcomb, y=y5comb,geom="line", main="Corrected by 5a")+ 
+  theme(plot.background=element_blank(), panel.grid.major=element_blank(), 
+       panel.grid.minor=element_blank(), panel.background=element_blank())+ylim(c(-2, 2))
+@
+3*a seems to be the optimal correction, perhaps because of the additional illusion of roundness (proxy to pi)? Additionally, the correction factor becomes noticable at the edges of the graph, when the roundness illusion ceases to exist. I'm not sure how to avoid that realization - possibly fade line color to grey?
+
+<<echo=FALSE,include=TRUE,out.width=".48\\textwidth">>=
+qplot(x=xcomb, y=ypicomb, geom="line", main=expression(paste("Corrected by ", pi, "a")))+ 
+  theme(plot.background=element_blank(), panel.grid.major=element_blank(), 
+       panel.grid.minor=element_blank(), panel.background=element_blank())+ylim(c(-2, 2))
+qplot(x=xcomb, y=y2picomb, geom="line", main=expression(paste("Corrected by ", 2*pi, "a (Too much!)")))+ 
+  theme(plot.background=element_blank(), panel.grid.major=element_blank(), 
+       panel.grid.minor=element_blank(), panel.background=element_blank())+ylim(c(-2, 2))
+@
+
+Without the sine function for the mean, the increased correction size is clear: 
+
+<<echo=FALSE,include=TRUE,out.width=".48\\textwidth">>=
+qplot(x=xcomb, y=y1comb-sin(xcomb), geom="line", main="Corrected by a", ylim=range(ypicomb))
+qplot(x=xcomb, y=ypicomb-sin(xcomb), geom="line", main=expression(paste("Corrected by ", pi, "a")), ylim=range(ypicomb))
+@
+\end{subsection}
