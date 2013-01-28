@@ -206,9 +206,10 @@ The original authors \citep{day:1991} write in their abstract: The illusion is e
 \begin{figure}[h!tbp]\centering
 <<ribbon-illusion,echo=FALSE, include=FALSE, fig.width=5, fig.height=2.6>>=
 library(plyr)
-angle <- .05
-x <- seq(-1*pi, 1*pi, .1)
-persp <- data.frame(xtop=(1-angle)*x + angle, xbottom=(1+angle)*x - angle, ytop = sin((1-angle)*x)+1/2, ybottom = sin(x*(1+angle))-1/2)
+angle <- .02
+shift <- pi/30
+x <- seq(-1*pi, 1*pi, pi/30)
+persp <- data.frame(xtop=x+shift + angle, xbottom=x-shift, ytop = (1-angle)*sin(x+shift)+1/2, ybottom = (1+angle)*sin(x+shift)-1/2)
 persp$ell <- with(persp, sqrt((xbottom-xtop)^2 + (ybottom-ytop)^2))
 qplot(data=persp, x=xtop, xend=xbottom, y=ytop, yend=ybottom, geom="segment") + ggtitle("What the brain expects the data to look like") + 
   xlab("") + ylab("") + 
@@ -216,26 +217,11 @@ qplot(data=persp, x=xtop, xend=xbottom, y=ytop, yend=ybottom, geom="segment") + 
         panel.background = element_rect(fill = "white", colour = "black"),
         panel.grid.minor=element_blank(), panel.background=element_blank(),
         axis.title = element_blank(), axis.ticks = element_blank(), 
-        axis.text = element_blank()) + coord_equal(ratio=1)
-# 
-# ribbon <- ldply(x, function(i) data.frame(x = i, y = sin(i+seq(-1, 1, .01)), offset=seq(-1, 1, .01)))
-# ribbon2 <- ddply(ribbon, .(x), summarise, lb=min(y), ub=max(y))
-# ribbon2$center <- sin(x)
-# x <- seq(-pi/2, pi/2, length=10)
-# y <- sin(x)
-# ystart <- y-1
-# yend <- y+1
-# df2 <- data.frame(xstart=x, xend=x, ystart=ystart, yend=yend)
-# 
-# 
-# qplot(x=x, y=center, geom="line", data=ribbon2, colour=I("red")) + geom_ribbon(aes(ymax=ub, ymin=lb), colour="blue", alpha=.5) + ggtitle("What our brains expect the data to look like") + 
-#   geom_segment(data=df2, aes(x=xstart, xend=xend, y=ystart, yend=yend)) + 
-#   xlab("") + ylab("") + 
-#   theme(panel.grid.major=element_blank(), 
-#         panel.background = element_rect(fill = "white", colour = "black"),
-#         panel.grid.minor=element_blank(), panel.background=element_blank(),
-#         axis.title = element_blank(), axis.ticks = element_blank(), 
-#         axis.text = element_blank()) + coord_equal(ratio=1)
+        axis.text = element_blank()) + coord_equal(ratio=1) +
+  geom_line(aes(x=xtop, y=ytop), size=1)+
+  geom_line(aes(x=xbottom, y=ybottom), size=1.5)
+
+
 @
 \includegraphics[width=.5\linewidth, keepaspectratio=TRUE]{figure/fig-ribbon-illusion}
 \caption{Experience with real-world objects suggests that the data are most similar to a slightly angled top view of a 3-dimensional strip such as a ribbon. Even though the sine illusion lines are not angled, the brain interprets the physiological stimuli within this context. This produces a conflict between past experience and the present perception that leads to the illusion.}
