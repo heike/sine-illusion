@@ -48,7 +48,7 @@ last paragraph is a sentence on the structure of the paper.
 }
 
 
-In the perception literature, the phenomenon is known as part of a group of geometrical optical misperceptions classified as M\"uller-Lyer illusions \citep{day:1991}. Figure \ref{original} shows a reproduction of Bach's applet \citep{bach} displaying the sine illusion. The sine illusion is closely related to the line width phenomenon -- the line segments along the steepest slopes of the sine curve appear to be the shortest: ``The illusion is explained in terms of a perceptual compromise between the vertical extent and the greater overall dimensions of the section at the turn of the sine-wave figure and is thereby held to be the same in principle as the M\"uller-Lyer illusion." \citep{day:1991}.
+In the perception literature, the phenomenon is known as part of a group of geometrical optical misperceptions classified as M\"uller-Lyer illusions \citep{day:1991}.  Figure \ref{original} shows a reproduction of Bach's applet \citep{bach} displaying the sine illusion. The sine illusion is closely related to the line width phenomenon -- the line segments along the steepest slopes of the sine curve appear to be the shortest: ``The illusion is explained in terms of a perceptual compromise between the vertical extent and the greater overall dimensions of the section at the turn of the sine-wave figure and is thereby held to be the same in principle as the M\"uller-Lyer illusion." \citep{day:1991}.
 M Bach's applet  gives the option to compensate the line length manually for its perceived shortcoming. The amount of compensation chosen turns out to be highly dependent on both the length of the vertical line segments and the amplitude of the sine function. The amplitude directly affects the slope -- the steeper  the slope the more compensation is necessary, see section \ref{distortion}  for a more detailed discussion and some results from a user study  \todo{could we start with our own data for the user study? that way we don't need IRB approval for now. data is in the data folder. I don't see any clear relationship, though/}.
 
 <<data, echo=FALSE, eval=TRUE>>=
@@ -78,7 +78,7 @@ createSine <- function(n=200, len=1, f=f, fprime=fprime) {
 \begin{figure}[hbtp]
 \centering
 \begin{minipage}{.495\textwidth}
-<<original, echo=FALSE, fig=TRUE, results='asis', fig.width=5, fig.height=2.6>>=
+<<original, echo=FALSE, results='asis', fig.width=5, fig.height=2.6>>=
 l <- 1
 qplot(x=x, xend=xend, y = ystart, yend=yend, geom="segment", data=createSine(40,1, f=f, fprime=fprime)) +
   theme(panel.grid.major=element_blank(), panel.background = element_rect(fill = "white", 
@@ -88,7 +88,7 @@ qplot(x=x, xend=xend, y = ystart, yend=yend, geom="segment", data=createSine(40,
        axis.text = element_blank()) + coord_equal(ratio=1)
 @
 \end{minipage}\begin{minipage}{.495\textwidth}
-<<original-redo, echo=FALSE, fig=FALSE, include=FALSE>>=
+<<original-redo, echo=FALSE, fig.keep='none', include=FALSE>>=
 cairo_pdf("./figure/fig-original-redo.pdf", width=5, height=2.6)
 l <- 1
 df1 <- createSine(20,1, f=f, fprime=fprime)
@@ -121,7 +121,7 @@ dev.off()
 
 \begin{figure}[hbtp]
 \centering
-<<originalgrid, dependson='data', echo=FALSE, fig=TRUE, results='asis',out.width=".5\\linewidth", fig.width=5, fig.height=2.6>>=
+<<originalgrid, dependson='data', echo=FALSE, results='asis',out.width=".5\\linewidth", fig.width=5, fig.height=2.6>>=
 dframe <- createSine(n = 40, len = 1, f=f, fprime=fprime)
 
 qplot(x=x, xend=xend, y = ystart*ell, yend=yend*ell, geom="segment", data=dframe) +
@@ -253,10 +253,8 @@ qplot(data=persp, x=xtop, xend=xbottom, y=ytop, yend=ybottom, geom="segment") + 
 
 @
 \includegraphics[width=.5\linewidth, keepaspectratio=TRUE]{figure/fig-ribbon-illusion}
-\caption{Experience with real-world objects suggests that the data are most similar to a slightly angled top view of a 3-dimensional strip such as a ribbon. Even though the sine illusion lines are not angled, the brain interprets the physiological stimuli within this context. This produces a conflict between past experience and the present perception that leads to the illusion.}
+\caption{Experience with real-world objects suggests that the data are most similar to a slightly angled top view of a 3-dimensional strip such as a ribbon. Even though the sine illusion lines are not angled, the brain often recruits paradigms from one situation when processing novel stimuli. Optical illusions result from the mismatch between the applied heuristic and the stimulus. \citep{goldstein}} % goldstein S&P 8th edition pg 249
 \end{figure}
-
-As in the M\"uller-Lyer illusion, the perceptual experience is influenced by the context in which similar stimuli exist in real world situations. One other common illusion of this sort is the Ames Room illusion (\url{http://en.wikipedia.org/wiki/Ames_room}), where ambiguous stimuli are perceived as resulting from situations that occur in the real world, even when those perceptions are misleading. This is in general an optimal processing strategy, as the vast majority of visual stimuli conform to the brain's expectations, however, it does lead to certain visual ``bugs" that we must work around when designing graphics.
  
 \clearpage
 \begin{subsection}{Data Setup}
@@ -281,9 +279,10 @@ atan \left(\cos \left| f^\prime (x) \right|\right) ^{-1}
 adjY <- function(df){
   dx <- diff(df$x)
   dy <- diff(df$y)
+  df$aspratio <- abs(diff(range(c(df$ystart, df$yend)))/diff(range(df$x)))
   adj <- atan(dy/dx)
   adj <- c(adj, rev(adj)[1])
-  adj <- 1/cos(abs(adj))
+  adj <- 1/cos(abs(adj))*aspratio
   adj <- adj-mean(adj)+1
   
   df$ell <- df$ell*adj
@@ -292,6 +291,7 @@ adjY <- function(df){
   
   df
 }
+
 @
 <<ytransform1, echo=FALSE>>=
 dframe1 <- createSine(n=40, len=1, f=f, fprime=fprime)
@@ -311,33 +311,9 @@ qplot(x=xstart, xend=xend, y = ystart, yend=yend, colour=I("blue"), geom="segmen
 \subfloat[Aspect ratio of 2]{\includegraphics[width=.32\linewidth,keepaspectratio=TRUE]{figure/fig-ytransform1-plot3}}
 \caption{\label{ytransform} Changing aspect ratios changes the strength of the illusion and the effectiveness of the transformation}
 \end{figure}
-% 
-% <<echo=FALSE, fig=TRUE, results='asis',out.width=".48\\textwidth">>=
-% qplot(x=x, xend=x, y = y2start, yend=y2end, colour=I("blue"), geom="segment", main="Transformed Length") +
-%   #geom_line(aes(x=x, y=cos(2*x)), colour=I("red")) +
-%   #geom_segment(aes(x = 0, xend=2*pi, y=0, yend=0), colour="black") + 
-%   theme(plot.background=element_blank(), panel.grid.major=element_blank(), 
-%        panel.grid.minor=element_blank(), panel.background=element_blank())+ylim(c(-3, 3))
-% qplot(x=x, xend=x, y = y2start, yend=y2end, colour=I("blue"), geom="segment", main="Transformed Length") +
-%   #geom_line(aes(x=x, y=cos(2*x)), colour=I("red")) +
-%   #geom_segment(aes(x = 0, xend=2*pi, y=0, yend=0), colour="black") + 
-%   theme(plot.background=element_blank(), panel.grid.major=element_blank(), 
-%        panel.grid.minor=element_blank(), panel.background=element_blank())+ylim(c(-10, 10))
-% @
-% 
-% <<echo=FALSE, fig=TRUE, results='asis',out.width=".48\\textwidth">>=
-% qplot(x=x, xend=x, y = y2start-sin(x), yend=y2end-sin(x), colour=I("blue"), geom="segment", main="Transformed Length, mean=0") +
-%   #geom_line(aes(x=x, y=cos(2*x)), colour=I("red")) +
-%   #geom_segment(aes(x = 0, xend=2*pi, y=0, yend=0), colour="black") + 
-%   theme(plot.background=element_blank(), panel.grid.major=element_blank(), 
-%        panel.grid.minor=element_blank(), panel.background=element_blank())+ylim(c(-3, 3))
-% qplot(x=1:length(l), y=l1, geom="line", main="L vs L*") + 
-%   geom_segment(aes(x=0, xend=length(l), y=l[1], yend=l[1]), colour="black", linetype=2)
-% @
-
 
 \begin{figure}[hbtp]
-<<fixingit, dependson='data', echo=FALSE, fig=TRUE, results='asis',out.width='.49\\textwidth', fig.width=5, fig.height=3>>=
+<<fixingit, dependson='data', echo=FALSE, results='asis',out.width='.49\\textwidth', fig.width=5, fig.height=3>>=
 dframe <- createSine(40,1, f=f, fprime=fprime)
 qplot(x=x, xend=xend, y = f(x) -ell/2, yend=f(x) +ell/2, geom="segment", data=dframe) +
   theme(panel.grid.major=element_blank(), panel.background = element_rect(fill = "white", 
@@ -406,6 +382,30 @@ qplot(x=x, xend=xend, y = g(x) -ellx/2, yend=g(x) +ellx/2, geom="segment", data=
 
 
 \end{subsection}\clearpage
+
+\begin{subsection}{Transformation of $X$ Values}
+\todo[inline]{Could you try to write the correction factor out in terms of a formula? - I still think that all of the lines should appear under the same slope, which means that the result would need to be an up/down triangle, like we had before. I'm a bit worried about the `fudge' factor $a$ -- let's first use a correction factor that we can derive mathematically from counteracting the line illusion and then allow some fudging. }
+In order to counteract the illusion of changing line length, we can slightly transform the $X$ values, narrowing the distance between values at the peak and trough of the curve and widening the distance between values at the inflection point. If we alter the $X$ axis such that $\triangle X^\ast = c*a(\cos(2x)+1)$, where $\triangle X = c$ is the distance between two evenly spaced $X$ points, the illusion's effect is broken and all $y$ values appear to be approximately the same length. Consistent with the hypothesis that the apparent line length is dependent on the slope of the tangent line, changing $\triangle x$ reduces the apparent length discrepancy $\triangle y$ significantly.
+\begin{figure}[H]\centering
+
+<<xtransform, echo=FALSE, include=TRUE, results='asis', out.width=".31\\textwidth">>=
+dframe <- createSine(80 , len=1, f=f, fprime=fprime)
+dframe$a <- c(0, diff(dframe$ystart))
+dframe$xtrans <- cumsum(diff(dframe$x)[1]*(dframe$a*cos(2*dframe$x)+1)) # Create transformed X axis
+dframe$xtrans <- dframe$xtrans-mean(dframe$xtrans-dframe$x) 
+
+qplot(x=xtrans, xend=xtrans, y = ystart, yend=yend, colour=I("blue"), geom="segment", main="Transformed X Axis", data=dframe) +
+  geom_segment(aes(x = 0, xend=2*pi, y=0, yend=0), colour="black") +
+  ylim(-3,3)
+# qplot(x=xtrans, xend=xtrans, y = ystart, yend=yend, colour=I("blue"), geom="segment", main="Transformed X Axis", data=dframe) +
+#   geom_segment(aes(x = 0, xend=2*pi, y=0, yend=0), colour="black") +
+#   ylim(-10,10)
+#qplot(x=x, y=x1, geom="line", main="X vs. X*")
+@
+
+\end{figure}
+\end{subsection}
+
 \section{Distortion} \label{distortion}
 place holder
 \section{Application: Simulation}
@@ -459,15 +459,24 @@ ushcn <- merge(ushcn, monthly[,c("time", "avg")], by.x="Time", by.y="time")
 ushcn$resid <- with(ushcn, value-avg)
 ggplot()  + geom_jitter(aes(Time, resid/100), data=ushcn, size=1) + 
   geom_hline(yintercept=0, colour="steelblue", size=1) + 
-  ylab("Residual temperature (in Celsius)")
+  ylab("Residual temperature (in Celsius)") + theme_bw()
 # ggsave(file="figure/monthly-resid-temps.pdf", width=12, height=4.5)
 @
 % \includegraphics[width=\textwidth]{monthly-resid-temps}
 \caption{\label{resid-temp}Residual monthly temperatures (in Celsius) from the baseline model fit. The original impression of smaller deviations during Spring and Fall is now almost gone: Winters have larger negative residuals, while Summers have larger positive ones. }
 \end{figure}
 
-Figures \ref{raw-temp} and \ref{resid-temp} show temperature data from 1218 stations across the US. The first plot shows raw temperatures, the second residuals from a `baseline' model. The caption for the raw temperature plot suggests that the baseline model is not quitable to capture all of the variability in summer and winter peaks. However, the model used is actually based on averages in each time point. This model is not  susceptible to shrinking values, and it is our perception of the plot rather than the data that makes us see any higher variability in the peaks. After removing the averages in figure \ref{resid-temp} the impression of higher variability in the peaks is gone with the exception of a few outliers.
+\begin{figure}[h!tbp]\centering
+<<residtempboxplot, dependson='residtemp', echo=FALSE, echo=FALSE, fig.width=12, fig.height=4.5, out.width='\\textwidth'>>=
+ggplot()  + geom_boxplot(aes(Year+(Month-1)/12, resid/100, group=Year+(Month-1)/12), data=subset(ushcn, Year<1995), size=1) + 
+  # geom_hline(yintercept=0, colour="steelblue", size=1) + 
+  ylab("Residual temperature (in Celsius)")
+# ggsave(file="figure/monthly-resid-temps.pdf", width=12, height=4.5)
+@
+\end{figure}
 
+Figures \ref{raw-temp} and \ref{resid-temp} show temperature data from 1218 stations across the US. The first plot shows raw temperatures, the second residuals from a `baseline' model. The caption for the raw temperature plot suggests that the baseline model is not quitable to capture all of the variability in summer and winter peaks. However, the model used is actually based on averages in each time point. This model is not  susceptible to shrinking values, and it is our perception of the plot rather than the data that makes us see any higher variability in the peaks. After removing the averages in figure \ref{resid-temp} the impression of higher variability in the peaks is gone with the exception of a few outliers.
+\clearpage
 \bibliographystyle{asa}
 % argument is your BibTeX string definitions and bibliography database(s)
 \bibliography{references}
@@ -475,28 +484,6 @@ Figures \ref{raw-temp} and \ref{resid-temp} show temperature data from 1218 stat
 \end{document}
 
 
-\begin{subsection}{Transformation of $X$ Values}
-\todo[inline]{Could you try to write the correction factor out in terms of a formula? - I still think that all of the lines should appear under the same slope, which means that the result would need to be an up/down triangle, like we had before. I'm a bit worried about the `fudge' factor $a$ -- let's first use a correction factor that we can derive mathematically from counteracting the line illusion and then allow some fudging. }
-In order to counteract the illusion of changing line length, we can slightly transform the $X$ values, narrowing the distance between values at the peak and trough of the curve and widening the distance between values at the inflection point. If we alter the $X$ axis such that $\triangle X^\ast = c*a(\cos(2x)+1)$, where $\triangle X = c$ is the distance between two evenly spaced $X$ points, the illusion's effect is broken and all $y$ values appear to be approximately the same length. Consistent with the hypothesis that the apparent line length is dependent on the slope of the tangent line, changing $\triangle x$ reduces the apparent length discrepancy $\triangle y$ significantly.
-\begin{figure}[H]\centering
-
-<<xtransform, echo=FALSE, include=TRUE, results='asis', out.width=".31\\textwidth">>=
-dframe <- createSine(80 , len=1, f=f, fprime=fprime)
-dframe$a <- max(diff(dframe$ystart))
-dframe$xtrans <- cumsum(diff(dframe$x)[1]*(dframe$a*cos(2*dframe$x)+1)) # Create transformed X axis
-dframe$xtrans <- dframe$xtrans-mean(dframe$xtrans-dframe$x) 
-
-qplot(x=xtrans, xend=xtrans, y = ystart, yend=yend, colour=I("blue"), geom="segment", main="Transformed X Axis", data=dframe) +
-  geom_segment(aes(x = 0, xend=2*pi, y=0, yend=0), colour="black") +
-  ylim(-3,3)
-qplot(x=xtrans, xend=xtrans, y = ystart, yend=yend, colour=I("blue"), geom="segment", main="Transformed X Axis", data=dframe) +
-  geom_segment(aes(x = 0, xend=2*pi, y=0, yend=0), colour="black") +
-  ylim(-10,10)
-#qplot(x=x, y=x1, geom="line", main="X vs. X*")
-@
-
-\end{figure}
-\end{subsection}
 
 \begin{subsection}{Exploration of Effect with Random Data}
 If we use randomly spaced x, does the effect still hold?
