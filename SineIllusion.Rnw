@@ -5,6 +5,7 @@
 \usepackage{wrapfig,float,subfig}
 \usepackage{graphicx}
 \usepackage{amssymb}
+\usepackage{amsmath}
 
 % help with editing and coauthoring
 \usepackage{todonotes}
@@ -20,6 +21,8 @@ opts_chunk$set(fig.path='figure/fig-', cache.path='cache/', fig.align='center', 
 library(reshape2)
 suppressMessages(library(ggplot2))
 @
+
+\newcommand{\atan}[1]{\text{atan }\left({#1}\right)}
 
 \title{Signs of the Sine Illusion -- why we need to care}
 \author{Susan Vanderplas, Heike Hofmann, probably include Di and Xiaoyue}
@@ -69,8 +72,9 @@ createSine <- function(n=200, len=1, f=f, fprime=fprime) {
 # needs to be fixed by factor a:  
   a <- dy/(dy + len) 
   ellx <- ell / cos(atan(abs(a*fprime(x))))
+  ellx2 <- ell * sqrt(1 + a*fprime(x)^2)
   # make this a data frame - ggplot2 doesn't do well with floating vectors
-  dframe <- data.frame(x=x, xstart=x, xend=x, y=fx, ystart=ystart, yend=yend, ell=ell, ellx = ellx)
+  dframe <- data.frame(x=x, xstart=x, xend=x, y=fx, ystart=ystart, yend=yend, ell=ell, ellx = ellx, ellx2=ellx2)
   
   dframe
 }
@@ -271,7 +275,7 @@ For that, we multiply the vertical width by a factor of $1/\cos\theta$, where $\
 \]
 We only distinguish the size, not the sign of the angle, which gives us an overall correction factor for the line width in vertical direction of 
 \begin{equation}\label{correction1}
-atan \left(\cos \left| f^\prime (x) \right|\right) ^{-1}
+\atan{\cos \left| f^\prime (x) \right|}^{-1}
 \end{equation}
 
 
@@ -313,7 +317,7 @@ qplot(x=xstart, xend=xend, y = ystart, yend=yend, colour=I("blue"), geom="segmen
 \end{figure}
 
 \begin{figure}[hbtp]
-<<fixingit, dependson='data', echo=FALSE, results='asis',out.width='.49\\textwidth', fig.width=5, fig.height=3>>=
+<<fixingit, dependson='data', echo=FALSE, results='asis',out.width='.3\\textwidth', fig.width=5, fig.height=3>>=
 dframe <- createSine(40,1, f=f, fprime=fprime)
 qplot(x=x, xend=xend, y = f(x) -ell/2, yend=f(x) +ell/2, geom="segment", data=dframe) +
   theme(panel.grid.major=element_blank(), panel.background = element_rect(fill = "white", 
@@ -328,8 +332,16 @@ qplot(x=x, xend=xend, y = f(x) -ellx/2, yend=f(x) +ellx/2, geom="segment", data=
        panel.grid.minor=element_blank(), panel.background=element_blank(),
        axis.title = element_blank(), axis.ticks = element_blank(), 
        axis.text = element_blank()) + coord_equal(ratio=1)
+
+qplot(x=x, xend=xend, y = f(x) -ellx2/2, yend=f(x) +ellx2/2, geom="segment", data=dframe) +
+  theme(panel.grid.major=element_blank(), panel.background = element_rect(fill = "white", 
+                colour = "black"),
+       panel.grid.minor=element_blank(), panel.background=element_blank(),
+       axis.title = element_blank(), axis.ticks = element_blank(), 
+       axis.text = element_blank()) + coord_equal(ratio=1)
+
 @
-\caption{\label{firstfix} First fix of the sine illusion by using the factor of $1/cos(atan(|f^\prime(x)|))$ for adjusting the vertical extent of the lines.}
+\caption{\label{firstfix} First fix of the sine illusion by using the factor of $1/\cos(\atan(|f^\prime(x)|))$ (middle) and $\sqrt{1 + f^\prime(x)^2}$ (right) for adjusting the vertical extent of the lines.  }
 \end{figure}
 
 \begin{figure}
