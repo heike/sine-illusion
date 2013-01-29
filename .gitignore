@@ -2,3 +2,11 @@
 .Rhistory
 .RData
 SineIllusion.Rproj
+cache/
+figure/
+SineIllusion.log
+SineIllusion.bbl
+SineIllusion.synctex.gz
+SineIllusion.toc
+SineIllusion.tex
+SineIllusion-concordance.tex
