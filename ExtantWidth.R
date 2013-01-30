@@ -24,7 +24,8 @@ createSine <- function(n=200, len=1, f=f, fprime=fprime) {
 adjY <- function(df){
   dx <- diff(df$x)
   dy <- diff(df$y)
-  df$aspratio <- abs(diff(range(c(df$ystart, df$yend)))/diff(range(df$x)))
+  #aspratio <- abs(diff(range(c(df$ystart, df$yend)))/diff(range(df$x)))
+  aspratio <- 1
   adj <- atan(dy/dx)
   adj <- c(adj, rev(adj)[1])
   adj <- 1/cos(atan(abs(aspratio*adj)))
@@ -38,15 +39,16 @@ adjY <- function(df){
 }
 
 
-getSecantSegment <- function(x, df, f, fprime){
-  secSlope <- -1/fprime(x)
-  elltemp <- df$ell[which.min(abs(df$x-x))]
-  temp <- seq(min(df$x)-x, max(df$x)+x, .0001)
-  leftend <- temp[which.min(abs(f(temp) + elltemp/2 - secSlope*(temp-x)))]
-  rightend <- temp[which.min(abs(f(temp) - elltemp/2 - secSlope*(temp-x)))]
-  yintercept <- -secSlope*x
-  df2 <- data.frame(xstart=leftend, x=x, xend=rightend, ystart=(yintercept + secSlope*(leftend)), y=secSlope*x, yend = (yintercept + secSlope*(rightend)))
-  df2$ell <- with(df2, sqrt((yend-ystart)^2+(xend-xstart)^2))
+getSecantSegment <- function(x1, df, f, fprime){
+  secSlope <- -1/fprime(x1)
+  elltemp <- df$ell[which.min(abs(df$x-x1))]
+  temp <- seq(min(df$x), max(df$x), .0001)
+  leftend <- temp[which.min(abs(f(temp) + elltemp/2 - secSlope*(temp-x1)))]
+  rightend <- temp[which.min(abs(f(temp) - elltemp/2 - secSlope*(temp-x1)))]
+  yintercept <- -secSlope*x1
+  df2 <- data.frame(xstart=leftend, x=x1, xend=rightend, ystart=(yintercept + secSlope*(leftend)), y=secSlope*x1, yend = (yintercept + secSlope*(rightend)))
+  df2$ell1 <- with(df2, sqrt((yend-y)^2+(xend-x)^2))
+  df2$ell2 <- with(df2, sqrt((y-ystart)^2+(x-xstart)^2))  
   df2$type <- "Perceived Width"
   return(df2)
 }
@@ -66,7 +68,9 @@ qplot(x=xstart, xend=xend, y = ystart, yend=yend, geom="segment", data=dframe2, 
   theme_bw() + coord_fixed(ratio=1)+ 
   geom_segment(aes(x=xstart, xend=xend, y=ystart, yend=yend), data=secantlines, colour="blue")
 
-qplot(x=x, y=ell, geom="line", data=subset(dframe2, type=="Perceived Width" & ell>.7))
+qplot(x=x, y=ell1, geom="line", data=subset(secantlines, type=="Perceived Width")) + 
+  geom_line(aes(y=ell2), colour="blue")
+
 qplot(x=x, xend=xend, y=ystart, yend=yend, geom="segment", data=adjY(dframe))+
   theme_bw() + coord_fixed(ratio=1)+ 
   geom_segment(aes(x=xstart, xend=xend, y=ystart, yend=yend), data=secantlines2, colour="blue") 
