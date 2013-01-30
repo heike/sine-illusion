@@ -431,23 +431,24 @@ qplot(x=xstart, xend=xend, y = ystart, yend=yend, geom="segment", data=dframe2, 
   theme_bw() + coord_fixed(ratio=1)+ 
   geom_segment(aes(x=xstart, xend=xend, y=ystart, yend=yend), data=secantlines, colour="blue") + 
   ggtitle("Untransformed Data") + theme(legend.position="bottom") 
+
 qplot(x=x, y=ell1, geom="line", data=subset(secantlines)) + 
   geom_line(aes(y=ell2), linetype=4) + ggtitle("Extant Half-Segment Length") + 
   geom_text(aes(x=x[1] + .25, y=ell2[1], label="Top\nSegment"), hjust=0, vjust=0) + 
   geom_text(aes(x=rev(x)[1]-.25, y=rev(ell1)[1], label="Bottom\nSegment"), hjust=1, vjust=0)
-
-qplot(x=x, y=ell1+ell2, geom="line", data=subset(secantlines)) + 
-  ggtitle("Total Extant Segment Length")  + coord_fixed(ratio=1)
+# 
+# qplot(x=x, y=ell1+ell2, geom="line", data=subset(secantlines)) + 
+#   ggtitle("Total Extant Segment Length")  + coord_fixed(ratio=1)
 
 qplot(x=x, xend=x, y=0, yend=ell1, geom="segment", data=secantlines, linetype=I(1)) + 
-  geom_segment(aes(yend=-ell2), linetype=4) + ggtitle("Extant Segment Length (Centered)") + coord_fixed(ratio=1)
+  geom_segment(aes(yend=-ell2), linetype=4) + ggtitle("Extant Segment Length (Centered)") + coord_fixed(ratio=1) + ylim(c(-1,1))
 
-qplot(x=x, xend=x, y=0, yend=ell1+ell2, geom="segment", data=secantlines, linetype=I(1)) + 
-  ggtitle("Extant Segment Length") + coord_fixed(ratio=1)
+# qplot(x=x, xend=x, y=0, yend=ell1+ell2, geom="segment", data=secantlines, linetype=I(1)) + 
+#   ggtitle("Extant Segment Length") + coord_fixed(ratio=1)
 
 qplot(x=x, xend=xend, y=ystart, yend=yend, geom="segment", data=adjY(dframe))+
   theme_bw() + coord_fixed(ratio=1)+ 
-  geom_segment(aes(x=xstart, xend=xend, y=ystart, yend=yend), data=secantlines2, colour="blue")  + coord_fixed(ratio=1)
+  geom_segment(aes(x=xstart, xend=xend, y=ystart, yend=yend), data=secantlines2, colour="blue")  + coord_fixed(ratio=1) + ggtitle("Linear Adjustment vs. Curved Adjustment")
 
 @
 \end{subsection}
