@@ -169,7 +169,7 @@ where $\theta$ is the angle of the line with respect to the horizontal line.
 
 \begin{figure}[htbp]
 \centering
-<<transform-illustration,echo=FALSE, fig.keep='all'>>=
+<<transform-illustration,echo=FALSE, fig.keep='none'>>=
 x <- seq(-pi, pi, length=200)
 y <- sin(x)
 deriv <- cos(0)*x
@@ -222,7 +222,8 @@ qplot(x=x, y=y, geom="line", data=df1, colour=I("grey50")) + theme_bw() +
   geom_point(aes(x=x, y=y), size=1, colour="blue", data=dframe0) + 
   coord_equal(ratio=1)
 @
-\includegraphics[width=.5\linewidth, keepaspectratio=TRUE]{figure/fig-transform-illustration}
+\subfloat[1]{\includegraphics[width=.45\linewidth, keepaspectratio=TRUE]{figure/fig-transform-illustration1}}
+\subfloat[2]{\includegraphics[width=.45\linewidth, keepaspectratio=TRUE]{figure/fig-transform-illustration2}}
 \caption{The perceived width orthogonal to the slope differs from the length of the lines. \todo[inline]{include blue orthogonal lines for the whole function. That way we can also see the problem at the changing curvature better -- you'll need to first make the getSecant function more general. }
 }
 \end{figure}
@@ -237,7 +238,7 @@ The original authors \citep{day:1991} write in their abstract: The illusion is e
 \end{quote}
 
 \begin{figure}[h!tbp]\centering
-<<ribbon-illusion,echo=FALSE, fig.keep='all', fig.width=5, fig.height=2.6>>=
+<<ribbon-illusion,echo=FALSE, fig.keep='none', fig.width=5, fig.height=2.6>>=
 library(plyr)
 angle <- .02
 shift <- pi/30
