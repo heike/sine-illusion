@@ -388,6 +388,13 @@ qplot(x=x, xend=xend, y = g(x) -ellx/2, yend=g(x) +ellx/2, geom="segment", data=
        panel.grid.minor=element_blank(), panel.background=element_blank(),
        axis.title = element_blank(), axis.ticks = element_blank(), 
        axis.text = element_blank()) + coord_equal(ratio=ar)
+
+qplot(x=x, xend=xend, y = g(x) -ellx2/2, yend=g(x) +ellx2/2, geom="segment", data=dframe) +
+  theme(panel.grid.major=element_blank(), panel.background = element_rect(fill = "white", 
+                colour = "black"),
+       panel.grid.minor=element_blank(), panel.background=element_blank(),
+       axis.title = element_blank(), axis.ticks = element_blank(), 
+       axis.text = element_blank()) + coord_equal(ratio=ar)
 @
 \caption{\label{thirdfix} The ratio of the length of the line to amplitude of the function needs to be included in the correction. Here, the amplitude is still 1, but the length of the line is 5. The correction factor leads to a massive over correction that makes the function almost unrecognizable. The plot on the left is uncorrected, the plot on the right is `corrected'.}
 \end{figure}
