@@ -13,7 +13,7 @@
 \graphicspath{{figure/}}
 
 
-<<setup, include=FALSE, cache=FALSE, eval=TRUE>>=
+<<setup, fig.keep='all', cache=FALSE, eval=TRUE>>=
 #rm(list=ls())
 options(replace.assign=TRUE,width=70)
 require(knitr)
@@ -92,7 +92,7 @@ qplot(x=x, xend=xend, y = ystart, yend=yend, geom="segment", data=createSine(40,
        axis.text = element_blank()) + coord_equal(ratio=1)
 @
 \end{minipage}\begin{minipage}{.495\textwidth}
-<<original-redo, echo=FALSE, fig.keep='none', include=FALSE>>=
+<<original-redo, echo=FALSE, fig.keep='none', fig.keep='all'>>=
 cairo_pdf("./figure/fig-original-redo.pdf", width=5, height=2.6)
 l <- 1
 df1 <- createSine(20,1, f=f, fprime=fprime)
@@ -169,7 +169,7 @@ where $\theta$ is the angle of the line with respect to the horizontal line.
 
 \begin{figure}[htbp]
 \centering
-<<transform-illustration,echo=FALSE, include=FALSE>>=
+<<transform-illustration,echo=FALSE, fig.keep='none'>>=
 x <- seq(-pi, pi, length=200)
 y <- sin(x)
 deriv <- cos(0)*x
@@ -222,7 +222,8 @@ qplot(x=x, y=y, geom="line", data=df1, colour=I("grey50")) + theme_bw() +
   geom_point(aes(x=x, y=y), size=1, colour="blue", data=dframe0) + 
   coord_equal(ratio=1)
 @
-\includegraphics[width=.5\linewidth, keepaspectratio=TRUE]{figure/fig-transform-illustration}
+\subfloat[1]{\includegraphics[width=.45\linewidth, keepaspectratio=TRUE]{figure/fig-transform-illustration1}}
+\subfloat[2]{\includegraphics[width=.45\linewidth, keepaspectratio=TRUE]{figure/fig-transform-illustration2}}
 \caption{The perceived width orthogonal to the slope differs from the length of the lines. \todo[inline]{include blue orthogonal lines for the whole function. That way we can also see the problem at the changing curvature better -- you'll need to first make the getSecant function more general. }
 }
 \end{figure}
@@ -237,7 +238,7 @@ The original authors \citep{day:1991} write in their abstract: The illusion is e
 \end{quote}
 
 \begin{figure}[h!tbp]\centering
-<<ribbon-illusion,echo=FALSE, include=FALSE, fig.width=5, fig.height=2.6>>=
+<<ribbon-illusion,echo=FALSE, fig.keep='none', fig.width=5, fig.height=2.6>>=
 library(plyr)
 angle <- .02
 shift <- pi/30
@@ -267,7 +268,7 @@ We begin with lines of length 2 evenly spaced along the x-axis, where the center
 
 \end{subsection}
 
-\begin{subsection}{Transformation of Y values}
+\begin{subsection}{Transformation of Y values - Linear Method}
 This approach aims to extend the orthogonal width, which onlookers generally evaluate,  to the amount of the vertical width, which we want to represent. 
 For that, we multiply the vertical width by a factor of $1/\cos\theta$, where $\theta$ is the angle under which the line is drawn. This angle is given by the slope of the function, mathematically we know that in position $x$ the angle $\theta(x)$ of function $f(x)$ is given as:
 \[
@@ -280,13 +281,18 @@ We only distinguish the size, not the sign of the angle, which gives us an overa
 
 
 <<ytransFcn, echo=FALSE>>=
+f <- function(x) sin(x)
+fprime <- function (x) cos(x)
+
+
 adjY <- function(df){
   dx <- diff(df$x)
   dy <- diff(df$y)
-  df$aspratio <- abs(diff(range(c(df$ystart, df$yend)))/diff(range(df$x)))
+  #aspratio <- abs(diff(range(c(df$ystart, df$yend)))/diff(range(df$x)))
+  aspratio <- 1
   adj <- atan(dy/dx)
   adj <- c(adj, rev(adj)[1])
-  adj <- 1/cos(abs(adj))*aspratio
+  adj <- 1/cos(atan(abs(aspratio*adj)))
   adj <- adj-mean(adj)+1
   
   df$ell <- df$ell*adj
@@ -304,7 +310,7 @@ dframe1 <- adjY(dframe1)
 
 \todo[inline]{for figure \ref{ytransform} I'm pretty sure that the fig.height=c(2,4,6) specification in knitr doesn't work.}
 \begin{figure}[htbp]\centering
-<<ytransform1-plot, echo=FALSE, include=FALSE, fig.width=4, fig.height=c(2, 4, 6)>>=
+<<ytransform1-plot, echo=FALSE, fig.keep='none', fig.width=4, fig.height=c(2, 4, 6)>>=
 qplot(x=xstart, xend=xend, y = ystart, yend=yend, colour=I("blue"), geom="segment", main="Transformed Length", data=dframe1) + ylim(c(-pi/2, pi/2))+ coord_fixed(ratio=1) + xlab("x") + ylab("y")
 qplot(x=xstart, xend=xend, y = ystart, yend=yend, colour=I("blue"), geom="segment", main="Transformed Length", data=dframe1) + ylim(c(-pi, pi))+ coord_fixed(ratio=1)+ xlab("x") + ylab("y")
 qplot(x=xstart, xend=xend, y = ystart, yend=yend, colour=I("blue"), geom="segment", main="Transformed Length", data=dframe1) + ylim(c(-2*pi, 2*pi))+ coord_fixed(ratio=1)+ xlab("x") + ylab("y")
@@ -401,13 +407,65 @@ qplot(x=x, xend=xend, y = g(x) -ellx2/2, yend=g(x) +ellx2/2, geom="segment", dat
 
 
 \end{subsection}\clearpage
+\begin{subsection}{Transformation of $Y$ Values - General Method}
+<<CtsMethodSetup, echo=FALSE, fig.keep='all'>>=
 
+getSecantSegment <- function(x1, df, f, fprime){
+  secSlope <- -1/fprime(x1)
+  elltemp <- df$ell[which.min(abs(df$x-x1))]
+  temp <- seq(min(df$x), max(df$x), .0001)
+  leftend <- temp[which.min(abs(f(temp) + elltemp/2 - secSlope*(temp-x1)))]
+  rightend <- temp[which.min(abs(f(temp) - elltemp/2 - secSlope*(temp-x1)))]
+  yintercept <- -secSlope*x1
+  df2 <- data.frame(xstart=leftend, x=x1, xend=rightend, ystart=(yintercept + secSlope*(leftend)), y=f(x1), yend = (yintercept + secSlope*(rightend)))
+  df2$ell1 <- with(df2, sqrt((yend-y)^2+(xend-x)^2))
+  df2$ell2 <- with(df2, sqrt((y-ystart)^2+(x-xstart)^2))  
+  df2$type <- "Perceived Width"
+  return(df2)
+}
+
+suppressMessages(library(ggplot2))
+dframe <- createSine(n = 40, len = 1, f=f, fprime=fprime)
+dframe$type <- "Segments"
+
+secantlines <- do.call("rbind", lapply(seq(0, 2*pi, length=40), function(i) getSecantSegment(i, dframe, sin, cos)))
+secantlines2 <- do.call("rbind", lapply(seq(0, 2*pi, length=40), function(i) getSecantSegment(i, adjY(dframe), sin, cos)))
+
+library(plyr)
+dframe2 <- rbind.fill(dframe, secantlines)
+
+qplot(x=xstart, xend=xend, y = ystart, yend=yend, geom="segment", data=dframe2, colour=type) +
+  scale_colour_manual(values=c("blue", "black"))+
+  theme_bw() + coord_fixed(ratio=1)+ 
+  geom_segment(aes(x=xstart, xend=xend, y=ystart, yend=yend), data=secantlines, colour="blue") + 
+  ggtitle("Untransformed Data") + theme(legend.position="bottom") 
+
+qplot(x=x, y=ell1, geom="line", data=subset(secantlines)) + 
+  geom_line(aes(y=ell2), linetype=4) + ggtitle("Extant Half-Segment Length") + 
+  geom_text(aes(x=x[1] + .25, y=ell2[1], label="Top\nSegment"), hjust=0, vjust=0) + 
+  geom_text(aes(x=rev(x)[1]-.25, y=rev(ell1)[1], label="Bottom\nSegment"), hjust=1, vjust=0)
+# 
+# qplot(x=x, y=ell1+ell2, geom="line", data=subset(secantlines)) + 
+#   ggtitle("Total Extant Segment Length")  + coord_fixed(ratio=1)
+
+qplot(x=x, xend=x, y=0, yend=ell1, geom="segment", data=secantlines, linetype=I(1)) + 
+  geom_segment(aes(yend=-ell2), linetype=4) + ggtitle("Extant Segment Length (Centered)") + coord_fixed(ratio=1) + ylim(c(-1,1))
+
+# qplot(x=x, xend=x, y=0, yend=ell1+ell2, geom="segment", data=secantlines, linetype=I(1)) + 
+#   ggtitle("Extant Segment Length") + coord_fixed(ratio=1)
+
+qplot(x=x, xend=xend, y=ystart, yend=yend, geom="segment", data=adjY(dframe))+
+  theme_bw() + coord_fixed(ratio=1)+ 
+  geom_segment(aes(x=xstart, xend=xend, y=ystart, yend=yend), data=secantlines2, colour="blue")  + coord_fixed(ratio=1) + ggtitle("Linear Adjustment vs. Curved Adjustment")
+
+@
+\end{subsection}
 \begin{subsection}{Transformation of $X$ Values}
 \todo[inline]{Could you try to write the correction factor out in terms of a formula? - I still think that all of the lines should appear under the same slope, which means that the result would need to be an up/down triangle, like we had before. I'm a bit worried about the `fudge' factor $a$ -- let's first use a correction factor that we can derive mathematically from counteracting the line illusion and then allow some fudging. }
 In order to counteract the illusion of changing line length, we can slightly transform the $X$ values, narrowing the distance between values at the peak and trough of the curve and widening the distance between values at the inflection point. If we alter the $X$ axis such that $\triangle X^\ast = c*a(\cos(2x)+1)$, where $\triangle X = c$ is the distance between two evenly spaced $X$ points, the illusion's effect is broken and all $y$ values appear to be approximately the same length. Consistent with the hypothesis that the apparent line length is dependent on the slope of the tangent line, changing $\triangle x$ reduces the apparent length discrepancy $\triangle y$ significantly.
 \begin{figure}[H]\centering
 
-<<xtransform, echo=FALSE, include=TRUE, results='asis', out.width=".31\\textwidth">>=
+<<xtransform, echo=FALSE, results='asis', out.width=".31\\textwidth">>=
 dframe <- createSine(80 , len=1, f=f, fprime=fprime)
 dframe$a <- c(0, diff(dframe$ystart))
 dframe$xtrans <- cumsum(diff(dframe$x)[1]*(dframe$a*cos(2*dframe$x)+1)) # Create transformed X axis
@@ -520,7 +578,7 @@ l3 <- l+a2*cos(2*x)
 y3start <- sin(x) - .5*l3
 y3end <- sin(x) + .5*l3
 @
-<<echo=FALSE,include=TRUE,out.width=".48\\textwidth">>=
+<<echo=FALSE,fig.keep='all',out.width=".48\\textwidth">>=
 qplot(x=x, xend=x, y=ystart, yend=yend, geom="segment")+ 
   theme(plot.background=element_blank(), panel.grid.major=element_blank(), 
        panel.grid.minor=element_blank(), panel.background=element_blank())+ylim(c(-2, 2))
@@ -547,7 +605,7 @@ y5end <- sin(x) + .5*l5
 @
 With sd=\Sexpr{sd1}, the illusion seems to hold and the correction (on the underlying sine distribution) does seem to mitigate the illusion to a small degree. 
 
-<<echo=FALSE,include=TRUE,out.width=".48\\textwidth">>=
+<<echo=FALSE,fig.keep='all',out.width=".48\\textwidth">>=
 qplot(x=x, xend=x, y=y4start, yend=y4end, geom="segment")+ 
   theme(plot.background=element_blank(), panel.grid.major=element_blank(), 
        panel.grid.minor=element_blank(), panel.background=element_blank())+ylim(c(-2, 2))
@@ -568,7 +626,7 @@ y7end <- sin(x)+.5*l7
 
 With sd=\Sexpr{sd2}, the illusion doesn't hold quite as strongly, and the correction (on the underlying sine distribution) similarly doesn't seem as effective. 
 
-<<echo=FALSE,include=TRUE,out.width=".48\\textwidth">>=
+<<echo=FALSE,fig.keep='all',out.width=".48\\textwidth">>=
 qplot(x=x, xend=x, y=y6start, yend=y6end, geom="segment")+ 
   theme(plot.background=element_blank(), panel.grid.major=element_blank(), 
        panel.grid.minor=element_blank(), panel.background=element_blank())+ylim(c(-2, 2))
@@ -590,7 +648,7 @@ y1start <- sin(x) - .5*l1
 y1end <- sin(x) + .5*l1
 
 @
-<<echo=FALSE,include=TRUE,out.width=".48\\textwidth">>=
+<<echo=FALSE,fig.keep='all',out.width=".48\\textwidth">>=
 qplot(x=x, y=ystart, geom="point") + geom_point(aes(x=x, y=yend))+ 
   theme(plot.background=element_blank(), panel.grid.major=element_blank(), 
        panel.grid.minor=element_blank(), panel.background=element_blank())+ylim(c(-2, 2))
@@ -638,7 +696,7 @@ ypicomb <- ypicomb[order(xcomb)]
 y2picomb <- y2picomb[order(xcomb)]
 xcomb <- xcomb[order(xcomb)]
 @
-<<echo=FALSE,include=TRUE,out.width=".48\\textwidth">>=
+<<echo=FALSE,fig.keep='all',out.width=".48\\textwidth">>=
 qplot(x=xcomb, y=ycomb, geom="line", main="Uncorrected")+ 
   theme(plot.background=element_blank(), panel.grid.major=element_blank(), 
        panel.grid.minor=element_blank(), panel.background=element_blank())+ylim(c(-2, 2))
@@ -646,7 +704,7 @@ qplot(x=xcomb, y=y1comb, geom="line", main="Corrected by a")+
   theme(plot.background=element_blank(), panel.grid.major=element_blank(), 
        panel.grid.minor=element_blank(), panel.background=element_blank())+ylim(c(-2, 2))
 @
-<<echo=FALSE,include=TRUE,out.width=".48\\textwidth">>=
+<<echo=FALSE,fig.keep='all',out.width=".48\\textwidth">>=
 qplot(x=xcomb, y=y2comb, geom="line", main="Corrected by 2a")+ 
   theme(plot.background=element_blank(), panel.grid.major=element_blank(), 
        panel.grid.minor=element_blank(), panel.background=element_blank())+ylim(c(-2, 2))
@@ -654,7 +712,7 @@ qplot(x=xcomb, y=y3comb,geom="line", main="Corrected by 3a")+
   theme(plot.background=element_blank(), panel.grid.major=element_blank(), 
        panel.grid.minor=element_blank(), panel.background=element_blank())+ylim(c(-2, 2))
 @
-<<echo=FALSE,include=FALSE,out.width=".48\\textwidth">>=
+<<echo=FALSE,fig.keep='all',out.width=".48\\textwidth">>=
 qplot(x=xcomb, y=y4comb, geom="line", main="Corrected by 4a")+ 
   theme(plot.background=element_blank(), panel.grid.major=element_blank(), 
        panel.grid.minor=element_blank(), panel.background=element_blank())+ylim(c(-2, 2))
@@ -664,7 +722,7 @@ qplot(x=xcomb, y=y5comb,geom="line", main="Corrected by 5a")+
 @
 3*a seems to be the optimal correction, perhaps because of the additional illusion of roundness (proxy to pi)? Additionally, the correction factor becomes noticable at the edges of the graph, when the roundness illusion ceases to exist. I'm not sure how to avoid that realization - possibly fade line color to grey?
 
-<<echo=FALSE,include=TRUE,out.width=".48\\textwidth">>=
+<<echo=FALSE,fig.keep='all',out.width=".48\\textwidth">>=
 qplot(x=xcomb, y=ypicomb, geom="line", main=expression(paste("Corrected by ", pi, "a")))+ 
   theme(plot.background=element_blank(), panel.grid.major=element_blank(), 
        panel.grid.minor=element_blank(), panel.background=element_blank())+ylim(c(-2, 2))
@@ -675,7 +733,7 @@ qplot(x=xcomb, y=y2picomb, geom="line", main=expression(paste("Corrected by ", 2
 
 Without the sine function for the mean, the increased correction size is clear: 
 
-<<echo=FALSE,include=TRUE,out.width=".48\\textwidth">>=
+<<echo=FALSE,fig.keep='all',out.width=".48\\textwidth">>=
 qplot(x=xcomb, y=y1comb-sin(xcomb), geom="line", main="Corrected by a", ylim=range(ypicomb))
 qplot(x=xcomb, y=ypicomb-sin(xcomb), geom="line", main=expression(paste("Corrected by ", pi, "a")), ylim=range(ypicomb))
 @
