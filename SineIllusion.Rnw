@@ -171,6 +171,7 @@ where $\theta$ is the angle of the line with respect to the horizontal line.
 
 \begin{figure}[htbp]
 \centering
+  
 <<transform-illustration,echo=FALSE, fig.keep='none'>>=
 x <- seq(-pi, pi, length=200)
 y <- sin(x)
@@ -411,6 +412,7 @@ qplot(x=x, xend=xend, y = g(x) -ellx2/2, yend=g(x) +ellx2/2, geom="segment", dat
 \end{subsection}\clearpage
 \begin{subsection}{Transformation of $Y$ Values - General Method}
 <<CtsMethodSetup, echo=FALSE, fig.keep='all'>>=
+<<CtsMethodSetup, echo=FALSE, fig.keep='none'>>=
 getSecantSegment <- function(x1, df, f, fprime){
   secSlope   <- -1/fprime(x1)
   ell.x1     <- df$ell[which.min(abs(df$x-x1))]/2
@@ -421,36 +423,19 @@ getSecantSegment <- function(x1, df, f, fprime){
   df2 <- data.frame(x=x1, y=f(x1), deriv=fprime(x1),
                     sec.xstart=leftend, sec.xend=rightend, 
                     sec.ystart=(yintercept + secSlope*(leftend)),
-<<<<<<< HEAD
                     sec.yend = (yintercept + secSlope*(rightend)),
                     ell.orig = 2*ell.x1)
-=======
-                    sec.yend = (yintercept + secSlope*(rightend)))
->>>>>>> 9e27162a738867a88719784e867eaf6a552ace15
+
   df2$sec.ell1 <- with(df2, sqrt((sec.yend-y)^2+(sec.xend-x)^2))
   df2$sec.ell2 <- with(df2, sqrt((y-sec.ystart)^2+(x-sec.xstart)^2))
   df2$type <- "Perceived Width"
   return(df2)
 }
 
-getAdjLength<- function(df, center=TRUE){
+getAdjLength<- function(df){
   theta <- atan(df$deriv)  
-  if(!center){
-<<<<<<< HEAD
   df$seg.ystart <-  with(df, y+ell.orig/2*(1+cos(theta))-sec.ell1*cos(theta))
   df$seg.yend   <-  with(df, y-ell.orig/2*(1+cos(theta))+sec.ell2*cos(theta))
-  return(df)
-  }  
-  df$seg.ystart <-  with(df, y+ell.orig/2*(1+cos(theta))-(sec.ell1+sec.ell2)/2*cos(theta))
-  df$seg.yend   <-  with(df, y-ell.orig/2*(1+cos(theta))+(sec.ell1+sec.ell2)/2*cos(theta))
-=======
-  df$seg.ystart <-  with(df, y+ell.x1*(1+cos(theta))-sec.ell1*cos(theta))
-  df$seg.yend   <-  with(df, y-ell.x1*(1+cos(theta))+sec.ell2*cos(theta))
-  return(df)
-  }  
-  df$seg.ystart <-  with(df, y+sec.ell1/(sec.ell1+sec.ell2)*2*ell.x1)
-  df$seg.yend   <-  with(df, y-sec.ell2/(sec.ell1+sec.ell2)*2*ell.x1)
->>>>>>> 9e27162a738867a88719784e867eaf6a552ace15
   df
 }
 
@@ -460,74 +445,71 @@ dframe$type <- "Segments"
 
 library(multicore)
 secantlines <- do.call("rbind", mclapply(seq(0, 2*pi, length=40), function(i) getSecantSegment(i, dframe, sin, cos)))
-secantlines2 <- getAdjLength(secantlines, center=TRUE)
+secantlines2 <- getAdjLength(secantlines)
 
 library(plyr)
 dframe2 <- secantlines
-<<<<<<< HEAD
 names(dframe2) <- c("x", "y", "deriv", "xstart", "xend", "ystart", "yend", "ell.orig", "ell1", "ell2", "type")
-=======
-names(dframe2) <- c("x", "y", "xstart", "xend", "ystart", "yend", "ell1", "ell2", "new.ystart", "new.yend", "type")
->>>>>>> 9e27162a738867a88719784e867eaf6a552ace15
-dframe2 <- rbind.fill(dframe, dframe2)
 
+dframe2 <- rbind.fill(dframe, dframe2)
+@
+\begin{figure}[h!tbp]\centering
+<<SecantLines,echo=FALSE>>=
 qplot(x=xstart, xend=xend, y = ystart, yend=yend, geom="segment", data=dframe2, colour=type) +
   scale_colour_manual(values=c("blue", "black"))+
   theme_bw() + coord_fixed(ratio=1)+ 
   geom_segment(aes(x=sec.xstart, xend=sec.xend, y=sec.ystart, yend=sec.yend), data=secantlines, colour="blue") + 
-  ggtitle("Untransformed Data") + theme(legend.position="bottom") 
-
+  ggtitle("Untransformed Data") + theme(legend.position="bottom")  + xlab("") + ylab("")
+@
+\caption{The perceived length of the lines is a function of the extant width, that is, the width of the secant line at a given point. The secant lines are varying lengths (0.8 to 1.2), suggesting that to counter the illusion, the line lengths must be altered such that the extant widths are perceived to be equal.}
+\end{figure}
+\begin{figure}[htbp]\centering
+<<HalfSegmentLineGraph,echo=FALSE>>=
 qplot(x=x, y=sec.ell1, geom="line", data=secantlines) + 
   geom_line(aes(y=sec.ell2), linetype=4) + ggtitle("Extant Half-Segment Length") + 
   geom_text(aes(x=x[1] + .25, y=sec.ell2[1], label="Top\nSegment"), hjust=0, vjust=0) + 
   geom_text(aes(x=rev(x)[1]-.25, y=rev(sec.ell1)[1], label="Bottom\nSegment"), hjust=1, vjust=0) +
   theme_bw()
-
-<<<<<<< HEAD
+@
+\caption{The secant  line segments are not symmetrical around the center line, so symmetric correction as employed in Figure \ref{thirdfix} leads to simultaneous over- and under-correcting which causes the distortions seen above.\todo[inline]{Not sure about this claim, but seems likely... we'll see...}}
+\end{figure}
+\begin{figure}[htbp]\centering
+<<HalfSegmentLengths,echo=FALSE>>=
 qplot(x=x, xend=x, y=0, yend=sec.ell1, geom="segment", data=secantlines, linetype=I(1), colour=I("black")) + 
   geom_segment(aes(yend=-sec.ell2), colour="grey40") + ggtitle("Extant Segment Length (Centered)") + coord_fixed(ratio=1) + ylim(c(-1,1)) + theme_bw()
-
-qplot(x=x, xend=x, y=0, yend=sec.ell1+sec.ell2, geom="segment", data=secantlines, linetype=I(1)) + ggtitle("Extant Segment Length") + coord_fixed(ratio=1) + theme_bw() + ylab("length")
-
-qplot(x=x, xend=x, y=0, yend=seg.ystart-seg.yend, geom="segment", data=secantlines2, linetype=I(1)) + ggtitle("Adjusted Segment Length") + coord_fixed(ratio=1) + theme_bw()
-
-qplot(x=x, xend=x, y=seg.ystart, yend=seg.yend, geom="segment", data=secantlines2, linetype=I(1)) + ggtitle("Adjusted Data") + coord_fixed(ratio=1) #+ geom_line(aes(x=x, y=sin(x) + 1/2), size=1) + geom_line(aes(x=x, y=sin(x) - 1/2), size=1)
-=======
-qplot(x=x, xend=x, y=0, yend=sec.ell1, geom="segment", data=secantlines, linetype=I(1)) + 
-  geom_segment(aes(yend=-sec.ell2), linetype=4) + ggtitle("Extant Segment Length (Centered)") + coord_fixed(ratio=1) + ylim(c(-1,1))
-
-qplot(x=x, xend=x, y=0, yend=sec.ell1+sec.ell2, geom="segment", data=secantlines, linetype=I(1)) + ggtitle("Extant Segment Length") + coord_fixed(ratio=1)
-
-qplot(x=x, xend=x, y=seg.ystart, yend=seg.yend, geom="segment", data=secantlines, linetype=I(1)) + ggtitle("Adjusted Segment Length") + coord_fixed(ratio=1)
-
-qplot(x=x, xend=x, y=0, yend=ell1, geom="segment", data=secantlines, linetype=I(1)) + 
-  geom_segment(aes(yend=-ell2), linetype=4) + ggtitle("Extant Segment Length (Centered)") + coord_fixed(ratio=1) + ylim(c(-1,1))
-
-qplot(x=x, xend=x, y=seg.ystart+y, yend=seg.yend+y, geom="segment", data=secantlines, linetype=I(1)) + ggtitle("Adjusted Data") + coord_fixed(ratio=1) 
->>>>>>> 9e27162a738867a88719784e867eaf6a552ace15
+# qplot(x=x, xend=x, y=0, yend=sec.ell1+sec.ell2, geom="segment", data=secantlines, linetype=I(1)) + ggtitle("Extant Segment Length") + coord_fixed(ratio=1) + theme_bw() + ylab("length")
+# qplot(x=x, xend=x, y=0, yend=seg.ystart-seg.yend, geom="segment", data=secantlines2, linetype=I(1)) + ggtitle("Adjusted Segment Length") + coord_fixed(ratio=1) + theme_bw()
 @
+\caption{The length of the extant segments with the underlying function $y=sin(x)$ removed.}
+\end{figure}
+\begin{figure}[htbp]\centering
+<<CtsAdjustedResults,echo=FALSE>>=
+qplot(x=x, xend=x, y=seg.ystart, yend=seg.yend, geom="segment", data=secantlines2, linetype=I(1)) + ggtitle("Adjusted Data") + coord_fixed(ratio=1) + theme_bw()
+@
+\caption{Adjusting the top and bottom segments of the vertical lines separately so that the extant width is constant breaks the illusion, but slightly distorts the sinusoidal shape of the peaks.}
+\todo[inline]{I need to go back and check the math on this for a third time, because it just looks funky.}
+\end{figure}
 \end{subsection}
 \begin{subsection}{Transformation of $X$ Values}
 \todo[inline]{Could you try to write the correction factor out in terms of a formula? - I still think that all of the lines should appear under the same slope, which means that the result would need to be an up/down triangle, like we had before. I'm a bit worried about the `fudge' factor $a$ -- let's first use a correction factor that we can derive mathematically from counteracting the line illusion and then allow some fudging. }
 In order to counteract the illusion of changing line length, we can slightly transform the $X$ values, narrowing the distance between values at the peak and trough of the curve and widening the distance between values at the inflection point. \todo[inline]{The following sentence is a statement, but it is not an explanation. Could you please add the explanation of why this works?  You also need to get away from the delta x and move to its infinitesimal counterpart, i.e. derivatives.} If we alter the $X$ axis such that $\triangle X^\ast = c*a(\cos(2x)+1)$, where $\triangle X = c$ is the distance between two evenly spaced $X$ points, the illusion's effect is broken and all $y$ values appear to be approximately the same length. Consistent with the hypothesis that the apparent line length is dependent on the slope of the tangent line, changing $\triangle x$ reduces the apparent length discrepancy $\triangle y$ significantly.
-\begin{figure}[H]\centering
 
 \todo[inline]{make the chart bigger, make it a figure and add a caption!}
-<<xtransform, echo=FALSE, results='asis', out.width=".31\\textwidth">>=
+\begin{figure}[htbp]\centering
+<<xtransform, echo=FALSE>>=
 dframe <- createSine(80 , len=1, f=f, fprime=fprime)
-dframe$a <- c(0, diff(dframe$ystart))
+dframe$a <- abs(diff(dframe$ystart)[c(1, 1:(length(dframe$ystart)-1))])
 dframe$xtrans <- cumsum(diff(dframe$x)[1]*(dframe$a*cos(2*dframe$x)+1)) # Create transformed X axis
 dframe$xtrans <- dframe$xtrans-mean(dframe$xtrans-dframe$x) 
 
 qplot(x=xtrans, xend=xtrans, y = ystart, yend=yend, colour=I("blue"), geom="segment", main="Transformed X Axis", data=dframe) +
-  geom_segment(aes(x = 0, xend=2*pi, y=0, yend=0), colour="black") +
-  ylim(-3,3)
+  geom_segment(aes(x = 0, xend=2*pi, y=0, yend=0), colour="black") +theme_bw() + coord_fixed(ratio=1)
 # qplot(x=xtrans, xend=xtrans, y = ystart, yend=yend, colour=I("blue"), geom="segment", main="Transformed X Axis", data=dframe) +
 #   geom_segment(aes(x = 0, xend=2*pi, y=0, yend=0), colour="black") +
 #   ylim(-10,10)
 #qplot(x=x, y=x1, geom="line", main="X vs. X*")
 @
-
+\caption{Adjusting the x-spacing of the lines also mitigates the illusion while changing the extant width so that it is more uniform in $x$}
 \end{figure}
 \end{subsection}
 
