@@ -411,55 +411,71 @@ qplot(x=x, xend=xend, y = g(x) -ellx2/2, yend=g(x) +ellx2/2, geom="segment", dat
 \end{subsection}\clearpage
 \begin{subsection}{Transformation of $Y$ Values - General Method}
 <<CtsMethodSetup, echo=FALSE, fig.keep='all'>>=
-
 getSecantSegment <- function(x1, df, f, fprime){
-  secSlope <- -1/fprime(x1)
-  elltemp <- df$ell[which.min(abs(df$x-x1))]
-  temp <- seq(min(df$x), max(df$x), .0001)
-  leftend <- temp[which.min(abs(f(temp) + elltemp/2 - secSlope*(temp-x1)))]
-  rightend <- temp[which.min(abs(f(temp) - elltemp/2 - secSlope*(temp-x1)))]
+  secSlope   <- -1/fprime(x1)
+  ell.x1     <- df$ell[which.min(abs(df$x-x1))]/2
+  temp       <- seq(min(df$x)-pi, max(df$x)+pi, .0001)
+  leftend    <- temp[which.min(abs(f(temp) + ell.x1 - secSlope*(temp-x1)))]
+  rightend   <- temp[which.min(abs(f(temp) - ell.x1 - secSlope*(temp-x1)))]
   yintercept <- -secSlope*x1
-  df2 <- data.frame(xstart=leftend, x=x1, xend=rightend, ystart=(yintercept + secSlope*(leftend)), y=f(x1), yend = (yintercept + secSlope*(rightend)))
-  df2$ell1 <- with(df2, sqrt((yend-y)^2+(xend-x)^2))
-  df2$ell2 <- with(df2, sqrt((y-ystart)^2+(x-xstart)^2))  
+  df2 <- data.frame(x=x1, y=f(x1), deriv=fprime(x1),
+                    sec.xstart=leftend, sec.xend=rightend, 
+                    sec.ystart=(yintercept + secSlope*(leftend)),
+                    sec.yend = (yintercept + secSlope*(rightend)))
+  df2$sec.ell1 <- with(df2, sqrt((sec.yend-y)^2+(sec.xend-x)^2))
+  df2$sec.ell2 <- with(df2, sqrt((y-sec.ystart)^2+(x-sec.xstart)^2))
   df2$type <- "Perceived Width"
   return(df2)
+}
+
+getAdjLength<- function(df, center=TRUE){
+  theta <- atan(df$deriv)  
+  if(!center){
+  df$seg.ystart <-  with(df, y+ell.x1*(1+cos(theta))-sec.ell1*cos(theta))
+  df$seg.yend   <-  with(df, y-ell.x1*(1+cos(theta))+sec.ell2*cos(theta))
+  return(df)
+  }  
+  df$seg.ystart <-  with(df, y+sec.ell1/(sec.ell1+sec.ell2)*2*ell.x1)
+  df$seg.yend   <-  with(df, y-sec.ell2/(sec.ell1+sec.ell2)*2*ell.x1)
+  df
 }
 
 suppressMessages(library(ggplot2))
 dframe <- createSine(n = 40, len = 1, f=f, fprime=fprime)
 dframe$type <- "Segments"
 
-secantlines <- do.call("rbind", lapply(seq(0, 2*pi, length=40), function(i) getSecantSegment(i, dframe, sin, cos)))
-secantlines2 <- do.call("rbind", lapply(seq(0, 2*pi, length=40), function(i) getSecantSegment(i, adjY(dframe), sin, cos)))
+library(multicore)
+secantlines <- do.call("rbind", mclapply(seq(0, 2*pi, length=40), function(i) getSecantSegment(i, dframe, sin, cos)))
+secantlines2 <- getAdjLength(secantlines, center=TRUE)
 
 library(plyr)
-dframe2 <- rbind.fill(dframe, secantlines)
+dframe2 <- secantlines
+names(dframe2) <- c("x", "y", "xstart", "xend", "ystart", "yend", "ell1", "ell2", "new.ystart", "new.yend", "type")
+dframe2 <- rbind.fill(dframe, dframe2)
 
 qplot(x=xstart, xend=xend, y = ystart, yend=yend, geom="segment", data=dframe2, colour=type) +
   scale_colour_manual(values=c("blue", "black"))+
   theme_bw() + coord_fixed(ratio=1)+ 
-  geom_segment(aes(x=xstart, xend=xend, y=ystart, yend=yend), data=secantlines, colour="blue") + 
+  geom_segment(aes(x=sec.xstart, xend=sec.xend, y=sec.ystart, yend=sec.yend), data=secantlines, colour="blue") + 
   ggtitle("Untransformed Data") + theme(legend.position="bottom") 
 
-qplot(x=x, y=ell1, geom="line", data=subset(secantlines)) + 
-  geom_line(aes(y=ell2), linetype=4) + ggtitle("Extant Half-Segment Length") + 
-  geom_text(aes(x=x[1] + .25, y=ell2[1], label="Top\nSegment"), hjust=0, vjust=0) + 
-  geom_text(aes(x=rev(x)[1]-.25, y=rev(ell1)[1], label="Bottom\nSegment"), hjust=1, vjust=0)
-# 
-# qplot(x=x, y=ell1+ell2, geom="line", data=subset(secantlines)) + 
-#   ggtitle("Total Extant Segment Length")  + coord_fixed(ratio=1)
+qplot(x=x, y=sec.ell1, geom="line", data=secantlines) + 
+  geom_line(aes(y=sec.ell2), linetype=4) + ggtitle("Extant Half-Segment Length") + 
+  geom_text(aes(x=x[1] + .25, y=sec.ell2[1], label="Top\nSegment"), hjust=0, vjust=0) + 
+  geom_text(aes(x=rev(x)[1]-.25, y=rev(sec.ell1)[1], label="Bottom\nSegment"), hjust=1, vjust=0) +
+  theme_bw()
+
+qplot(x=x, xend=x, y=0, yend=sec.ell1, geom="segment", data=secantlines, linetype=I(1)) + 
+  geom_segment(aes(yend=-sec.ell2), linetype=4) + ggtitle("Extant Segment Length (Centered)") + coord_fixed(ratio=1) + ylim(c(-1,1))
+
+qplot(x=x, xend=x, y=0, yend=sec.ell1+sec.ell2, geom="segment", data=secantlines, linetype=I(1)) + ggtitle("Extant Segment Length") + coord_fixed(ratio=1)
+
+qplot(x=x, xend=x, y=seg.ystart, yend=seg.yend, geom="segment", data=secantlines, linetype=I(1)) + ggtitle("Adjusted Segment Length") + coord_fixed(ratio=1)
 
 qplot(x=x, xend=x, y=0, yend=ell1, geom="segment", data=secantlines, linetype=I(1)) + 
   geom_segment(aes(yend=-ell2), linetype=4) + ggtitle("Extant Segment Length (Centered)") + coord_fixed(ratio=1) + ylim(c(-1,1))
 
-# qplot(x=x, xend=x, y=0, yend=ell1+ell2, geom="segment", data=secantlines, linetype=I(1)) + 
-#   ggtitle("Extant Segment Length") + coord_fixed(ratio=1)
-
-qplot(x=x, xend=xend, y=ystart, yend=yend, geom="segment", data=adjY(dframe))+
-  theme_bw() + coord_fixed(ratio=1)+ 
-  geom_segment(aes(x=xstart, xend=xend, y=ystart, yend=yend), data=secantlines2, colour="blue")  + coord_fixed(ratio=1) + ggtitle("Linear Adjustment vs. Curved Adjustment")
-
+qplot(x=x, xend=x, y=seg.ystart+y, yend=seg.yend+y, geom="segment", data=secantlines, linetype=I(1)) + ggtitle("Adjusted Data") + coord_fixed(ratio=1) 
 @
 \end{subsection}
 \begin{subsection}{Transformation of $X$ Values}
