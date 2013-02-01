@@ -13,7 +13,7 @@
 \graphicspath{{figure/}}
 
 
-<<setup, fig.keep='all', cache=FALSE, eval=TRUE>>=
+<<setup, fig.keep='all', cache=FALSE, echo=FALSE, eval=TRUE>>=
 #rm(list=ls())
 options(replace.assign=TRUE,width=70)
 require(knitr)
@@ -34,7 +34,9 @@ The sine illusion, which is part of a set of optical illusions which occur based
 \end{abstract}
 \tableofcontents
 \section{General Comments}
-\todo[inline]{Put labels for reference for all of your charts and write a couple of sentences of why you're drawing this chart and what you see ... it doesn't need to stay in the paper necessarily, but it's usually a good start for keeping track of what we want to do.}
+\todo[inline]{Once you've dealt with a comment, could you color it differently or comment it out, so I can see that you read it and dealt with it? That will help streamline things a bit ... Thanks!}
+\todo[inline]{
+Put labels for reference for all of your charts and write a couple of sentences of why you're drawing this chart and what you see ... it doesn't need to stay in the paper necessarily, but it's usually a good start for keeping track of what we want to do.}
 
 \section{Background and Introduction}
 
@@ -55,8 +57,9 @@ In the perception literature, the phenomenon is known as part of a group of geom
 M Bach's applet  gives the option to compensate the line length manually for its perceived shortcoming. The amount of compensation chosen turns out to be highly dependent on both the length of the vertical line segments and the amplitude of the sine function. The amplitude directly affects the slope -- the steeper  the slope the more compensation is necessary, see section \ref{distortion}  for a more detailed discussion and some results from a user study  \todo{could we start with our own data for the user study? that way we don't need IRB approval for now. data is in the data folder. I don't see any clear relationship, though/}.
 
 <<data, echo=FALSE, eval=TRUE>>=
-f <- function(x) sin(x)
-fprime <- function (x) cos(x)
+f <- function(x) 2*sin(x)
+fprime <- function(x) 2*cos(x)
+f2prime <- function(x) -2*sin(x)
 
 createSine <- function(n=200, len=1, f=f, fprime=fprime) {
   x <- seq(0, 2*pi, length=n)
@@ -82,9 +85,8 @@ createSine <- function(n=200, len=1, f=f, fprime=fprime) {
 \begin{figure}[hbtp]
 \centering
 \begin{minipage}{.495\textwidth}
-<<original, echo=FALSE, results='asis', fig.width=5, fig.height=2.6>>=
-l <- 1
-qplot(x=x, xend=xend, y = ystart, yend=yend, geom="segment", data=createSine(40,1, f=f, fprime=fprime)) +
+<<original, dependson='data', echo=FALSE, results='asis', fig.width=5, fig.height=5>>=
+qplot(x=x, xend=xend, y = ystart, yend=yend, geom="segment", data=createSine(40, 1, f=f, fprime=fprime)) +
   theme(panel.grid.major=element_blank(), panel.background = element_rect(fill = "white", 
                 colour = "black"),
        panel.grid.minor=element_blank(), panel.background=element_blank(),
@@ -92,9 +94,8 @@ qplot(x=x, xend=xend, y = ystart, yend=yend, geom="segment", data=createSine(40,
        axis.text = element_blank()) + coord_equal(ratio=1)
 @
 \end{minipage}\begin{minipage}{.495\textwidth}
-<<original-redo, echo=FALSE, fig.keep='none', fig.keep='all'>>=
-cairo_pdf("./figure/fig-original-redo.pdf", width=5, height=2.6)
-l <- 1
+<<original-redo, echo=FALSE, fig.keep='none', results='hide', fig.keep='all'>>=
+cairo_pdf("./figure/fig-original-redo.pdf", width=5, height=5)
 df1 <- createSine(20,1, f=f, fprime=fprime)
 df1$colour <- c(rep("A", 5), "A", rep("A", 13), "A")
 qplot(x=xstart, xend=xend, y = ystart, yend=yend, geom="segment", data=df1, colour=I("grey20")) +
@@ -120,12 +121,13 @@ dev.off()
 @
 \includegraphics[keepaspectratio=true, width=\linewidth]{fig-original-redo.pdf}
 \end{minipage}
-\caption{\label{original}The original Sine Illusion. The regions of the graph in the peak and the valley appear to be composed of longer lines than the other regions. $s$ denotes the amplitude of the function, $\ell$ the length of the line segments.}
+\caption{\label{original}The original Sine Illusion. The regions of the graph in the peak and the valley appear to be composed of longer lines than the other regions. $s$ denotes the amplitude of the function, $\ell$ the length of the line segments. \todo[inline]{We need to mention that there's a left and a right chart.
+Please get rid of the strong colours - we don't need red and blue for the labels. Use shades of grey.}}
 \end{figure}
 
 \begin{figure}[hbtp]
 \centering
-<<originalgrid, dependson='data', echo=FALSE, results='asis',out.width=".5\\linewidth", fig.width=5, fig.height=2.6>>=
+<<originalgrid, dependson='data', echo=FALSE, results='asis',out.width=".5\\linewidth">>=
 dframe <- createSine(n = 40, len = 1, f=f, fprime=fprime)
 
 qplot(x=x, xend=xend, y = ystart*ell, yend=yend*ell, geom="segment", data=dframe) +
@@ -143,12 +145,12 @@ qplot(x=x, xend=xend, y = ystart*ell, yend=yend*ell, geom="segment", data=dframe
 
 \clearpage
 \subsection*{Discussion of Sine Illusion}
-Using the notation given in the applet, we assume a value $s$ for the sine amplitude, $\ell$ for the vertical length of line segments, and $\ell_c$ for the amount of compensation. 
+Using the notation given in figure \ref{original}, we assume a value $s$ for the sine amplitude, $\ell$ for the vertical length of line segments, and $\ell_c$ for the amount of compensation. 
 The sine curve is then given by function $f$, written as 
 \[
-f(x) = s/2 \sin(x)
+f(x) = s \cdot \sin(x)
 \]
-for $x$ in $[-\pi, \pi]$. The slope of the sine curve is the steepest in its reflection point at $x=0$. We can calculate the slope as $f^\prime(x) = s/2 \cos(x)$, which in $x=0$ yields a slope of $s/2$.
+for $x$ in $[-\pi, \pi]$. The slope of the sine curve is the steepest in its reflection point at $x=0$. We can calculate the slope as $f^\prime(x) = s \cos(x)$, which in $x=0$ yields a slope of $s/2$.
 
 These differences in the slope are the reason we perceive the lines to have different length, as we have an innate tendency to evaluate line or band widths orthogonally rather than vertically, as would be the mathematically correct way.
 
@@ -347,7 +349,7 @@ qplot(x=x, xend=xend, y = f(x) -ellx2/2, yend=f(x) +ellx2/2, geom="segment", dat
        axis.text = element_blank()) + coord_equal(ratio=1)
 
 @
-\caption{\label{firstfix} First fix of the sine illusion by using the factor of $1/\cos(\atan(|f^\prime(x)|))$ (middle) and $\sqrt{1 + f^\prime(x)^2}$ (right) for adjusting the vertical extent of the lines.  }
+\caption{\label{firstfix} First fix of the sine illusion by using the factor of $1/\cos\left(\atan{|f^\prime(x)|}\right)$ (middle) and $\sqrt{1 + f^\prime(x)^2}$ (right) for adjusting the vertical extent of the lines.  }
 \end{figure}
 
 \begin{figure}
@@ -394,6 +396,13 @@ qplot(x=x, xend=xend, y = g(x) -ellx/2, yend=g(x) +ellx/2, geom="segment", data=
        panel.grid.minor=element_blank(), panel.background=element_blank(),
        axis.title = element_blank(), axis.ticks = element_blank(), 
        axis.text = element_blank()) + coord_equal(ratio=ar)
+
+qplot(x=x, xend=xend, y = g(x) -ellx2/2, yend=g(x) +ellx2/2, geom="segment", data=dframe) +
+  theme(panel.grid.major=element_blank(), panel.background = element_rect(fill = "white", 
+                colour = "black"),
+       panel.grid.minor=element_blank(), panel.background=element_blank(),
+       axis.title = element_blank(), axis.ticks = element_blank(), 
+       axis.text = element_blank()) + coord_equal(ratio=ar)
 @
 \caption{\label{thirdfix} The ratio of the length of the line to amplitude of the function needs to be included in the correction. Here, the amplitude is still 1, but the length of the line is 5. The correction factor leads to a massive over correction that makes the function almost unrecognizable. The plot on the left is uncorrected, the plot on the right is `corrected'.}
 \end{figure}
@@ -412,8 +421,12 @@ getSecantSegment <- function(x1, df, f, fprime){
   df2 <- data.frame(x=x1, y=f(x1), deriv=fprime(x1),
                     sec.xstart=leftend, sec.xend=rightend, 
                     sec.ystart=(yintercept + secSlope*(leftend)),
+<<<<<<< HEAD
                     sec.yend = (yintercept + secSlope*(rightend)),
                     ell.orig = 2*ell.x1)
+=======
+                    sec.yend = (yintercept + secSlope*(rightend)))
+>>>>>>> 9e27162a738867a88719784e867eaf6a552ace15
   df2$sec.ell1 <- with(df2, sqrt((sec.yend-y)^2+(sec.xend-x)^2))
   df2$sec.ell2 <- with(df2, sqrt((y-sec.ystart)^2+(x-sec.xstart)^2))
   df2$type <- "Perceived Width"
@@ -423,12 +436,21 @@ getSecantSegment <- function(x1, df, f, fprime){
 getAdjLength<- function(df, center=TRUE){
   theta <- atan(df$deriv)  
   if(!center){
+<<<<<<< HEAD
   df$seg.ystart <-  with(df, y+ell.orig/2*(1+cos(theta))-sec.ell1*cos(theta))
   df$seg.yend   <-  with(df, y-ell.orig/2*(1+cos(theta))+sec.ell2*cos(theta))
   return(df)
   }  
   df$seg.ystart <-  with(df, y+ell.orig/2*(1+cos(theta))-(sec.ell1+sec.ell2)/2*cos(theta))
   df$seg.yend   <-  with(df, y-ell.orig/2*(1+cos(theta))+(sec.ell1+sec.ell2)/2*cos(theta))
+=======
+  df$seg.ystart <-  with(df, y+ell.x1*(1+cos(theta))-sec.ell1*cos(theta))
+  df$seg.yend   <-  with(df, y-ell.x1*(1+cos(theta))+sec.ell2*cos(theta))
+  return(df)
+  }  
+  df$seg.ystart <-  with(df, y+sec.ell1/(sec.ell1+sec.ell2)*2*ell.x1)
+  df$seg.yend   <-  with(df, y-sec.ell2/(sec.ell1+sec.ell2)*2*ell.x1)
+>>>>>>> 9e27162a738867a88719784e867eaf6a552ace15
   df
 }
 
@@ -442,7 +464,11 @@ secantlines2 <- getAdjLength(secantlines, center=TRUE)
 
 library(plyr)
 dframe2 <- secantlines
+<<<<<<< HEAD
 names(dframe2) <- c("x", "y", "deriv", "xstart", "xend", "ystart", "yend", "ell.orig", "ell1", "ell2", "type")
+=======
+names(dframe2) <- c("x", "y", "xstart", "xend", "ystart", "yend", "ell1", "ell2", "new.ystart", "new.yend", "type")
+>>>>>>> 9e27162a738867a88719784e867eaf6a552ace15
 dframe2 <- rbind.fill(dframe, dframe2)
 
 qplot(x=xstart, xend=xend, y = ystart, yend=yend, geom="segment", data=dframe2, colour=type) +
@@ -457,6 +483,7 @@ qplot(x=x, y=sec.ell1, geom="line", data=secantlines) +
   geom_text(aes(x=rev(x)[1]-.25, y=rev(sec.ell1)[1], label="Bottom\nSegment"), hjust=1, vjust=0) +
   theme_bw()
 
+<<<<<<< HEAD
 qplot(x=x, xend=x, y=0, yend=sec.ell1, geom="segment", data=secantlines, linetype=I(1), colour=I("black")) + 
   geom_segment(aes(yend=-sec.ell2), colour="grey40") + ggtitle("Extant Segment Length (Centered)") + coord_fixed(ratio=1) + ylim(c(-1,1)) + theme_bw()
 
@@ -465,13 +492,27 @@ qplot(x=x, xend=x, y=0, yend=sec.ell1+sec.ell2, geom="segment", data=secantlines
 qplot(x=x, xend=x, y=0, yend=seg.ystart-seg.yend, geom="segment", data=secantlines2, linetype=I(1)) + ggtitle("Adjusted Segment Length") + coord_fixed(ratio=1) + theme_bw()
 
 qplot(x=x, xend=x, y=seg.ystart, yend=seg.yend, geom="segment", data=secantlines2, linetype=I(1)) + ggtitle("Adjusted Data") + coord_fixed(ratio=1) #+ geom_line(aes(x=x, y=sin(x) + 1/2), size=1) + geom_line(aes(x=x, y=sin(x) - 1/2), size=1)
+=======
+qplot(x=x, xend=x, y=0, yend=sec.ell1, geom="segment", data=secantlines, linetype=I(1)) + 
+  geom_segment(aes(yend=-sec.ell2), linetype=4) + ggtitle("Extant Segment Length (Centered)") + coord_fixed(ratio=1) + ylim(c(-1,1))
+
+qplot(x=x, xend=x, y=0, yend=sec.ell1+sec.ell2, geom="segment", data=secantlines, linetype=I(1)) + ggtitle("Extant Segment Length") + coord_fixed(ratio=1)
+
+qplot(x=x, xend=x, y=seg.ystart, yend=seg.yend, geom="segment", data=secantlines, linetype=I(1)) + ggtitle("Adjusted Segment Length") + coord_fixed(ratio=1)
+
+qplot(x=x, xend=x, y=0, yend=ell1, geom="segment", data=secantlines, linetype=I(1)) + 
+  geom_segment(aes(yend=-ell2), linetype=4) + ggtitle("Extant Segment Length (Centered)") + coord_fixed(ratio=1) + ylim(c(-1,1))
+
+qplot(x=x, xend=x, y=seg.ystart+y, yend=seg.yend+y, geom="segment", data=secantlines, linetype=I(1)) + ggtitle("Adjusted Data") + coord_fixed(ratio=1) 
+>>>>>>> 9e27162a738867a88719784e867eaf6a552ace15
 @
 \end{subsection}
 \begin{subsection}{Transformation of $X$ Values}
 \todo[inline]{Could you try to write the correction factor out in terms of a formula? - I still think that all of the lines should appear under the same slope, which means that the result would need to be an up/down triangle, like we had before. I'm a bit worried about the `fudge' factor $a$ -- let's first use a correction factor that we can derive mathematically from counteracting the line illusion and then allow some fudging. }
-In order to counteract the illusion of changing line length, we can slightly transform the $X$ values, narrowing the distance between values at the peak and trough of the curve and widening the distance between values at the inflection point. If we alter the $X$ axis such that $\triangle X^\ast = c*a(\cos(2x)+1)$, where $\triangle X = c$ is the distance between two evenly spaced $X$ points, the illusion's effect is broken and all $y$ values appear to be approximately the same length. Consistent with the hypothesis that the apparent line length is dependent on the slope of the tangent line, changing $\triangle x$ reduces the apparent length discrepancy $\triangle y$ significantly.
+In order to counteract the illusion of changing line length, we can slightly transform the $X$ values, narrowing the distance between values at the peak and trough of the curve and widening the distance between values at the inflection point. \todo[inline]{The following sentence is a statement, but it is not an explanation. Could you please add the explanation of why this works?  You also need to get away from the delta x and move to its infinitesimal counterpart, i.e. derivatives.} If we alter the $X$ axis such that $\triangle X^\ast = c*a(\cos(2x)+1)$, where $\triangle X = c$ is the distance between two evenly spaced $X$ points, the illusion's effect is broken and all $y$ values appear to be approximately the same length. Consistent with the hypothesis that the apparent line length is dependent on the slope of the tangent line, changing $\triangle x$ reduces the apparent length discrepancy $\triangle y$ significantly.
 \begin{figure}[H]\centering
 
+\todo[inline]{make the chart bigger, make it a figure and add a caption!}
 <<xtransform, echo=FALSE, results='asis', out.width=".31\\textwidth">>=
 dframe <- createSine(80 , len=1, f=f, fprime=fprime)
 dframe$a <- c(0, diff(dframe$ystart))
@@ -527,7 +568,7 @@ ggplot()  + geom_jitter(aes(Time, value/100), data=ushcn, size=1) +
 \caption{\label{raw-temp}Raw monthly maximum temperatures (in Celsius) between 1980 and 2012 at 1218 stations across the US. The blue line shows fitted temperatures from a baseline model. The plot suggests that the model fails to capture the more extreme values in summer and winter. }
 \end{figure}
 \begin{figure}[hbtp]\centering
-<<boxtemp, dependson='readdata', echo=FALSE, echo=FALSE, fig.width=12, fig.height=4.5, out.width='\\textwidth',cache=TRUE>>=
+<<boxtemp, dependson='readdata', echo=FALSE, fig.width=12, fig.height=4.5, out.width='\\textwidth',cache=TRUE>>=
 ggplot()  + geom_boxplot(aes(Time, value/100, group=interaction(Year, Month)), outlier.size=1, fill = "grey65", data=subset(ushcn, Year<1995)) + theme_bw() + 
   #geom_line(aes(time, avg/100), data=subset(monthly, year(time)<1995), colour="steelblue", size=1.5, alpha=.5) + 
   ylab("Temperature (in Celsius)")
