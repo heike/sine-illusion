@@ -409,7 +409,12 @@ getSecantSegment <- function(x1, df, f, fprime){
   df2 <- data.frame(x=x1, y=f(x1), deriv=fprime(x1),
                     sec.xstart=leftend, sec.xend=rightend, 
                     sec.ystart=(yintercept + secSlope*(leftend)),
+<<<<<<< HEAD
+                    sec.yend = (yintercept + secSlope*(rightend)),
+                    ell.orig = 2*ell.x1)
+=======
                     sec.yend = (yintercept + secSlope*(rightend)))
+>>>>>>> 9e27162a738867a88719784e867eaf6a552ace15
   df2$sec.ell1 <- with(df2, sqrt((sec.yend-y)^2+(sec.xend-x)^2))
   df2$sec.ell2 <- with(df2, sqrt((y-sec.ystart)^2+(x-sec.xstart)^2))
   df2$type <- "Perceived Width"
@@ -419,12 +424,21 @@ getSecantSegment <- function(x1, df, f, fprime){
 getAdjLength<- function(df, center=TRUE){
   theta <- atan(df$deriv)  
   if(!center){
+<<<<<<< HEAD
+  df$seg.ystart <-  with(df, y+ell.orig/2*(1+cos(theta))-sec.ell1*cos(theta))
+  df$seg.yend   <-  with(df, y-ell.orig/2*(1+cos(theta))+sec.ell2*cos(theta))
+  return(df)
+  }  
+  df$seg.ystart <-  with(df, y+ell.orig/2*(1+cos(theta))-(sec.ell1+sec.ell2)/2*cos(theta))
+  df$seg.yend   <-  with(df, y-ell.orig/2*(1+cos(theta))+(sec.ell1+sec.ell2)/2*cos(theta))
+=======
   df$seg.ystart <-  with(df, y+ell.x1*(1+cos(theta))-sec.ell1*cos(theta))
   df$seg.yend   <-  with(df, y-ell.x1*(1+cos(theta))+sec.ell2*cos(theta))
   return(df)
   }  
   df$seg.ystart <-  with(df, y+sec.ell1/(sec.ell1+sec.ell2)*2*ell.x1)
   df$seg.yend   <-  with(df, y-sec.ell2/(sec.ell1+sec.ell2)*2*ell.x1)
+>>>>>>> 9e27162a738867a88719784e867eaf6a552ace15
   df
 }
 
@@ -438,7 +452,11 @@ secantlines2 <- getAdjLength(secantlines, center=TRUE)
 
 library(plyr)
 dframe2 <- secantlines
+<<<<<<< HEAD
+names(dframe2) <- c("x", "y", "deriv", "xstart", "xend", "ystart", "yend", "ell.orig", "ell1", "ell2", "type")
+=======
 names(dframe2) <- c("x", "y", "xstart", "xend", "ystart", "yend", "ell1", "ell2", "new.ystart", "new.yend", "type")
+>>>>>>> 9e27162a738867a88719784e867eaf6a552ace15
 dframe2 <- rbind.fill(dframe, dframe2)
 
 qplot(x=xstart, xend=xend, y = ystart, yend=yend, geom="segment", data=dframe2, colour=type) +
@@ -453,6 +471,16 @@ qplot(x=x, y=sec.ell1, geom="line", data=secantlines) +
   geom_text(aes(x=rev(x)[1]-.25, y=rev(sec.ell1)[1], label="Bottom\nSegment"), hjust=1, vjust=0) +
   theme_bw()
 
+<<<<<<< HEAD
+qplot(x=x, xend=x, y=0, yend=sec.ell1, geom="segment", data=secantlines, linetype=I(1), colour=I("black")) + 
+  geom_segment(aes(yend=-sec.ell2), colour="grey40") + ggtitle("Extant Segment Length (Centered)") + coord_fixed(ratio=1) + ylim(c(-1,1)) + theme_bw()
+
+qplot(x=x, xend=x, y=0, yend=sec.ell1+sec.ell2, geom="segment", data=secantlines, linetype=I(1)) + ggtitle("Extant Segment Length") + coord_fixed(ratio=1) + theme_bw() + ylab("length")
+
+qplot(x=x, xend=x, y=0, yend=seg.ystart-seg.yend, geom="segment", data=secantlines2, linetype=I(1)) + ggtitle("Adjusted Segment Length") + coord_fixed(ratio=1) + theme_bw()
+
+qplot(x=x, xend=x, y=seg.ystart, yend=seg.yend, geom="segment", data=secantlines2, linetype=I(1)) + ggtitle("Adjusted Data") + coord_fixed(ratio=1) #+ geom_line(aes(x=x, y=sin(x) + 1/2), size=1) + geom_line(aes(x=x, y=sin(x) - 1/2), size=1)
+=======
 qplot(x=x, xend=x, y=0, yend=sec.ell1, geom="segment", data=secantlines, linetype=I(1)) + 
   geom_segment(aes(yend=-sec.ell2), linetype=4) + ggtitle("Extant Segment Length (Centered)") + coord_fixed(ratio=1) + ylim(c(-1,1))
 
@@ -464,6 +492,7 @@ qplot(x=x, xend=x, y=0, yend=ell1, geom="segment", data=secantlines, linetype=I(
   geom_segment(aes(yend=-ell2), linetype=4) + ggtitle("Extant Segment Length (Centered)") + coord_fixed(ratio=1) + ylim(c(-1,1))
 
 qplot(x=x, xend=x, y=seg.ystart+y, yend=seg.yend+y, geom="segment", data=secantlines, linetype=I(1)) + ggtitle("Adjusted Data") + coord_fixed(ratio=1) 
+>>>>>>> 9e27162a738867a88719784e867eaf6a552ace15
 @
 \end{subsection}
 \begin{subsection}{Transformation of $X$ Values}
