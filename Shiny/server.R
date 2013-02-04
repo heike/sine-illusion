@@ -75,7 +75,7 @@ shinyServer(function(input, output) {
     dframe <- createSine(n=input$obs+2, len=input$ell, f, fprime, f2prime)[c(2:(input$obs+1)),]
     corr <- which(input$correct==c("none", "geom", "linear", "quad"))
     
-    dframeAdj <- cbind(rbind(df, df), with(df, rbind(data.frame(seg.ystart=y-ell/2, seg.yend=y+ell/2, type="Segment"), data.frame(seg.ystart=ell/2, seg.yend=-ell/2, type="Adjustment"))), adj="None")
+    dframeAdj <- cbind(rbind(dframe, dframe), with(dframe, rbind(data.frame(seg.ystart=y-ell/2, seg.yend=y+ell/2, type="Segment"), data.frame(seg.ystart=ell/2, seg.yend=-ell/2, type="Adjustment"))), adj="None")
     p1 <- qplot(x=x, xend=x, y=seg.ystart, yend=seg.yend, geom="segment", data=dframeAdj) +
             facet_grid(type~adj, scales="free_y") + theme_bw() + 
             coord_equal(ratio=1) + xlab("x") + ylab("y")
