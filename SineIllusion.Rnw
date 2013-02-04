@@ -38,6 +38,29 @@ The sine illusion, which is part of a set of optical illusions which occur based
 \todo[inline]{
 Put labels for reference for all of your charts and write a couple of sentences of why you're drawing this chart and what you see ... it doesn't need to stay in the paper necessarily, but it's usually a good start for keeping track of what we want to do. De-orphanize those charts!! They need labels, so that you can refer to them in the write-up.}
 
+\todo[inline]{
+Proposed structure of the paper:}
+
+\begin{enumerate}
+\item Background and Motivation:
+\begin{itemize}
+\item introduction and discussion of the sine illusion with example: cognitive literature, statistical literature
+\item extent of illusion and generalization to any function with change in slope
+\item variability assessment as example affected by sine illusion
+\end{itemize}
+\item Correction Approaches
+\begin{itemize}
+\item Trend removal
+\item Warping of $x$-axis
+\item Adjustment in $y$:
+\begin{enumerate}
+\item Hammock approach ($1/\atan{\cos(f^\prime(x))}$)
+\item Taylor approximation: linear and quadratic term
+\end{enumerate}
+\end{itemize}
+\item Example: USHCN Data
+\end{enumerate}
+
 \section{Background and Introduction}
 
 
