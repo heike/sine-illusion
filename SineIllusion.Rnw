@@ -399,27 +399,28 @@ qplot(x=x, xend=xend, y = g(x) -ellx2/2, yend=g(x) +ellx2/2, geom="segment", dat
 \end{subsection}\clearpage
 \begin{subsection}{Transformation of $Y$ Values - General Method}
 <<CtsMethodSetup, echo=FALSE, fig.keep='none'>>=
-getSecantSegment <- function(x1, df, f, fprime, f2prime){
-  secSlope   <- -1/fprime(x1)
-  ell.x1     <- df$ell[which.min(abs(df$x-x1))]/2
+getSecantSegment <- function(x0, df, f, fprime, f2prime){
+  secSlope   <- -1/fprime(x0)
+  ell.x0     <- df$ell[which.min(abs(df$x-x0))]/2
   #--- Actual Roots
-#  temp       <- seq(min(df$x)-pi, max(df$x)+pi, .0001)
-#   leftend    <- temp[which.min(abs(f(temp) + ell.x1 - secSlope*(temp-x1)))]
-#   rightend   <- temp[which.min(abs(f(temp) - ell.x1 - secSlope*(temp-x1)))]
+  #  temp       <- seq(min(df$x)-pi, max(df$x)+pi, .0001)
+  #   leftend    <- temp[which.min(abs(f(temp) + ell.x1 - secSlope*(temp-x1)))]
+  #   rightend   <- temp[which.min(abs(f(temp) - ell.x1 - secSlope*(temp-x1)))]
   #---
-  
-  yintercept <- -secSlope*x1
   
   #--- Approximation
-  leftend <- (-(1+fprime(x1)^2) + sqrt((1+fprime(x1)^2)^2 - 2*f2prime(x1)*fprime(x1)*(fprime(x1)*f(x1)+ell.x1)))/(f2prime(x1)*fprime(x1))+x1 
-  rightend <- (-(1+fprime(x1)^2) + sqrt((1+fprime(x1)^2)^2 - 2*f2prime(x1)*fprime(x1)*(fprime(x1)*f(x1)-ell.x1)))/(f2prime(x1)*fprime(x1))+x1
+  lambda1 <- (-(fprime(x0)^2 + 1) + sqrt((fprime(x0)^2 + 1)^2 - 2* fprime(x0)^2*f2prime(x0)*ell.x0))/(fprime(x0)^2*f2prime(x0))
+  lambda2 <- (-(fprime(x0)^2 + 1) + sqrt((fprime(x0)^2 + 1)^2 + 2* fprime(x0)^2*f2prime(x0)*ell.x0))/(fprime(x0)^2*f2prime(x0))
+  
+  leftend <- lambda1*fprime(x0)+x0
+  rightend <- lambda2*fprime(x0)+x0
   #---
   
-  df2 <- data.frame(x=x1, y=f(x1), deriv=fprime(x1),
+  df2 <- data.frame(x=x0, y=f(x0), deriv=fprime(x0),
                     sec.xstart=leftend, sec.xend=rightend, 
-                    sec.ystart=(yintercept + secSlope*(leftend)),
-                    sec.yend = (yintercept + secSlope*(rightend)),
-                    ell.orig = 2*ell.x1)
+                    sec.ystart=f(x0) -lambda1,
+                    sec.yend = f(x0) -lambda2,
+                    ell.orig = 2*ell.x0)
 
   df2$sec.ell1 <- with(df2, sqrt((sec.yend-y)^2+(sec.xend-x)^2))
   df2$sec.ell2 <- with(df2, sqrt((y-sec.ystart)^2+(x-sec.xstart)^2))
@@ -439,7 +440,7 @@ dframe <- createSine(n = 40, len = 1, f=f, fprime=fprime)
 dframe$type <- "Segments"
 
 library(multicore)
-secantlines <- do.call("rbind", mclapply(seq(0, 2*pi, length=40), function(i) getSecantSegment(i, dframe, sin, cos, function(x) -sin(x))))
+secantlines <- do.call("rbind", mclapply(seq(0, 2*pi, length=40), function(i) getSecantSegment(i, dframe, sin, cos, function(x) -sin(x))))[-c(1,40),]
 secantlines2 <- getAdjLength(secantlines)
 
 library(plyr)
@@ -484,7 +485,7 @@ qplot(x=x, xend=x, y=seg.ystart, yend=seg.yend, geom="segment", data=secantlines
 \caption{Adjusting the top and bottom segments of the vertical lines separately so that the extant width is constant breaks the illusion, but slightly distorts the sinusoidal shape of the peaks.}
 \todo[inline]{I need to go back and check the math on this for a third time, because it just looks funky.}
 \end{figure}
-\end{subsection}
+\end{subsection}\clearpage
 \begin{subsection}{Transformation of $X$ Values}
 \todo[inline]{Could you try to write the correction factor out in terms of a formula? - I still think that all of the lines should appear under the same slope, which means that the result would need to be an up/down triangle, like we had before. I'm a bit worried about the `fudge' factor $a$ -- let's first use a correction factor that we can derive mathematically from counteracting the line illusion and then allow some fudging. }
 In order to counteract the illusion of changing line length, we can slightly transform the $X$ values, narrowing the distance between values at the peak and trough of the curve and widening the distance between values at the inflection point. \todo[inline]{The following sentence is a statement, but it is not an explanation. Could you please add the explanation of why this works?  You also need to get away from the delta x and move to its infinitesimal counterpart, i.e. derivatives.} If we alter the $X$ axis such that $\triangle X^\ast = c*a(\cos(2x)+1)$, where $\triangle X = c$ is the distance between two evenly spaced $X$ points, the illusion's effect is broken and all $y$ values appear to be approximately the same length. Consistent with the hypothesis that the apparent line length is dependent on the slope of the tangent line, changing $\triangle x$ reduces the apparent length discrepancy $\triangle y$ significantly.
