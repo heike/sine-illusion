@@ -398,16 +398,23 @@ qplot(x=x, xend=xend, y = g(x) -ellx2/2, yend=g(x) +ellx2/2, geom="segment", dat
 
 \end{subsection}\clearpage
 \begin{subsection}{Transformation of $Y$ Values - General Method}
-\todo[inline]{using multicore feels a bit like shooting  on sparrows with cannons.}
-<<CtsMethodSetup, echo=FALSE, fig.keep='all'>>=
 <<CtsMethodSetup, echo=FALSE, fig.keep='none'>>=
-getSecantSegment <- function(x1, df, f, fprime){
+getSecantSegment <- function(x1, df, f, fprime, f2prime){
   secSlope   <- -1/fprime(x1)
   ell.x1     <- df$ell[which.min(abs(df$x-x1))]/2
-  temp       <- seq(min(df$x)-pi, max(df$x)+pi, .0001)
-  leftend    <- temp[which.min(abs(f(temp) + ell.x1 - secSlope*(temp-x1)))]
-  rightend   <- temp[which.min(abs(f(temp) - ell.x1 - secSlope*(temp-x1)))]
+  #--- Actual Roots
+#  temp       <- seq(min(df$x)-pi, max(df$x)+pi, .0001)
+#   leftend    <- temp[which.min(abs(f(temp) + ell.x1 - secSlope*(temp-x1)))]
+#   rightend   <- temp[which.min(abs(f(temp) - ell.x1 - secSlope*(temp-x1)))]
+  #---
+  
   yintercept <- -secSlope*x1
+  
+  #--- Approximation
+  leftend <- (-(1+fprime(x1)^2) + sqrt((1+fprime(x1)^2)^2 - 2*f2prime(x1)*fprime(x1)*(fprime(x1)*f(x1)+ell.x1)))/(f2prime(x1)*fprime(x1))+x1 
+  rightend <- (-(1+fprime(x1)^2) + sqrt((1+fprime(x1)^2)^2 - 2*f2prime(x1)*fprime(x1)*(fprime(x1)*f(x1)-ell.x1)))/(f2prime(x1)*fprime(x1))+x1
+  #---
+  
   df2 <- data.frame(x=x1, y=f(x1), deriv=fprime(x1),
                     sec.xstart=leftend, sec.xend=rightend, 
                     sec.ystart=(yintercept + secSlope*(leftend)),
@@ -432,7 +439,7 @@ dframe <- createSine(n = 40, len = 1, f=f, fprime=fprime)
 dframe$type <- "Segments"
 
 library(multicore)
-secantlines <- do.call("rbind", mclapply(seq(0, 2*pi, length=40), function(i) getSecantSegment(i, dframe, sin, cos)))
+secantlines <- do.call("rbind", mclapply(seq(0, 2*pi, length=40), function(i) getSecantSegment(i, dframe, sin, cos, function(x) -sin(x))))
 secantlines2 <- getAdjLength(secantlines)
 
 library(plyr)
