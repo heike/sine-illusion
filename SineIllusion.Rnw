@@ -266,8 +266,8 @@ qplot(x=x, y=y, geom="line", data=dframe, colour=I("grey50")) + theme_bw() +
   geom_segment(data=subset(dframe, !is.na(type)), aes(x=xstart, xend = xend, y=ystart, yend=yend, colour=type))  + 
   coord_equal(ratio=1) + scale_colour_manual("", values=c("black", "blue")) + theme(legend.position="bottom")  + 
   geom_text(aes(label=paste("theta", "%~~%", round(vangle/pi*180), "^o", sep=""),
-                x=xstart/2+x/2-sign(vangle)*.1, y=y-sign(vangle)*.64+.04), data=dframe.1, parse=TRUE, hjust=.75, vjust=.5) + 
-  xlim(c(-pi/8, 17*pi/8)) + ggtitle("Changes in Perceived Orthogonal Width due to Change in Secant Angle")
+                x=xstart/2+x/2-sign(vangle)*.1, y=y-sign(vangle)*.64+.04), data=dframe.1, parse=TRUE, hjust=.75, vjust=.5, size=2.5) + 
+  xlim(c(-pi/8, 17*pi/8)) + ggtitle("Changes in Perceived Orthogonal Width \ndue to Change in Secant Angle")
 @
 % \includegraphics[width=.45\linewidth, keepaspectratio=TRUE]{figure/fig-transform-illustration}
 \caption{\label{OrthogonalWidth} The perceived width orthogonal to the slope differs from the length of the lines. \done{include blue orthogonal lines for the whole function. That way we can also see the problem at the changing curvature better. }
