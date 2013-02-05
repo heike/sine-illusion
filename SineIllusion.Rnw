@@ -57,6 +57,7 @@ Proposed structure of the paper:}
 \item Hammock approach ($1/\atan{\cos(f^\prime(x))}$)
 \item Taylor approximation: linear and quadratic term
 \end{enumerate}
+\item Limitations/Comparisons
 \end{itemize}
 \item Example: USHCN Data
 \end{enumerate}
