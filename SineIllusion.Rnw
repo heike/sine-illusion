@@ -1,14 +1,18 @@
 \documentclass[11pt]{article}
 \usepackage{natbib}
 \usepackage{fullpage}
-\usepackage{hyperref}
+\usepackage{color}
+\usepackage[dvipsnames,svgnames]{xcolor}
+\usepackage[colorlinks=TRUE, linkcolor=blue]{hyperref}
 \usepackage{wrapfig,float,subfig}
 \usepackage{graphicx}
 \usepackage{amssymb}
 \usepackage{amsmath}
 
+
 % help with editing and coauthoring
-\usepackage{todonotes}
+\usepackage[textwidth=3.7cm,colorinlistoftodos]{todonotes}
+\setlength{\marginparwidth}{3.7cm}
 
 \graphicspath{{figure/}}
 
@@ -22,7 +26,11 @@ library(reshape2)
 suppressMessages(library(ggplot2))
 @
 
+
 \newcommand{\atan}[1]{\text{atan }\left({#1}\right)}
+\newcommand{\done}[2][inline]{\todo[color=green, #1]{#2}}  % for todos that have been seen and dealt with
+\newcommand{\meh}[2][inline]{\todo[color=white, #1]{#2}}   % for todos that may no longer be relevant 
+\newcommand{\comment}[2][inline]{\todo[color=cyan, #1]{#2}} % for comments that may not be "to-do"s
 
 \title{Signs of the Sine Illusion -- why we need to care}
 \author{Susan Vanderplas, Heike Hofmann, probably include Di and Xiaoyue}
@@ -33,8 +41,9 @@ suppressMessages(library(ggplot2))
 The sine illusion, which is part of a set of optical illusions which occur based on a conflict between a stimuli and the real-world situation which can cause similar stimuli, has a notable impact on perception of time-series data with a seasonal component. In this paper, we discuss the reasons for the illusion and various strategies which might be useful to break the illusion or reduce its' strength, demonstrating the presence of the illusion in real-world and theoretical situations. We also present data from user studies which demonstrate the dramatic effect the sine illusion can have on conclusions drawn from displayed data.
 \end{abstract}
 \tableofcontents
+
 \section{General Comments}
-\todo[inline]{Once you've dealt with a comment, could you color it differently or comment it out, so I can see that you read it and dealt with it? That will help streamline things a bit ... Thanks!}
+\todo[inline,color=SpringGreen]{Once you've dealt with a comment, could you color it differently or comment it out, so I can see that you read it and dealt with it? That will help streamline things a bit ... Thanks!}
 \todo[inline]{
 Put labels for reference for all of your charts and write a couple of sentences of why you're drawing this chart and what you see ... it doesn't need to stay in the paper necessarily, but it's usually a good start for keeping track of what we want to do. De-orphanize those charts!! They need labels, so that you can refer to them in the write-up.}
 
@@ -66,7 +75,7 @@ Proposed structure of the paper:}
 
 
 
-\todo[inline]{this is where we need to introduce the sine-illusion
+\todo[inline,caption={Introduce Sine Illusion}]{this is where we need to introduce the sine-illusion
 
 and lay out the problem that we have with it from a statistical graphics side
 
@@ -77,7 +86,7 @@ last paragraph is a sentence on the structure of the paper.
 
 
 In the perception literature, the phenomenon is known as part of a group of geometrical optical misperceptions classified as M\"uller-Lyer illusions \citep{day:1991}.  Figure \ref{original} shows a reproduction of Bach's applet \citep{bach} displaying the sine illusion. The sine illusion is closely related to the line width phenomenon -- the line segments along the steepest slopes of the sine curve appear to be the shortest: ``The illusion is explained in terms of a perceptual compromise between the vertical extent and the greater overall dimensions of the section at the turn of the sine-wave figure and is thereby held to be the same in principle as the M\"uller-Lyer illusion." \citep{day:1991}.
-M Bach's applet  gives the option to compensate the line length manually for its perceived shortcoming. The amount of compensation chosen turns out to be highly dependent on both the length of the vertical line segments and the amplitude of the sine function. The amplitude directly affects the slope -- the steeper  the slope the more compensation is necessary, see section \ref{distortion}  for a more detailed discussion and some results from a user study  \todo{could we start with our own data for the user study? that way we don't need IRB approval for now. data is in the data folder. I don't see any clear relationship, though/}.
+M Bach's applet  gives the option to compensate the line length manually for its perceived shortcoming. The amount of compensation chosen turns out to be highly dependent on both the length of the vertical line segments and the amplitude of the sine function. The amplitude directly affects the slope -- the steeper  the slope the more compensation is necessary, see section \ref{distortion}  for a more detailed discussion and some results from a user study.  \meh{could we start with our own data for the user study? that way we don't need IRB approval for now. data is in the data folder. I don't see any clear relationship, though/}
 
 <<data, echo=FALSE, eval=TRUE>>=
 f <- function(x) 2*sin(x)
@@ -131,24 +140,24 @@ qplot(x=xstart, xend=xend, y = ystart, yend=yend, geom="segment", data=df1, colo
         panel.grid.minor=element_blank(), panel.background=element_blank(),
         axis.title = element_blank(), axis.ticks = element_blank(), 
         axis.text = element_blank()) + coord_equal(ratio=1) + 
-  geom_segment(x=-pi/12, xend=2*pi+pi/12, y=0, yend=0, colour="grey", linetype=2)+
-  geom_segment(aes(x=x, xend=xend, y=y, yend=yend), colour="red", 
+  geom_segment(x=-pi/12, xend=2*pi+pi/12, y=0, yend=0, colour="grey80", linetype=2)+
+  geom_segment(aes(x=x, xend=xend, y=y, yend=yend), colour="grey50", 
                data=data.frame(x=c(df1$x[6],  mean(df1$x[5:6]), mean(df1$x[5:6])), 
                                xend = c(mean(df1$x[5:6]), mean(df1$x[5:6]), df1$x[6]),
                                y = c(df1$y[6], df1$y[6], 0), 
                                yend = c(df1$y[6], 0, 0)), size=1) + 
-  geom_text(aes(x=df1$x[5], y=df1$y[6]/2, label="s"), hjust=1, vjust=.5, size=10, colour="red") + 
-  geom_segment(aes(x=x, xend=xend, y=y, yend=yend), colour="blue", 
+  geom_text(aes(x=df1$x[5], y=df1$y[6]/2, label="s"), hjust=1, vjust=.5, size=10, colour="grey50") + 
+  geom_segment(aes(x=x, xend=xend, y=y, yend=yend), colour="grey70", 
              data=data.frame(x=c(df1$x[20],  mean(df1$x[19:20]), mean(df1$x[19:20])), 
                              xend = c(mean(df1$x[19:20]), mean(df1$x[19:20]), df1$x[20]),
                              y = c(df1$ystart[20], df1$ystart[20], df1$yend[20]), 
                              yend = c(df1$ystart[20], df1$yend[20], df1$yend[20])), size=1) +
-  geom_text(aes(x=df1$x[19], y=df1$y[20], label="\u2113"), hjust=1, vjust=.5, size=10, colour="blue")
+  geom_text(aes(x=df1$x[19], y=df1$y[20], label="\u2113"), hjust=1, vjust=.5, size=10, colour="grey70")
 dev.off()
 @
 \includegraphics[keepaspectratio=true, width=\linewidth]{fig-original-redo.pdf}
 \end{minipage}
-\caption{\label{original}The original Sine Illusion. The regions of the graph in the peak and the valley appear to be composed of longer lines than the other regions. $s$ denotes the amplitude of the function, $\ell$ the length of the line segments. \todo[inline]{We need to mention that there's a left and a right chart.
+\caption{\label{original}The original Sine Illusion. The regions of the left graph in the peak and the valley appear to be composed of longer lines than the other regions. The right graph illustrates the parameters determining the appearance of the illusion: $s$ denotes the amplitude of the function, $\ell$ the length of the line segments. \done[caption={Remove Color}, inline]{We need to mention that there's a left and a right chart.
 Please get rid of the strong colours - we don't need red and blue for the labels. Use shades of grey.}}
 \end{figure}
 
@@ -167,7 +176,7 @@ qplot(x=x, xend=xend, y = ystart*ell, yend=yend*ell, geom="segment", data=dframe
        axis.title = element_blank(), axis.ticks = element_blank(), 
        axis.text = element_blank()) + coord_equal(ratio=1)
 @
-\caption{\label{originalgrid} Horizontal grid lines do not help much in resolving the illusion, even though they provide a clear basis for comparison of line lengths.}
+\caption{\label{originalgrid} Horizontal grid lines do not help to resolve the illusion, even though they provide a clear basis for comparison of line lengths.}
 \end{figure}
 
 \clearpage
@@ -186,7 +195,7 @@ Orthogonal $w_o$ and vertical $w_v$ line widths are related -- the orthogonal li
 w_o = w_v \cos \theta,
 \end{equation}
 where $\theta$ is the angle of the line with respect to the horizontal line.
-\todo[inline]{Should we make the $w_o$ vs. b and $w_v$ vs. a terminology consistent? -- I'm not sure that we keep the figure - let's worry about content first. I like the next figure actually better, but it's not labelled at all yet. HH}
+\done{Should we make the $w_o$ vs. b and $w_v$ vs. a terminology consistent? -- I'm not sure that we keep the figure - let's worry about content first. I like the next figure actually better, but it's not labelled at all yet. HH}
 \begin{figure}[htbp]
 \begin{center}
 \includegraphics[width=0.3\linewidth]{images/linewidth}
