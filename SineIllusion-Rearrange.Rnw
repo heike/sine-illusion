@@ -44,7 +44,8 @@ The sine illusion, which is part of a set of optical illusions which occur based
 \tableofcontents
 
 \section{Introduction}
-The sine illusion is an optical illusion which has a pervasive effect on our ability to interpret statistical graphics commonly used for time-series data. Data which follows a sinusoidal trend seems to have higher variance at the peak and trough, and much lower variance where the slope of the curve is steepest. One presentation\mcomment{Presentation isn't the right word... occurrence?} of the Sine illusion comes from M. Bach's applet \citep{bach}, which cites perception research suggesting that the sine illusion occurs due to misapplication of perceptual experience with the three-dimensional world to a two-dimensional ``artificial" display of data. One possible three-dimensional context for similar stimuli is shown in Figure \ref{ribbon-illusion}.
+The sine illusion, shown in Figure \ref{original}, is an optical illusion which has a pervasive effect on our ability to interpret statistical graphics commonly used for time-series data. Data which follows a sinusoidal trend seems to have higher variance at the peak and trough, and much lower variance where the slope of the curve is steepest. 
+
 
 <<data, echo=FALSE, eval=TRUE>>=
 f <- function(x) 2*sin(x)
@@ -118,6 +119,10 @@ dev.off()
 \end{minipage}
 \caption{\label{original}The original Sine Illusion. The regions of the left graph in the peak and the valley appear to be composed of longer lines than the other regions. The right graph illustrates the parameters determining the appearance of the illusion: $s$ denotes the amplitude of the function, $\ell$ the length of the line segments.}
 \end{figure}
+
+\subsection{Perceptual Explanations for the Sine Illusion}
+One presentation \mcomment{\footnotesize Presentation isn't the right word... occurrence?} of the Sine illusion comes from M. Bach's applet \citep{bach}, which cites perception research suggesting that the sine illusion occurs due to misapplication of perceptual experience with the three-dimensional world to a two-dimensional ``artificial" display of data. One possible three-dimensional context for similar stimuli is shown in Figure \ref{ribbon-illusion}.
+
 \begin{figure}[h!tbp]\centering
 <<ribbon-illusion,echo=FALSE, fig.keep='none', fig.width=5, fig.height=2.6>>=
 angle <- .02
@@ -142,7 +147,8 @@ qplot(data=persp, x=xtop, xend=xbottom, y=ytop, yend=ybottom, geom="segment") + 
 \label{ribbon-illusion}
 \end{figure}
 
-An interesting facet of the sine illusion is that when the graph is examined as if it were a two-dimensional projection of a three-dimensional figure, the illusion disappears and the line widths seem once more to be constant. In addition, if the lines are considered without the surrounding context, judgments comparing two lines are relatively accurate, particularly if the graph also includes horizontal reference lines, as in Figure \ref{original-grid}
+An interesting facet of the sine illusion is that when the graph is examined as if it were a two-dimensional projection of a three-dimensional figure, the illusion disappears and the line widths seem once more to be constant. In addition, if the lines are considered without the surrounding context, judgments comparing two lines are relatively accurate, particularly if the graph also includes horizontal reference lines, as in Figure \ref{original-grid}. 
+
 
 \begin{figure}[hbtp]
 \centering
@@ -161,6 +167,8 @@ qplot(x=x, xend=xend, y = ystart*ell, yend=yend*ell, geom="segment", data=dframe
 @
 \caption{\label{original-grid} Horizontal grid lines do not help to resolve the illusion, even though they provide a clear basis for comparison of line lengths.}
 \end{figure}
+
+Though it is typically a bad idea to use three-dimensional representations when two dimensions are adequate to display the data \citep{tufte}, in this case, the data are perceived more accurately. A three-dimensional projection of two-dimensional data, however, is not easy to create and would likely lead to distortions and instability in the visual display. In particular, there does not seem to be an easy guideline for determining the projection angle or color gradient that would be necessary to create the illusory depth that would remove the optical illusion. 
 
 While not thoroughly examined in the sensation and perception literature, the sine illusion seems to have been classified as part of a group of geometrical optical misperceptions which may be related to the M\"uller-Lyer illusion \citep{day:1991} or the Poggendorf illusion \citep{poggendorf}.  Figure \ref{original} shows a reproduction of Bach's applet \citep{bach} displaying the sine illusion. The sine illusion is closely related to the line width phenomenon -- the line segments along the steepest slopes of the sine curve appear to be the shortest: ``The illusion is explained in terms of a perceptual compromise between the vertical extent and the greater overall dimensions of the section at the turn of the sine-wave figure and is thereby held to be the same in principle as the M\"uller-Lyer illusion." \citep{day:1991}.
 M Bach's applet  gives the option to compensate the line length manually for its perceived shortcoming. The amount of compensation chosen turns out to be highly dependent on both the length of the vertical line segments and the amplitude of the sine function. While the applet does not provide details on the compensation function, it does suggest that it may be possible to correct the graphical display so that the brain interprets the stimuli in a manner consistent with the numerical data. 
@@ -191,9 +199,180 @@ Another example of this phenomenon is shown in Figure \ref{robbins-graph} \todo[
 \caption{\cite{cleveland:1985} examined the task of judging the distance between two curves experimentally: ``In the top panel it is difficult to judge how much greater the y-values of curve 1 are than those for curve 2 because our visual system has difficulty detecting the vertical distances between the curves. In the bottom panel the differences are graphed directly; the values are quite different from how they appear in the top panel"}
 \label{cleveland-figure}
 \end{figure}
+
+More recently, the line-width illusion has been cited as a reason to modify hammock plots...\todo[inline]{add more here...} Figure \ref{hammocks} shows the hammock plot and the corrected plot, which has been modified so that all angles are constant.
+\begin{figure}[htbp]
+\centering
+\missingfigure{Figure or figures showing hammock plots and the corrected version}
+\caption{}
+\label{hammocks}
+\end{figure}
+
+\subsection{Geometry of the Sine Illusion}
+The visual preference for judging the length of the line by the orthogonal extant suggests that the underlying illusion may be a function of geometry rather than some mysterious visual process that occurs automatically between perception of the stimulus and conscious thought. If this is the case, then it may be that by comparing the orthogonal width and the vertical length of the line it may be possible to dissect the illusion and correct the graphical display so that it is not as visually deceptive.
+
+Using the notation given in Figure \ref{original}, we assume a value $s$ for the sine amplitude, $\ell$ for the vertical length of line segments, and $\ell_c$ for the amount of compensation. 
+The sine curve is then given by function $f$, written as 
+\[
+f(x) = s \cdot \sin(x)
+\]
+for $x$ in $[-\pi, \pi]$. The slope of the sine curve is the steepest in its reflection point at $x=0$. We can calculate the slope as $f^\prime(x) = s \cos(x)$, which in $x=0$ yields a slope of $s/2$.
+
+These differences in the slope are the reason we perceive the lines to have different length, as we have an innate tendency to evaluate line or band widths orthogonally rather than vertically, even though the mathematical judgment requires evaluation of the vertical distance. 
+
+\begin{figure}[h!tbp]
+\begin{center}
+\includegraphics[width=0.3\linewidth]{images/linewidth}
+\end{center}
+\caption{\label{fig:linewidth}Sketch of line width assessments: (a) is showing  vertical width, (b) shows  width orthogonal to the slope. \comment{From previous surveys (we could cite Marie's survey here) we know that  observers associate line width more with  orthogonal width (b) than vertical width (a).}}
+\end{figure}
+% 
+
+Orthogonal $w_o$ and vertical $w_v$ line widths are related -- the orthogonal line width depends on the angle (or, equivalently, the slope) of the line:
+\begin{equation}\label{adjust}
+w_o = w_v \cos \theta,
+\end{equation}
+where $\theta$ is the acute angle between the secant line and the vertical, that is, $\theta \in (-pi, pi]$.
+\begin{figure}[h!tbp]
+\centering
+<<transform-illustration,echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE>>=
+library(plyr)
+dframe <- createSine(n = 150, len = 1, f=f, fprime=fprime)
+dframe$ystartcts <- dframe$ystart
+dframe$yendcts <- dframe$yend
+dframe[1:150,c(2, 3, 5, 6)] <- NA
+dframe[(1:15)*10-5, c(2, 3)] <- dframe[(1:15)*10-5, 1] 
+dframe[(1:15)*10-5, 5] <- dframe[(1:15)*10-5, 4] - .5
+dframe[(1:15)*10-5, 6] <- dframe[(1:15)*10-5, 4] + .5
+dframe$type <- "Data"
+getSecantSegment <- function(x0, df, f, fprime, f2prime){
+  secSlope   <- -1/fprime(x0)
+  ell.x0     <- df$ell[which.min(abs(df$x-x0))]/2
+  #--- Actual Roots
+  #  temp       <- seq(min(df$x)-pi, max(df$x)+pi, .0001)
+  #   leftend    <- temp[which.min(abs(f(temp) + ell.x1 - secSlope*(temp-x1)))]
+  #   rightend   <- temp[which.min(abs(f(temp) - ell.x1 - secSlope*(temp-x1)))]
+  #---
+  
+  #--- Approximation
+  lambda1 <- (-(fprime(x0)^2 + 1) + sqrt((fprime(x0)^2 + 1)^2 - 2* fprime(x0)^2*f2prime(x0)*ell.x0))/(fprime(x0)^2*f2prime(x0))
+  lambda2 <- (-(fprime(x0)^2 + 1) + sqrt((fprime(x0)^2 + 1)^2 + 2* fprime(x0)^2*f2prime(x0)*ell.x0))/(fprime(x0)^2*f2prime(x0))
+  
+  leftend <- lambda1*fprime(x0)+x0
+  rightend <- lambda2*fprime(x0)+x0
+  #---
+  
+  df2 <- data.frame(x=x0, y=f(x0), deriv=fprime(x0),
+                    sec.xstart=leftend, sec.xend=rightend, 
+                    sec.ystart=f(x0) -lambda1,
+                    sec.yend = f(x0) -lambda2,
+                    ell.orig = 2*ell.x0)
+
+  df2$sec.ell1 <- with(df2, sqrt((sec.yend-y)^2+(sec.xend-x)^2))
+  df2$sec.ell2 <- with(df2, sqrt((y-sec.ystart)^2+(x-sec.xstart)^2))
+  df2$type <- "Perceived Width"
+  return(df2)
+}
+
+
+dframe.1 <- getSecantSegment(dframe$xstart, dframe, f, fprime, f2prime)
+
+names(dframe.1) <- c("x", "y", "deriv", "xstart", "xend", "ystart", "yend", "ell", "ell.quad1", "ell.quad2", "type")
+dframe.1 <- dframe.1[!is.na(dframe.1$x),]
+dframe.1$vangle <- with(dframe.1, asin((xstart-x)/ell.quad1))
+# dframe.1$x <- dframe$x
+# dframe.1$y <- dframe$y
+# dframe.1$ystartcts <- dframe$ystartcts
+# dframe.1$yendcts <- dframe$yendcts
+dframe <- rbind.fill(dframe, dframe.1)
+
+
+qplot(x=x, y=y, geom="line", data=dframe, colour=I("grey50")) + theme_bw() + 
+  geom_line(aes(y=ystartcts), colour="grey50", linetype=4) + 
+  geom_line(aes(y=yendcts), colour="grey50", linetype=4) +
+  geom_segment(data=subset(dframe, !is.na(type)), aes(x=xstart, xend = xend, y=ystart, yend=yend, colour=type))  + 
+  coord_equal(ratio=1) + scale_colour_manual("", values=c("black", "blue")) + theme(legend.position="bottom")  + 
+  geom_text(aes(label=paste("theta", "%~~%", round(vangle/pi*180), "^o", sep=""),
+                x=xstart/2+x/2-sign(vangle)*.1, y=y-sign(vangle)*.64+.04), data=dframe.1, parse=TRUE, hjust=.75, vjust=.5, size=2.5) + 
+  xlim(c(-pi/8, 17*pi/8)) + ggtitle("Changes in Perceived Orthogonal Width \ndue to Change in Secant Angle")
+@
+% \includegraphics[width=.45\linewidth, keepaspectratio=TRUE]{figure/fig-transform-illustration}
+\caption{\label{OrthogonalWidth} The perceived length of the vertical line changes with the angle of the line perpendicular to the slope of $\sin(x)$, suggesting that the sine illusion stems from a conflict between the visual system's perception of figure width and the mathematical judgement necessary to determine the length of the vertical lines.
+}
+\end{figure}
+
+
+\comment{This probably should be moved, or re-fashioned into a nice transition between sections...}
+The sine illusion disappears when the width orthogonal to the slope is made constant. This can be done by forcing the magnitude of the slope to be constant (by transforming the $x$ axis), or by making the lines appear to be of the same height, by adjusting their lengths to maintain a constant orthogonal width. This is the approach that we pursue when transforming the $Y$ values. 
+\clearpage
+\section{Breaking the Sine Illusion by Mathematical Transformations}
+\subsection{Hammock-Plot Transformations}
+\subsection{Transformation of the X-Axis}
+\subsection{Transformation of the Y-Axis}
+\subsubsection{Linear Approximation to f(x)}
+\subsubsection{Quadratic Approximation to f(x)}
+\subsection{Discussion of Transformations}
+\clearpage
+\section{Application: USHCN Data}
+<<readdata, echo=FALSE>>=
+ushcn <- na.omit(read.csv("data/ushcn.csv"))
+monthly <- read.csv("data/monthly-avgs.csv")
+suppressMessages(require(lubridate))
+suppressMessages(require(ggplot2))
+ushcn$Time <- as.Date(ushcn$Time)
+monthly$time <- as.Date(monthly$time)
+@
+
+\begin{figure}[hbtp]
+\centering
+<<rawtemp, dependson='readdata', echo=FALSE, echo=FALSE, fig.width=12, fig.height=4.5, out.width='\\textwidth',cache=TRUE>>=
+ggplot()  + geom_jitter(aes(Time, value/100), data=ushcn, size=1) + 
+  geom_line(aes(time, avg/100), data=monthly, colour="steelblue", size=1.5) + 
+  ylab("Temperature (in Celsius)")
+# ggsave(file="figure/monthly-temps.pdf", width=12, height=4.5)
+@
+% \includegraphics[width=\textwidth]{monthly-temps}
+\caption{\label{raw-temp}Raw monthly maximum temperatures (in Celsius) between 1980 and 2012 at 1218 stations across the US. The blue line shows fitted temperatures from a baseline model. The plot suggests that the model fails to capture the more extreme values in summer and winter. }
+\end{figure}
+\begin{figure}[hbtp]\centering
+<<boxtemp, dependson='readdata', echo=FALSE, fig.width=12, fig.height=4.5, out.width='\\textwidth',cache=TRUE>>=
+ggplot()  + geom_boxplot(aes(Time, value/100, group=interaction(Year, Month)), outlier.size=1, fill = "grey65", data=subset(ushcn, Year<1995)) + theme_bw() + 
+  #geom_line(aes(time, avg/100), data=subset(monthly, year(time)<1995), colour="steelblue", size=1.5, alpha=.5) + 
+  ylab("Temperature (in Celsius)")
+# ggsave(file="figure/monthly-temps.pdf", width=12, height=4.5)
+@
+
+\caption{\label{box-temp}Monthly boxplot of maximum temperatures (in Celsius) between 1980 and 1995 at 1218 stations across the US. The sine illusion is less powerful but still visible in three locations:  the box area of the boxes,  the whiskers, and in the outliers.}
+\end{figure}
+\begin{figure}[hbtp]
+\centering
+<<residtemp, dependson='rawtemp', echo=FALSE, echo=FALSE, fig.width=12, fig.height=4.5, out.width='\\textwidth'>>=
+ushcn <- merge(ushcn, monthly[,c("time", "avg")], by.x="Time", by.y="time")
+ushcn$resid <- with(ushcn, value-avg)
+ggplot()  + geom_jitter(aes(Time, resid/100), data=ushcn, size=1) + 
+  geom_hline(yintercept=0, colour="steelblue", size=1) + 
+  ylab("Residual temperature (in Celsius)") + theme_bw()
+# ggsave(file="figure/monthly-resid-temps.pdf", width=12, height=4.5)
+@
+% \includegraphics[width=\textwidth]{monthly-resid-temps}
+\caption{\label{resid-temp}Residual monthly temperatures (in Celsius) from the baseline model fit. The original impression of smaller deviations during Spring and Fall is now almost gone: Winters have larger negative residuals, while Summers have larger positive ones. }
+\end{figure}
+
+\begin{figure}[h!tbp]\centering
+<<residtempboxplot, dependson='residtemp', echo=FALSE, echo=FALSE, fig.width=12, fig.height=4.5, out.width='\\textwidth'>>=
+ggplot()  + geom_boxplot(aes(Year+(Month-1)/12, resid/100, group=Year+(Month-1)/12), data=subset(ushcn, Year<1995), size=1) + 
+  # geom_hline(yintercept=0, colour="steelblue", size=1) + 
+  ylab("Residual temperature (in Celsius)")
+# ggsave(file="figure/monthly-resid-temps.pdf", width=12, height=4.5)
+@
+\end{figure}
+
+Figures \ref{raw-temp} and \ref{resid-temp} show temperature data from 1218 stations across the US. The first plot shows raw temperatures, the second residuals from a `baseline' model. The caption for the raw temperature plot suggests that the baseline model is not quitable to capture all of the variability in summer and winter peaks. However, the model used is actually based on averages in each time point. This model is not  susceptible to shrinking values, and it is our perception of the plot rather than the data that makes us see any higher variability in the peaks. After removing the averages in figure \ref{resid-temp} the impression of higher variability in the peaks is gone with the exception of a few outliers.
+
+\clearpage
+\section{Conclusion}
 \clearpage
 \bibliographystyle{asa}
 % argument is your BibTeX string definitions and bibliography database(s)
 \bibliography{references}
-
 \end{document}
