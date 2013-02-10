@@ -1,0 +1,199 @@
+\documentclass[11pt]{article}
+\usepackage{natbib}
+\usepackage{fullpage}
+\usepackage{color}
+\usepackage[dvipsnames,svgnames]{xcolor}
+\usepackage[colorlinks=TRUE, linkcolor=blue]{hyperref}
+\usepackage{wrapfig,float,subfig}
+\usepackage{graphicx}
+\usepackage{amssymb}
+\usepackage{amsmath}
+
+
+% help with editing and coauthoring
+\usepackage[colorinlistoftodos]{todonotes}
+
+\graphicspath{{figure/}}
+
+
+<<setup, fig.keep='all', cache=FALSE, echo=FALSE, eval=TRUE>>=
+#rm(list=ls())
+options(replace.assign=TRUE,width=70)
+require(knitr)
+opts_chunk$set(fig.path='figure/fig-', cache.path='cache/', fig.align='center', fig.width=5, fig.height=5, fig.show='hold', par=TRUE, cache=TRUE, concordance=TRUE, autodep=TRUE)
+library(reshape2)
+suppressMessages(library(ggplot2))
+library(plyr)
+@
+
+
+\newcommand{\atan}[1]{\text{atan }\left({#1}\right)}
+\newcommand{\done}[2][inline]{\todo[color=SpringGreen, #1]{#2}}  % for todos that have been seen and dealt with
+\newcommand{\meh}[2][inline]{\todo[color=White, #1]{#2}}   % for todos that may no longer be relevant 
+\newcommand{\comment}[2][inline]{\todo[color=SkyBlue, #1]{#2}} % for comments that may not be "to-do"s
+\newcommand{\mcomment}[1]{\todo[color=SkyBlue]{#1}} % for margin comments
+
+\title{Signs of the Sine Illusion -- why we need to care}
+\author{Susan Vanderplas, Heike Hofmann, probably include Di and Xiaoyue}
+
+\begin{document}
+\maketitle
+\begin{abstract}
+The sine illusion, which is part of a set of optical illusions which occur based on a conflict between a stimuli and the real-world situation which can cause similar stimuli, has a notable impact on perception of time-series data with a seasonal component. In this paper, we discuss the reasons for the illusion and various strategies which might be useful to break the illusion or reduce its' strength, demonstrating the presence of the illusion in real-world and theoretical situations. We also present data from user studies which demonstrate the dramatic effect the sine illusion can have on conclusions drawn from displayed data.
+\end{abstract}
+\tableofcontents
+
+\section{Background: Graphics and Optical Illusions}
+The sine illusion is an optical illusion which has a pervasive effect on our ability to interpret statistical graphics commonly used for time-series data. Data which follows a sinusoidal trend seems to have higher variance at the peak and trough, and much lower variance where the slope of the curve is steepest. One presentation\mcomment{Presentation isn't the right word... occurrence?} of the Sine illusion comes from M. Bach's applet \citep{bach}, which cites perception research suggesting that the sine illusion occurs due to misapplication of perceptual experience with the three-dimensional world to a two-dimensional ``artificial" display of data. One possible three-dimensional context for similar stimuli is shown in Figure \ref{ribbon-illusion}.
+
+<<data, echo=FALSE, eval=TRUE>>=
+f <- function(x) 2*sin(x)
+fprime <- function(x) 2*cos(x)
+f2prime <- function(x) -2*sin(x)
+
+createSine <- function(n=200, len=1, f=f, fprime=fprime) {
+  x <- seq(0, 2*pi, length=n)
+  l <- rep(len, length=length(x))
+  fx <- f(x)
+  ystart <- fx - .5*l
+  yend <- fx + .5*l
+  ell <- yend-ystart
+  # now correct for line illusion in vertical direction
+  dy <- diff(range(fx))
+  dx <- diff(range(x))
+# fprime works in framework of dx and dy, but we represent it in framework of dx and dy+len
+# needs to be fixed by factor a:  
+  a <- dy/(dy + len) 
+# ellx is based on the "hammock" correction
+  ellx <- ell / cos(atan(abs(a*fprime(x))))
+# ellx2 is based on linear approximation of f  
+  ellx2 <- ell * sqrt(1 + a*fprime(x)^2)
+# third adjustment is based on quadratic approximation of f.
+# this needs two parts: correction above and below f(x)  
+  
+  # make this a data frame - ggplot2 doesn't do well with floating vectors
+  dframe <- data.frame(x=x, xstart=x, xend=x, y=fx, ystart=ystart, yend=yend, ell=ell, ellx = ellx, ellx2=ellx2)
+  
+  dframe
+}
+@
+\begin{figure}[hbtp]
+\centering
+\begin{minipage}{.49\linewidth}
+<<original, dependson='data', echo=FALSE, results='asis', fig.width=5, fig.height=5>>=
+qplot(x=x, xend=xend, y = ystart, yend=yend, geom="segment", data=createSine(40, 1, f=f, fprime=fprime)) +
+  theme(panel.grid.major=element_blank(), panel.background = element_rect(fill = "white", 
+                colour = "black"),
+       panel.grid.minor=element_blank(), panel.background=element_blank(),
+       axis.title = element_blank(), axis.ticks = element_blank(), 
+       axis.text = element_blank()) + coord_equal(ratio=1)
+@
+\end{minipage}\begin{minipage}{.49\linewidth}
+<<original-redo, echo=FALSE, fig.keep='none', results='hide', fig.keep='all'>>=
+cairo_pdf("./figure/fig-original-redo.pdf", width=5, height=5)
+df1 <- createSine(20,1, f=f, fprime=fprime)
+df1$colour <- c(rep("A", 5), "A", rep("A", 13), "A")
+qplot(x=xstart, xend=xend, y = ystart, yend=yend, geom="segment", data=df1, colour=I("grey20")) +
+  theme(panel.grid.major=element_blank(), 
+        panel.background = element_rect(fill = "white", colour = "black"),
+        panel.grid.minor=element_blank(), panel.background=element_blank(),
+        axis.title = element_blank(), axis.ticks = element_blank(), 
+        axis.text = element_blank()) + coord_equal(ratio=1) + 
+  geom_segment(x=-pi/12, xend=2*pi+pi/12, y=0, yend=0, colour="grey80", linetype=2)+
+  geom_segment(aes(x=x, xend=xend, y=y, yend=yend), colour="grey50", 
+               data=data.frame(x=c(df1$x[6],  mean(df1$x[5:6]), mean(df1$x[5:6])), 
+                               xend = c(mean(df1$x[5:6]), mean(df1$x[5:6]), df1$x[6]),
+                               y = c(df1$y[6], df1$y[6], 0), 
+                               yend = c(df1$y[6], 0, 0)), size=1) + 
+  geom_text(aes(x=df1$x[5], y=df1$y[6]/2, label="s"), hjust=1, vjust=.5, size=10, colour="grey50") + 
+  geom_segment(aes(x=x, xend=xend, y=y, yend=yend), colour="grey60", 
+             data=data.frame(x=c(df1$x[20],  mean(df1$x[19:20]), mean(df1$x[19:20])), 
+                             xend = c(mean(df1$x[19:20]), mean(df1$x[19:20]), df1$x[20]),
+                             y = c(df1$ystart[20], df1$ystart[20], df1$yend[20]), 
+                             yend = c(df1$ystart[20], df1$yend[20], df1$yend[20])), size=1) +
+  geom_text(aes(x=df1$x[19], y=df1$y[20], label="\u2113"), hjust=1, vjust=.5, size=10, colour="grey60")
+dev.off()
+@
+\includegraphics[keepaspectratio=true, width=\linewidth]{fig-original-redo.pdf}
+\end{minipage}
+\caption{\label{original}The original Sine Illusion. The regions of the left graph in the peak and the valley appear to be composed of longer lines than the other regions. The right graph illustrates the parameters determining the appearance of the illusion: $s$ denotes the amplitude of the function, $\ell$ the length of the line segments.}
+\end{figure}
+\begin{figure}[h!tbp]\centering
+<<ribbon-illusion,echo=FALSE, fig.keep='none', fig.width=5, fig.height=2.6>>=
+angle <- .02
+shift <- pi/30
+x <- seq(-1*pi, 1*pi, pi/30)
+persp <- data.frame(xtop=x+shift + angle, xbottom=x-shift, ytop = (1-angle)*sin(x+shift)+1/2, ybottom = (1+angle)*sin(x+shift)-1/2)
+persp$ell <- with(persp, sqrt((xbottom-xtop)^2 + (ybottom-ytop)^2))
+qplot(data=persp, x=xtop, xend=xbottom, y=ytop, yend=ybottom, geom="segment") + ggtitle("What the brain expects the data to look like") + 
+  xlab("") + ylab("") + 
+  theme(panel.grid.major=element_blank(), 
+        panel.background = element_rect(fill = "white", colour = "black"),
+        panel.grid.minor=element_blank(), panel.background=element_blank(),
+        axis.title = element_blank(), axis.ticks = element_blank(), 
+        axis.text = element_blank()) + coord_equal(ratio=1) +
+  geom_line(aes(x=xtop, y=ytop), size=1)+
+  geom_line(aes(x=xbottom, y=ybottom), size=1.5)
+
+
+@
+\includegraphics[width=.5\linewidth, keepaspectratio=TRUE]{figure/fig-ribbon-illusion}
+\caption{Experience with real-world objects suggests that the data are most similar to a slightly angled top view of a 3-dimensional strip such as a ribbon. Even though the sine illusion lines are not angled, the brain often recruits paradigms from one situation when processing novel stimuli. Optical illusions result from the mismatch between the applied heuristic and the stimulus. \citep{goldstein}} % goldstein S&P 8th edition pg 249
+\label{ribbon-illusion}
+\end{figure}
+
+An interesting facet of the sine illusion is that when the graph is examined as if it were a two-dimensional projection of a three-dimensional figure, the illusion disappears and the line widths seem once more to be constant. In addition, if the lines are considered without the surrounding context, judgments comparing two lines are relatively accurate, particularly if the graph also includes horizontal reference lines, as in Figure \ref{original-grid}
+
+\begin{figure}[hbtp]
+\centering
+<<originalgrid, dependson='data', echo=FALSE, results='asis',out.width=".5\\linewidth">>=
+dframe <- createSine(n = 40, len = 1, f=f, fprime=fprime)
+
+qplot(x=x, xend=xend, y = ystart*ell, yend=yend*ell, geom="segment", data=dframe) +
+  theme(panel.grid.major.y=element_line(colour="grey75"), 
+        panel.grid.minor.y=element_line(colour="grey85"), 
+        panel.grid.major.x=element_blank(),
+        panel.background = element_rect(fill = "white", 
+                colour = "black"),
+       panel.grid.minor.x=element_blank(), panel.background=element_blank(),
+       axis.title = element_blank(), axis.ticks = element_blank(), 
+       axis.text = element_blank()) + coord_equal(ratio=1)
+@
+\caption{\label{original-grid} Horizontal grid lines do not help to resolve the illusion, even though they provide a clear basis for comparison of line lengths.}
+\end{figure}
+
+While not thoroughly examined in the sensation and perception literature, the sine illusion seems to have been classified as part of a group of geometrical optical misperceptions which may be related to the M\"uller-Lyer illusion \citep{day:1991} or the Poggendorf illusion \citep{poggendorf}.  Figure \ref{original} shows a reproduction of Bach's applet \citep{bach} displaying the sine illusion. The sine illusion is closely related to the line width phenomenon -- the line segments along the steepest slopes of the sine curve appear to be the shortest: ``The illusion is explained in terms of a perceptual compromise between the vertical extent and the greater overall dimensions of the section at the turn of the sine-wave figure and is thereby held to be the same in principle as the M\"uller-Lyer illusion." \citep{day:1991}.
+M Bach's applet  gives the option to compensate the line length manually for its perceived shortcoming. The amount of compensation chosen turns out to be highly dependent on both the length of the vertical line segments and the amplitude of the sine function. While the applet does not provide details on the compensation function, it does suggest that it may be possible to correct the graphical display so that the brain interprets the stimuli in a manner consistent with the numerical data. 
+
+\subsection{Statistical Graphics and the Line Width Illusion}
+While the illusion presented above is termed the sine illusion, it holds for non-sinusoidal curves which have dramatic changes in the slope of the lines over time as well. Figure \ref{playfair-debt} shows one example of this common phenomenon: the vertical distance between the two lines is much less visually salient than the extant width of the line, that is, the width of the line segment which is perpendicular to the tangent line at a given point. For this reason, the difference between the lines at \todo{insert explanation specific to the graph here}.
+
+\begin{figure}[htbp]
+\centering
+\missingfigure{Playfair's graph goes here - I couldn't manage to find the right one on Google. I found several which were similar but the effect wasn't nearly as dramatic.}
+\caption{Playfair's graph of... demonstrates that the line width illusion is not only found on sinusoidal curves but is present whenever the slope of the lines change dramatically.}
+\label{playfair-debt}
+\end{figure}
+
+Another example of this phenomenon is shown in Figure \ref{robbins-graph} \todo[inline]{Add description, etc. here}
+\begin{figure}[htbp]
+\centering
+\missingfigure{Creating More effective graphs Figure 2.16}
+\caption{}
+\label{robbins-graph}
+\end{figure}
+
+\cite{cleveland:1985} also discuss the perceptual difficulty of judging the difference between two curves plotted on the same axis. They recommend the difference between the two curves as an alternate display, as shown in the second part of Figure \ref{cleveland-figure}. While this is good practice when there are two separate curves (as in Figure \ref{playfair-debt}), when the contours of the data implicitly create two curves (the boundaries of the variability in the data) there is not an easy way to display the difference between these implicit curves without resorting to arbitrary minimum and maximum smoothing values. In addition, as in Figure \ref{playfair-debt} both the difference between the curves and the overall trend are of visual importance, and plotting the difference between the two curves removes the overall trend. 
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[keepaspectratio=TRUE, width=.75\linewidth]{images/ClevelandMcGillFig7}
+\caption{\cite{cleveland:1985} examined the task of judging the distance between two curves experimentally: ``In the top panel it is difficult to judge how much greater the y-values of curve 1 are than those for curve 2 because our visual system has difficulty detecting the vertical distances between the curves. In the bottom panel the differences are graphed directly; the values are quite different from how they appear in the top panel"}
+\label{cleveland-figure}
+\end{figure}
+\clearpage
+\bibliographystyle{asa}
+% argument is your BibTeX string definitions and bibliography database(s)
+\bibliography{references}
+
+\end{document}
