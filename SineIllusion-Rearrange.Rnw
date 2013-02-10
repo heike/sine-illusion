@@ -200,10 +200,10 @@ Another example of this phenomenon is shown in Figure \ref{robbins-graph} \todo[
 \label{cleveland-figure}
 \end{figure}
 
-More recently, the line-width illusion has been cited as a reason to modify hammock plots...\todo[inline]{add more here...} Figure \ref{hammocks} shows the hammock plot and the corrected plot, which has been modified so that all angles are constant.
+More recently, the line-width illusion has been cited as a reason to modify parallel sets plots to avoid pitfalls in human perception.  Figure \ref{hammocks} shows the parallel sets plot, the hammock plot, and the common angle plot, which has been modified so that all angles are constant. The hammock plot corrects for the line width illusion, where the common angle plot holds all of the angles constant so as not to require correction. These two approaches are similar to the approaches we will take in correcting the sine illusion byadjusting the vertical height so that the extant width appears constant, and by modifying the $x$ axis so that the slope appears to be constant. These two approaches will produce somewhat different graphical displays.
 \begin{figure}[htbp]
 \centering
-\missingfigure{Figure or figures showing hammock plots and the corrected version}
+\missingfigure{Figure or figures showing hammock plots and the corrected version. I'd copy them from the paper but I'm sure there's a better version that was used to generate the paper.}
 \caption{}
 \label{hammocks}
 \end{figure}
@@ -306,9 +306,45 @@ qplot(x=x, y=y, geom="line", data=dframe, colour=I("grey50")) + theme_bw() +
 The sine illusion disappears when the width orthogonal to the slope is made constant. This can be done by forcing the magnitude of the slope to be constant (by transforming the $x$ axis), or by making the lines appear to be of the same height, by adjusting their lengths to maintain a constant orthogonal width. This is the approach that we pursue when transforming the $Y$ values. 
 \clearpage
 \section{Breaking the Sine Illusion by Mathematical Transformations}
-\subsection{Hammock-Plot Transformations}
+Though the line-width illusion clearly occurs in non-sinusoidal curves, for the purposes of consistency, we will proceed with data derived as follows: equally spaced points $x$ along the interval $[0,2\pi]$ which correspond to lines centered at $y=s*sin(x)$ with length $\ell$. The slope of the tangent line at a point $x=x_0$ is $y=s*cos(x_0)$, and thus the slope of the line orthogonal to the slope (along which the width is perceived) is $y=-1/(s*cos(x_0))$. Individual lines can of course be completely determined by substituting in the point $x_0, y_0$ to find the corresponding $y-intercept$.
+
 \subsection{Transformation of the X-Axis}
+One approach to breaking the power of the sine illusion is to remove the variation in slope by transforming the $x$ axis so that the slope remains constant. This is similar in nature to the approach taken by common angle plots in removing the line width illusion: by fixing the angle at which the two sets are connected, it is possible to compare line widths, because the extant widths are proportional to the actual widths. 
+
+Geometrically, we want to take the horizontal distance $\triangle x$ between two points and fix it so that the extant width $\triangle x/\triangle y$ is constant, that is, $\triangle \tilde x \propto |\triangle y/\triangle x|$ is the new horizontal distance between the two points. Translating this to a continuous expression, we want $|f^\prime(x)| \propto d\tilde x$. This transformation can be considered as a reparameterization of the $x$ axis in terms of the slope, that is, since the slope of the graph seems to be the visually salient detail, it makes sense to reparameterize the axis in terms of the slope so that it is possible to see the other information contained in the graphic. 
+
+\begin{figure}[h!tbp]\centering
+<<xtransform, echo=FALSE>>=
+f <- sin
+fprime <- cos
+dframe <- createSine(40 , len=1, f=f, fprime=fprime)
+dframe$correction <- abs(cos(dframe$x))
+dframe$correction <- dframe$correction/(sum(dframe$correction))*2*pi
+dframe$correction2 <- rowMeans(cbind(abs(cos(dframe$x)), mean(abs(cos(dframe$x)))))
+dframe$correction2 <- dframe$correction2/sum(dframe$correction2)*2*pi
+
+dframe$xtrans <- cumsum(dframe$correction) # Create transformed X axis
+dframe$xtrans2 <- cumsum(dframe$correction2) # Create transformed X axis
+
+qplot(x=xtrans, xend=xtrans, y = ystart, yend=yend, colour=I("blue"), geom="segment", main="Transformed X Axis", data=dframe) +
+  geom_segment(aes(x = 0, xend=2*pi, y=0, yend=0), colour="black") +theme_bw() + coord_fixed(ratio=1) + xlab(expression(tilde(x))) + ylab("y")
+@
+\caption{Adjusting the x-spacing of the lines mitigates the sine illusion by changing the extant width so that it is uniform in $x$}
+\label{xtrans1}
+\end{figure}
+Interestingly, the illusion can be broken by a much less severe transformation in $x$. By averaging the transformation in Figure \ref{xtrans1} with the average absolute slope over the range of $x$ values, that is $\tilde x^\prime \propto .5 d\tilde x + .5(1/n\sum_{i=1}^n |cos(x_i)|)$ where $n$ is the number of lines at points $x_i$, the illusion is still broken and the data are closer to the original function $y=sin(x)$. The extent to which this weighting holds is likely to vary with the aspect ratio and the shape of the function, but merits further investigation, as it may be possible to find an ``optimal weighting" for specific situations which minimizes distortion and maximizes the correspondence between inferences made from the data and inferences made using the visual display.
+\begin{figure}[h!tbp]\centering
+<<xtrans-mid,echo=FALSE>>=
+qplot(x=xtrans2, xend=xtrans2, y = ystart, yend=yend, colour=I("blue"), geom="segment", main="Transformed X Axis", data=dframe) +
+  geom_segment(aes(x = 0, xend=2*pi, y=0, yend=0), colour="black") +theme_bw() + coord_fixed(ratio=1) + xlab(expression(tilde(x))) + ylab("y")
+@
+\caption{Using a less severe adjustment, the illusion is still broken with a smaller distortion along the $x$ axis.}
+\label{xtrans2}
+\end{figure}
+\clearpage
 \subsection{Transformation of the Y-Axis}
+Another potentially less disruptive option to break the sine illusion is to transform the line length directly so that the resultant extant width appears to be constant. 
+\subsubsection{Hammock-Plot style Transformations}
 \subsubsection{Linear Approximation to f(x)}
 \subsubsection{Quadratic Approximation to f(x)}
 \subsection{Discussion of Transformations}
