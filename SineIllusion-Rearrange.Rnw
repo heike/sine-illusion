@@ -43,7 +43,7 @@ The sine illusion, which is part of a set of optical illusions which occur based
 \end{abstract}
 \tableofcontents
 
-\section{Background: Graphics and Optical Illusions}
+\section{Introduction}
 The sine illusion is an optical illusion which has a pervasive effect on our ability to interpret statistical graphics commonly used for time-series data. Data which follows a sinusoidal trend seems to have higher variance at the peak and trough, and much lower variance where the slope of the curve is steepest. One presentation\mcomment{Presentation isn't the right word... occurrence?} of the Sine illusion comes from M. Bach's applet \citep{bach}, which cites perception research suggesting that the sine illusion occurs due to misapplication of perceptual experience with the three-dimensional world to a two-dimensional ``artificial" display of data. One possible three-dimensional context for similar stimuli is shown in Figure \ref{ribbon-illusion}.
 
 <<data, echo=FALSE, eval=TRUE>>=
