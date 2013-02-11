@@ -178,8 +178,8 @@ While the illusion presented above is termed the sine illusion, it holds for non
 
 \begin{figure}[htbp]
 \centering
-\missingfigure{Playfair's graph goes here - I couldn't manage to find the right one on Google. I found several which were similar but the effect wasn't nearly as dramatic.}
-\caption{Playfair's graph of... demonstrates that the line width illusion is not only found on sinusoidal curves but is present whenever the slope of the lines change dramatically.}
+\includegraphics[keepaspectratio=TRUE,width=.8\linewidth]{images/PlayfairExportImports}
+\caption{Playfair's graph of exports to and imports from the East Indies demonstrates that the line width illusion is not only found on sinusoidal curves but is present whenever the slope of the lines change dramatically. The increase in both imports and exports circa 1763 does not appear to portray as large of a deficit as that in 1710, even though they are of similar magnitude.}
 \label{playfair-debt}
 \end{figure}
 
