@@ -203,19 +203,32 @@ qplot(data=df, x=x, y=y, geom="line") + geom_line(aes(y=y2)) + theme_bw()
 
 \begin{figure}[h!tbp]
 \centering
-\includegraphics[keepaspectratio=TRUE, width=.5\linewidth]{images/ClevelandMcGillFig7}
+%\includegraphics[keepaspectratio=TRUE, width=.5\linewidth]{images/ClevelandMcGillFig7}
+<<clevelandgraph,echo=FALSE, fig.width=6, fig.height=8, include=FALSE>>=
+x <- seq(0, 4, .01)
+y <- 8-(x-2.5)^2
+y1 <- 8- (x-2.5)^2 - (1-(x/8))
+df <- data.frame(x=x, y=y, y2=y1)
+p1 <- qplot(data=df, x=x, y=y, geom="line") + geom_line(aes(y=y2)) + theme_bw()
+p2 <- qplot(data=df, x=x, y=y-y1, geom="line") + theme_bw() + ylab(expression(paste(y-y,"'",sep="")))
+suppressMessages(library(gridExtra))
+grid.arrange(p1, p2, nrow=2, heights=c(1.5, 1))
+@
+\includegraphics[keepaspectratio=TRUE, width=.5\linewidth]{figure/fig-clevelandgraph}
 \caption{\cite{cleveland:1985} examined the task of judging the distance between two curves experimentally: ``In the top panel it is difficult to judge how much greater the y-values of curve 1 are than those for curve 2 because our visual system has difficulty detecting the vertical distances between the curves. In the bottom panel the differences are graphed directly; the values are quite different from how they appear in the top panel"}
 \label{cleveland-figure}
 \end{figure}
 
-More recently, the line-width illusion has been cited as a reason to modify parallel sets plots to avoid pitfalls in human perception.  Figure \ref{hammocks} shows the parallel sets plot, the hammock plot, and the common angle plot, which has been modified so that all angles are constant. The hammock plot corrects for the line width illusion, where the common angle plot holds all of the angles constant so as not to require correction. These two approaches are similar to the approaches we will take in correcting the sine illusion by adjusting the vertical height so that the extant width appears constant, and by modifying the $x$ axis so that the slope appears to be constant. These two approaches will produce somewhat different graphical displays.
-\begin{figure}[h!tbp]
-\centering
-\missingfigure{Figure or figures showing hammock plots and the corrected version. I'd copy them from the paper but I'm sure there's a better version that was used to generate the paper.}
-\caption{}
-\label{hammocks}
-\end{figure}
+% More recently, the line-width illusion has been cited as a reason to modify parallel sets plots to avoid pitfalls in human perception.  Figure \ref{hammocks} shows the parallel sets plot, the hammock plot, and the common angle plot, which has been modified so that all angles are constant. The hammock plot corrects for the line width illusion, where the common angle plot holds all of the angles constant so as not to require correction. 
+%These two approaches are similar to the approaches we will take in correcting the sine illusion by adjusting the vertical height so that the extant width appears constant, and by modifying the $x$ axis so that the slope appears to be constant. These two approaches will produce somewhat different graphical displays.
+% \begin{figure}[h!tbp]
+% \centering
+% \missingfigure{Figure or figures showing hammock plots and the corrected version. I'd copy them from the paper but I'm sure there's a better version that was used to generate the paper.}
+% \caption{}
+% \label{hammocks}
+% \end{figure}
 \clearpage
+\todo[inline]{Add variance simulation section}
 \subsection{Geometry of the Sine Illusion}
 The visual preference for judging the length of the line by the orthogonal extant suggests that the underlying illusion may be a function of geometry rather than some mysterious visual process that occurs automatically between perception of the stimulus and conscious thought. If this is the case, then it may be that by comparing the orthogonal width and the vertical length of the line it may be possible to dissect the illusion and correct the graphical display so that it is not as visually deceptive.
 
@@ -302,10 +315,13 @@ qplot(x=x, y=y, geom="line", data=dframe, colour=I("grey50")) + theme_bw() +
   coord_equal(ratio=1) + scale_colour_manual("", values=c("black", "blue")) + theme(legend.position="bottom")  + 
   geom_text(aes(label=paste("theta", "%~~%", round(vangle/pi*180), "^o", sep=""),
                 x=xstart/2+x/2-sign(vangle)*.1, y=y-sign(vangle)*.64+.04), data=dframe.1, parse=TRUE, hjust=.75, vjust=.5, size=2.5) + 
-  xlim(c(-pi/8, 17*pi/8)) + ggtitle("Changes in Perceived Orthogonal Width \ndue to Change in Secant Angle")
+  xlim(c(-pi/8, 17*pi/8)) + 
+  scale_x_continuous(breaks=seq(0, 2*pi, by=pi/2), 
+                     labels=c("0", expression(paste(pi,"/2")), expression(pi), expression(paste("3",pi, "/2")), expression(paste("2",pi))))
+  # + ggtitle("Changes in Perceived Orthogonal Width \ndue to Change in Secant Angle")
 @
 % \includegraphics[width=.45\linewidth, keepaspectratio=TRUE]{figure/fig-transform-illustration}
-\caption{\label{OrthogonalWidth} The perceived length of the vertical line changes with the angle of the line perpendicular to the slope of $\sin(x)$, suggesting that the sine illusion stems from a conflict between the visual system's perception of figure width and the mathematical judgement necessary to determine the length of the vertical lines.
+\caption{\label{OrthogonalWidth} Changes in perceived orthogonal width due to the change in secant angle. The perceived length of the vertical line changes with the angle of the line perpendicular to the slope of $\sin(x)$, suggesting that the sine illusion stems from a conflict between the visual system's perception of figure width and the mathematical judgement necessary to determine the length of the vertical lines.
 }
 \end{figure}
 
@@ -319,31 +335,30 @@ Though the line-width illusion clearly occurs in non-sinusoidal curves, for the 
 \subsection{Trend Removal}
 The most obvious approach to breaking the sine illusion is to present the trend and variance separately, as shown in Figure \ref{trendremoval}. A Loess smooth was used to estimate the trendline, and this estimate was subtracted from the line center to produce separate graphs of the trend and the variance. While this does largely remove the sine illusion, it also makes it somewhat more difficult to parse the overall data, as judgments must be made by combining two graphs or by mentally re-composing the original graph (at which point, the sine-illusion becomes a factor). Ideally, it would be possible to tell the whole story with a single graph, to minimize cognitive demands - while this example is relatively simple, it would be much harder to create a de-trended version of Figure \ref{playfair-debt} that could be easily assessed to determine both trend and change in the size of the trade imbalance over time. 
 \begin{figure}[h!tbp]\centering
-\comment{Might be better to use simulated data or something - the lines are a bit too artificial here - not really "data"}
-<<trend-removal, include=FALSE>>=
+<<trend-removal, include=FALSE, fig.height=4, fig.width=4>>=
 df <- df2 <- createSine(40, 1, sin, cos)
 df2$y <- loess(df$y~df$x)$fitted
 df2$type <- "Loess Fit"
 df$type <- "Original Function"
 df <- rbind(df, df2)
 
-ggplot(data=df,aes(x=x, y=y)) + geom_segment(aes(x=xstart, xend=xend, y=ystart, yend=yend)) + geom_line(aes(group=type, linetype=type)) + scale_linetype_discrete("") + theme(legend.position="bottom") + coord_equal(ratio=1) + theme_bw()
-qplot(data=subset(df, type=="Loess Fit"), x=xstart, xend=xend, y=ystart-y, yend=yend-y, geom="segment") + ylab("De-Trended Data") + xlab("x")+ ylim(c(-1.5, 1.5)) + coord_equal(ratio=1)+ theme_bw()
-qplot(data=subset(df, type=="Loess Fit"), x=x, y=y, geom="line") + ylab("Fit Trendline") + xlab("x") + ylim(c(-1.5, 1.5)) + coord_equal(ratio=1)+ theme_bw()
+ggplot(data=df,aes(x=x, y=y)) + geom_segment(aes(x=xstart, xend=xend, y=ystart, yend=yend)) + geom_line(aes(group=type, linetype=type)) + scale_linetype_discrete("") + theme_bw() + theme(legend.position="bottom")
+qplot(data=subset(df, type=="Loess Fit"), x=xstart, xend=xend, y=ystart-y, yend=yend-y, geom="segment", linetype=type)  + xlab("x")+ ylim(c(-1.5, 1.5)) + theme_bw()+ scale_linetype_discrete("", labels="De-Trended Data") + theme(legend.position="bottom")
+qplot(data=subset(df, type=="Loess Fit"), x=x, y=y, geom="line", linetype=type) + xlab("x") + ylim(c(-1.5, 1.5)) + theme_bw() + scale_linetype_discrete("") + theme(legend.position="bottom")
 @
-\begin{subfigure}[b]{.3\linewidth}
+\begin{subfigure}[b]{.32\linewidth}
   \centering
   \includegraphics[width=\textwidth]{figure/fig-trend-removal1}
   \caption{\small Original Data}
   \label{trendremovalFit}
 \end{subfigure}
-\begin{subfigure}[b]{.3\linewidth}
+\begin{subfigure}[b]{.32\linewidth}
   \centering
   \includegraphics[width=\textwidth]{figure/fig-trend-removal2}
   \caption{\small Variability}
   \label{trendremovalVariability}
 \end{subfigure}
-\begin{subfigure}[b]{.3\linewidth}
+\begin{subfigure}[b]{.32\linewidth}
   \centering
   \includegraphics[width=\textwidth]{figure/fig-trend-removal3}
   \caption{\small Trend}
