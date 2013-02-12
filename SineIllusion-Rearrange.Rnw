@@ -535,6 +535,7 @@ for the upper endpoint $(x_u,y_u)$ at which the secant line intersects the top p
 y_l & = f(x_l) - \ell/2\\
 y_l & = \left(-1/f^\prime(x_0)\right) x_l + f(x_0) + x_0/f^\prime(x_0)
 \end{align*}
+
 for the lower endpoint $(x_l, y_l)$. With these two endpoints, we can correct separately for the top and bottom portions of the line, as the extant width is not symmetric when reflected across the original function f(x). \todo[inline]{Math language?}
 
 As the solutions to these two sets of equations requires numerical optimization to obtain, at least for $f(x) = sin(x)$, Taylor approximations can be employed to reduce the computational requirements. Approximations derived from the first and second-order taylor approximations are described in the following sections.
@@ -552,6 +553,7 @@ Solving these systems of equations results in a symmetric overall correction fac
 \end{equation}
 \comment{Not sure if the pictures should be combined with the hammock plots, and if so, where the pictures should be located. }
 Figure \ref{LinearApprox} shows the correction factor compared with the hammock-plot style correction and the untransformed data. As with the hammock plot correction, the linear adjustment is prone to the same overcorrection distortion shown in Figure \ref{linearFixOvercorrect}.  The asymmetric nature of the distortion suggests that we may want to use a second-order taylor polynomial approximation to $f(x)$ to account for the asymmetry in the extant widths on either side of the center trendline.
+
 \subsubsection{Quadratic Approximation to f(x)}
 Using the approximation $f(x) \approx f(x_0) + f^\prime(x_0)(x-x_0) + 1/2 f^{\prime\prime}(x_0)(x-x_0)^2$, the system of equations shown above reduces to
 \begin{align*}
