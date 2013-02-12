@@ -4,7 +4,7 @@
 \usepackage{color}
 \usepackage[dvipsnames,svgnames]{xcolor}
 \usepackage[colorlinks=TRUE, linkcolor=blue]{hyperref}
-\usepackage{wrapfig,float,subfig}
+\usepackage{wrapfig,float,subcaption}
 \usepackage{graphicx}
 \usepackage{amssymb}
 \usepackage{amsmath}
@@ -174,7 +174,7 @@ While not thoroughly examined in the sensation and perception literature, the si
 M Bach's applet  gives the option to compensate the line length manually for its perceived shortcoming. The amount of compensation chosen turns out to be highly dependent on both the length of the vertical line segments and the amplitude of the sine function. While the applet does not provide details on the compensation function, it does suggest that it may be possible to correct the graphical display so that the brain interprets the stimuli in a manner consistent with the numerical data. 
 
 \subsection{Statistical Graphics and the Line Width Illusion}
-While the illusion presented above is termed the sine illusion, it holds for non-sinusoidal curves which have dramatic changes in the slope of the lines over time as well. Figure \ref{playfair-debt} shows one example of this common phenomenon: the vertical distance between the two lines is much less visually salient than the extant width of the line, that is, the width of the line segment which is perpendicular to the tangent line at a given point. For this reason, the difference between the lines at \todo{insert explanation specific to the graph here}.
+While the illusion presented above is termed the sine illusion, it holds for non-sinusoidal curves which have dramatic changes in the slope of the lines over time as well. Figure \ref{playfair-debt} shows one example of this common phenomenon: the vertical distance between the two lines is much less visually salient than the extant width of the line, that is, the width of the line segment which is perpendicular to the tangent line at a given point.
 
 \begin{figure}[htbp]
 \centering
@@ -193,21 +193,21 @@ Another example of this phenomenon is shown in Figure \ref{robbins-graph} \todo[
 
 \cite{cleveland:1985} also discuss the perceptual difficulty of judging the difference between two curves plotted on the same axis. They recommend the difference between the two curves as an alternate display, as shown in the second part of Figure \ref{cleveland-figure}. While this is good practice when there are two separate curves (as in Figure \ref{playfair-debt}), when the contours of the data implicitly create two curves (the boundaries of the variability in the data) there is not an easy way to display the difference between these implicit curves without resorting to arbitrary minimum and maximum smoothing values. In addition, as in Figure \ref{playfair-debt} both the difference between the curves and the overall trend are of visual importance, and plotting the difference between the two curves removes the overall trend. 
 
-\begin{figure}[htbp]
+\begin{figure}[h!tbp]
 \centering
-\includegraphics[keepaspectratio=TRUE, width=.75\linewidth]{images/ClevelandMcGillFig7}
+\includegraphics[keepaspectratio=TRUE, width=.5\linewidth]{images/ClevelandMcGillFig7}
 \caption{\cite{cleveland:1985} examined the task of judging the distance between two curves experimentally: ``In the top panel it is difficult to judge how much greater the y-values of curve 1 are than those for curve 2 because our visual system has difficulty detecting the vertical distances between the curves. In the bottom panel the differences are graphed directly; the values are quite different from how they appear in the top panel"}
 \label{cleveland-figure}
 \end{figure}
 
-More recently, the line-width illusion has been cited as a reason to modify parallel sets plots to avoid pitfalls in human perception.  Figure \ref{hammocks} shows the parallel sets plot, the hammock plot, and the common angle plot, which has been modified so that all angles are constant. The hammock plot corrects for the line width illusion, where the common angle plot holds all of the angles constant so as not to require correction. These two approaches are similar to the approaches we will take in correcting the sine illusion byadjusting the vertical height so that the extant width appears constant, and by modifying the $x$ axis so that the slope appears to be constant. These two approaches will produce somewhat different graphical displays.
-\begin{figure}[htbp]
+More recently, the line-width illusion has been cited as a reason to modify parallel sets plots to avoid pitfalls in human perception.  Figure \ref{hammocks} shows the parallel sets plot, the hammock plot, and the common angle plot, which has been modified so that all angles are constant. The hammock plot corrects for the line width illusion, where the common angle plot holds all of the angles constant so as not to require correction. These two approaches are similar to the approaches we will take in correcting the sine illusion by adjusting the vertical height so that the extant width appears constant, and by modifying the $x$ axis so that the slope appears to be constant. These two approaches will produce somewhat different graphical displays.
+\begin{figure}[h!tbp]
 \centering
 \missingfigure{Figure or figures showing hammock plots and the corrected version. I'd copy them from the paper but I'm sure there's a better version that was used to generate the paper.}
 \caption{}
 \label{hammocks}
 \end{figure}
-
+\clearpage
 \subsection{Geometry of the Sine Illusion}
 The visual preference for judging the length of the line by the orthogonal extant suggests that the underlying illusion may be a function of geometry rather than some mysterious visual process that occurs automatically between perception of the stimulus and conscious thought. If this is the case, then it may be that by comparing the orthogonal width and the vertical length of the line it may be possible to dissect the illusion and correct the graphical display so that it is not as visually deceptive.
 
@@ -305,9 +305,45 @@ qplot(x=x, y=y, geom="line", data=dframe, colour=I("grey50")) + theme_bw() +
 \comment{This probably should be moved, or re-fashioned into a nice transition between sections...}
 The sine illusion disappears when the width orthogonal to the slope is made constant. This can be done by forcing the magnitude of the slope to be constant (by transforming the $x$ axis), or by making the lines appear to be of the same height, by adjusting their lengths to maintain a constant orthogonal width. This is the approach that we pursue when transforming the $Y$ values. 
 \clearpage
-\section{Breaking the Sine Illusion by Mathematical Transformations}
+\section{Breaking the Sine Illusion}
 Though the line-width illusion clearly occurs in non-sinusoidal curves, for the purposes of consistency, we will proceed with data derived as follows: equally spaced points $x$ along the interval $[0,2\pi]$ which correspond to lines centered at $y=s*sin(x)$ with length $\ell$. The slope of the tangent line at a point $x=x_0$ is $y=s*cos(x_0)$, and thus the slope of the line orthogonal to the slope (along which the width is perceived) is $y=-1/(s*cos(x_0))$. Individual lines can of course be completely determined by substituting in the point $x_0, y_0$ to find the corresponding $y-intercept$.
 
+\subsection{Trend Removal}
+The most obvious approach to breaking the sine illusion is to present the trend and variance separately, as shown in Figure \ref{trendremoval}. A Loess smooth was used to estimate the trendline, and this estimate was subtracted from the line center to produce separate graphs of the trend and the variance. While this does largely remove the sine illusion, it also makes it somewhat more difficult to parse the overall data, as judgments must be made by combining two graphs or by mentally re-composing the original graph (at which point, the sine-illusion becomes a factor). Ideally, it would be possible to tell the whole story with a single graph, to minimize cognitive demands - while this example is relatively simple, it would be much harder to create a de-trended version of Figure \ref{playfair-debt} that could be easily assessed to determine both trend and change in the size of the trade imbalance over time. 
+\begin{figure}[h!tbp]\centering
+\comment{Might be better to use simulated data or something - the lines are a bit too artificial here - not really "data"}
+<<trend-removal, include=FALSE>>=
+df <- df2 <- createSine(40, 1, sin, cos)
+df2$y <- loess(df$y~df$x)$fitted
+df2$type <- "Loess Fit"
+df$type <- "Original Function"
+df <- rbind(df, df2)
+
+ggplot(data=df,aes(x=x, y=y)) + geom_segment(aes(x=xstart, xend=xend, y=ystart, yend=yend)) + geom_line(aes(group=type, linetype=type)) + scale_linetype_discrete("") + theme(legend.position="bottom") + coord_equal(ratio=1) + theme_bw()
+qplot(data=subset(df, type=="Loess Fit"), x=xstart, xend=xend, y=ystart-y, yend=yend-y, geom="segment") + ylab("De-Trended Data") + xlab("x")+ ylim(c(-1.5, 1.5)) + coord_equal(ratio=1)+ theme_bw()
+qplot(data=subset(df, type=="Loess Fit"), x=x, y=y, geom="line") + ylab("Fit Trendline") + xlab("x") + ylim(c(-1.5, 1.5)) + coord_equal(ratio=1)+ theme_bw()
+@
+\begin{subfigure}[b]{.3\linewidth}
+  \centering
+  \includegraphics[width=\textwidth]{figure/fig-trend-removal1}
+  \caption{\small Original Data}
+  \label{trendremovalFit}
+\end{subfigure}
+\begin{subfigure}[b]{.3\linewidth}
+  \centering
+  \includegraphics[width=\textwidth]{figure/fig-trend-removal2}
+  \caption{\small Variability}
+  \label{trendremovalVariability}
+\end{subfigure}
+\begin{subfigure}[b]{.3\linewidth}
+  \centering
+  \includegraphics[width=\textwidth]{figure/fig-trend-removal3}
+  \caption{\small Trend}
+  \label{trendremovalLine}
+\end{subfigure}
+\caption{Separating the trend and the variability removes the Sine illusion. Figure \ref{trendremovalFit} shows the fit line compared to the original function, Figure \ref{trendremovalVariability} shows the remaining trend in the vertical lines, which now appear to be of the same size, and Figure \ref{trendremovalLine} shows the underlying fitted trendline without the accompanying vertical lines.}\label{trendremoval}
+\end{figure}
+ \todo[inline]{Need to expand the discussion (i.e. harder to interpret graphs like this, requires more cognitive load, etc.), but don't want to make unsupported claims}
 \subsection{Transformation of the X-Axis}
 One approach to breaking the power of the sine illusion is to remove the variation in slope by transforming the $x$ axis so that the slope remains constant. This is similar in nature to the approach taken by common angle plots in removing the line width illusion: by fixing the angle at which the two sets are connected, it is possible to compare line widths, because the extant widths are proportional to the actual widths. 
 
@@ -344,11 +380,183 @@ qplot(x=xtrans2, xend=xtrans2, y = ystart, yend=yend, colour=I("blue"), geom="se
 \clearpage
 \subsection{Transformation of the Y-Axis}
 Another potentially less disruptive option to break the sine illusion is to transform the line length directly so that the resultant extant width appears to be constant. 
-\subsubsection{Hammock-Plot style Transformations}
-\subsubsection{Linear Approximation to f(x)}
+\subsubsection{Linear Method}
+This approach aims to extend the orthogonal width, which onlookers generally evaluate,  to the amount of the vertical width, which we want to represent. 
+We first multiply the vertical width by a factor of $1/\cos\theta$, where $\theta$ is the angle under which the line is drawn. This angle is given by the slope of the function, mathematically we know that in position $x$ the angle $\theta(x)$ of function $f(x)$ is given as:
+\[
+\tan \theta (x) = f^\prime (x).
+\]
+We only distinguish the size, not the sign of the angle, which gives us an overall correction factor for the line width in vertical direction of 
+\begin{equation}\label{hammockCorrection}
+\atan{\cos \left| f^\prime (x) \right|}^{-1}
+\end{equation}
+
+\begin{figure}[h!btp]
+<<hammockFix, dependson='data', echo=FALSE, include=FALSE>>=
+dframe <- createSine(40,1, f=f, fprime=fprime)
+qplot(x=x, xend=xend, y = f(x) -ell/2, yend=f(x) +ell/2, geom="segment", data=dframe) +
+  theme(panel.grid.major=element_blank(), panel.background = element_rect(fill = "white", 
+                colour = "black"),
+       panel.grid.minor=element_blank(), panel.background=element_blank(),
+       axis.title = element_blank(), axis.ticks = element_blank(), 
+       axis.text = element_blank()) + coord_equal(ratio=1)
+
+qplot(x=x, xend=xend, y = f(x) -ellx/2, yend=f(x) +ellx/2, geom="segment", data=dframe) +
+  theme(panel.grid.major=element_blank(), panel.background = element_rect(fill = "white", 
+                colour = "black"),
+       panel.grid.minor=element_blank(), panel.background=element_blank(),
+       axis.title = element_blank(), axis.ticks = element_blank(), 
+       axis.text = element_blank()) + coord_equal(ratio=1)
+
+qplot(x=x, xend=xend, y = f(x) -ellx2/2, yend=f(x) +ellx2/2, geom="segment", data=dframe) +
+  theme(panel.grid.major=element_blank(), panel.background = element_rect(fill = "white", 
+                colour = "black"),
+       panel.grid.minor=element_blank(), panel.background=element_blank(),
+       axis.title = element_blank(), axis.ticks = element_blank(), 
+       axis.text = element_blank()) + coord_equal(ratio=1)
+
+@
+\begin{subfigure}[b]{.3\linewidth}\centering
+\includegraphics[width=\linewidth,keepaspectratio=TRUE]{figure/fig-hammockFix1}
+\caption{Uncorrected}
+\end{subfigure}
+\begin{subfigure}[b]{.3\linewidth}\centering
+\includegraphics[width=\linewidth,keepaspectratio=TRUE]{figure/fig-hammockFix2}
+\caption{Correction factor in Eqn \ref{hammockCorrection}}
+\end{subfigure}
+\begin{subfigure}[b]{.3\linewidth}\centering
+\includegraphics[width=\linewidth,keepaspectratio=TRUE]{figure/fig-hammockFix3}
+\caption{Correction factor in Eqn. \ref{LinearApprox}}
+\end{subfigure}
+\caption{First two fix of the sine illusion by using the factor of $1/\cos\left(\atan{|f^\prime(x)|}\right)$} (middle) and $\sqrt{1 + f^\prime(x)^2}$ (right) for adjusting the vertical extent of the lines.  
+\label{hammockFix} 
+\end{figure}
+
+As in \todo{Cite Marie's paper}, the correction factor necessary to remove the illusion depends on the aspect ratio of the graphs. Figure \ref{hammockFix-aspectRatio} demonstrates the relative effectiveness of the correction factor.
+<<hammocktransform, echo=FALSE>>=
+f <- function(x) sin(x)
+fprime <- function (x) cos(x)
+
+
+adjY <- function(df){
+  dx <- diff(df$x)
+  dy <- diff(df$y)
+  #aspratio <- abs(diff(range(c(df$ystart, df$yend)))/diff(range(df$x)))
+  aspratio <- 1
+  adj <- atan(dy/dx)
+  adj <- c(adj, rev(adj)[1])
+  adj <- 1/cos(atan(abs(aspratio*adj)))
+  adj <- adj-mean(adj)+1
+  
+  df$ell <- df$ell*adj
+  df$ystart <- df$y - .5*df$ell
+  df$yend <- df$y + .5*df$ell
+  
+  df
+}
+
+dframe1 <- createSine(n=40, len=1, f=f, fprime=fprime)
+dframe1 <- adjY(dframe1)
+@
+\begin{figure}[h!tbp]\centering
+<<hammocktransform1-plot, echo=FALSE, include=FALSE>>=
+qplot(x=xstart, xend=xend, y = ystart, yend=yend, colour=I("blue"), geom="segment", main="Transformed Length", data=dframe1) + ylim(c(-pi/2, pi/2))+ coord_fixed(ratio=1) + xlab("x") + ylab("y")
+qplot(x=xstart, xend=xend, y = ystart, yend=yend, colour=I("blue"), geom="segment", main="Transformed Length", data=dframe1) + ylim(c(-pi, pi))+ coord_fixed(ratio=1)+ xlab("x") + ylab("y")
+qplot(x=xstart, xend=xend, y = ystart, yend=yend, colour=I("blue"), geom="segment", main="Transformed Length", data=dframe1) + ylim(c(-2*pi, 2*pi))+ coord_fixed(ratio=1)+ xlab("x") + ylab("y")
+@
+
+\begin{subfigure}[b]{.3\linewidth}\centering
+\includegraphics[width=\linewidth,keepaspectratio=TRUE]{figure/fig-hammocktransform1-plot1}
+\caption{Aspect Ratio of .5}
+\end{subfigure}
+\begin{subfigure}[b]{.3\linewidth}\centering
+\includegraphics[width=\linewidth,keepaspectratio=TRUE]{figure/fig-hammocktransform1-plot2}
+\caption{Aspect Ratio of 1}
+\end{subfigure}
+\begin{subfigure}[b]{.3\linewidth}\centering
+\includegraphics[width=\linewidth,keepaspectratio=TRUE]{figure/fig-hammocktransform1-plot3}
+\caption{Aspect Ratio of 2}
+\end{subfigure}
+\caption{Changing aspect ratios changes the strength of the illusion and the effectiveness of the transformation}\label{hammockFix-aspectRatio} 
+\end{figure}
+
+\begin{figure}[h!tbp]
+\centering
+<<linearFixOvercorrect, dependson='data', echo=FALSE, include=FALSE>>=
+g <- function(x) 5*sin(x)
+gprime <- function(x) 5*cos(x)
+dframe <- createSine(100, len=5, f=g, fprime=gprime)
+ar <- 1
+qplot(x=x, xend=xend, y = g(x) -ell/2, yend=g(x) +ell/2, geom="segment", data=dframe) +
+  theme(panel.grid.major=element_blank(), panel.background = element_rect(fill = "white", 
+                colour = "black"),
+       panel.grid.minor=element_blank(), panel.background=element_blank(),
+       axis.title = element_blank(), axis.ticks = element_blank(), 
+       axis.text = element_blank()) + coord_equal(ratio=ar)
+
+qplot(x=x, xend=xend, y = g(x) -ellx/2, yend=g(x) +ellx/2, geom="segment", data=dframe) +
+  theme(panel.grid.major=element_blank(), panel.background = element_rect(fill = "white", 
+                colour = "black"),
+       panel.grid.minor=element_blank(), panel.background=element_blank(),
+       axis.title = element_blank(), axis.ticks = element_blank(), 
+       axis.text = element_blank()) + coord_equal(ratio=ar)
+
+qplot(x=x, xend=xend, y = g(x) -ellx2/2, yend=g(x) +ellx2/2, geom="segment", data=dframe) +
+  theme(panel.grid.major=element_blank(), panel.background = element_rect(fill = "white", 
+                colour = "black"),
+       panel.grid.minor=element_blank(), panel.background=element_blank(),
+       axis.title = element_blank(), axis.ticks = element_blank(), 
+       axis.text = element_blank()) + coord_equal(ratio=ar)
+@
+
+\begin{subfigure}[b]{.3\linewidth}\centering
+\includegraphics[width=\linewidth,keepaspectratio=TRUE]{figure/fig-linearFixOvercorrect1}
+\caption{$\ell=5$, Uncorrected}
+\end{subfigure}
+\begin{subfigure}[b]{.3\linewidth}\centering
+\includegraphics[width=\linewidth,keepaspectratio=TRUE]{figure/fig-linearFixOvercorrect2}
+\caption{Corrected by Eqn. \ref{hammockCorrection}}
+\end{subfigure}
+\begin{subfigure}[b]{.3\linewidth}\centering
+\includegraphics[width=\linewidth,keepaspectratio=TRUE]{figure/fig-linearFixOvercorrect3}
+\caption{Corrected by Eqn \ref{LinearApprox}}
+\end{subfigure}
+\caption{The ratio of the length of the line to amplitude of the function needs to be included in the correction. Here, the amplitude is still 1, but the length of the line is 5. The correction factor leads to a massive over correction that makes the function almost unrecognizable. The plot on the left is uncorrected, the plot on the right is `corrected'.}\label{linearFixOvercorrect} 
+\end{figure}
+
+\subsubsection{A General Correction Method}
+Another method for adjusting the vertical length to ensure constant extant width is to solve the system of equations
+\begin{align}
+y & = f(x_u) + \ell/2\\
+y & = \left(-1/f^\prime(x_0)\right) x_u + f(x_0) + x_0/f^\prime(x_0)
+\end{align}
+for the upper endpoint $(x_u,y_u)$ at which the secant line intersects the top portion of the graph. Similarly, we would need to solve 
+\begin{align}
+y_l & = f(x_l) - \ell/2\\
+y_l & = \left(-1/f^\prime(x_0)\right) x_l + f(x_0) + x_0/f^\prime(x_0)
+\end{align}
+for the lower endpoint $(x_l, y_l)$. With these two endpoints, we can correct separately for the top and bottom portions of the line, as the extant width is not symmetric when reflected across the original function f(x). \todo[inline]{Math language?}
+
+As the solutions to these two sets of equations requires numerical optimization to obtain, at least for $f(x) = sin(x)$, Taylor approximations can be employed to reduce the computational requirements. Approximations derived from the first and second-order taylor approximations are described in the following sections.
+
+\paragraph{Linear Approximation to $f(x)$}
+Using the approximation $f(x) \approx f(x_0) + f^\prime(x_0)(x-x_0)$, the system of equations shown above reduces to
+\begin{align*}
+y & = f(x_0) + f^\prime(x_0)(x-x_0) \pm \ell/2\\
+y & = \left(-1/f^\prime(x_0)\right) x + f(x_0) + x_0/f^\prime(x_0)
+\end{align*}
+
+Solving these systems of equations results in a symmetric overall correction factor of 
+\begin{equation}\label{LinearApprox}
+\sqrt{1 + f^\prime(x)^2} 
+\end{equation}
+\comment{Not sure if the pictures should be combined with the hammock plots, and if so, where the pictures should be located. }
+Figure \ref{LinearApprox} shows the correction factor compared with the hammock-plot style correction and the untransformed data. As with the hammock plot correction, the linear adjustment is prone to the same overcorrection distortion shown in Figure \ref{linearFixOvercorrect}
 \subsubsection{Quadratic Approximation to f(x)}
 \subsection{Discussion of Transformations}
 \clearpage
+
+
 \section{Application: USHCN Data}
 <<readdata, echo=FALSE>>=
 ushcn <- na.omit(read.csv("data/ushcn.csv"))
