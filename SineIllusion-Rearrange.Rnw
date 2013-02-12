@@ -176,7 +176,7 @@ While not thoroughly examined in the sensation and perception literature, the si
 M Bach's applet  gives the option to compensate the line length manually for its perceived shortcoming. The amount of compensation chosen turns out to be highly dependent on both the length of the vertical line segments and the amplitude of the sine function. While the applet does not provide details on the compensation function, it does suggest that it may be possible to correct the graphical display so that the brain interprets the stimuli in a manner consistent with the numerical data. 
 
 \subsection{Statistical Graphics and the Line Width Illusion}
-While the illusion presented above is termed the sine illusion, it holds for non-sinusoidal curves which have dramatic changes in the slope of the lines over time as well. Figure \ref{playfair-debt} shows one example of this common phenomenon: the vertical distance between the two lines is much less visually salient than the extant width of the line, that is, the width of the line segment which is perpendicular to the tangent line at a given point.
+While the illusion presented above is termed the sine illusion, it holds for non-sinusoidal curves which have dramatic changes in the slope of the lines over time as well. Figure \ref{playfair-debt} shows one example of this common phenomenon \citet{playfair, playfair2}: the vertical distance between the two lines is much less visually salient than the extant width of the line, that is, the width of the line segment which is perpendicular to the tangent line at a given point.
 
 \begin{figure}[htbp]
 \centering
@@ -185,7 +185,7 @@ While the illusion presented above is termed the sine illusion, it holds for non
 \label{playfair-debt}
 \end{figure}
 
-Another example of this phenomenon is shown in Figure \ref{robbins-graph}. The line-width illusion is also present in the graphs of $e^x$ and $e^x + 1$, as the lines appear to be separated by a much smaller distance at $x=2.5$ than at $x=0$.
+Another example of this phenomenon is shown in Figure \ref{robbins-graph} \citep{robbins:2005}. The line-width illusion is also present in the graphs of $e^x$ and $e^x + 1$, as the lines appear to be separated by a much smaller distance at $x=2.5$ than at $x=0$.
 \begin{figure}[htbp]
 \centering
 <<effectivegraphsfig,echo=FALSE>>=
@@ -199,7 +199,7 @@ qplot(data=df, x=x, y=y, geom="line") + geom_line(aes(y=y2)) + theme_bw()
 \label{robbins-graph}
 \end{figure}
 
-\cite{cleveland:1985} also discuss the perceptual difficulty of judging the difference between two curves plotted on the same axis. They recommend the difference between the two curves as an alternate display, as shown in the second part of Figure \ref{cleveland-figure}. While this is good practice when there are two separate curves (as in Figure \ref{playfair-debt}), when the contours of the data implicitly create two curves (the boundaries of the variability in the data) there is not an easy way to display the difference between these implicit curves without resorting to arbitrary minimum and maximum smoothing values. In addition, as in Figure \ref{playfair-debt} both the difference between the curves and the overall trend are of visual importance, and plotting the difference between the two curves removes the overall trend. 
+\cite{cleveland:1984, cleveland:1985} also discuss the perceptual difficulty of judging the difference between two curves plotted on the same axis. They recommend the difference between the two curves as an alternate display, as shown in the second part of Figure \ref{cleveland-figure}. While this is good practice when there are two separate curves (as in Figure \ref{playfair-debt}), when the contours of the data implicitly create two curves (the boundaries of the variability in the data) there is not an easy way to display the difference between these implicit curves without resorting to arbitrary minimum and maximum smoothing values. In addition, as in Figure \ref{playfair-debt} both the difference between the curves and the overall trend are of visual importance, and plotting the difference between the two curves removes the overall trend. 
 
 \begin{figure}[h!tbp]
 \centering
