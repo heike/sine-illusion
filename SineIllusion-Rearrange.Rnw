@@ -36,7 +36,7 @@ library(plyr)
 \newcommand{\mcomment}[1]{\todo[color=SkyBlue]{#1}} % for margin comments
 
 \title{Signs of the Sine Illusion -- why we need to care}
-\author{Susan Vanderplas, Heike Hofmann, probably include Di and Xiaoyue}
+\author{Susan Vanderplas, Heike Hofmann, Dianne Cook, Xiaoyue Cheng}
 
 \begin{document}
 \maketitle
@@ -46,6 +46,7 @@ The sine illusion, which is part of a set of optical illusions which occur based
 \tableofcontents
 
 \section{Introduction}
+
 The sine illusion, shown in Figure \ref{original}, is an optical illusion which has a pervasive effect on our ability to interpret statistical graphics commonly used for time-series data. Data which follows a sinusoidal trend seems to have higher variance at the peak and trough, and much lower variance where the slope of the curve is steepest. 
 
 
@@ -217,6 +218,22 @@ grid.arrange(p1, p2, nrow=2, heights=c(1.5, 1))
 \includegraphics[keepaspectratio=TRUE, width=.5\linewidth]{figure/fig-clevelandgraph}
 \caption{\cite{cleveland:1985} examined the task of judging the distance between two curves experimentally: ``In the top panel it is difficult to judge how much greater the y-values of curve 1 are than those for curve 2 because our visual system has difficulty detecting the vertical distances between the curves. In the bottom panel the differences are graphed directly; the values are quite different from how they appear in the top panel"}
 \label{cleveland-figure}
+\end{figure}
+
+\begin{figure}
+<<cleveland, echo=FALSE, fig.width=6, fig.height=6, out.width='0.5\\textwidth'>>=
+f <- function(x) -x^2
+sdf <- function(x) (4-0.5*x)/5
+  
+x <- seq(-2,2.5, by=0.1)
+
+id <- 1:30
+dframe <- expand.grid(x=x, id=id)
+dframe$y <- with(dframe, rnorm(n=nrow(dframe), mean=f(x), sd=sdf(x)/2))
+qplot(x,y, data=dframe, geom="jitter")
+@
+\caption{Alternative to the cleveland figure: in order to get around copyright, we could use the idea of shrinking distance (= decreasing variance) and introduce the new concept that it doesn't have to be two lines, but judging variability. Question to the audience: `Where's the variance the highest?' or `Describe the conditional variability of the points along the $x$ axis`}
+\label{cleveland-figure-2}
 \end{figure}
 
 % More recently, the line-width illusion has been cited as a reason to modify parallel sets plots to avoid pitfalls in human perception.  Figure \ref{hammocks} shows the parallel sets plot, the hammock plot, and the common angle plot, which has been modified so that all angles are constant. The hammock plot corrects for the line width illusion, where the common angle plot holds all of the angles constant so as not to require correction. 
@@ -706,3 +723,5 @@ Figures \ref{raw-temp} and \ref{resid-temp} show temperature data from 1218 stat
 % argument is your BibTeX string definitions and bibliography database(s)
 \bibliography{references}
 \end{document}
+
+
