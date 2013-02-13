@@ -35,6 +35,10 @@ library(plyr)
 \newcommand{\comment}[2][inline]{\todo[color=SkyBlue, #1]{#2}} % for comments that may not be "to-do"s
 \newcommand{\mcomment}[1]{\todo[color=SkyBlue]{#1}} % for margin comments
 
+\newcommand{\newtext}[1]{\todo[inline, color=White]{ \color{LimeGreen}{#1}}} % new text - not necessarily something to be done
+\newcommand{\newdo}[1]{\todo[inline, color=Plum]{#1}} % new to do item
+
+
 \title{Signs of the Sine Illusion -- why we need to care}
 \author{Susan Vanderplas, Heike Hofmann, Dianne Cook, Xiaoyue Cheng}
 
@@ -46,7 +50,11 @@ The sine illusion, which is part of a set of optical illusions which occur based
 \tableofcontents
 
 \section{Introduction}
+\newtext{Graphics are powerful tools for summarizing large or complex data. The main premise in our dealings with statistical graphics is that
+graphics have to be true to the data (e.g. lie factor Tufte, Wainer, ...). Computational tools help us ensure technical trueness -- but how do we deal with situations that involve innate inability or trigger learned misperceptions? In this paper we want to raise awareness for one of these situations, show that it occurs frequently in our dealings with graphics and provide different attempts at solving or avoiding it.
+}
 
+\newdo{We need a relevant example as a hook - then explain to people what trap they fell in.}
 The sine illusion, shown in Figure \ref{original}, is an optical illusion which has a pervasive effect on our ability to interpret statistical graphics commonly used for time-series data. Data which follows a sinusoidal trend seems to have higher variance at the peak and trough, and much lower variance where the slope of the curve is steepest. 
 
 
