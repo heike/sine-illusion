@@ -282,6 +282,9 @@ where $\theta$ is the acute angle between the secant line and the vertical, that
 \begin{figure}[h!tbp]
 \centering
 <<transform-illustration,echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE>>=
+f <- function(x) 2*sin(x)
+fprime <- function(x) 2*cos(x)
+f2prime <- function(x) -2*sin(x)
 library(plyr)
 dframe <- createSine(n = 150, len = 1, f=f, fprime=fprime)
 dframe$ystartcts <- dframe$ystart
@@ -322,9 +325,13 @@ getSecantSegment <- function(x0, df, f, fprime, f2prime){
 
 
 dframe.1 <- getSecantSegment(dframe$xstart, dframe, f, fprime, f2prime)
-
-names(dframe.1) <- c("x", "y", "deriv", "xstart", "xend", "ystart", "yend", "ell", "ell.quad1", "ell.quad2", "type")
-dframe.1 <- dframe.1[!is.na(dframe.1$x),]
+dframe.1$x <- dframe$x
+dframe.1$y <- dframe$y
+dframe.1$ystartcts <- dframe$ystartcts
+dframe.1$yendcts <- dframe$yendcts
+names(dframe.1) <- c("x", "y", "deriv", "xstart", "xend", "ystart", "yend", "ell", "ell.quad1", "ell.quad2", "type", "ystartcts", "yendcts")
+# names(dframe.1) <- c("x", "y", "deriv", "xstart", "xend", "ystart", "yend", "ell", "ell.quad1", "ell.quad2", "type")
+# dframe.1 <- dframe.1[!is.na(dframe.1$x),]
 dframe.1$vangle <- with(dframe.1, asin((xstart-x)/ell.quad1))
 # dframe.1$x <- dframe$x
 # dframe.1$y <- dframe$y
@@ -338,11 +345,16 @@ qplot(x=x, y=y, geom="line", data=dframe, colour=I("grey50")) + theme_bw() +
   geom_line(aes(y=yendcts), colour="grey50", linetype=4) +
   geom_segment(data=subset(dframe, !is.na(type)), aes(x=xstart, xend = xend, y=ystart, yend=yend, colour=type))  + 
   coord_equal(ratio=1) + scale_colour_manual("", values=c("black", "blue")) + theme(legend.position="bottom")  + 
+#   geom_text(aes(label=paste(round(vangle/pi*180), "^o", sep=""),
+#                 x=xstart*(x<pi/2 | x>1.5*pi) + xend*(x>pi/2 & x<1.5*pi), y=ystart*(x<pi/2 | x<1.5*pi) + yend*(x>pi/2 & x<1.5*pi)), 
+#             data=dframe.1, parse=TRUE, hjust=1, vjust=.5, size=2.5) + 
   geom_text(aes(label=paste("theta", "%~~%", round(vangle/pi*180), "^o", sep=""),
-                x=xstart/2+x/2-sign(vangle)*.1, y=y-sign(vangle)*.64+.04), data=dframe.1, parse=TRUE, hjust=.75, vjust=.5, size=2.5) + 
+                x=xstart/2+x/2-sign(vangle)*.1, y=y-sign(vangle)*.64+.04), 
+            data=dframe.1, parse=TRUE, hjust=.75, vjust=.5, size=2.5) + 
   xlim(c(-pi/8, 17*pi/8)) + 
   scale_x_continuous(breaks=seq(0, 2*pi, by=pi/2), 
-                     labels=c("0", expression(paste(pi,"/2")), expression(pi), expression(paste("3",pi, "/2")), expression(paste("2",pi))))
+                     labels=c("0", expression(paste(pi,"/2")), expression(pi), expression(paste("3",pi, "/2")), expression(paste("2",pi)))) #+ 
+  # facet_wrap(~type)
   # + ggtitle("Changes in Perceived Orthogonal Width \ndue to Change in Secant Angle")
 @
 % \includegraphics[width=.45\linewidth, keepaspectratio=TRUE]{figure/fig-transform-illustration}
