@@ -26,6 +26,62 @@ opts_chunk$set(fig.path='figure/fig-', cache.path='cache/', fig.align='center', 
 library(reshape2)
 suppressMessages(library(ggplot2))
 library(plyr)
+
+createSine <- function(n=200, len=1, f=f, fprime=fprime) {
+  x <- seq(0, 2*pi, length=n)
+  l <- rep(len, length=length(x))
+  fx <- f(x)
+  ystart <- fx - .5*l
+  yend <- fx + .5*l
+  ell <- yend-ystart
+  # now correct for line illusion in vertical direction
+  dy <- diff(range(fx))
+  dx <- diff(range(x))
+# fprime works in framework of dx and dy, but we represent it in framework of dx and dy+len
+# needs to be fixed by factor a:  
+  a <- dy/(dy + len) 
+# ellx is based on the "hammock" correction
+  ellx <- ell / cos(atan(abs(a*fprime(x))))
+# ellx2 is based on linear approximation of f  
+  ellx2 <- ell * sqrt(1 + a*fprime(x)^2)
+# third adjustment is based on quadratic approximation of f.
+# this needs two parts: correction above and below f(x)  
+  
+  # make this a data frame - ggplot2 doesn't do well with floating vectors
+  dframe <- data.frame(x=x, xstart=x, xend=x, y=fx, ystart=ystart, yend=yend, ell=ell, ellx = ellx, ellx2=ellx2)
+  
+  dframe
+}
+
+getSecantSegment <- function(x0, df, f, fprime, f2prime){
+  secSlope   <- -1/fprime(x0)
+  ell.x0     <- df$ell[which.min(abs(df$x-x0))]/2
+  #--- Actual Roots
+  #  temp       <- seq(min(df$x)-pi, max(df$x)+pi, .0001)
+  #   leftend    <- temp[which.min(abs(f(temp) + ell.x1 - secSlope*(temp-x1)))]
+  #   rightend   <- temp[which.min(abs(f(temp) - ell.x1 - secSlope*(temp-x1)))]
+  #---
+  
+  #--- Approximation
+  lambda1 <- (-(fprime(x0)^2 + 1) + sqrt((fprime(x0)^2 + 1)^2 - 2* fprime(x0)^2*f2prime(x0)*ell.x0))/(fprime(x0)^2*f2prime(x0))
+  lambda2 <- (-(fprime(x0)^2 + 1) + sqrt((fprime(x0)^2 + 1)^2 + 2* fprime(x0)^2*f2prime(x0)*ell.x0))/(fprime(x0)^2*f2prime(x0))
+  
+  leftend <- lambda1*fprime(x0)+x0
+  rightend <- lambda2*fprime(x0)+x0
+  #---
+  
+  df2 <- data.frame(x=x0, y=f(x0), deriv=fprime(x0),
+                    sec.xstart=leftend, sec.xend=rightend, 
+                    sec.ystart=f(x0) -lambda1,
+                    sec.yend = f(x0) -lambda2,
+                    ell.orig = 2*ell.x0)
+
+  df2$sec.ell1 <- with(df2, sqrt((sec.yend-y)^2+(sec.xend-x)^2))
+  df2$sec.ell2 <- with(df2, sqrt((y-sec.ystart)^2+(x-sec.xstart)^2))
+  df2$type <- "Perceived Width"
+  return(df2)
+}
+
 @
 
 
@@ -55,44 +111,67 @@ graphics have to be true to the data (e.g. lie factor Tufte, Wainer, ...). Compu
 }
 
 \newdo{We need a relevant example as a hook - then explain to people what trap they fell in.}
+<<intro-example,echo=FALSE, include=FALSE>>=
+library(reshape)
+library(plyr)
+f <- function(x) 2*sin(4*x/pi)
+fprime <- function(x) 2*cos(4*x/pi)
+f2prime <- function(x) 2*sin(4*x/pi)
+df <- createSine(200, len=1, f, fprime)[,c(1, 4, 7:9)]
+df2 <- ddply(df, .(x), transform, ysamp = rnorm(30, y, ellx/2))
+qplot(data=df2, x=x, y=ysamp, geom="point") + xlab("x") + ylab("y") + coord_equal(ratio=1) + theme_bw() +ylim(c(-4,4))         
+qplot(data=df2, x=x, y=ysamp-y, geom="point") + xlab("x") + ylab("y") + coord_equal(ratio=1) + theme_bw() +ylim(c(-3,3))  
+@
+<<intro-example-redo,echo=FALSE, include=FALSE>>=
+library(reshape)
+library(plyr)
+f <- function(x) 2*sin(4*x/pi)
+fprime <- function(x) 2*cos(4*x/pi)
+f2prime <- function(x) 2*sin(4*x/pi)
+df <- createSine(200, len=1, f, fprime)[,c(1, 4, 7:9)]
+df2 <- ddply(df, .(x), transform, ysamp = rnorm(30, y, mean(df$ellx/2)))
+qplot(data=df2, x=x, y=ysamp, geom="point") + xlab("x") + ylab("y") + coord_equal(ratio=1) + theme_bw() +ylim(c(-4,4))     
+qplot(data=df2, x=x, y=ysamp-y, geom="point") + xlab("x") + ylab("y") + coord_equal(ratio=1) + theme_bw() +ylim(c(-3,3))  
+@
+
+\begin{figure}[h!tbp]
+\centering
+\begin{subfigure}[b]{.45\linewidth}\centering
+\includegraphics[width=\linewidth,keepaspectratio=TRUE]{figure/fig-intro-example1}
+\caption{}\label{motivation1}
+\end{subfigure}
+\begin{subfigure}[b]{.45\linewidth}\centering
+\includegraphics[width=\linewidth,keepaspectratio=TRUE]{figure/fig-intro-example-redo1}
+\caption{}\label{motivation2}
+\end{subfigure}
+\caption{Which figure has less heteroskedasticity? }
+\end{figure}
+
 The sine illusion, shown in Figure \ref{original}, is an optical illusion which has a pervasive effect on our ability to interpret statistical graphics commonly used for time-series data. Data which follows a sinusoidal trend seems to have higher variance at the peak and trough, and much lower variance where the slope of the curve is steepest. 
 
+\begin{figure}[h!tbp]
+\centering
+\begin{subfigure}[b]{.45\linewidth}\centering
+\includegraphics[width=\linewidth,keepaspectratio=TRUE]{figure/fig-intro-example2}
+\caption{Residuals from Figure \ref{motivation1}}\label{motivation3}
+\end{subfigure}
+\begin{subfigure}[b]{.45\linewidth}\centering
+\includegraphics[width=\linewidth,keepaspectratio=TRUE]{figure/fig-intro-example-redo2}
+\caption{Residuals from Figure \ref{motivation2}}\label{motivation4}
+\end{subfigure}
+\caption{Figure \ref{motivation2} has constant variance, but appears to have nonconstant variance. Figure \ref{motivation1} has nonconstant variance but appears to have constant variance. }
+\end{figure}
 
-<<data, echo=FALSE, eval=TRUE>>=
+<<functions, echo=FALSE, eval=TRUE>>=
 f <- function(x) 2*sin(x)
 fprime <- function(x) 2*cos(x)
 f2prime <- function(x) -2*sin(x)
 
-createSine <- function(n=200, len=1, f=f, fprime=fprime) {
-  x <- seq(0, 2*pi, length=n)
-  l <- rep(len, length=length(x))
-  fx <- f(x)
-  ystart <- fx - .5*l
-  yend <- fx + .5*l
-  ell <- yend-ystart
-  # now correct for line illusion in vertical direction
-  dy <- diff(range(fx))
-  dx <- diff(range(x))
-# fprime works in framework of dx and dy, but we represent it in framework of dx and dy+len
-# needs to be fixed by factor a:  
-  a <- dy/(dy + len) 
-# ellx is based on the "hammock" correction
-  ellx <- ell / cos(atan(abs(a*fprime(x))))
-# ellx2 is based on linear approximation of f  
-  ellx2 <- ell * sqrt(1 + a*fprime(x)^2)
-# third adjustment is based on quadratic approximation of f.
-# this needs two parts: correction above and below f(x)  
-  
-  # make this a data frame - ggplot2 doesn't do well with floating vectors
-  dframe <- data.frame(x=x, xstart=x, xend=x, y=fx, ystart=ystart, yend=yend, ell=ell, ellx = ellx, ellx2=ellx2)
-  
-  dframe
-}
 @
 \begin{figure}[hbtp]
 \centering
 \begin{minipage}{.49\linewidth}
-<<original, dependson='data', echo=FALSE, results='asis', fig.width=5, fig.height=5>>=
+<<original, dependson='functions', echo=FALSE, results='asis', fig.width=5, fig.height=5>>=
 qplot(x=x, xend=xend, y = ystart, yend=yend, geom="segment", data=createSine(40, 1, f=f, fprime=fprime)) +
   theme(panel.grid.major=element_blank(), panel.background = element_rect(fill = "white", 
                 colour = "black"),
@@ -294,34 +373,6 @@ dframe[(1:15)*10-5, c(2, 3)] <- dframe[(1:15)*10-5, 1]
 dframe[(1:15)*10-5, 5] <- dframe[(1:15)*10-5, 4] - .5
 dframe[(1:15)*10-5, 6] <- dframe[(1:15)*10-5, 4] + .5
 dframe$type <- "Data"
-getSecantSegment <- function(x0, df, f, fprime, f2prime){
-  secSlope   <- -1/fprime(x0)
-  ell.x0     <- df$ell[which.min(abs(df$x-x0))]/2
-  #--- Actual Roots
-  #  temp       <- seq(min(df$x)-pi, max(df$x)+pi, .0001)
-  #   leftend    <- temp[which.min(abs(f(temp) + ell.x1 - secSlope*(temp-x1)))]
-  #   rightend   <- temp[which.min(abs(f(temp) - ell.x1 - secSlope*(temp-x1)))]
-  #---
-  
-  #--- Approximation
-  lambda1 <- (-(fprime(x0)^2 + 1) + sqrt((fprime(x0)^2 + 1)^2 - 2* fprime(x0)^2*f2prime(x0)*ell.x0))/(fprime(x0)^2*f2prime(x0))
-  lambda2 <- (-(fprime(x0)^2 + 1) + sqrt((fprime(x0)^2 + 1)^2 + 2* fprime(x0)^2*f2prime(x0)*ell.x0))/(fprime(x0)^2*f2prime(x0))
-  
-  leftend <- lambda1*fprime(x0)+x0
-  rightend <- lambda2*fprime(x0)+x0
-  #---
-  
-  df2 <- data.frame(x=x0, y=f(x0), deriv=fprime(x0),
-                    sec.xstart=leftend, sec.xend=rightend, 
-                    sec.ystart=f(x0) -lambda1,
-                    sec.yend = f(x0) -lambda2,
-                    ell.orig = 2*ell.x0)
-
-  df2$sec.ell1 <- with(df2, sqrt((sec.yend-y)^2+(sec.xend-x)^2))
-  df2$sec.ell2 <- with(df2, sqrt((y-sec.ystart)^2+(x-sec.xstart)^2))
-  df2$type <- "Perceived Width"
-  return(df2)
-}
 
 
 dframe.1 <- getSecantSegment(dframe$xstart, dframe, f, fprime, f2prime)
