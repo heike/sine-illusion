@@ -110,14 +110,100 @@ The sine illusion, which is part of a set of optical illusions which occur based
 graphics have to be true to the data (e.g. lie factor Tufte, Wainer, ...). Computational tools help us ensure technical trueness -- but how do we deal with situations that involve innate inability or trigger learned misperceptions? In this paper we want to raise awareness for one of these situations, show that it occurs frequently in our dealings with graphics and provide different attempts at solving or avoiding it.
 }
 
-\newdo{We need a relevant example as a hook - then explain to people what trap they fell in.}
-<<cars,echo=FALSE>>=
 
-cars <- read.csv("http://www.epa.gov/otaq/cert/mpg/testcars/database/13tstcar-2012-11-09.csv")
-qplot(ETW, FE.Bag.3, data=cars) + geom_jitter()
+<<example,echo=FALSE, include=FALSE>>=
 
+# cars <- read.csv("http://www.epa.gov/otaq/cert/mpg/testcars/database/13tstcar-2012-11-09.csv")
+# qplot(ETW, FE.Bag.3, data=cars) + geom_jitter()
+
+# Dataset with outliers present
+airquality2 <- airquality[!is.na(airquality$Ozone),]
+airquality2$fit <- loess(data=airquality2, Ozone~Temp)$fitted
+airquality2$resid <- loess(data=airquality2, Ozone~Temp)$resid
+# Group data by quantiles, compute residual variance for each quantile to see if the error variance is similar
+airquality2$group <- sapply(airquality2$Temp, function(i) sum(i<=(quantile(airquality2$Temp, c(.25, .5, .75, 1)))))
+airquality2 <- ddply(airquality2, .(group), transform, groupvar=var(resid))
+airquality2 <- airquality2[order(airquality2$Temp),]
+
+# Dataset with outliers removed
+airquality3 <- airquality2[which(abs(airquality2$resid)<50), ]
+airquality3$fit <- loess(data=airquality3, Ozone~Temp)$fitted
+airquality3$resid <- loess(data=airquality3, Ozone~Temp)$resid
+# Group data by quantiles (using quantiles from unaltered dataset), 
+# compute residual variance for each quantile to see if the error variance is similar
+airquality3$group <- sapply(airquality3$Temp, function(i) sum(i<=(quantile(airquality2$Temp, c(.25, .5, .75, 1)))))
+airquality3 <- ddply(airquality3, .(group), transform, groupvar=var(resid))
+airquality3 <- airquality3[order(airquality3$Temp),]
+
+qplot(data=airquality2, x=Temp, y=Ozone) + geom_line(aes(y=fit)) + theme_bw()
+qplot(data=airquality3, x=Temp, y=Ozone) + geom_line(aes(y=fit))+ theme_bw()
+
+qplot(data=airquality2, x=Temp, y=Ozone) + geom_line(aes(y=fit)) + geom_ribbon(aes(ymax=fit+2*sqrt(groupvar), ymin=fit-2*sqrt(groupvar)), alpha=.25, colour="grey")+ theme_bw()
+qplot(data=airquality3, x=Temp, y=Ozone) + geom_line(aes(y=fit)) + geom_ribbon(aes(ymax=fit+2*sqrt(groupvar), ymin=fit-2*sqrt(groupvar)), alpha=.25, colour="grey")+ theme_bw()
+qplot(data=airquality2, x=Temp, y=resid) + geom_line(aes(y=0*fit)) + geom_ribbon(aes(ymax=2*sqrt(groupvar), ymin=-2*sqrt(groupvar)), alpha=.25, colour="grey") + ylab("Residual")+ theme_bw()
+qplot(data=airquality3, x=Temp, y=resid) + geom_line(aes(y=0*fit)) + geom_ribbon(aes(ymax=2*sqrt(groupvar), ymin=-2*sqrt(groupvar)), alpha=.25, colour="grey") + ylab("Residual")+ theme_bw()
 @
 
+\done{We need a relevant example as a hook - then explain to people what trap they fell in.}
+
+Figure \ref{example1} shows daily measurements of Ozone concentration and temperature in New York from May to September, 1973 with a loess smooth line for reference. What seems to be the trend in overall variance? Figure \ref{example2} shows the same data with the three most heinous outliers removed. What seems to be the trend in overall variance in Figure \ref{example2} compared to the trend in overall variance in Figure \ref{example1}?
+
+\begin{figure}[h!tbp]\centering
+\caption{Ozone and Temperature in New York, May-September 1973}
+\begin{subfigure}[b]{.45\linewidth}
+  \centering
+  \includegraphics[width=\textwidth]{figure/fig-example1}
+  \caption{\small All data}
+  \label{example1}
+\end{subfigure}
+\begin{subfigure}[b]{.45\linewidth}
+  \centering
+  \includegraphics[width=\textwidth]{figure/fig-example2}
+  \caption{\small Outliers removed}
+  \label{example2}
+\end{subfigure}
+\label{exampleFull1}
+\end{figure}
+
+Figure \ref{exampleFull2} shows the same data, but includes a shaded region that is 2$\sigma_q$ above and below the fitted line, computed separately for each quartile $q=1, 2, 3, 4$ of temperature. It is much more obvious now that the variance is actually increasing with temperature, and in fact, the variance in the 4th quartile is \Sexpr{round(mean(airquality3$groupvar[which(airquality3$group==1)])/mean(airquality3$groupvar[which(airquality3$group==4)]), 2)} times that of the 1st quartile, even when outliers are removed. Without the outliers, the increasing variance might be more obvious, but is still camoflauged by the increasing trend.  
+\begin{figure}[h!tbp]\centering
+\begin{subfigure}[b]{.45\linewidth}
+  \centering
+  \includegraphics[width=\textwidth]{figure/fig-example3}
+  \caption{\small All data}
+  \label{example3}
+\end{subfigure}
+\begin{subfigure}[b]{.45\linewidth}
+  \centering
+  \includegraphics[width=\textwidth]{figure/fig-example4}
+  \caption{\small Outliers removed}
+  \label{example4}
+\end{subfigure}
+\caption{Variance in Ozone levels with Temperature, New York (May-September 1973). Shaded bands are 2$\sigma$ above and below the fit line, computed separately for each temperature quartile. Even with the outliers removed, the variance for  days above 85 degrees is much higher than the variance for days below 70 degrees.}
+\label{exampleFull2}
+\end{figure}
+\comment{I left the bands around the trendline because it's more obvious there than without the bands that there is increasing variance, but obviously the bands are still effected by the illusion. Not sure what's best there...}
+\begin{figure}[h!tbp]\centering
+\begin{subfigure}[b]{.45\linewidth}
+  \centering
+  \includegraphics[width=\textwidth]{figure/fig-example5}
+  \caption{\small Residuals}
+  \label{example5}
+\end{subfigure}
+\begin{subfigure}[b]{.45\linewidth}
+  \centering
+  \includegraphics[width=\textwidth]{figure/fig-example6}
+  \caption{\small Residuals with outliers removed}
+  \label{example6}
+\end{subfigure}
+\caption{Residual variance in Ozone levels with Temperature, New York (May-September 1973), with bands showing the increase in variance as temperature increases}
+\label{exampleFull3}
+\end{figure}
+
+Even with the variance bands, it is difficult to truly comprehend the magnitude of the change in variance until the residuals are plotted without the underlying trend. This is shown in Figure \ref{exampleFull3}. The line width illusion is a frequent occurrence in statistical analysis, and graphical displays should be thoughtfully considered to minimize its effect visually and acknowledge its influence even when the effect cannot be entirely mitigated through graphical means.
+
+\comment{I think we'll need to restructure the introduction to account for the "line width illusion" vs. "sine illusion" discrepancy - we'll want to make a case that the sine illusion can provide insight into how to mitigate the more general line width illusion.
+}
 <<functions, echo=FALSE, eval=TRUE>>=
 f <- function(x) 2*sin(x)
 fprime <- function(x) 2*cos(x)
@@ -176,7 +262,7 @@ shift <- pi/30
 x <- seq(-1*pi, 1*pi, pi/30)
 persp <- data.frame(xtop=x+shift + angle, xbottom=x-shift, ytop = (1-angle)*sin(x+shift)+1/2, ybottom = (1+angle)*sin(x+shift)-1/2)
 persp$ell <- with(persp, sqrt((xbottom-xtop)^2 + (ybottom-ytop)^2))
-qplot(data=persp, x=xtop, xend=xbottom, y=ytop, yend=ybottom, geom="segment") + ggtitle("What the brain expects the data to look like") + 
+qplot(data=persp, x=xtop, xend=xbottom, y=ytop, yend=ybottom, geom="segment") + 
   xlab("") + ylab("") + 
   theme(panel.grid.major=element_blank(), 
         panel.background = element_rect(fill = "white", colour = "black"),
@@ -189,7 +275,7 @@ qplot(data=persp, x=xtop, xend=xbottom, y=ytop, yend=ybottom, geom="segment") + 
 
 @
 \includegraphics[width=.5\linewidth, keepaspectratio=TRUE]{figure/fig-ribbon-illusion}
-\caption{Experience with real-world objects suggests that the data are most similar to a slightly angled top view of a 3-dimensional strip such as a ribbon. Even though the sine illusion lines are not angled, the brain often recruits paradigms from one situation when processing novel stimuli. Optical illusions result from the mismatch between the applied heuristic and the stimulus. \citep{goldstein}} % goldstein S&P 8th edition pg 249
+\caption{What the brain expects the data to look like. Experience with real-world objects suggests that the data are most similar to a slightly angled top view of a 3-dimensional strip such as a ribbon. Even though the sine illusion lines are not angled, the brain often recruits paradigms from one situation when processing novel stimuli. Optical illusions result from the mismatch between the applied heuristic and the stimulus. \citep{goldstein}} % goldstein S&P 8th edition pg 249
 \label{ribbon-illusion}
 \end{figure}
 
@@ -273,7 +359,7 @@ x <- seq(-2,2.5, by=0.1)
 id <- 1:30
 dframe <- expand.grid(x=x, id=id)
 dframe$y <- with(dframe, rnorm(n=nrow(dframe), mean=f(x), sd=sdf(x)/2))
-qplot(x,y, data=dframe, geom="jitter")
+qplot(x,y, data=dframe, geom="jitter")+ theme_bw()
 @
 \caption{Alternative to the cleveland figure: in order to get around copyright, we could use the idea of shrinking distance (= decreasing variance) and introduce the new concept that it doesn't have to be two lines, but judging variability. Question to the audience: `Where's the variance the highest?' or `Describe the conditional variability of the points along the $x$ axis`}
 \label{cleveland-figure-2}
@@ -429,19 +515,19 @@ dframe$correction2 <- dframe$correction2/sum(dframe$correction2)*2*pi
 dframe$xtrans <- cumsum(dframe$correction) # Create transformed X axis
 dframe$xtrans2 <- cumsum(dframe$correction2) # Create transformed X axis
 
-qplot(x=xtrans, xend=xtrans, y = ystart, yend=yend, colour=I("blue"), geom="segment", main="Transformed X Axis", data=dframe) +
+qplot(x=xtrans, xend=xtrans, y = ystart, yend=yend, colour=I("blue"), geom="segment", data=dframe) +
   geom_segment(aes(x = 0, xend=2*pi, y=0, yend=0), colour="black") +theme_bw() + coord_fixed(ratio=1) + xlab(expression(tilde(x))) + ylab("y")
 @
-\caption{Adjusting the x-spacing of the lines mitigates the sine illusion by changing the extant width so that it is uniform in $x$}
+\caption{Transformation of the $X$ axis. Adjusting the x-spacing of the lines mitigates the sine illusion by changing the extant width so that it is uniform in $x$}
 \label{xtrans1}
 \end{figure}
 Interestingly, the illusion can be broken by a much less severe transformation in $x$. By averaging the transformation in Figure \ref{xtrans1} with the average absolute slope over the range of $x$ values, that is $\tilde x^\prime \propto .5 d\tilde x + .5(1/n\sum_{i=1}^n |cos(x_i)|)$ where $n$ is the number of lines at points $x_i$, the illusion is still broken and the data are closer to the original function $y=sin(x)$. The extent to which this weighting holds is likely to vary with the aspect ratio and the shape of the function, but merits further investigation, as it may be possible to find an ``optimal weighting" for specific situations which minimizes distortion and maximizes the correspondence between inferences made from the data and inferences made using the visual display.
 \begin{figure}[h!tbp]\centering
 <<xtrans-mid,echo=FALSE>>=
-qplot(x=xtrans2, xend=xtrans2, y = ystart, yend=yend, colour=I("blue"), geom="segment", main="Transformed X Axis", data=dframe) +
+qplot(x=xtrans2, xend=xtrans2, y = ystart, yend=yend, colour=I("blue"), geom="segment", data=dframe) +
   geom_segment(aes(x = 0, xend=2*pi, y=0, yend=0), colour="black") +theme_bw() + coord_fixed(ratio=1) + xlab(expression(tilde(x))) + ylab("y")
 @
-\caption{Using a less severe adjustment, the illusion is still broken with a smaller distortion along the $x$ axis.}
+\caption{Transformed $X$ Axis, shrunken towards a constant spacing. Using a less severe adjustment, the illusion is still broken with a smaller distortion along the $x$ axis.}
 \label{xtrans2}
 \end{figure}
 \clearpage
@@ -526,10 +612,10 @@ dframe1 <- createSine(n=40, len=1, f=f, fprime=fprime)
 dframe1 <- adjY(dframe1)
 @
 \begin{figure}[h!tbp]\centering
-<<hammocktransform1-plot, echo=FALSE, include=FALSE>>=
-qplot(x=xstart, xend=xend, y = ystart, yend=yend, colour=I("blue"), geom="segment", main="Transformed Length", data=dframe1) + ylim(c(-pi/2, pi/2))+ coord_fixed(ratio=2) + xlab("x") + ylab("y")
-qplot(x=xstart, xend=xend, y = ystart, yend=yend, colour=I("blue"), geom="segment", main="Transformed Length", data=dframe1) + ylim(c(-pi, pi))+ coord_fixed(ratio=2)+ xlab("x") + ylab("y")
-qplot(x=xstart, xend=xend, y = ystart, yend=yend, colour=I("blue"), geom="segment", main="Transformed Length", data=dframe1) + ylim(c(-2*pi, 2*pi))+ coord_fixed(ratio=2)+ xlab("x") + ylab("y")
+<<hammocktransform1-plot, echo=FALSE, include=FALSE, fig.width=4, fig.height=4>>=
+qplot(x=xstart, xend=xend, y = ystart, yend=yend, colour=I("blue"), geom="segment", data=dframe1) + coord_fixed(ratio=.5) + xlab("x") + ylab("y") + theme_bw()
+qplot(x=xstart, xend=xend, y = ystart, yend=yend, colour=I("blue"), geom="segment", data=dframe1) + coord_fixed(ratio=1)+ xlab("x") + ylab("y")+ theme_bw()
+qplot(x=xstart, xend=xend, y = ystart, yend=yend, colour=I("blue"), geom="segment", data=dframe1) + coord_fixed(ratio=2)+ xlab("x") + ylab("y")+ theme_bw()
 @
 
 \begin{subfigure}[b]{.3\linewidth}\centering
