@@ -40,7 +40,7 @@ createSine <- function(n=200, len=1, f=f, fprime=fprime) {
 # fprime works in framework of dx and dy, but we represent it in framework of dx and dy+len
 # needs to be fixed by factor a:  
   a <- dy/(dy + len) 
-# ellx is based on the "hammock" correction
+# ellx is based on the "trig" correction
   ellx <- ell / cos(atan(abs(a*fprime(x))))
 # ellx2 is based on linear approximation of f  
   ellx2 <- ell * sqrt(1 + a*fprime(x)^2)
@@ -202,13 +202,83 @@ Figure \ref{exampleFull2} shows the same data, but includes a shaded region that
 
 Even with the variance bands, it is difficult to truly comprehend the magnitude of the change in variance until the residuals are plotted without the underlying trend. This is shown in Figure \ref{exampleFull3}. The line width illusion is a frequent occurrence in statistical analysis, and graphical displays should be thoughtfully considered to minimize its effect visually and acknowledge its influence even when the effect cannot be entirely mitigated through graphical means.
 
-\comment{I think we'll need to restructure the introduction to account for the "line width illusion" vs. "sine illusion" discrepancy - we'll want to make a case that the sine illusion can provide insight into how to mitigate the more general line width illusion.
-}
+\comment{I've restructured the introduction a bit to better transition from "line width illusion" to sine illusion (at least, I think it flows a bit better)}
+
+\subsection{Statistical Graphics and the Line Width Illusion}\label{statisticalgraphics}
+% While the illusion presented above is termed the sine illusion, it holds for non-sinusoidal curves which have dramatic changes in the slope of the lines over time as well.
+The line width illusion demonstrated in Figures \ref{exampleFull1} through \ref{exampleFull3} has been frequently noted in statistical graphics, though usually not as an optical illusion. Rather, the problem is typically identified as the difficulty of visually subtracting two curves, and the misleading conclusions that may result when this process goes awry. Figure \ref{playfair-debt} shows one example of this common phenomenon \citet{playfair, playfair2}: the vertical distance between the two lines is much less visually salient than the extant width of the line, that is, the width of the line segment which is perpendicular to the tangent line at a given point.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[keepaspectratio=TRUE,width=.8\linewidth]{images/PlayfairExportImports}
+\caption{Playfair's graph of exports to and imports from the East Indies demonstrates that the line width illusion is not only found on sinusoidal curves but is present whenever the slope of the lines change dramatically. The increase in both imports and exports circa 1763 does not appear to portray as large of a deficit as that in 1710, even though they are of similar magnitude.}
+\label{playfair-debt}
+\end{figure}
+
+Another example of this phenomenon is shown in Figure \ref{robbins-graph} \citep{robbins:2005}. The line-width illusion is also present in the graphs of $e^x$ and $e^x + 1$, as the lines appear to be separated by a much smaller distance at $x=2.5$ than at $x=0$.
+\begin{figure}[htbp]
+\centering
+<<effectivegraphsfig,echo=FALSE>>=
+x <- seq(0, 2.5, .01)
+y1 <- exp(x)
+y2 <- exp(x)+1
+df <- data.frame(x=x, y=y1, y2=y2)
+qplot(data=df, x=x, y=y, geom="line") + geom_line(aes(y=y2)) + theme_bw()
+@
+\caption{A replication of Figure 2.16 in \cite{robbins:2005}. The line width illusion seems to be related to increasing slope - as the slope increases, the apparent distance between the two lines decreases, even though the lines are separated by a constant distance.}
+\label{robbins-graph}
+\end{figure}
+
+\cite{cleveland:1984, cleveland:1985} also discuss the perceptual difficulty of judging the difference between two curves plotted on the same axis. They recommend the difference between the two curves as an alternate display, as shown in the second part of Figure \ref{cleveland-figure}. While this is good practice when there are two separate curves (as in Figure \ref{playfair-debt}), when the contours of the data implicitly create two curves (the boundaries of the variability in the data) there is not an easy way to display the difference between these implicit curves without resorting to arbitrary minimum and maximum smoothing values or separating the display of the trendline and the variance. In addition, as in Figure \ref{playfair-debt} both the difference between the curves and the overall trend are of visual importance, and plotting the difference between the two curves removes the overall trend. 
+
+\begin{figure}[h!tbp]
+\centering
+%\includegraphics[keepaspectratio=TRUE, width=.5\linewidth]{images/ClevelandMcGillFig7}
+<<clevelandgraph,echo=FALSE, fig.width=6, fig.height=8, include=FALSE>>=
+x <- seq(0, 4, .01)
+y <- 8-(x-2.5)^2
+y1 <- 8- (x-2.5)^2 - (1-(x/8))
+df <- data.frame(x=x, y=y, y2=y1)
+p1 <- qplot(data=df, x=x, y=y, geom="line") + geom_line(aes(y=y2)) + theme_bw()
+p2 <- qplot(data=df, x=x, y=y-y1, geom="line") + theme_bw() + ylab(expression(paste(y-y,"'",sep="")))
+suppressMessages(library(gridExtra))
+grid.arrange(p1, p2, nrow=2, heights=c(1.5, 1))
+@
+\includegraphics[keepaspectratio=TRUE, width=.5\linewidth]{figure/fig-clevelandgraph}
+\caption{\cite{cleveland:1985} examined the task of judging the distance between two curves experimentally: ``In the top panel it is difficult to judge how much greater the y-values of curve 1 are than those for curve 2 because our visual system has difficulty detecting the vertical distances between the curves. In the bottom panel the differences are graphed directly; the values are quite different from how they appear in the top panel"}
+\label{cleveland-figure}
+\end{figure}
+
+\begin{figure}
+<<cleveland, echo=FALSE, fig.width=6, fig.height=6, out.width='0.5\\textwidth'>>=
+f <- function(x) -x^2
+sdf <- function(x) (4-0.5*x)/5
+  
+x <- seq(-2,2.5, by=0.1)
+
+id <- 1:30
+dframe <- expand.grid(x=x, id=id)
+dframe$y <- with(dframe, rnorm(n=nrow(dframe), mean=f(x), sd=sdf(x)/2))
+qplot(x,y, data=dframe, geom="jitter") + theme_bw()
+@
+\caption{Alternative to the cleveland figure: in order to get around copyright, we could use the idea of shrinking distance (= decreasing variance) and introduce the new concept that it doesn't have to be two lines, but judging variability. Question to the audience: `Where's the variance the highest?' or `Describe the conditional variability of the points along the $x$ axis`}
+\label{cleveland-figure-2}
+\end{figure}
+
+% More recently, the line-width illusion has been cited as a reason to modify parallel sets plots to avoid pitfalls in human perception.  Figure \ref{hammocks} shows the parallel sets plot, the hammock plot, and the common angle plot, which has been modified so that all angles are constant. The hammock plot corrects for the line width illusion, where the common angle plot holds all of the angles constant so as not to require correction. 
+%These two approaches are similar to the approaches we will take in correcting the sine illusion by adjusting the vertical height so that the extant width appears constant, and by modifying the $x$ axis so that the slope appears to be constant. These two approaches will produce somewhat different graphical displays.
+% \begin{figure}[h!tbp]
+% \centering
+% \missingfigure{Figure or figures showing hammock plots and the corrected version. I'd copy them from the paper but I'm sure there's a better version that was used to generate the paper.}
+% \caption{}
+% \label{hammocks}
+% \end{figure}
+\clearpage
+\newtext{The line width illusion can become even more misleading when it occurs along a periodic function, where the variance may appear to follow a periodic trend when it is in fact constant. This more specific instance of the line width illusion, the sine illusion, is shown in Figure \ref{original}.}
 <<functions, echo=FALSE, eval=TRUE>>=
 f <- function(x) 2*sin(x)
 fprime <- function(x) 2*cos(x)
 f2prime <- function(x) -2*sin(x)
-
 @
 \begin{figure}[hbtp]
 \centering
@@ -252,8 +322,8 @@ dev.off()
 \caption{\label{original}The original Sine Illusion. The regions of the left graph in the peak and the valley appear to be composed of longer lines than the other regions. The right graph illustrates the parameters determining the appearance of the illusion: $s$ denotes the amplitude of the function, $\ell$ the length of the line segments.}
 \end{figure}
 
-\subsection{Perceptual Explanations for the Sine Illusion}
-One presentation \mcomment{\footnotesize Presentation isn't the right word... occurrence?} of the Sine illusion comes from M. Bach's applet \citep{bach}, which cites perception research suggesting that the sine illusion occurs due to misapplication of perceptual experience with the three-dimensional world to a two-dimensional ``artificial" display of data. One possible three-dimensional context for similar stimuli is shown in Figure \ref{ribbon-illusion}.
+\subsection{Perceptual Explanations for the Sine Illusion}\label{perceptualexplanations}
+One illuminating demonstration of the Sine illusion comes from M. Bach's applet \citep{bach}. The applet cites perception research suggesting that the sine illusion occurs due to misapplication of perceptual experience with the three-dimensional world to a two-dimensional ``artificial" display of data. One possible three-dimensional context for similar stimuli is shown in Figure \ref{ribbon-illusion}. 
 
 \begin{figure}[h!tbp]\centering
 <<ribbon-illusion,echo=FALSE, fig.keep='none', fig.width=5, fig.height=2.6>>=
@@ -279,7 +349,8 @@ qplot(data=persp, x=xtop, xend=xbottom, y=ytop, yend=ybottom, geom="segment") +
 \label{ribbon-illusion}
 \end{figure}
 
-An interesting facet of the sine illusion is that when the graph is examined as if it were a two-dimensional projection of a three-dimensional figure, the illusion disappears and the line widths seem once more to be constant. In addition, if the lines are considered without the surrounding context, judgments comparing two lines are relatively accurate, particularly if the graph also includes horizontal reference lines, as in Figure \ref{original-grid}. 
+An interesting facet of the sine illusion is that when the graph is examined as if it were a two-dimensional projection of a three-dimensional figure, the illusion disappears and the line widths seem once more to be constant. In addition, if the lines are considered without the surrounding context, judgments comparing two lines seem to be relatively accurate, particularly if the graph also includes horizontal reference lines, as in Figure \ref{original-grid}. 
+\newtext{That is, the illusion breaks down if the visual heuristic is pre-empted by an attempt to view the graph as if it were three dimensional or if each piece is considered without the surrounding context. The illusion then holds only when a significant portion of the graph is considered simultaneously without regard to the perceptual mechanisms at play. (See \cite{day:1991} for a more thorough discussion of how much surrounding context is required for the illusion to persist)}
 
 
 \begin{figure}[hbtp]
@@ -300,81 +371,72 @@ qplot(x=x, xend=xend, y = ystart*ell, yend=yend*ell, geom="segment", data=dframe
 \caption{\label{original-grid} Horizontal grid lines do not help to resolve the illusion, even though they provide a clear basis for comparison of line lengths.}
 \end{figure}
 
-Though it is typically a bad idea to use three-dimensional representations when two dimensions are adequate to display the data \citep{tufte}, in this case, the data are perceived more accurately. A three-dimensional projection of two-dimensional data, however, is not easy to create and would likely lead to distortions and instability in the visual display. In particular, there does not seem to be an easy guideline for determining the projection angle or color gradient that would be necessary to create the illusory depth that would remove the optical illusion. 
+Though it is typically a bad idea to use three-dimensional representations when two dimensions are adequate to display the data \citep{tufte}, in this case, the data are perceived more accurately.\comment{Do we need user studies to back this claim up?} A three-dimensional projection of two-dimensional data, however, is not easy to create and would likely lead to distortions and instability in the visual display. In particular, there does not seem to be an easy guideline for determining the projection angle or color gradient that would be necessary to create the illusory depth that would remove the optical illusion. 
 
 While not thoroughly examined in the sensation and perception literature, the sine illusion seems to have been classified as part of a group of geometrical optical misperceptions which may be related to the M\"uller-Lyer illusion \citep{day:1991} or the Poggendorf illusion \citep{poggendorf}.  Figure \ref{original} shows a reproduction of Bach's applet \citep{bach} displaying the sine illusion. The sine illusion is closely related to the line width phenomenon -- the line segments along the steepest slopes of the sine curve appear to be the shortest: ``The illusion is explained in terms of a perceptual compromise between the vertical extent and the greater overall dimensions of the section at the turn of the sine-wave figure and is thereby held to be the same in principle as the M\"uller-Lyer illusion." \citep{day:1991}.
 M Bach's applet  gives the option to compensate the line length manually for its perceived shortcoming. The amount of compensation chosen turns out to be highly dependent on both the length of the vertical line segments and the amplitude of the sine function. While the applet does not provide details on the compensation function, it does suggest that it may be possible to correct the graphical display so that the brain interprets the stimuli in a manner consistent with the numerical data. 
 
-\subsection{Statistical Graphics and the Line Width Illusion}
-While the illusion presented above is termed the sine illusion, it holds for non-sinusoidal curves which have dramatic changes in the slope of the lines over time as well. Figure \ref{playfair-debt} shows one example of this common phenomenon \citet{playfair, playfair2}: the vertical distance between the two lines is much less visually salient than the extant width of the line, that is, the width of the line segment which is perpendicular to the tangent line at a given point.
+\subsection{Application: Simulation}
+Sections \ref{perceptualexplanations} and \ref{statisticalgraphics} explain the related line width illusion and sine illusion. While these illusions are not entirely separate, and similar visual processing heuristics likely underly both illusions, the size of the effect can be vastly increased when the two are superimposed. This occurs frequently in time series with both trend and seasonality, but for the sake of simplicity, we will use simulated data to demonstrate the effect. 
+\begin{figure}[h!tbp]\centering
+\begin{subfigure}[b]{.31\linewidth}
+  \centering
+<<simulation1Sine, echo=FALSE, fig.width=4, fig.height=4>>=
+x <- rep(seq(0,2*pi*2, length=120), each=100)
+y <- rnorm(n=length(x), mean=sin(x), sd=0.2)
+qplot(x,y, geom="jitter")+ 
+  geom_line(y=0*x) + 
+  scale_x_continuous(breaks=seq(0, 4*pi, by=pi), 
+                     labels=c("0", expression(paste(pi)), 
+                              expression(paste("2", pi)), 
+                              expression(paste("3", pi)), 
+                              expression(paste("4", pi)))) +
+  theme_bw()
 
-\begin{figure}[htbp]
-\centering
-\includegraphics[keepaspectratio=TRUE,width=.8\linewidth]{images/PlayfairExportImports}
-\caption{Playfair's graph of exports to and imports from the East Indies demonstrates that the line width illusion is not only found on sinusoidal curves but is present whenever the slope of the lines change dramatically. The increase in both imports and exports circa 1763 does not appear to portray as large of a deficit as that in 1710, even though they are of similar magnitude.}
-\label{playfair-debt}
-\end{figure}
-
-Another example of this phenomenon is shown in Figure \ref{robbins-graph} \citep{robbins:2005}. The line-width illusion is also present in the graphs of $e^x$ and $e^x + 1$, as the lines appear to be separated by a much smaller distance at $x=2.5$ than at $x=0$.
-\begin{figure}[htbp]
-\centering
-<<effectivegraphsfig,echo=FALSE>>=
-x <- seq(0, 2.5, .01)
-y1 <- exp(x)
-y2 <- exp(x)+1
-df <- data.frame(x=x, y=y1, y2=y2)
-qplot(data=df, x=x, y=y, geom="line") + geom_line(aes(y=y2)) + theme_bw()
 @
-\caption{A replication of Figure 2.16 in \cite{robbins:2005}. The line width illusion is present in non-periodic functions as well and seems to be related to increasing slope - as the slope increases, the apparent distance between the two lines decreases, even though the lines are separated by a constant distance.}
-\label{robbins-graph}
-\end{figure}
+  \caption{\small Seasonality, No Trend}
+  \label{simulation1}
+\end{subfigure}
+\begin{subfigure}[b]{.31\linewidth}\centering
+<<simulation2SineTrend, echo=FALSE, fig.width=4, fig.height=4>>=
+x <- rep(seq(0,2*pi*2, length=120), each=100)
+y <- rnorm(n=length(x), mean=1/10*(-x+pi)^2+sin(x), sd=0.2)
+qplot(x,y, geom="jitter")+ 
+  geom_line(y=1/10*(-x+pi)^2) + 
+  scale_x_continuous(breaks=seq(0, 4*pi, by=pi), 
+                     labels=c("0", expression(paste(pi)), 
+                              expression(paste("2", pi)), 
+                              expression(paste("3", pi)), 
+                              expression(paste("4", pi)))) +
+  theme_bw()
 
-\cite{cleveland:1984, cleveland:1985} also discuss the perceptual difficulty of judging the difference between two curves plotted on the same axis. They recommend the difference between the two curves as an alternate display, as shown in the second part of Figure \ref{cleveland-figure}. While this is good practice when there are two separate curves (as in Figure \ref{playfair-debt}), when the contours of the data implicitly create two curves (the boundaries of the variability in the data) there is not an easy way to display the difference between these implicit curves without resorting to arbitrary minimum and maximum smoothing values. In addition, as in Figure \ref{playfair-debt} both the difference between the curves and the overall trend are of visual importance, and plotting the difference between the two curves removes the overall trend. 
-
-\begin{figure}[h!tbp]
-\centering
-%\includegraphics[keepaspectratio=TRUE, width=.5\linewidth]{images/ClevelandMcGillFig7}
-<<clevelandgraph,echo=FALSE, fig.width=6, fig.height=8, include=FALSE>>=
-x <- seq(0, 4, .01)
-y <- 8-(x-2.5)^2
-y1 <- 8- (x-2.5)^2 - (1-(x/8))
-df <- data.frame(x=x, y=y, y2=y1)
-p1 <- qplot(data=df, x=x, y=y, geom="line") + geom_line(aes(y=y2)) + theme_bw()
-p2 <- qplot(data=df, x=x, y=y-y1, geom="line") + theme_bw() + ylab(expression(paste(y-y,"'",sep="")))
-suppressMessages(library(gridExtra))
-grid.arrange(p1, p2, nrow=2, heights=c(1.5, 1))
 @
-\includegraphics[keepaspectratio=TRUE, width=.5\linewidth]{figure/fig-clevelandgraph}
-\caption{\cite{cleveland:1985} examined the task of judging the distance between two curves experimentally: ``In the top panel it is difficult to judge how much greater the y-values of curve 1 are than those for curve 2 because our visual system has difficulty detecting the vertical distances between the curves. In the bottom panel the differences are graphed directly; the values are quite different from how they appear in the top panel"}
-\label{cleveland-figure}
-\end{figure}
+  \caption{\small Seasonality and Trend}
+  \label{simulation2}
+\end{subfigure}
+\begin{subfigure}[b]{.31\linewidth}\centering
+<<Simulation3Trend, echo=FALSE, fig.width=4, fig.height=4>>=
+x <- rep(seq(0,2*pi*2, length=120), each=100)
+y <- rnorm(n=length(x), mean=1/10*(-x+pi)^2, sd=0.2)
+qplot(x,y, geom="jitter")+ 
+  geom_line(y=1/10*(-x+pi)^2) + 
+  scale_x_continuous(breaks=seq(0, 4*pi, by=pi), 
+                     labels=c("0", expression(paste(pi)), 
+                              expression(paste("2", pi)), 
+                              expression(paste("3", pi)), 
+                              expression(paste("4", pi)))) +
+  theme_bw()
 
-\begin{figure}
-<<cleveland, echo=FALSE, fig.width=6, fig.height=6, out.width='0.5\\textwidth'>>=
-f <- function(x) -x^2
-sdf <- function(x) (4-0.5*x)/5
-  
-x <- seq(-2,2.5, by=0.1)
-
-id <- 1:30
-dframe <- expand.grid(x=x, id=id)
-dframe$y <- with(dframe, rnorm(n=nrow(dframe), mean=f(x), sd=sdf(x)/2))
-qplot(x,y, data=dframe, geom="jitter")+ theme_bw()
 @
-\caption{Alternative to the cleveland figure: in order to get around copyright, we could use the idea of shrinking distance (= decreasing variance) and introduce the new concept that it doesn't have to be two lines, but judging variability. Question to the audience: `Where's the variance the highest?' or `Describe the conditional variability of the points along the $x$ axis`}
-\label{cleveland-figure-2}
+  \caption{\small Trend, No Seasonality}
+  \label{simulation3}
+\end{subfigure}
+\caption{The sine illusion and the line width illusion describe overlapping phenomena which may manifest on different orders of magnitude within the data but can both be visually misleading. Figure \ref{simulation1} shows the sine illusion without any underlying trend, Figure \ref{simulation2} shows the sine illusion superimposed on a quadratic trend, and Figure \ref{simulation3} shows a quadratic trend without the sine illusion. Though all three sets of simulated data have constant variance, Figure \ref{simulation2} seems more extreme.}
 \end{figure}
 
-% More recently, the line-width illusion has been cited as a reason to modify parallel sets plots to avoid pitfalls in human perception.  Figure \ref{hammocks} shows the parallel sets plot, the hammock plot, and the common angle plot, which has been modified so that all angles are constant. The hammock plot corrects for the line width illusion, where the common angle plot holds all of the angles constant so as not to require correction. 
-%These two approaches are similar to the approaches we will take in correcting the sine illusion by adjusting the vertical height so that the extant width appears constant, and by modifying the $x$ axis so that the slope appears to be constant. These two approaches will produce somewhat different graphical displays.
-% \begin{figure}[h!tbp]
-% \centering
-% \missingfigure{Figure or figures showing hammock plots and the corrected version. I'd copy them from the paper but I'm sure there's a better version that was used to generate the paper.}
-% \caption{}
-% \label{hammocks}
-% \end{figure}
-\clearpage
-\todo[inline]{Add variance simulation section}
+When we judge the variability of data, we must overcome both the visual bias due to the line width illusion and the visual bias due to the sine illusion. As it turns out, these two illusions are incredibly difficult to overcome, even when they are obviously present. What follows is a compliation of various methods to correct for or mitigate the effect of these two illusions.
+
+
 \subsection{Geometry of the Sine Illusion}
 The visual preference for judging the length of the line by the orthogonal extant suggests that the underlying illusion may be a function of geometry rather than some mysterious visual process that occurs automatically between perception of the stimulus and conscious thought. If this is the case, then it may be that by comparing the orthogonal width and the vertical length of the line it may be possible to dissect the illusion and correct the graphical display so that it is not as visually deceptive.
 
@@ -455,26 +517,36 @@ qplot(x=x, y=y, geom="line", data=dframe, colour=I("grey50")) + theme_bw() +
 }
 \end{figure}
 
+\begin{figure}[h!tbp]\centering
+\includegraphics[keepaspectratio=TRUE, width=.8\linewidth]{figure/fig-CtsQuadratic}
+\caption{Alternate Figure Option -- The perceived length of the lines is a function of the extant width, that is, the width of the secant line at a given point. The secant lines are of varying lengths (.4 to 1), suggesting that to counter the illusion, the line lengths must be altered such that the extant widths are perceived to be equal.}
+\end{figure}
+The sine illusion disappears when the width orthogonal to the slope is made constant. \newtext{This can be accomplished by separating the trend and the variability, by forcing the slope to be constant (by reparameterizing the $x$ axis), or by making the lines appear to be of the same height, by adjusting their lengths to maintain a constant orthogonal width. Each of these approaches is discussed in the following section.}
 
-\comment{This probably should be moved, or re-fashioned into a nice transition between sections...}
-The sine illusion disappears when the width orthogonal to the slope is made constant. This can be done by forcing the magnitude of the slope to be constant (by transforming the $x$ axis), or by making the lines appear to be of the same height, by adjusting their lengths to maintain a constant orthogonal width. This is the approach that we pursue when transforming the $Y$ values. 
-\clearpage
 \section{Breaking the Sine Illusion}
 Though the line-width illusion clearly occurs in non-sinusoidal curves, for the purposes of consistency, we will proceed with data derived as follows: equally spaced points $x$ along the interval $[0,2\pi]$ which correspond to lines centered at $y=s*sin(x)$ with length $\ell$. The slope of the tangent line at a point $x=x_0$ is $y=s*cos(x_0)$, and thus the slope of the line orthogonal to the slope (along which the width is perceived) is $y=-1/(s*cos(x_0))$. Individual lines can of course be completely determined by substituting in the point $x_0, y_0$ to find the corresponding $y-intercept$.
 
 \subsection{Trend Removal}
 The most obvious approach to breaking the sine illusion is to present the trend and variance separately, as shown in Figure \ref{trendremoval}. A Loess smooth was used to estimate the trendline, and this estimate was subtracted from the line center to produce separate graphs of the trend and the variance. While this does largely remove the sine illusion, it also makes it somewhat more difficult to parse the overall data, as judgments must be made by combining two graphs or by mentally re-composing the original graph (at which point, the sine-illusion becomes a factor). Ideally, it would be possible to tell the whole story with a single graph, to minimize cognitive demands - while this example is relatively simple, it would be much harder to create a de-trended version of Figure \ref{playfair-debt} that could be easily assessed to determine both trend and change in the size of the trade imbalance over time. 
 \begin{figure}[h!tbp]\centering
-<<trend-removal, include=FALSE, fig.height=4, fig.width=4>>=
+<<trend-removal, include=FALSE, fig.height=3, fig.width=3.5>>=
 df <- df2 <- createSine(40, 1, sin, cos)
 df2$y <- loess(df$y~df$x)$fitted
 df2$type <- "Loess Fit"
 df$type <- "Original Function"
 df <- rbind(df, df2)
 
-ggplot(data=df,aes(x=x, y=y)) + geom_segment(aes(x=xstart, xend=xend, y=ystart, yend=yend)) + geom_line(aes(group=type, linetype=type)) + scale_linetype_discrete("") + theme_bw() + theme(legend.position="bottom")
-qplot(data=subset(df, type=="Loess Fit"), x=xstart, xend=xend, y=ystart-y, yend=yend-y, geom="segment", linetype=type)  + xlab("x")+ ylim(c(-1.5, 1.5)) + theme_bw()+ scale_linetype_discrete("", labels="De-Trended Data") + theme(legend.position="bottom")
-qplot(data=subset(df, type=="Loess Fit"), x=x, y=y, geom="line", linetype=type) + xlab("x") + ylim(c(-1.5, 1.5)) + theme_bw() + scale_linetype_discrete("") + theme(legend.position="bottom")
+ggplot(data=df,aes(x=x, y=y)) + geom_segment(aes(x=xstart, xend=xend, y=ystart, yend=yend)) + geom_line(aes(group=type, linetype=type)) + scale_linetype_discrete("") + theme_bw() + theme(legend.position="bottom")+ 
+  scale_x_continuous(breaks=seq(0, 2*pi, by=pi/2), 
+                     labels=c("0", expression(paste(pi,"/2")), expression(pi), expression(paste("3",pi, "/2")), expression(paste("2",pi))))
+
+qplot(data=subset(df, type=="Loess Fit"), x=xstart, xend=xend, y=ystart-y, yend=yend-y, geom="segment", linetype=type)  + xlab("x")+ ylim(c(-1.5, 1.5)) + theme_bw()+ scale_linetype_discrete("", labels="De-Trended Data") + theme(legend.position="bottom")+ 
+  scale_x_continuous(breaks=seq(0, 2*pi, by=pi/2), 
+                     labels=c("0", expression(paste(pi,"/2")), expression(pi), expression(paste("3",pi, "/2")), expression(paste("2",pi)))) + ylab("Variability")
+
+qplot(data=subset(df, type=="Loess Fit"), x=x, y=y, geom="line", linetype=type) + xlab("x") + ylim(c(-1.5, 1.5)) + theme_bw() + scale_linetype_discrete("") + theme(legend.position="bottom")+ 
+  scale_x_continuous(breaks=seq(0, 2*pi, by=pi/2), 
+                     labels=c("0", expression(paste(pi,"/2")), expression(pi), expression(paste("3",pi, "/2")), expression(paste("2",pi))))
 @
 \begin{subfigure}[b]{.32\linewidth}
   \centering
@@ -503,7 +575,12 @@ One approach to breaking the power of the sine illusion is to remove the variati
 Geometrically, we want to take the horizontal distance $\triangle x$ between two points and fix it so that the extant width $\triangle x/\triangle y$ is constant, that is, $\triangle \tilde x \propto |\triangle y/\triangle x|$ is the new horizontal distance between the two points. Translating this to a continuous expression, we want $|f^\prime(x)| \propto d\tilde x$. This transformation can be considered as a reparameterization of the $x$ axis in terms of the slope, that is, since the slope of the graph seems to be the visually salient detail, it makes sense to reparameterize the axis in terms of the slope so that it is possible to see the other information contained in the graphic. 
 
 \begin{figure}[h!tbp]\centering
-<<xtransform, echo=FALSE>>=
+
+\end{figure}
+Interestingly, the illusion can be broken by a much less severe transformation in $x$. By averaging the transformation in Figure \ref{xtrans1} with the average absolute slope over the range of $x$ values, that is $\tilde x^\prime \propto .5 d\tilde x + .5(1/n\sum_{i=1}^n |cos(x_i)|)$ where $n$ is the number of lines at points $x_i$, the illusion is still broken and the data are closer to the original function $y=sin(x)$. The extent to which this weighting holds is likely to vary with the aspect ratio and the shape of the function, but merits further investigation, as it may be possible to find an ``optimal weighting" for specific situations which minimizes distortion and maximizes the correspondence between inferences made from the data and inferences made using the visual display.
+\begin{figure}[h!tbp]\centering
+\begin{subfigure}[b]{.48\linewidth}\centering
+<<xtransform, echo=FALSE, fig.width=4, fig.height=2>>=
 f <- sin
 fprime <- cos
 dframe <- createSine(40 , len=1, f=f, fprime=fprime)
@@ -516,36 +593,41 @@ dframe$xtrans <- cumsum(dframe$correction) # Create transformed X axis
 dframe$xtrans2 <- cumsum(dframe$correction2) # Create transformed X axis
 
 qplot(x=xtrans, xend=xtrans, y = ystart, yend=yend, colour=I("blue"), geom="segment", data=dframe) +
-  geom_segment(aes(x = 0, xend=2*pi, y=0, yend=0), colour="black") +theme_bw() + coord_fixed(ratio=1) + xlab(expression(tilde(x))) + ylab("y")
+  geom_segment(aes(x = 0, xend=2*pi, y=0, yend=0), colour="black") +theme_bw() + coord_fixed(ratio=1) + xlab(expression(tilde(x))) + ylab("y")+ 
+  scale_x_continuous(breaks=seq(0, 2*pi, by=pi/2), 
+                     labels=c("0", expression(paste(pi,"/2")), expression(pi), expression(paste("3",pi, "/2")), expression(paste("2",pi))))
 @
-\caption{Transformation of the $X$ axis. Adjusting the x-spacing of the lines mitigates the sine illusion by changing the extant width so that it is uniform in $x$}
+\caption{$X$ axis transformation}
 \label{xtrans1}
-\end{figure}
-Interestingly, the illusion can be broken by a much less severe transformation in $x$. By averaging the transformation in Figure \ref{xtrans1} with the average absolute slope over the range of $x$ values, that is $\tilde x^\prime \propto .5 d\tilde x + .5(1/n\sum_{i=1}^n |cos(x_i)|)$ where $n$ is the number of lines at points $x_i$, the illusion is still broken and the data are closer to the original function $y=sin(x)$. The extent to which this weighting holds is likely to vary with the aspect ratio and the shape of the function, but merits further investigation, as it may be possible to find an ``optimal weighting" for specific situations which minimizes distortion and maximizes the correspondence between inferences made from the data and inferences made using the visual display.
-\begin{figure}[h!tbp]\centering
-<<xtrans-mid,echo=FALSE>>=
+\end{subfigure}
+\begin{subfigure}[b]{.48\linewidth}\centering
+<<xtrans-mid,echo=FALSE, fig.width=4, fig.height=2>>=
 qplot(x=xtrans2, xend=xtrans2, y = ystart, yend=yend, colour=I("blue"), geom="segment", data=dframe) +
-  geom_segment(aes(x = 0, xend=2*pi, y=0, yend=0), colour="black") +theme_bw() + coord_fixed(ratio=1) + xlab(expression(tilde(x))) + ylab("y")
+  geom_segment(aes(x = 0, xend=2*pi, y=0, yend=0), colour="black") +theme_bw() + coord_fixed(ratio=1) + xlab(expression(tilde(x))) + ylab("y")+ 
+  scale_x_continuous(breaks=seq(0, 2*pi, by=pi/2), 
+                     labels=c("0", expression(paste(pi,"/2")), expression(pi), expression(paste("3",pi, "/2")), expression(paste("2",pi))))
 @
-\caption{Transformed $X$ Axis, shrunken towards a constant spacing. Using a less severe adjustment, the illusion is still broken with a smaller distortion along the $x$ axis.}
+\caption{Weighted $X$ axis transformation}
 \label{xtrans2}
+\end{subfigure}
+\caption{$X$ axis transformations. In (a), adjusting the x-spacing of the lines mitigates the sine illusion by changing the extant width so that it is uniform in $x$. (b) shrinks the transformation in (a) towards a uniform spacing and still breaks the illusion with a much less severe distortion of the $x$-axis.}
+\label{xtrans}
 \end{figure}
 \clearpage
 \subsection{Transformation of the Y-Axis}
 Another potentially less disruptive option to break the sine illusion is to transform the line length directly so that the resultant extant width appears to be constant. 
-\subsubsection{Linear Method}
+\subsubsection{Trigonometry Method}
 This approach aims to extend the orthogonal width, which onlookers generally evaluate,  to the amount of the vertical width, which we want to represent. 
 We first multiply the vertical width by a factor of $1/\cos\theta$, where $\theta$ is the angle under which the line is drawn. This angle is given by the slope of the function, mathematically we know that in position $x$ the angle $\theta(x)$ of function $f(x)$ is given as:
 \[
 \tan \theta (x) = f^\prime (x).
 \]
 We only distinguish the size, not the sign of the angle, which gives us an overall correction factor for the line width in vertical direction of 
-\begin{equation}\label{hammockCorrection}
+\begin{equation}\label{trigCorrection}
 \atan{\cos \left| f^\prime (x) \right|}^{-1}
 \end{equation}
 
-\begin{figure}[h!btp]
-<<hammockFix, dependson='data', echo=FALSE, include=FALSE>>=
+<<trigFix, dependson='data', echo=FALSE, include=FALSE, fig.width=4, fig.height=3>>=
 dframe <- createSine(40,1, f=f, fprime=fprime)
 qplot(x=x, xend=xend, y = f(x) -ell/2, yend=f(x) +ell/2, geom="segment", data=dframe) +
   theme(panel.grid.major=element_blank(), panel.background = element_rect(fill = "white", 
@@ -569,26 +651,143 @@ qplot(x=x, xend=xend, y = f(x) -ellx2/2, yend=f(x) +ellx2/2, geom="segment", dat
        axis.text = element_blank()) + coord_equal(ratio=1)
 
 @
-\begin{subfigure}[b]{.3\linewidth}\centering
-\includegraphics[width=\linewidth,keepaspectratio=TRUE]{figure/fig-hammockFix1}
+\begin{figure}[h!btp]
+\begin{subfigure}[b]{.45\linewidth}\centering
+\includegraphics[width=\linewidth,keepaspectratio=TRUE]{figure/fig-trigFix1}
 \caption{Uncorrected}
 \end{subfigure}
-\begin{subfigure}[b]{.3\linewidth}\centering
-\includegraphics[width=\linewidth,keepaspectratio=TRUE]{figure/fig-hammockFix2}
-\caption{Correction factor in Eqn \ref{hammockCorrection}}
+\begin{subfigure}[b]{.45\linewidth}\centering
+\includegraphics[width=\linewidth,keepaspectratio=TRUE]{figure/fig-trigFix2}
+\caption{Correction factor in Eqn \ref{trigCorrection}}
 \end{subfigure}
-\begin{subfigure}[b]{.3\linewidth}\centering
-\includegraphics[width=\linewidth,keepaspectratio=TRUE]{figure/fig-hammockFix3}
+% \begin{subfigure}[b]{.3\linewidth}\centering
+% \includegraphics[width=\linewidth,keepaspectratio=TRUE]{figure/fig-trigFix3}
+% \caption{Correction factor in Eqn. \ref{LinearApprox}}
+% \end{subfigure}
+\caption{Fix of the sine illusion by using the factor of $1/\cos\left(\atan{|f^\prime(x)|}\right)$} to adjust the vertical extent of the lines.  
+\label{trigFix} 
+\end{figure}
+\subsubsection{A General Correction Method}
+Another method for adjusting the vertical length to ensure constant extant width is to solve the system of equations
+\begin{align*}
+y_u & = f(x_u) + \ell/2\\
+y_u & = \left(-1/f^\prime(x_0)\right) x_u + f(x_0) + x_0/f^\prime(x_0)
+\end{align*}
+for the upper endpoint $(x_u,y_u)$ at which the secant line intersects the top portion of the graph. Similarly, we would need to solve 
+\begin{align*}
+y_l & = f(x_l) - \ell/2\\
+y_l & = \left(-1/f^\prime(x_0)\right) x_l + f(x_0) + x_0/f^\prime(x_0)
+\end{align*}
+
+to obtain the lower endpoint $(x_l, y_l)$. With these two endpoints, we can correct separately for the top and bottom portions of the line, as the extant width is not symmetric when reflected across the original function f(x). \comment{Math language?}
+
+As the solutions to these two sets of equations requires numerical optimization to obtain, at least for $f(x) = sin(x)$, Taylor approximations can be employed to reduce the computational requirements. Approximations derived from the first and second-order taylor approximations are described in the following sections.
+
+\paragraph{Linear Approximation to $f(x)$}
+Using the approximation $f(x) \approx f(x_0) + f^\prime(x_0)(x-x_0)$, the system of equations shown above reduces to
+\begin{align*}
+y & = f(x_0) + f^\prime(x_0)(x-x_0) \pm \ell/2\\
+y & = \left(-1/f^\prime(x_0)\right) x + f(x_0) + x_0/f^\prime(x_0)
+\end{align*}
+
+Solving these systems of equations results in a symmetric overall correction factor of 
+\begin{equation}\label{LinearApprox}
+\sqrt{1 + f^\prime(x)^2} 
+\end{equation}
+
+\begin{figure}[h!btp]
+\begin{subfigure}[b]{.45\linewidth}\centering
+\includegraphics[width=\linewidth,keepaspectratio=TRUE]{figure/fig-trigFix1}
+\caption{Uncorrected}
+\end{subfigure}
+\begin{subfigure}[b]{.45\linewidth}\centering
+\includegraphics[width=\linewidth,keepaspectratio=TRUE]{figure/fig-trigFix3}
 \caption{Correction factor in Eqn. \ref{LinearApprox}}
 \end{subfigure}
-\caption{First two fix of the sine illusion by using the factor of $1/\cos\left(\atan{|f^\prime(x)|}\right)$} (middle) and $\sqrt{1 + f^\prime(x)^2}$ (right) for adjusting the vertical extent of the lines.  
-\label{hammockFix} 
+\caption{Fix of the sine illusion by using the factor of $\sqrt{1 + f^\prime(x)^2}$} to adjust the vertical extent of the lines.  
+\label{GeneralLinearCorrection} 
 \end{figure}
 
-As in \todo{Cite Marie's paper}, the correction factor necessary to remove the illusion depends on the aspect ratio of the graphs. Figure \ref{hammockFix-aspectRatio} demonstrates the relative effectiveness of the correction factor.
-<<hammocktransform, echo=FALSE>>=
-f <- function(x) sin(x)
-fprime <- function (x) cos(x)
+Figure \ref{GeneralLinearCorrection} shows the correction factor compared with the trigonometry-style correction and the untransformed data. As with the trigonometry correction, the linear adjustment is prone to the same overcorrection distortion shown in Figure \ref{linearFixOvercorrect}.  The asymmetric nature of the distortion suggests that we may want to use a second-order taylor polynomial approximation to $f(x)$ to account for the asymmetry in the extant widths on either side of the center trendline.
+
+\subsubsection{Quadratic Approximation to f(x)}
+Using the approximation $f(x) \approx f(x_0) + f^\prime(x_0)(x-x_0) + 1/2 f^{\prime\prime}(x_0)(x-x_0)^2$, the system of equations shown above reduces to
+\begin{align*}
+y & = f(x_0) + f(x_0) + f^\prime(x_0)(x-x_0) + 1/2 f^{\prime\prime}(x_0)(x-x_0)^2 \pm \ell/2\\
+y & = \left(-1/f^\prime(x_0)\right) x + f(x_0) + x_0/f^\prime(x_0)
+\end{align*}
+
+Solving the system of equations provides endpoints $(x_l, y_l)$ and $(x_u, y_u)$ which can then be used to compute the extant width of each half-segment $\ell_\perp$. The correction factors are then $(\ell/2)/(\ell_{\perp_u})$ and $(\ell/2)/(\ell_{\perp_l})$ respectively. 
+<<CtsQuadratic, echo=FALSE, include=FALSE>>=
+f <- function(x) 2*sin(x)
+fprime <- function(x) 2*cos(x)
+f2prime <- function(x) -2*sin(x)
+
+getAdjLength<- function(df){
+#   theta <- atan(df$deriv)  
+#   df$seg.ystart <-  with(df, y+ell.orig/2*(1+cos(theta))-sec.ell1*cos(theta))
+#   df$seg.yend   <-  with(df, y-ell.orig/2*(1+cos(theta))+sec.ell2*cos(theta))
+  df$seg.ystart <- with(df, y+.5*(ell.orig)/sec.ell1)
+  df$seg.yend <- with(df, y-.5*(ell.orig)/sec.ell2)
+  df
+}
+
+suppressMessages(library(ggplot2))
+dframe <- createSine(n = 40, len = 1, f=f, fprime=fprime)
+dframe$type <- "Data"
+
+secantlines <- do.call("rbind", lapply(seq(0, 2*pi, length=40), function(i) getSecantSegment(i, dframe, f, fprime, f2prime)))
+secantlines2 <- getAdjLength(secantlines)
+
+dframe2 <- secantlines
+names(dframe2) <- c("x", "y", "deriv", "xstart", "xend", "ystart", "yend", "ell.orig", "ell1", "ell2", "type")
+
+dframe2 <- rbind.fill(dframe, dframe2)
+names(secantlines)[9:10] <- c("Bottom.Segment", "Top.Segment")
+# 
+# library(reshape2)
+# secantlines.long <- melt(secantlines, measure.vars=c("Bottom.Segment", "Top.Segment"),  variable.name="Line", value.name="len")
+# secantlines.long <- subset(secantlines.long, abs(x-pi)<pi)
+# ggplot(aes(x=x, y=len, linetype=Line), data=secantlines.long) + geom_line()+
+#   scale_x_continuous(breaks=seq(0, 2*pi, by=pi/2), 
+#                      labels=c("0", expression(paste(pi,"/2")), 
+#                               expression(pi), 
+#                               expression(paste("3",pi, "/2")), 
+#                               expression(paste("2",pi)))) + 
+#   theme_bw() + theme(legend.position="bottom") + scale_linetype_discrete("Half-Segment")
+# ggsave("./figure/fig-wtf.pdf", height=4, width=8)
+
+
+qplot(x=xstart, xend=xend, y = ystart, yend=yend, geom="segment", data=dframe2) +
+  theme_bw() + coord_fixed(ratio=1)+ 
+  theme(legend.position="bottom")  + xlab("") + ylab("") + facet_grid(.~type)+ 
+  scale_x_continuous(breaks=seq(0, 2*pi, by=pi/2), 
+                     labels=c("0", expression(paste(pi,"/2")), 
+                              expression(pi), 
+                              expression(paste("3",pi, "/2")), 
+                              expression(paste("2",pi))))
+
+@
+
+\begin{figure}[htbp]\centering
+\includegraphics[keepaspectratio=TRUE, width=.8\linewidth]{figure/fig-wtf}
+\caption{Extant Half-segment Length. The secant  line segments are not symmetrical around the center line, so symmetric correction as employed in Figure \ref{GeneralLinearCorrection} leads to simultaneous over- and under-correcting, as in the distortions seen in Figure \ref{linearFixOvercorrect}}
+\end{figure}
+
+\begin{figure}[htbp]\centering
+<<CtsAdjustedResults,echo=FALSE>>=
+qplot(x=x, xend=x, y=seg.ystart, yend=seg.yend, geom="segment", data=secantlines2, linetype=I(1)) + ggtitle("Adjusted Data") + coord_fixed(ratio=1) + theme_bw()
+@
+\caption{Adjusting the top and bottom segments of the vertical lines separately so that the extant width is constant breaks the illusion, but slightly distorts the sinusoidal shape of the peaks.}
+\end{figure}
+
+
+\subsection{Discussion of Transformations}
+Some modifications are necessary to implement the correction factor in a realistic situation in which it might not be practical for the aspect ratio of the graph to be fixed at 1. As in \todo{Cite Marie's paper}, the correction factor necessary to remove the illusion depends on the aspect ratio of the graphs. Figure \ref{trigFix-aspectRatio} demonstrates the relative effectiveness of the correction factor.
+<<aspectratio, echo=FALSE, include=FALSE>>=
+f <- function(x) 2*sin(x)
+fprime <- function(x) 2*cos(x)
+f2prime <- function(x) -2*sin(x)
 
 
 adjY <- function(df){
@@ -610,27 +809,52 @@ adjY <- function(df){
 
 dframe1 <- createSine(n=40, len=1, f=f, fprime=fprime)
 dframe1 <- adjY(dframe1)
+
+qplot(x=xstart, xend=xend, y = y+ellx/2, yend = y-ellx/2, geom="segment", data=dframe1) + 
+  coord_fixed(ratio=.5) + xlab("x") + ylab("y") + theme_bw() + 
+#  ylim(c(-pi, pi)) + 
+  scale_x_continuous(breaks=seq(0, 2*pi, by=pi/2), 
+                     labels=c("0", expression(paste(pi,"/2")), 
+                              expression(pi), 
+                              expression(paste("3",pi, "/2")), 
+                              expression(paste("2",pi))))
+qplot(x=xstart, xend=xend, y = y+ellx/2, yend = y-ellx/2, geom="segment", data=dframe1) + 
+  coord_fixed(ratio=1) + xlab("x") + ylab("y") + theme_bw() + 
+#  ylim(c(-pi, pi)) + 
+  scale_x_continuous(breaks=seq(0, 2*pi, by=pi/2), 
+                     labels=c("0", expression(paste(pi,"/2")), 
+                              expression(pi), 
+                              expression(paste("3",pi, "/2")), 
+                              expression(paste("2",pi))))
+qplot(x=xstart, xend=xend, y = y+ellx/2, yend = y-ellx/2, geom="segment", data=dframe1) + 
+  coord_fixed(ratio=2) + xlab("x") + ylab("y") + theme_bw() + 
+#  ylim(c(-pi, pi)) + 
+  scale_x_continuous(breaks=seq(0, 2*pi, by=pi/2), 
+                     labels=c("0", expression(paste(pi,"/2")), 
+                              expression(pi), 
+                              expression(paste("3",pi, "/2")), 
+                              expression(paste("2",pi))))
+# qplot(x=xstart, xend=xend, y = y+ellx/2, yend = y-ellx/2, geom="segment", data=dframe1) + ylim(c(-2*pi, 2*pi))+ coord_fixed(ratio=2)+ xlab("x") + ylab("y") + theme_bw()+ 
+#   scale_x_continuous(breaks=seq(0, 2*pi, by=pi), 
+#                      labels=c("0", expression(pi), expression(paste("2",pi))))
+# qplot(x=xstart, xend=xend, y = y+ellx/2, yend = y-ellx/2, geom="segment",data=dframe1) + ylim(c(-4*pi, 4*pi))+ coord_fixed(ratio=2)+ xlab("x") + ylab("y") + theme_bw()+ 
+#   scale_x_continuous(breaks=seq(0, 2*pi, by=pi), 
+#                      labels=c("0", expression(pi), expression(paste("2",pi))))
 @
 \begin{figure}[h!tbp]\centering
-<<hammocktransform1-plot, echo=FALSE, include=FALSE, fig.width=4, fig.height=4>>=
-qplot(x=xstart, xend=xend, y = ystart, yend=yend, colour=I("blue"), geom="segment", data=dframe1) + coord_fixed(ratio=.5) + xlab("x") + ylab("y") + theme_bw()
-qplot(x=xstart, xend=xend, y = ystart, yend=yend, colour=I("blue"), geom="segment", data=dframe1) + coord_fixed(ratio=1)+ xlab("x") + ylab("y")+ theme_bw()
-qplot(x=xstart, xend=xend, y = ystart, yend=yend, colour=I("blue"), geom="segment", data=dframe1) + coord_fixed(ratio=2)+ xlab("x") + ylab("y")+ theme_bw()
-@
-
-\begin{subfigure}[b]{.3\linewidth}\centering
-\includegraphics[width=\linewidth,keepaspectratio=TRUE]{figure/fig-hammocktransform1-plot1}
+\begin{subfigure}[b]{.32\linewidth}\centering
+\includegraphics[width=\linewidth,keepaspectratio=TRUE]{figure/fig-aspectratio1}
 \caption{Aspect Ratio of .5}
 \end{subfigure}
-\begin{subfigure}[b]{.3\linewidth}\centering
-\includegraphics[width=\linewidth,keepaspectratio=TRUE]{figure/fig-hammocktransform1-plot2}
+\begin{subfigure}[b]{.32\linewidth}\centering
+\includegraphics[width=\linewidth,keepaspectratio=TRUE]{figure/fig-aspectratio2}
 \caption{Aspect Ratio of 1}
 \end{subfigure}
-\begin{subfigure}[b]{.3\linewidth}\centering
-\includegraphics[width=\linewidth,keepaspectratio=TRUE]{figure/fig-hammocktransform1-plot3}
+\begin{subfigure}[b]{.32\linewidth}\centering
+\includegraphics[width=\linewidth,keepaspectratio=TRUE]{figure/fig-aspectratio3}
 \caption{Aspect Ratio of 2}
 \end{subfigure}
-\caption{Changing aspect ratios changes the strength of the illusion and the effectiveness of the transformation}\label{hammockFix-aspectRatio} 
+\caption{Changing aspect ratios changes the strength of the illusion and the effectiveness of the transformation}\label{trigFix-aspectRatio} 
 \end{figure}
 
 \begin{figure}[h!tbp]
@@ -668,7 +892,7 @@ qplot(x=x, xend=xend, y = g(x) -ellx2/2, yend=g(x) +ellx2/2, geom="segment", dat
 \end{subfigure}
 \begin{subfigure}[b]{.3\linewidth}\centering
 \includegraphics[width=\linewidth,keepaspectratio=TRUE]{figure/fig-linearFixOvercorrect2}
-\caption{Corrected by Eqn. \ref{hammockCorrection}}
+\caption{Corrected by Eqn. \ref{trigCorrection}}
 \end{subfigure}
 \begin{subfigure}[b]{.3\linewidth}\centering
 \includegraphics[width=\linewidth,keepaspectratio=TRUE]{figure/fig-linearFixOvercorrect3}
@@ -677,100 +901,6 @@ qplot(x=x, xend=xend, y = g(x) -ellx2/2, yend=g(x) +ellx2/2, geom="segment", dat
 \caption{The ratio of the length of the line to amplitude of the function needs to be included in the correction. Here, the amplitude is still 1, but the length of the line is 5. The correction factor leads to a massive over correction that makes the function almost unrecognizable. The plot on the left is uncorrected, the plot on the right is `corrected'.}\label{linearFixOvercorrect} 
 \end{figure}
 
-\subsubsection{A General Correction Method}
-Another method for adjusting the vertical length to ensure constant extant width is to solve the system of equations
-\begin{align*}
-y_u & = f(x_u) + \ell/2\\
-y_u & = \left(-1/f^\prime(x_0)\right) x_u + f(x_0) + x_0/f^\prime(x_0)
-\end{align*}
-for the upper endpoint $(x_u,y_u)$ at which the secant line intersects the top portion of the graph. Similarly, we would need to solve 
-\begin{align*}
-y_l & = f(x_l) - \ell/2\\
-y_l & = \left(-1/f^\prime(x_0)\right) x_l + f(x_0) + x_0/f^\prime(x_0)
-\end{align*}
-
-for the lower endpoint $(x_l, y_l)$. With these two endpoints, we can correct separately for the top and bottom portions of the line, as the extant width is not symmetric when reflected across the original function f(x). \todo[inline]{Math language?}
-
-As the solutions to these two sets of equations requires numerical optimization to obtain, at least for $f(x) = sin(x)$, Taylor approximations can be employed to reduce the computational requirements. Approximations derived from the first and second-order taylor approximations are described in the following sections.
-
-\paragraph{Linear Approximation to $f(x)$}
-Using the approximation $f(x) \approx f(x_0) + f^\prime(x_0)(x-x_0)$, the system of equations shown above reduces to
-\begin{align*}
-y & = f(x_0) + f^\prime(x_0)(x-x_0) \pm \ell/2\\
-y & = \left(-1/f^\prime(x_0)\right) x + f(x_0) + x_0/f^\prime(x_0)
-\end{align*}
-
-Solving these systems of equations results in a symmetric overall correction factor of 
-\begin{equation}\label{LinearApprox}
-\sqrt{1 + f^\prime(x)^2} 
-\end{equation}
-\comment{Not sure if the pictures should be combined with the hammock plots, and if so, where the pictures should be located. }
-Figure \ref{LinearApprox} shows the correction factor compared with the hammock-plot style correction and the untransformed data. As with the hammock plot correction, the linear adjustment is prone to the same overcorrection distortion shown in Figure \ref{linearFixOvercorrect}.  The asymmetric nature of the distortion suggests that we may want to use a second-order taylor polynomial approximation to $f(x)$ to account for the asymmetry in the extant widths on either side of the center trendline.
-
-\subsubsection{Quadratic Approximation to f(x)}
-Using the approximation $f(x) \approx f(x_0) + f^\prime(x_0)(x-x_0) + 1/2 f^{\prime\prime}(x_0)(x-x_0)^2$, the system of equations shown above reduces to
-\begin{align*}
-y & = f(x_0) + f(x_0) + f^\prime(x_0)(x-x_0) + 1/2 f^{\prime\prime}(x_0)(x-x_0)^2 \pm \ell/2\\
-y & = \left(-1/f^\prime(x_0)\right) x + f(x_0) + x_0/f^\prime(x_0)
-\end{align*}
-
-Solving the system of equations provides endpoints $(x_l, y_l)$ and $(x_u, y_u)$ which can then be used to compute the extant width of each half-segment $\ell_\perp$. The correction factors are then $(\ell/2)/(\ell_{\perp_u})$ and $(\ell/2)/(\ell_{\perp_l})$ respectively. 
-<<CtsMethodSetup, echo=FALSE, fig.keep='none'>>=
-getSecantSegment <- function(x0, df, f, fprime, f2prime){
-  secSlope   <- -1/fprime(x0)
-  ell.x0     <- df$ell[which.min(abs(df$x-x0))]/2
-  #--- Actual Roots
-  #  temp       <- seq(min(df$x)-pi, max(df$x)+pi, .0001)
-  #   leftend    <- temp[which.min(abs(f(temp) + ell.x1 - secSlope*(temp-x1)))]
-  #   rightend   <- temp[which.min(abs(f(temp) - ell.x1 - secSlope*(temp-x1)))]
-  #---
-  
-  #--- Approximation
-  lambda1 <- (-(fprime(x0)^2 + 1) + sqrt((fprime(x0)^2 + 1)^2 - 2* fprime(x0)^2*f2prime(x0)*ell.x0))/(fprime(x0)^2*f2prime(x0))
-  lambda2 <- (-(fprime(x0)^2 + 1) + sqrt((fprime(x0)^2 + 1)^2 + 2* fprime(x0)^2*f2prime(x0)*ell.x0))/(fprime(x0)^2*f2prime(x0))
-  
-  leftend <- lambda1*fprime(x0)+x0
-  rightend <- lambda2*fprime(x0)+x0
-  #---
-  
-  df2 <- data.frame(x=x0, y=f(x0), deriv=fprime(x0),
-                    sec.xstart=leftend, sec.xend=rightend, 
-                    sec.ystart=f(x0) -lambda1,
-                    sec.yend = f(x0) -lambda2,
-                    ell.orig = 2*ell.x0)
-
-  df2$sec.ell1 <- with(df2, sqrt((sec.yend-y)^2+(sec.xend-x)^2))
-  df2$sec.ell2 <- with(df2, sqrt((y-sec.ystart)^2+(x-sec.xstart)^2))
-  df2$type <- "Perceived Width"
-  return(df2)
-}
-
-getAdjLength<- function(df){
-#   theta <- atan(df$deriv)  
-#   df$seg.ystart <-  with(df, y+ell.orig/2*(1+cos(theta))-sec.ell1*cos(theta))
-#   df$seg.yend   <-  with(df, y-ell.orig/2*(1+cos(theta))+sec.ell2*cos(theta))
-  df$seg.ystart <- with(df, y+.5*(ell.orig)/sec.ell1)
-  df$seg.ystart <- with(df, y-.5*(ell.orig)/sec.ell2)
-  df
-}
-
-suppressMessages(library(ggplot2))
-dframe <- createSine(n = 40, len = 1, f=f, fprime=fprime)
-dframe$type <- "Data"
-
-library(multicore)
-secantlines <- do.call("rbind", mclapply(seq(0, 2*pi, length=40), function(i) getSecantSegment(i, dframe, f, fprime, f2prime)))
-secantlines2 <- getAdjLength(secantlines)
-
-library(plyr)
-dframe2 <- secantlines
-names(dframe2) <- c("x", "y", "deriv", "xstart", "xend", "ystart", "yend", "ell.orig", "ell1", "ell2", "type")
-
-dframe2 <- rbind.fill(dframe, dframe2)
-@
-
-\subsection{Discussion of Transformations}
-\clearpage
 
 
 \section{Application: USHCN Data}
