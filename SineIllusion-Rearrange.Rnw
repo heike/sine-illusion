@@ -117,9 +117,9 @@ library(plyr)
 f <- function(x) 2*sin(4*x/pi)
 fprime <- function(x) 2*cos(4*x/pi)
 f2prime <- function(x) 2*sin(4*x/pi)
-df <- createSine(200, len=1, f, fprime)[,c(1, 4, 7:9)]
-df2 <- ddply(df, .(x), transform, ysamp = rnorm(30, y, ellx/2))
-qplot(data=df2, x=x, y=ysamp, geom="point") + xlab("x") + ylab("y") + coord_equal(ratio=1) + theme_bw() +ylim(c(-4,4))         
+df <- createSine(150, len=1, f, fprime)[,c(1, 4, 7:9)]
+df2 <- ddply(df, .(x), transform, ysamp = rnorm(15, y, ellx/2))
+qplot(data=df2, x=x, y=ysamp, geom="point", size=I(1.5)) + xlab("x") + ylab("y") + coord_equal(ratio=1) + theme_bw() +ylim(c(-4,4))         
 qplot(data=df2, x=x, y=ysamp-y, geom="point") + xlab("x") + ylab("y") + coord_equal(ratio=1) + theme_bw() +ylim(c(-3,3))  
 @
 <<intro-example-redo,echo=FALSE, include=FALSE>>=
@@ -128,9 +128,9 @@ library(plyr)
 f <- function(x) 2*sin(4*x/pi)
 fprime <- function(x) 2*cos(4*x/pi)
 f2prime <- function(x) 2*sin(4*x/pi)
-df <- createSine(200, len=1, f, fprime)[,c(1, 4, 7:9)]
-df2 <- ddply(df, .(x), transform, ysamp = rnorm(30, y, mean(df$ellx/2)))
-qplot(data=df2, x=x, y=ysamp, geom="point") + xlab("x") + ylab("y") + coord_equal(ratio=1) + theme_bw() +ylim(c(-4,4))     
+df <- createSine(150, len=1, f, fprime)[,c(1, 4, 7:9)]
+df2 <- ddply(df, .(x), transform, ysamp = rnorm(15, y, mean(df$ellx/2)))
+qplot(data=df2, x=x, y=ysamp, geom="point", size=I(1.5)) + xlab("x") + ylab("y") + coord_equal(ratio=1) + theme_bw() +ylim(c(-4,4))     
 qplot(data=df2, x=x, y=ysamp-y, geom="point") + xlab("x") + ylab("y") + coord_equal(ratio=1) + theme_bw() +ylim(c(-3,3))  
 @
 
@@ -138,11 +138,11 @@ qplot(data=df2, x=x, y=ysamp-y, geom="point") + xlab("x") + ylab("y") + coord_eq
 \centering
 \begin{subfigure}[b]{.45\linewidth}\centering
 \includegraphics[width=\linewidth,keepaspectratio=TRUE]{figure/fig-intro-example1}
-\caption{}\label{motivation1}
+\caption{\label{motivation1}}
 \end{subfigure}
 \begin{subfigure}[b]{.45\linewidth}\centering
 \includegraphics[width=\linewidth,keepaspectratio=TRUE]{figure/fig-intro-example-redo1}
-\caption{}\label{motivation2}
+\caption{\label{motivation2}}
 \end{subfigure}
 \caption{Which figure has less heteroskedasticity? }
 \end{figure}
@@ -318,6 +318,9 @@ id <- 1:30
 dframe <- expand.grid(x=x, id=id)
 dframe$y <- with(dframe, rnorm(n=nrow(dframe), mean=f(x), sd=sdf(x)/2))
 qplot(x,y, data=dframe, geom="jitter")
+qplot(x,y, data=dframe, geom="smooth")
+qplot(x,y-f(x), data=dframe, geom="jitter") + ylim(c(-3,3))
+
 @
 \caption{Alternative to the cleveland figure: in order to get around copyright, we could use the idea of shrinking distance (= decreasing variance) and introduce the new concept that it doesn't have to be two lines, but judging variability. Question to the audience: `Where's the variance the highest?' or `Describe the conditional variability of the points along the $x$ axis`}
 \label{cleveland-figure-2}
