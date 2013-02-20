@@ -273,6 +273,7 @@ qplot(x,y, data=dframe, geom="jitter") + theme_bw()
 \label{cleveland-figure-2}
 \end{figure}
 
+% helloworld 
 % More recently, the line-width illusion has been cited as a reason to modify parallel sets plots to avoid pitfalls in human perception.  Figure \ref{hammocks} shows the parallel sets plot, the hammock plot, and the common angle plot, which has been modified so that all angles are constant. The hammock plot corrects for the line width illusion, where the common angle plot holds all of the angles constant so as not to require correction. 
 %These two approaches are similar to the approaches we will take in correcting the sine illusion by adjusting the vertical height so that the extant width appears constant, and by modifying the $x$ axis so that the slope appears to be constant. These two approaches will produce somewhat different graphical displays.
 % \begin{figure}[h!tbp]
