@@ -200,7 +200,7 @@ The first documentation we could find of this illusion, \cite{day:1991} document
 
 \subsection{Statistical Graphics and the Sine Illusion}\label{statisticalgraphics}
 % While the illusion presented above is termed the sine illusion, it holds for non-sinusoidal curves which have dramatic changes in the slope of the lines over time as well.
-The illusion demonstrated in Figures \ref{exampleFull1} and \ref{original} has been frequently noted in statistical graphics, though usually not as an optical illusion. Rather, the problem is typically identified as the difficulty of visually subtracting two curves, and the misleading conclusions that may result when this process goes awry. Figure \ref{playfair-debt} shows one example of this common phenomenon \citet{playfair, playfair2}: the vertical distance between the two lines is much less visually salient than the extant width of the line, that is, the width of the line segment which is perpendicular to the tangent line at a given point.
+The illusion demonstrated in Figures \ref{exampleFull1} and \ref{original} has been frequently noted in statistical graphics, though usually not as an optical illusion. Rather, the problem is typically identified as the difficulty of visually subtracting two curves, and the misleading conclusions that may result when this process goes awry. Figure \ref{playfair-debt} shows one example of this common phenomenon \citep{playfair, playfair2}: the vertical distance between the two lines is much less visually salient than the extant width of the line, that is, the width of the line segment which is perpendicular to the tangent line at a given point.
 
 \begin{figure}[h!tbp]
 \centering
@@ -210,7 +210,7 @@ The illusion demonstrated in Figures \ref{exampleFull1} and \ref{original} has b
 \end{figure}
 
 Another example of this phenomenon is shown in Figure \ref{robbins-graph} \citep{robbins:2005}. The line-width illusion is also present in the graphs of $e^x$ and $e^x + 1$, as the lines appear to be separated by a much smaller distance at $x=2.5$ than at $x=0$.
-<<effectivegraphsfig,echo=FALSE>>=
+<<effectivegraphsfig,echo=FALSE, include=FALSE>>=
 x <- seq(0, 2.5, .01)
 y1 <- exp(x)
 y2 <- exp(x)+1
@@ -323,10 +323,11 @@ qplot(data=persp, x=xtop, xend=xbottom, y=ytop, yend=ybottom, geom="segment") +
 An interesting facet of the sine illusion is that when the graph is examined as if it were a two-dimensional projection of a three-dimensional figure, the illusion disappears and the line widths seem once more to be constant. In addition, if the lines are considered without the surrounding context, judgments comparing two lines seem to be relatively accurate, particularly if the graph also includes horizontal reference lines, as in Figure \ref{original-grid}. 
 \newtext{That is, the illusion breaks down if the visual heuristic is pre-empted by an attempt to view the graph as if it were three dimensional or if each piece is considered without the surrounding context. The illusion then holds only when a significant portion of the graph is considered simultaneously without regard to the perceptual mechanisms at play. (See \cite{day:1991} for a more thorough discussion of how much surrounding context is required for the illusion to persist)}
 
+<<originalgrid, dependson='data', echo=FALSE, include=FALSE>>=
+f <- function(x) 2*sin(x)
+fprime <- function(x) 2*cos(x)
+f2prime <- function(x) -2*sin(x)
 
-\begin{figure}[hbtp]
-\centering
-<<originalgrid, dependson='data', echo=FALSE, results='asis',out.width=".5\\linewidth">>=
 dframe <- createSine(n = 40, len = 1, f=f, fprime=fprime)
 
 qplot(x=x, xend=xend, y = ystart*ell, yend=yend*ell, geom="segment", data=dframe) +
@@ -339,16 +340,19 @@ qplot(x=x, xend=xend, y = ystart*ell, yend=yend*ell, geom="segment", data=dframe
        axis.title = element_blank(), axis.ticks = element_blank(), 
        axis.text = element_blank()) + coord_equal(ratio=1)
 @
+\begin{figure}[hbtp]
+\centering
+\includegraphics[width=.5\linewidth]{figure/fig-originalgrid}
 \caption{\label{original-grid} Horizontal grid lines do not help to resolve the illusion, even though they provide a clear basis for comparison of line lengths.}
 \end{figure}
 
-Though it is typically a bad idea to use three-dimensional representations when two dimensions are adequate to display the data \citep{tufte}, in this case, the data are perceived more accurately.\comment{Do we need user studies to back this claim up?} A three-dimensional projection of two-dimensional data, however, is not easy to create and would likely lead to distortions and instability in the visual display. In particular, there does not seem to be an easy guideline for determining the projection angle or color gradient that would be necessary to create the illusory depth that would remove the optical illusion. 
+Though it is typically a bad idea to use three-dimensional representations when two dimensions are adequate to display the data \citep{tufte}, counteracting a visual heuristic might make that approach more viable. However, a three-dimensional projection of two-dimensional data is not easy to create and would likely lead to distortions and instability in the visual display. In particular, there does not seem to be an easy guideline for determining the projection angle or color gradient that would be necessary to create the illusory depth that would remove the optical illusion. 
 
 While not thoroughly examined in the sensation and perception literature, the sine illusion seems to have been classified as part of a group of geometrical optical misperceptions which may be related to the M\"uller-Lyer illusion \citep{day:1991} or the Poggendorf illusion \citep{poggendorf}.  Figure \ref{original} shows a reproduction of Bach's applet \citep{bach} displaying the sine illusion. The sine illusion is closely related to the line width phenomenon -- the line segments along the steepest slopes of the sine curve appear to be the shortest: ``The illusion is explained in terms of a perceptual compromise between the vertical extent and the greater overall dimensions of the section at the turn of the sine-wave figure and is thereby held to be the same in principle as the M\"uller-Lyer illusion." \citep{day:1991}.
 M Bach's applet  gives the option to compensate the line length manually for its perceived shortcoming. The amount of compensation chosen turns out to be highly dependent on both the length of the vertical line segments and the amplitude of the sine function. While the applet does not provide details on the compensation function, it does suggest that it may be possible to correct the graphical display so that the brain interprets the stimuli in a manner consistent with the numerical data. 
 
 \subsection{Application: Simulation}
-Sections \ref{perceptualexplanations} and \ref{statisticalgraphics} explain the related line width illusion and sine illusion. While these illusions are not entirely separate, and similar visual processing heuristics likely underly both illusions, the size of the effect can be vastly increased when the two are superimposed. This occurs frequently in time series with both trend and seasonality, but for the sake of simplicity, we will use simulated data to demonstrate the effect. 
+Sections \ref{perceptualexplanations} and \ref{statisticalgraphics} explore the perceptual and statistical literature examining this illusion. The ``line width illusion" and the ``sine illusion" are the same phenomenon, as explicitly demonstrated in Figure \ref{simulation1}. 
 \begin{figure}[h!tbp]\centering
 \begin{subfigure}[b]{.31\linewidth}
   \centering
@@ -386,7 +390,7 @@ qplot(x,y, geom="jitter")+
   \label{simulation2}
 \end{subfigure}
 \begin{subfigure}[b]{.31\linewidth}\centering
-<<Simulation3Trend, echo=FALSE, fig.width=4, fig.height=4>>=
+<<simulation3Trend, echo=FALSE, fig.width=4, fig.height=4>>=
 x <- rep(seq(0,2*pi*2, length=120), each=100)
 y <- rnorm(n=length(x), mean=1/10*(-x+pi)^2, sd=0.2)
 qplot(x,y, geom="jitter")+ 
@@ -402,7 +406,7 @@ qplot(x,y, geom="jitter")+
   \caption{\small Trend, No Seasonality}
   \label{simulation3}
 \end{subfigure}
-\caption{The sine illusion and the line width illusion describe overlapping phenomena which may manifest on different orders of magnitude within the data but can both be visually misleading. Figure \ref{simulation1} shows the sine illusion without any underlying trend, Figure \ref{simulation2} shows the sine illusion superimposed on a quadratic trend, and Figure \ref{simulation3} shows a quadratic trend without the sine illusion. Though all three sets of simulated data have constant variance, Figure \ref{simulation2} seems more extreme.}
+\caption{(a) shows seasonality without any underlying trend, (b) shows seasonality superimposed on a quadratic trend, and (c) shows a quadratic trend without seasonality. Though all three sets of simulated data have constant variance, none of the variances appear constant due to the sine illusion.}
 \end{figure}
 
 When we judge the variability of data, we must overcome both the visual bias due to the line width illusion and the visual bias due to the sine illusion. As it turns out, these two illusions are incredibly difficult to overcome, even when they are obviously present. What follows is a compliation of various methods to correct for or mitigate the effect of these two illusions.
@@ -433,9 +437,8 @@ Orthogonal $w_o$ and vertical $w_v$ line widths are related -- the orthogonal li
 w_o = w_v \cos \theta,
 \end{equation}
 where $\theta$ is the acute angle between the secant line and the vertical, that is, $\theta \in (-pi, pi]$.
-\begin{figure}[h!tbp]
-\centering
-<<transform-illustration,echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE>>=
+
+<<transform-illustration,echo=FALSE, message=FALSE, warning=FALSE, include=FALSE>>=
 f <- function(x) 2*sin(x)
 fprime <- function(x) 2*cos(x)
 f2prime <- function(x) -2*sin(x)
@@ -476,67 +479,67 @@ qplot(x=x, y=y, geom="line", data=dframe, colour=I("grey50")) + theme_bw() +
 #             data=dframe.1, parse=TRUE, hjust=1, vjust=.5, size=2.5) + 
   geom_text(aes(label=paste("theta", "%~~%", round(vangle/pi*180), "^o", sep=""),
                 x=xstart/2+x/2-sign(vangle)*.1, y=y-sign(vangle)*.64+.04), 
-            data=dframe.1, parse=TRUE, hjust=.75, vjust=.5, size=2.5) + 
+            data=dframe.1, parse=TRUE, hjust=.75, vjust=.5, size=3) + 
   scale_x_continuous(breaks=seq(0, 2*pi, by=pi/2), 
                      labels=c("0", expression(paste(pi,"/2")), expression(pi), expression(paste("3",pi, "/2")), expression(paste("2",pi)))) #+ 
   # facet_wrap(~type)
   # + ggtitle("Changes in Perceived Orthogonal Width \ndue to Change in Secant Angle")
 @
-% \includegraphics[width=.45\linewidth, keepaspectratio=TRUE]{figure/fig-transform-illustration}
-\caption{\label{OrthogonalWidth} Changes in perceived orthogonal width due to the change in secant angle. The perceived length of the vertical line changes with the angle of the line perpendicular to the slope of $\sin(x)$, suggesting that the sine illusion stems from a conflict between the visual system's perception of figure width and the mathematical judgement necessary to determine the length of the vertical lines.
+\begin{figure}[h!tbp]
+\centering
+\includegraphics[width=.45\linewidth, keepaspectratio=TRUE]{figure/fig-transform-illustration}
+\caption{\label{OrthogonalWidth} Changes in perceived orthogonal width due to the change in secant angle. 
 }
 \end{figure}
+The perceived length of the vertical line changes with the angle of the line perpendicular to the slope of $\sin(x)$, suggesting that the sine illusion stems from a conflict between the visual system's perception of figure width and the mathematical judgement necessary to determine the length of the vertical lines.
+% \begin{figure}[h!tbp]\centering
+% \includegraphics[keepaspectratio=TRUE, width=.8\linewidth]{figure/fig-CtsQuadratic}
+% \caption{Alternate Figure Option -- The perceived length of the lines is a function of the extant width, that is, the width of the secant line at a given point. The secant lines are of varying lengths (.4 to 1), suggesting that to counter the illusion, the line lengths must be altered such that the extant widths are perceived to be equal.}\label{altOrthogonalWidth}
+% \end{figure}
 
-\begin{figure}[h!tbp]\centering
-\includegraphics[keepaspectratio=TRUE, width=.8\linewidth]{figure/fig-CtsQuadratic}
-\caption{Alternate Figure Option -- The perceived length of the lines is a function of the extant width, that is, the width of the secant line at a given point. The secant lines are of varying lengths (.4 to 1), suggesting that to counter the illusion, the line lengths must be altered such that the extant widths are perceived to be equal.}\label{altOrthogonalWidth}
-\end{figure}
-The sine illusion disappears when the width orthogonal to the slope is made constant. \newtext{This can be accomplished by separating the trend and the variability, by forcing the slope to be constant (by reparameterizing the $x$ axis), or by making the lines appear to be of the same height, by adjusting their lengths to maintain a constant orthogonal width. Each of these approaches is discussed in the following section.}
 
-\section{Breaking the Sine Illusion}
-Though the line-width illusion clearly occurs in non-sinusoidal curves, for the purposes of consistency, we will proceed with data derived as follows: equally spaced points $x$ along the interval $[0,2\pi]$ which correspond to lines centered at $y=s*sin(x)$ with length $\ell$. The slope of the tangent line at a point $x=x_0$ is $y=s*cos(x_0)$, and thus the slope of the line orthogonal to the slope (along which the width is perceived) is $y=-1/(s*cos(x_0))$. Individual lines can of course be completely determined by substituting in the point $x_0, y_0$ to find the corresponding $y-intercept$.
+\section{Breaking the Illusion}
+As the illusion is caused by a conflict between the vertical length and the width orthogonal to the slope, it can be resolved by making the orthogonal width constant. \newtext{This can be accomplished in several ways: by separating the trend and the variability, by forcing the slope to be constant (by reparameterizing the $x$ axis), or by making the lines appear to be of the same height by adjusting their lengths to maintain a constant orthogonal width. Each of these approaches is discussed in the following section.}
 
 \subsection{Trend Removal}
-The most obvious approach to breaking the sine illusion is to present the trend and variance separately, as shown in Figure \ref{trendremoval}. A Loess smooth was used to estimate the trendline, and this estimate was subtracted from the line center to produce separate graphs of the trend and the variance. While this does largely remove the sine illusion, it also makes it somewhat more difficult to parse the overall data, as judgments must be made by combining two graphs or by mentally re-composing the original graph (at which point, the sine-illusion becomes a factor). Ideally, it would be possible to tell the whole story with a single graph, to minimize cognitive demands - while this example is relatively simple, it would be much harder to create a de-trended version of Figure \ref{playfair-debt} that could be easily assessed to determine both trend and change in the size of the trade imbalance over time. 
-\begin{figure}[h!tbp]\centering
-<<trend-removal, include=FALSE, fig.height=3, fig.width=3.5>>=
+One approach to breaking the sine illusion is to present the trend and variance separately, as shown in Figure \ref{trendremoval} and recommended by \cite{wainer:2000}. A Loess smooth was used to estimate the trendline, and this estimate was subtracted from the line center to produce separate graphs of the trend and the variance. While this does largely remove the sine illusion, it also makes it somewhat more difficult to parse the overall data, as judgments must be made by combining two graphs or by mentally re-composing the original graph (at which point, the sine-illusion becomes a factor). Ideally, it would be possible to tell the whole story with a single graph, to minimize cognitive demands. While this example is relatively simple, it would be much harder to create a de-trended version of Figure \ref{playfair-debt} that could be easily assessed to determine both trend and change in the size of the trade imbalance over time. 
+
+<<trend-removal, include=FALSE, fig.height=4.5, fig.width=4.5>>=
 df <- df2 <- createSine(40, 1, sin, cos)
 df2$y <- loess(df$y~df$x)$fitted
 df2$type <- "Loess Fit"
 df$type <- "Original Function"
 df <- rbind(df, df2)
 
-ggplot(data=df,aes(x=x, y=y)) + geom_segment(aes(x=xstart, xend=xend, y=ystart, yend=yend)) + geom_line(aes(group=type, linetype=type)) + scale_linetype_discrete("") + theme_bw() + theme(legend.position="bottom")+ 
+ggplot(data=df,aes(x=x, y=y)) + geom_segment(aes(x=xstart, xend=xend, y=ystart, yend=yend)) + geom_line(aes(group=type, linetype=type)) + scale_linetype_discrete("") + theme_bw() + theme(legend.position="bottom") 
   scale_x_continuous(breaks=seq(0, 2*pi, by=pi/2), 
                      labels=c("0", expression(paste(pi,"/2")), expression(pi), expression(paste("3",pi, "/2")), expression(paste("2",pi))))
 
-qplot(data=subset(df, type=="Loess Fit"), x=xstart, xend=xend, y=ystart-y, yend=yend-y, geom="segment", linetype=type)  + xlab("x")+ ylim(c(-1.5, 1.5)) + theme_bw()+ scale_linetype_discrete("", labels="De-Trended Data") + theme(legend.position="bottom")+ 
+p1 <- qplot(data=subset(df, type=="Loess Fit"), x=xstart, xend=xend, y=ystart-y, yend=yend-y, geom="segment", linetype=type)  + xlab("x")+ ylim(c(-1.5, 1.5)) + theme_bw()+ scale_linetype(guide="none") + 
   scale_x_continuous(breaks=seq(0, 2*pi, by=pi/2), 
                      labels=c("0", expression(paste(pi,"/2")), expression(pi), expression(paste("3",pi, "/2")), expression(paste("2",pi)))) + ylab("Variability")
 
-qplot(data=subset(df, type=="Loess Fit"), x=x, y=y, geom="line", linetype=type) + xlab("x") + ylim(c(-1.5, 1.5)) + theme_bw() + scale_linetype_discrete("") + theme(legend.position="bottom")+ 
+p2 <- qplot(data=subset(df, type=="Loess Fit"), x=x, y=y, geom="line", linetype=type) + xlab("x") + ylim(c(-1.5, 1.5)) + theme_bw() + scale_linetype(guide="none") +
   scale_x_continuous(breaks=seq(0, 2*pi, by=pi/2), 
                      labels=c("0", expression(paste(pi,"/2")), expression(pi), expression(paste("3",pi, "/2")), expression(paste("2",pi))))
+
+print(grid.arrange(p2, p1, nrow=2))
 @
-\begin{subfigure}[b]{.32\linewidth}
+\begin{figure}[h!tbp]\centering
+
+\begin{subfigure}[b]{.45\linewidth}
   \centering
   \includegraphics[width=\textwidth]{figure/fig-trend-removal1}
   \caption{\small Original Data}
   \label{trendremovalFit}
 \end{subfigure}
-\begin{subfigure}[b]{.32\linewidth}
+\begin{subfigure}[b]{.45\linewidth}
   \centering
   \includegraphics[width=\textwidth]{figure/fig-trend-removal2}
-  \caption{\small Variability}
+  \caption{\small Trend and Variability}
   \label{trendremovalVariability}
 \end{subfigure}
-\begin{subfigure}[b]{.32\linewidth}
-  \centering
-  \includegraphics[width=\textwidth]{figure/fig-trend-removal3}
-  \caption{\small Trend}
-  \label{trendremovalLine}
-\end{subfigure}
-\caption{Separating the trend and the variability removes the Sine illusion. Figure \ref{trendremovalFit} shows the fit line compared to the original function, Figure \ref{trendremovalVariability} shows the remaining trend in the vertical lines, which now appear to be of the same size, and Figure \ref{trendremovalLine} shows the underlying fitted trendline without the accompanying vertical lines.}\label{trendremoval}
+\caption{Separating the trend and the variability removes the Sine illusion. Figure \ref{trendremovalFit} shows the fit line compared to the original function, Figure \ref{trendremovalVariability} shows the the underlying fitted trendline and the leftover variability in the vertical lines which now appear to be of the same size.}\label{trendremoval}
 \end{figure}
  \todo[inline]{Need to expand the discussion (i.e. harder to interpret graphs like this, requires more cognitive load, etc.), but don't want to make unsupported claims}
 \subsection{Transformation of the X-Axis}
@@ -738,7 +741,7 @@ names(secantlines)[9:10] <- c("Bottom.Segment", "Top.Segment")
 #                               expression(paste("2",pi))))
 # ggsave("./figure/fig-CtsQuadratic.pdf", height=4, width=8)
 @
-\comment{Something very odd is going on with the CtsQuadratic chunk - I can't get either picture to compile correctly, but it runs fine on its own...? Figures \ref{altOrthogonalWidth} and \ref{HalfSegLength}}
+\comment{Something very odd is going on with the CtsQuadratic chunk - I can't get either picture to compile correctly, but it runs fine on its own...? Figure \ref{HalfSegLength}}
 \begin{figure}[h!tbp]\centering
 \includegraphics[keepaspectratio=TRUE, width=.8\linewidth]{figure/fig-wtf}
 \caption{Extant Half-segment Length. The secant  line segments are not symmetrical around the center line, so symmetric correction as employed in Figure \ref{GeneralLinearCorrection} leads to simultaneous over- and under-correcting, as in the distortions seen in Figure \ref{linearFixOvercorrect}}\label{HalfSegLength}
