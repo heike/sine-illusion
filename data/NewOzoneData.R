@@ -53,7 +53,7 @@ setwd("./data/Ozone")
 data <- read.csv("2011OzoneTempData.csv", stringsAsFactors=FALSE)
 # qplot(data=subset(data, DewPoint<60 & Tmax>40), x=Tmax, y=Ozone)
 
-datasub <- subset(data, DewPoint<60)
+datasub <- subset(data, Tmax>45 & DewPoint<60)
 # qplot(data=ddply(datasub, .(Tmax), summarize, var=var(Ozone)), x=Tmax, y=var)
 model <- loess(data=datasub, Ozone~Tmax)
 quantiles <- quantile(datasub$Tmax, seq(0, .9, .1))
