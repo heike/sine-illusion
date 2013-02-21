@@ -559,11 +559,9 @@ fprime <- cos
 dframe <- createSine(40 , len=1, f=f, fprime=fprime)
 dframe$correction <- abs(cos(dframe$x))
 dframe$correction <- dframe$correction/(sum(dframe$correction))*2*pi
-dframe$correction2 <- rowMeans(cbind(abs(cos(dframe$x)), mean(abs(cos(dframe$x)))))
-dframe$correction2 <- dframe$correction2/sum(dframe$correction2)*2*pi
 
 dframe$xtrans <- cumsum(dframe$correction) # Create transformed X axis
-dframe$xtrans2 <- cumsum(dframe$correction2) # Create transformed X axis
+
 
 qplot(x=xtrans, xend=xtrans, y = ystart, yend=yend, colour=I("blue"), geom="segment", data=dframe) +
   geom_segment(aes(x = 0, xend=2*pi, y=0, yend=0), colour="black") +theme_bw() + coord_fixed(ratio=1) + xlab(expression(tilde(x))) + ylab("y")+ 
@@ -575,6 +573,9 @@ qplot(x=xtrans, xend=xtrans, y = ystart, yend=yend, colour=I("blue"), geom="segm
 \end{subfigure}
 \begin{subfigure}[b]{.48\linewidth}\centering
 <<xtrans-mid,echo=FALSE, fig.width=4, fig.height=2>>=
+dframe$correction2 <- rowMeans(cbind(abs(cos(dframe$x)), mean(abs(cos(dframe$x)))))
+dframe$correction2 <- dframe$correction2/sum(dframe$correction2)*2*pi
+dframe$xtrans2 <- cumsum(dframe$correction2) # Create transformed X axis
 qplot(x=xtrans2, xend=xtrans2, y = ystart, yend=yend, colour=I("blue"), geom="segment", data=dframe) +
   geom_segment(aes(x = 0, xend=2*pi, y=0, yend=0), colour="black") +theme_bw() + coord_fixed(ratio=1) + xlab(expression(tilde(x))) + ylab("y")+ 
   scale_x_continuous(breaks=seq(0, 2*pi, by=pi/2), 
@@ -582,6 +583,35 @@ qplot(x=xtrans2, xend=xtrans2, y = ystart, yend=yend, colour=I("blue"), geom="se
 @
 \caption{Weighted $X$ axis transformation}
 \label{xtrans2}
+\end{subfigure}
+
+\begin{subfigure}[b]{.48\linewidth}\centering
+<<xtrans-mid2,echo=FALSE, fig.width=4, fig.height=2>>=
+dframe$correction3 <- rowMeans(cbind(abs(cos(dframe$x)), mean(abs(cos(dframe$x))), mean(abs(cos(dframe$x)))))
+dframe$correction3 <- dframe$correction3/sum(dframe$correction3)*2*pi
+dframe$xtrans3 <- cumsum(dframe$correction3) # Create transformed X axis
+
+qplot(x=xtrans3, xend=xtrans3, y = ystart, yend=yend, colour=I("blue"), geom="segment", data=dframe) +
+  geom_segment(aes(x = 0, xend=2*pi, y=0, yend=0), colour="black") +theme_bw() + coord_fixed(ratio=1) + xlab(expression(tilde(x))) + ylab("y")+ 
+  scale_x_continuous(breaks=seq(0, 2*pi, by=pi/2), 
+                     labels=c("0", expression(paste(pi,"/2")), expression(pi), expression(paste("3",pi, "/2")), expression(paste("2",pi))))
+@
+\caption{Weighted $X$ axis transformation\newline\hspace*{1.5em}(1 part transformation, 2 parts mean)}
+\label{xtrans3}
+\end{subfigure}
+\begin{subfigure}[b]{.48\linewidth}\centering
+<<xtrans-mid3,echo=FALSE, fig.width=4, fig.height=2>>=
+dframe$correction4 <- rowMeans(cbind(abs(cos(dframe$x)), mean(abs(cos(dframe$x))), mean(abs(cos(dframe$x))), mean(abs(cos(dframe$x)))))
+dframe$correction4 <- dframe$correction4/sum(dframe$correction4)*2*pi
+dframe$xtrans4 <- cumsum(dframe$correction4) # Create transformed X axis
+
+qplot(x=xtrans4, xend=xtrans4, y = ystart, yend=yend, colour=I("blue"), geom="segment", data=dframe) +
+  geom_segment(aes(x = 0, xend=2*pi, y=0, yend=0), colour="black") +theme_bw() + coord_fixed(ratio=1) + xlab(expression(tilde(x))) + ylab("y")+ 
+  scale_x_continuous(breaks=seq(0, 2*pi, by=pi/2), 
+                     labels=c("0", expression(paste(pi,"/2")), expression(pi), expression(paste("3",pi, "/2")), expression(paste("2",pi))))
+@
+\caption{Weighted $X$ axis transformation\newline\hspace*{1.5em}(1 part transformation, 3 parts mean)}
+\label{xtrans4}
 \end{subfigure}
 \todo[inline]{add 2nd example, add dots to the axis, add minor gridlines that are accurate.}
 \caption{$X$ axis transformations. In (a), adjusting the x-spacing of the lines mitigates the sine illusion by changing the extant width so that it is uniform in $x$. (b) shrinks the transformation in (a) towards a uniform spacing and still breaks the illusion with a much less severe distortion of the $x$-axis.}
