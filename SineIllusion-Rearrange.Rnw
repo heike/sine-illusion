@@ -545,14 +545,12 @@ print(grid.arrange(p2, p1, nrow=2))
 \end{figure}
  \todo[inline]{Need to expand the discussion (i.e. harder to interpret graphs like this, requires more cognitive load, etc.), but don't want to make unsupported claims}
 \subsection{Transformation of the X-Axis}
-Another approach to breaking the power of the sine illusion is to remove the changes in the slope of the overall trend line by transforming the $x$ axis scaling so that the absolute slope is constant. This is similar in nature to the approach taken by common angle plots in removing the line width illusion: by fixing the angle at which the two sets are connected, it is possible to compare line widths, because the extant widths are proportional to the actual widths. 
+Another approach to breaking the power of the sine illusion is to remove the changes in the slope of the overall trend line by transforming the $x$ axis scaling so that the absolute slope is constant. 
+Geometrically, we want to change the x-axis spacing so that the absolute slope of the underlying trend line remains constant, which will force the extant width to be constant. 
+\todo[inline]{add math notation} 
+This transformation can be considered as a reparameterization of the $x$ axis in terms of the slope. As the sine illusion depends on changing slope in the overall trend, it makes sense to reparameterize the axis in terms of the slope so that it is possible to see the other information contained in the graphic.This transformation is shown in Figure \ref{xtrans1}.
 
-Geometrically, we want to take the horizontal distance $\triangle x$ between two points and fix it so that the extant width $\triangle x/\triangle y$ is constant, that is, $\triangle \tilde x \propto |\triangle y/\triangle x|$ is the new horizontal distance between the two points. Translating this to a continuous expression, we want $|f^\prime(x)| \propto d\tilde x$. This transformation can be considered as a reparameterization of the $x$ axis in terms of the slope, that is, since the slope of the graph seems to be the visually salient detail, it makes sense to reparameterize the axis in terms of the slope so that it is possible to see the other information contained in the graphic. 
-
-\begin{figure}[h!tbp]\centering
-
-\end{figure}
-Interestingly, the illusion can be broken by a much less severe transformation in $x$. By averaging the transformation in Figure \ref{xtrans1} with the average absolute slope over the range of $x$ values, that is $\tilde x^\prime \propto .5 d\tilde x + .5(1/n\sum_{i=1}^n |cos(x_i)|)$ where $n$ is the number of lines at points $x_i$, the illusion is still broken and the data are closer to the original function $y=sin(x)$. The extent to which this weighting holds is likely to vary with the aspect ratio and the shape of the function, but merits further investigation, as it may be possible to find an ``optimal weighting" for specific situations which minimizes distortion and maximizes the correspondence between inferences made from the data and inferences made using the visual display.
+In practice we can see that the illusion can be broken by a much less severe transformation in $x$. By averaging the transformation in Figure \ref{xtrans1} with the average absolute slope over the range of $x$ values, that is $dx \propto .5 d\tilde x + .5(1/n\sum_{i=1}^n |cos(x_i)|)$ where $n$ is the number of lines at points $x_i$, the illusion is still broken and the data are closer to the original function $y=sin(x)$. The extent to which this weighting holds is likely to vary with the aspect ratio and the shape of the function, but merits further investigation, as it may be possible to find an ``optimal weighting" for specific situations which minimizes distortion and maximizes the correspondence between inferences made from the data and inferences made using the visual display.
 \begin{figure}[h!tbp]\centering
 \begin{subfigure}[b]{.48\linewidth}\centering
 <<xtransform, echo=FALSE, fig.width=4, fig.height=2>>=
@@ -585,6 +583,7 @@ qplot(x=xtrans2, xend=xtrans2, y = ystart, yend=yend, colour=I("blue"), geom="se
 \caption{Weighted $X$ axis transformation}
 \label{xtrans2}
 \end{subfigure}
+\todo[inline]{add 2nd example, add dots to the axis, add minor gridlines that are accurate.}
 \caption{$X$ axis transformations. In (a), adjusting the x-spacing of the lines mitigates the sine illusion by changing the extant width so that it is uniform in $x$. (b) shrinks the transformation in (a) towards a uniform spacing and still breaks the illusion with a much less severe distortion of the $x$-axis.}
 \label{xtrans}
 \end{figure}
