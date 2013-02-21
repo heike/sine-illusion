@@ -119,7 +119,6 @@ The sine illusion, which is part of a set of optical illusions which occur based
 graphics have to be true to the data (e.g. lie factor Tufte, Wainer, ...). Computational tools help us ensure technical trueness -- but how do we deal with situations that involve innate inability or trigger learned misperceptions? In this paper we want to raise awareness for one of these situations, show that it occurs frequently in our dealings with graphics and provide different attempts at solving or avoiding it.
 }
 
-
 <<example,echo=FALSE, include=FALSE>>=
 source("./data/NewOzoneData.R")
 nsite <- length(unique(datasub$SiteID))
@@ -411,6 +410,9 @@ qplot(x,y, geom="jitter")+
 
 When we judge the variability of data, we must overcome both the visual bias due to the line width illusion and the visual bias due to the sine illusion. As it turns out, these two illusions are incredibly difficult to overcome, even when they are obviously present. What follows is a compliation of various methods to correct for or mitigate the effect of these two illusions.
 
+% \caption{Alternative to the cleveland figure: in order to get around copyright, we could use the idea of shrinking distance (= decreasing variance) and introduce the new concept that it doesn't have to be two lines, but judging variability. Question to the audience: `Where's the variance the highest?' or `Describe the conditional variability of the points along the $x$ axis`}
+% \label{cleveland-figure-2}
+% \end{figure}
 
 \subsection{Geometry of the Sine Illusion}
 The visual preference for judging the length of the line by the orthogonal extant suggests that the underlying illusion may be a function of geometry rather than some mysterious visual process that occurs automatically between perception of the stimulus and conscious thought. If this is the case, then it may be that by comparing the orthogonal width and the vertical length of the line it may be possible to dissect the illusion and correct the graphical display so that it is not as visually deceptive.
@@ -715,6 +717,7 @@ secantlines2 <- getAdjLength(secantlines)
 dframe2 <- secantlines
 names(dframe2) <- c("x", "y", "deriv", "xstart", "xend", "ystart", "yend", "ell", "ell1", "ell2", "type", "a")
 
+library(plyr)
 dframe2 <- rbind.fill(dframe, dframe2)
 names(secantlines)[9:10] <- c("Bottom.Segment", "Top.Segment")
 # 
