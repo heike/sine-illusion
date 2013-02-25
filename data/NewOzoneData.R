@@ -64,3 +64,5 @@ datasub <- ddply(datasub, .(quant), transform, stdev=sd(resid))
 # qplot(Tmax, stdev^2, data=datasub, geom="line", group=quant,ylab="Residual Variance of each Temperature Decile")
 
 setwd(oldwd)
+
+write.csv(datasub, "Ozone-subset.csv", row.names=FALSE)

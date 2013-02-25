@@ -26,7 +26,7 @@ opts_chunk$set(fig.path='figure/fig-', cache.path='cache/', fig.align='center', 
 library(reshape2)
 suppressMessages(library(ggplot2))
 library(plyr)
-library(gridExtra)
+suppressMessages(library(gridExtra))
 
 createSine <- function(n=200, len=1, f=f, fprime=fprime) {
   x <- seq(0, 2*pi, length=n+2)[(2:(n+1))]
@@ -115,24 +115,26 @@ The sine illusion, which is part of a set of optical illusions which occur based
 \tableofcontents
 
 \section{Introduction}
-\newtext{Graphics are powerful tools for summarizing large or complex data. The main premise in our dealings with statistical graphics is that
-graphics have to be true to the data (e.g. lie factor Tufte, Wainer, ...). Computational tools help us ensure technical trueness -- but how do we deal with situations that involve innate inability or trigger learned misperceptions? In this paper we want to raise awareness for one of these situations, show that it occurs frequently in our dealings with graphics and provide different attempts at solving or avoiding it.
-}
+Graphics are powerful tools for summarizing large or complex data. The main premise in our dealings with statistical graphics is that
+graphics have to be true to the data (e.g. \newdo{fix citations: lie factor Tufte, Wainer, ...}). Computational tools help us ensure technical trueness -- but how do we deal with situations that involve innate inability or trigger learned misperceptions? In this paper we want to raise awareness for one of these situations, show that it occurs frequently in our dealings with graphics and provide different attempts at solving or avoiding it.
+
 
 <<example,echo=FALSE, include=FALSE>>=
-source("./data/NewOzoneData.R")
+#source("./data/NewOzoneData.R")
+datasub <- read.csv("data/Ozone-subset.csv")
 nsite <- length(unique(datasub$SiteID))
-qplot(data=datasub, x=jitter(Tmax), y=Ozone, geom="point", colour=I("grey"), alpha=I(.5), xlab="Temperature (F)", ylab="8-hour Average Ozone Concentration (ppm)") + geom_line(aes(x=Tmax, y=fit)) + theme_bw()
-qplot(data=datasub, x=jitter(Tmax), y=resid, geom="point", colour=I("grey"), alpha=I(.5), xlab="Temperature (F)", ylab="Residual Ozone Concentration (ppm)") + geom_line(aes(x=Tmax, y=0*resid)) + theme_bw()
-
+qplot(data=datasub, x=jitter(Tmax), y=Ozone, geom="point", colour=I("grey30"), alpha=I(.5), xlab="Temperature (F)", ylab="8-hour Average Ozone Concentration (ppm)") + geom_line(aes(x=Tmax, y=fit), size=1.25, colour="steelblue") + theme_bw()
+qplot(data=datasub, x=jitter(Tmax), y=resid, geom="point", colour=I("grey20"), alpha=I(.5), xlab="Temperature (F)", ylab="Residual Ozone Concentration (ppm)") + geom_line(aes(x=Tmax, y=0*resid), size=1.25, colour="steelblue") + theme_bw()
 @
 
-\done{We need a relevant example as a hook - then explain to people what trap they fell in.}
 
-Figure \ref{example1} shows daily measurements of 8-hour average ozone concentration and temperature at several sites in Houston \citep{epa}, for days in 2011 with temperature above $45^o$ F and dew point less than $60^o$ F (as ozone concentration is related to temperature and humidity) with a loess smooth line for reference. Ozone concentrations were gathered from \Sexpr{nsite} locations in the Houston area \citep{epa}, and weather data is aggregated from the NCDC \citep{noaa} site at Hobby International Airport, which is located in the center of the Houston area. 
+Figure \ref{example1} shows daily measurements of 8-hour average ozone concentration and temperature at several sites in Houston, for days in 2011 with temperatures above $45^o$ F \newdo{is Fahrenheit really used with $^o$?} and dew points of less than $60^o$ F. %(as ozone concentration is related to temperature and humidity)
+A loess smooth line is added for reference. 
+Ozone concentrations were gathered from \Sexpr{nsite} locations in the Houston area \citep{epa}, and weather data is aggregated from the NCDC \citep{noaa} site at Hobby International Airport, which is located in the center of the Houston area. 
+
+\newdo{I like this example! But we still need to suggest that the trumpet shape in the residuals comes as a surprise to lots of people.}
 
 \begin{figure}[h!tbp]\centering
-\caption{Ozone and Temperature in Houston, 2011. What seems to be the trend in overall variance? Is the variance trend in (a) consistent with the residual plot in (b)?}
 \begin{subfigure}[b]{.45\linewidth}
   \centering
   \includegraphics[width=\textwidth]{figure/fig-example1}
@@ -142,12 +144,12 @@ Figure \ref{example1} shows daily measurements of 8-hour average ozone concentra
 \begin{subfigure}[b]{.45\linewidth}
   \centering
   \includegraphics[width=\textwidth]{figure/fig-example2}
-  \caption{\small Outliers removed}
+  \caption{\small Residuals}
   \label{example2}
 \end{subfigure}
-\label{exampleFull1}
+\caption{\label{exampleFull1} Ozone and Temperature in Houston, 2011. What seems to be the trend in overall variance? Is the variance trend in (a) consistent with the residual plot in (b)?}
 \end{figure}
-The sine illusion (also known in graphical literature as the line width illusion) is a frequent occurrence in statistical analysis, and graphical displays should be thoughtfully considered to minimize its effect visually and acknowledge its influence. Figure \ref{original} shows the classical sine illusion with the parameters which determine the illusionn's strength.  
+The sine illusion (also known in graphical literature as the line width illusion) is a frequent occurrence in statistical analysis, and graphical displays should be thoughtfully considered to minimize its effect visually and acknowledge its influence. Figure \ref{original} shows the classical sine illusion along with the parameters that determine the illusion's strength.  
 <<functions, echo=FALSE, eval=TRUE>>=
 f <- function(x) 2*sin(x)
 fprime <- function(x) 2*cos(x)
@@ -194,12 +196,12 @@ dev.off()
 \end{minipage}
 \caption{\label{original}The original Sine Illusion. The regions of the left graph in the peak and the valley appear to be composed of longer lines than the other regions. The right graph illustrates the parameters determining the appearance of the illusion: $s$ denotes the amplitude of the function, $\ell$ the length of the line segments.}
 \end{figure}
-The first documentation we could find of this illusion, \cite{day:1991} documented the illusion in the context of sinusoidal vertical lines. More recently the illusions have been documented on non-sinusoidal curves \todo{add Citation for hammock plots}, but the illusions seem to be the same.  
+The first documentation we could find of this illusion, \cite{day:1991} documented the illusion in the context of sinusoidal vertical lines. More recently the illusions have been documented on non-sinusoidal curves \citep{schonlau:2003, marie}, but the illusions seem to be the same.  
 
 
 \subsection{Statistical Graphics and the Sine Illusion}\label{statisticalgraphics}
 % While the illusion presented above is termed the sine illusion, it holds for non-sinusoidal curves which have dramatic changes in the slope of the lines over time as well.
-The illusion demonstrated in Figures \ref{exampleFull1} and \ref{original} has been frequently noted in statistical graphics, though usually not as an optical illusion. Rather, the problem is typically identified as the difficulty of visually subtracting two curves, and the misleading conclusions that may result when this process goes awry. Figure \ref{playfair-debt} shows one example of this common phenomenon \citep{playfair, playfair2}: the vertical distance between the two lines is much less visually salient than the extant width of the line, that is, the width of the line segment which is perpendicular to the tangent line at a given point.
+The illusion demonstrated in Figures \ref{exampleFull1} and \ref{original} has been frequently noted in statistical graphics, though usually not as an optical illusion. Rather, the problem is typically identified as the difficulty of visually subtracting two curves, and the misleading conclusions that may result when this process goes awry. Figure \ref{playfair-debt} shows one of the possibly oldest example of this common phenomenon \citep{playfair, playfair2}: the vertical distance between the two lines is much less visually salient than the extant width of the line, that is, the width of the line segment which is perpendicular to the tangent line at a given point.
 
 \begin{figure}[h!tbp]
 \centering
@@ -219,11 +221,11 @@ qplot(data=df, x=x, y=y, geom="line") + geom_line(aes(y=y2)) + theme_bw()
 \begin{figure}[h!tbp]
 \centering
 \includegraphics[width=.5\linewidth]{figure/fig-effectivegraphsfig}
-\caption{A replication of Figure 2.16 in \cite{robbins:2005}. The line width illusion seems to be related to increasing slope - as the slope increases, the apparent distance between the two lines decreases, even though the lines are separated by a constant distance.}
+\caption{A replication of Figure 2.16 in \cite{robbins:2005}. The line width illusion seems to be related to increasing slope - as the slope increases, the apparent distance between the two lines decreases, even though the lines represent a constant vertical shift.}
 \label{robbins-graph}
 \end{figure}
 
-\cite{cleveland:1984, cleveland:1985} also discuss the perceptual difficulty of judging the difference between two curves plotted on the same axis. They recommend the difference between the two curves as an alternate display, as shown in the second part of Figure \ref{cleveland-figure}. While this is good practice when there are two separate curves (as in Figure \ref{playfair-debt}), when the contours of the data implicitly create two curves (the boundaries of the variability in the data) there is not an easy way to display the difference between these implicit curves without separating the display of the trendline and the variance, which creates a more complex set of graphs that require more cognitive effort to interpret. In addition, as in Figure \ref{playfair-debt} both the difference between the curves and the overall trend are of visual importance, and plotting the difference between the two curves removes the overall trend. 
+\cite{cleveland:1984, cleveland:1985} also discuss the perceptual difficulty of judging the difference between two curves plotted on the same axis. They recommend the difference between the two curves as an alternate display, as shown in the second part of Figure \ref{cleveland-figure}. While this is good practice when there are two separate curves (as in Figure \ref{playfair-debt}), when the contours of the data implicitly create two curves (the boundaries of the variability in the data) there is not an easy way to display the difference between these implicit curves without separating the display of the trendline and the variance, which creates a more complex set of graphs that require more cognitive effort to interpret. %In addition, as in Figure \ref{playfair-debt} both the difference between the curves and the overall trend are of visual importance, and plotting the difference between the two curves removes the overall trend. 
 % 
 % \begin{figure}[h!tbp]
 % \centering
@@ -280,15 +282,7 @@ p
 \label{cleveland-figure}
 \end{figure}
 
-% helloworld 
-% More recently, the line-width illusion has been cited as a reason to modify parallel sets plots to avoid pitfalls in human perception.  Figure \ref{hammocks} shows the parallel sets plot, the hammock plot, and the common angle plot, which has been modified so that all angles are constant. The hammock plot corrects for the line width illusion, where the common angle plot holds all of the angles constant so as not to require correction. 
-%These two approaches are similar to the approaches we will take in correcting the sine illusion by adjusting the vertical height so that the extant width appears constant, and by modifying the $x$ axis so that the slope appears to be constant. These two approaches will produce somewhat different graphical displays.
-% \begin{figure}[h!tbp]
-% \centering
-% \missingfigure{Figure or figures showing hammock plots and the corrected version. I'd copy them from the paper but I'm sure there's a better version that was used to generate the paper.}
-% \caption{}
-% \label{hammocks}
-% \end{figure}
+
 \clearpage
 
 
@@ -342,7 +336,7 @@ qplot(x=x, xend=xend, y = ystart*ell, yend=yend*ell, geom="segment", data=dframe
 \begin{figure}[hbtp]
 \centering
 \includegraphics[width=.5\linewidth]{figure/fig-originalgrid}
-\caption{\label{original-grid} Horizontal grid lines do not help to resolve the illusion, even though they provide a clear basis for comparison of line lengths.}
+\caption{\label{original-grid} Horizontal grid lines do not help  to resolve the illusion, even though they provide a clear basis for comparison of line lengths.}
 \end{figure}
 
 Though it is typically a bad idea to use three-dimensional representations when two dimensions are adequate to display the data \citep{tufte}, counteracting a visual heuristic might make that approach more viable. However, a three-dimensional projection of two-dimensional data is not easy to create and would likely lead to distortions and instability in the visual display. In particular, there does not seem to be an easy guideline for determining the projection angle or color gradient that would be necessary to create the illusory depth that would remove the optical illusion. 
@@ -351,6 +345,8 @@ While not thoroughly examined in the sensation and perception literature, the si
 M Bach's applet  gives the option to compensate the line length manually for its perceived shortcoming. The amount of compensation chosen turns out to be highly dependent on both the length of the vertical line segments and the amplitude of the sine function. While the applet does not provide details on the compensation function, it does suggest that it may be possible to correct the graphical display so that the brain interprets the stimuli in a manner consistent with the numerical data. 
 
 \subsection{Application: Simulation}
+\newdo{I'm not quite sure where this paragraph belongs, but it should probably not be a subsection of its own - it reads rather like a segue in or out of a section ...}
+
 Sections \ref{perceptualexplanations} and \ref{statisticalgraphics} explore the perceptual and statistical literature examining this illusion. The ``line width illusion" and the ``sine illusion" are the same phenomenon, as explicitly demonstrated in Figure \ref{simulation1}. 
 \begin{figure}[h!tbp]\centering
 \begin{subfigure}[b]{.31\linewidth}
@@ -408,11 +404,8 @@ qplot(x,y, geom="jitter")+
 \caption{(a) shows seasonality without any underlying trend, (b) shows seasonality superimposed on a quadratic trend, and (c) shows a quadratic trend without seasonality. Though all three sets of simulated data have constant variance, none of the variances appear constant due to the sine illusion.}
 \end{figure}
 
-When we judge the variability of data, we must overcome both the visual bias due to the line width illusion and the visual bias due to the sine illusion. As it turns out, these two illusions are incredibly difficult to overcome, even when they are obviously present. What follows is a compliation of various methods to correct for or mitigate the effect of these two illusions.
+When we judge the variability of data, we must overcome both the visual bias due to the line width illusion and the visual bias due to the sine illusion. As it turns out, these two illusions are incredibly difficult to overcome, even when they are obviously present. What follows is a compilation of various methods to correct for or mitigate the effect of these two illusions.
 
-% \caption{Alternative to the cleveland figure: in order to get around copyright, we could use the idea of shrinking distance (= decreasing variance) and introduce the new concept that it doesn't have to be two lines, but judging variability. Question to the audience: `Where's the variance the highest?' or `Describe the conditional variability of the points along the $x$ axis`}
-% \label{cleveland-figure-2}
-% \end{figure}
 
 \subsection{Geometry of the Sine Illusion}
 The visual preference for judging the length of the line by the orthogonal extant suggests that the underlying illusion may be a function of geometry rather than some mysterious visual process that occurs automatically between perception of the stimulus and conscious thought. If this is the case, then it may be that by comparing the orthogonal width and the vertical length of the line it may be possible to dissect the illusion and correct the graphical display so that it is not as visually deceptive.
