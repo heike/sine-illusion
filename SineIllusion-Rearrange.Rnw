@@ -122,8 +122,8 @@ graphics have to be true to the data (e.g. lie factor Tufte, Wainer, ...). Compu
 <<example,echo=FALSE, include=FALSE>>=
 source("./data/NewOzoneData.R")
 nsite <- length(unique(datasub$SiteID))
-qplot(data=datasub, x=jitter(Tmax), y=Ozone, geom="point", colour=I("grey"), alpha=I(.5), xlab="Temperature (F)", ylab="8-hour Average Ozone Concentration (ppm)") + geom_line(aes(x=Tmax, y=fit)) + theme_bw()
-qplot(data=datasub, x=jitter(Tmax), y=resid, geom="point", colour=I("grey"), alpha=I(.5), xlab="Temperature (F)", ylab="Residual Ozone Concentration (ppm)") + geom_line(aes(x=Tmax, y=0*resid)) + theme_bw()
+qplot(data=datasub, x=jitter(Tmax), y=Ozone, geom="point", colour=I("grey"), alpha=I(.75), xlab="Temperature (F)", ylab="8-hour Average Ozone Concentration (ppm)") + geom_line(aes(x=Tmax, y=fit)) + theme_bw()
+qplot(data=datasub, x=jitter(Tmax), y=resid, geom="point", colour=I("grey"), alpha=I(.75), xlab="Temperature (F)", ylab="Residual Ozone Concentration (ppm)") + geom_line(aes(x=Tmax, y=0*resid)) + theme_bw()
 
 @
 
@@ -622,13 +622,61 @@ qplot(x=xtrans4, xend=xtrans4, y = ystart, yend=yend, colour=I("blue"), geom="se
 Another potentially less disruptive option to break the sine illusion is to transform the line length directly so that the resultant extant width appears to be constant. 
 \subsubsection{Trigonometry Method}
 This approach aims to extend the orthogonal width, which onlookers generally evaluate,  to the amount of the vertical width, which we want to represent. 
-We first multiply the vertical width by a factor of $1/\cos\theta$, where $\theta$ is the angle under which the line is drawn. This angle is given by the slope of the function, mathematically we know that in position $x$ the angle $\theta(x)$ of function $f(x)$ is given as:
-\[
-\tan \theta (x) = f^\prime (x).
-\]
-We only distinguish the size, not the sign of the angle, which gives us an overall correction factor for the line width in vertical direction of 
+
+<<trigmethodcartoon,echo=FALSE, include=FALSE, cache=FALSE>>=
+f <- function(x) 2*sin(x)
+fprime <- function(x) 2*cos(x)
+f2prime <- function(x) -2*sin(x)
+df <- createSine(40 , len=1, f=f, fprime=fprime)[5:16,]
+a <- 9
+dfsec <- getSecantSegment(df$x[a], df, f, fprime, f2prime)
+dfslope <- data.frame(xstart=df$x[a]+.5, xend=df$x[a]-.9, ystart=fprime(df$x[a])*.5+df$y[a], yend=-.9*fprime(df$x[a])+df$y[a])
+dfslope2 <- data.frame(xstart=df$x[a]+.5, xend=df$x[a]-.3, ystart=fprime(df$x[a])*.5+df$y[a]+.5, yend=-.3*fprime(df$x[a])+df$y[a]+.5)
+ftsize <- 4
+cairo_pdf("./figure/fig-trigmethodcartoon.pdf", width=5, height=5)
+ggplot(data=df, aes(x=xstart, xend=xend, y=ystart, yend=yend)) + theme_bw() + coord_fixed(ratio=1) + 
+  geom_segment(colour="grey") + 
+  geom_segment(data=df[a,], aes(x=xend-.008, xend=x-.008, y=yend, yend=y), colour="grey50") + 
+  geom_point(aes(x=x, y=y)) + 
+  geom_segment(data=df[a,], aes(x=xstart, xend=xend, y=ystart, yend=yend)) + 
+  geom_segment(data=dfsec, aes(x=sec.xstart+.005, xend=x+.005, y=sec.ystart-.005, yend=y-.005), colour="grey50") + 
+  geom_segment(data=dfsec, aes(x=sec.xstart, xend=sec.xend, y=sec.ystart, yend=sec.yend)) + 
+  geom_text(aes(x=dfsec$sec.xend, y=dfsec$sec.yend, 
+                label="slope: -1/paste(f, \"'\", (x))"), parse=TRUE, hjust=.75, vjust=1) +
+  geom_segment(data=dfslope, linetype=2) + 
+  geom_segment(data=dfslope2, linetype=2) + 
+  geom_text(data=dfslope, aes(x=xend+.1, y=yend-.05, label="slope: paste(f, \"'\", (x))"), parse=TRUE, hjust=0, vjust=1) +
+  geom_text(aes(x=mean(c(dfsec$sec.xstart, df$xend[a], df$x[a], df$x[a])), 
+                y=mean(c(dfsec$sec.ystart, df$yend[a], df$y[a], df$y[a])), 
+                label="theta"), parse=TRUE, size=ftsize) +
+#   geom_text(aes(x=dfslope$xend,  y=dfslope$yend+.075, 
+#                 label=paste("paste(y == f, \"'\", (x[0]) (x-x[0]) + f(x[0]))")), 
+#             parse=TRUE, hjust=.25, size=ftsize) + 
+  geom_text(data=df[a,], aes(x=.5*xend-.03 + .5*x, y=.5*yend+.5*y, label="\u2113"), size=ftsize+1, face="bold") +
+  geom_text(aes(x=.5*dfsec$sec.xstart+ .5*dfsec$x +.05 , y=.5*dfsec$sec.ystart+.5*dfsec$y-0.05, label="italic(m)"), parse=TRUE, face="plain") + 
+  xlab("x") + ylab("y") 
+dev.off()
+@
+\begin{figure}[h!tbp]\centering
+\includegraphics[keepaspectratio=TRUE,width=.5\linewidth]{figure/fig-trigmethodcartoon}
+\caption{Geometry of the trigonometry correction approach.}
+\end{figure}
+\comment{Note that the actual extant width is not as large as $m=\ell\cos\theta$ in this example. We're approximating the extant width with a simple geometric fix, but we could be more precise using law of cosines or by modifying the slope as in the linear and quadratic fixes.}
+
+Our goal is to make the segment $m$ appear as long as the segment $\ell$. As the angle $\theta$ is determined by the slope of the tangent line, that is, 
+$$\tan \theta = \left|f^\prime(x)\right|$$ 
+we can solve for $\theta$ to get $$\atan{\left|f^\prime(x)\right|} = \theta$$
+Then 
+$\cos(\theta) = \cos(\atan{\left|f^\prime(x)\right|}) = m/\ell$ and 
+$$\left[\cos(\atan{\left|f^\prime(x)\right|})\right]^{-1} = \ell/m$$ That is, we have to scale $\ell$ by a factor of 
+$\left[\cos(\atan{\left|f^\prime(x)\right|})\right]^{-1}$ to make the extant width appear as long as $\ell$ in the original graph. 
+% We first multiply the vertical width by a factor of $1/\cos\theta$, where $\theta$ is the angle under which the line is drawn. This angle is given by the slope of the function, mathematically we know that in position $x$ the angle $\theta(x)$ of function $f(x)$ is given as:
+% \[
+% \tan \theta (x) = f^\prime (x).
+% \]
+% We only distinguish the size, not the sign of the angle, which gives us an overall correction factor for the line width in vertical direction of 
 \begin{equation}\label{trigCorrection}
-\atan{\cos \left| f^\prime (x) \right|}^{-1}
+\ell_{\text{new}} = \ell\cdot\left(\cos\left[\atan{\left| f^\prime (x) \right|}\right]\right)^{-1}
 \end{equation}
 
 <<trigFix, dependson='data', echo=FALSE, include=FALSE, fig.width=4, fig.height=3>>=
@@ -656,19 +704,15 @@ qplot(x=x, xend=xend, y = f(x) -ellx2/2, yend=f(x) +ellx2/2, geom="segment", dat
 
 @
 \begin{figure}[h!btp]
-\begin{subfigure}[b]{.45\linewidth}\centering
+\begin{subfigure}[b]{.48\linewidth}\centering
 \includegraphics[width=\linewidth,keepaspectratio=TRUE]{figure/fig-trigFix1}
 \caption{Uncorrected}
 \end{subfigure}
-\begin{subfigure}[b]{.45\linewidth}\centering
+\begin{subfigure}[b]{.48\linewidth}\centering
 \includegraphics[width=\linewidth,keepaspectratio=TRUE]{figure/fig-trigFix2}
 \caption{Correction factor in Eqn \ref{trigCorrection}}
 \end{subfigure}
-% \begin{subfigure}[b]{.3\linewidth}\centering
-% \includegraphics[width=\linewidth,keepaspectratio=TRUE]{figure/fig-trigFix3}
-% \caption{Correction factor in Eqn. \ref{LinearApprox}}
-% \end{subfigure}
-\caption{Fix of the sine illusion by using the factor of $1/\cos\left(\atan{|f^\prime(x)|}\right)$} to adjust the vertical extent of the lines.  
+\caption{Fix of the sine illusion by using the factor of $1/\cos\left(\atan{|\cos(x)|}\right)$} to adjust the vertical extent of the lines.  
 \label{trigFix} 
 \end{figure}
 \subsubsection{A General Correction Method}
