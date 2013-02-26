@@ -123,7 +123,7 @@ The sine illusion, which is part of a set of optical illusions which occur based
 
 \section{Introduction}
 Graphics are powerful tools for summarizing large or complex data. The main premise in our dealings with statistical graphics is that
-graphics have to be true to the data (e.g. \cite{tufte, wainer:2000}) \newdo{fix citations: lie factor\sout{ Tufte, Wainer, }...}. Computational tools help us ensure technical trueness -- but how do we deal with situations that involve innate inability or trigger learned misperceptions? In this paper we want to raise awareness for one of these situations, show that it occurs frequently in our dealings with graphics and provide different attempts at solving or avoiding it.
+graphics have to be true to the data (e.g. \cite{wainer:2000}). \newtext{Generally, we see a lot of discussion on keeping true to the data in the framework of (ab)using three dimensional effects in graphics. \citep{tufte} goes as far as defining a {\it lie-factor} -- the ratio of the size of an effect in the data compared to the size of an effect shown, with the premise that any large deviations from one indicate a misuse of graphical techniques.} Computational tools help us ensure technical trueness -- but this brings up the additional question of how we deal with situations that involve innate inability or trigger learned misperceptions? In this paper we want to raise awareness for one of these situations, show that it occurs frequently in our dealings with graphics and provide different attempts at solving or avoiding it.
 
 
 <<example,echo=FALSE, include=FALSE>>=
@@ -419,7 +419,7 @@ When we judge the variability of data, we must overcome both the visual bias due
 The visual preference for judging the length of the line by the orthogonal extant suggests that the underlying illusion may be a function of geometry rather than some mysterious visual process that occurs automatically between perception of the stimulus and conscious thought. 
 %If this is the case, then it may be that by comparing the orthogonal width and the vertical length of the line it may be possible to dissect the illusion and correct the graphical display so that it is not as visually deceptive.
 
-\newtext{If this is the case, then it may be  possible to correct the graphical display for so that it is not as visually deceptive. Our first approach to this is to compare the (perceived) orthogonal width to the (information-carrying) vertical length of the line. By adjusting the vertical line such that the orthogonal width is displays the quantity of interest, we can match the audience's intuitive expectation with the data. This approach is further discussed in section \ref{hammock}.
+\newtext{If this is the case, then it may be  possible to correct the graphical display for so that it is not as visually deceptive. Our first approach to this is to compare the (perceived) orthogonal width to the (information-carrying) vertical length of the line. By adjusting the vertical line such that the orthogonal width displays the quantity of interest, we can match the audience's intuitive expectation with the data. This approach is further discussed in section \ref{hammock}.
 }
 
 % Using the notation given in Figure~\ref{original}, we assume a value $s$ for the sine amplitude, $\ell$ for the vertical length of line segments, and $\ell_c$ for the amount of compensation. 
