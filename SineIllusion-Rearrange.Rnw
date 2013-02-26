@@ -26,7 +26,10 @@ library(reshape2)
 suppressMessages(library(ggplot2))
 library(plyr)
 suppressMessages(library(gridExtra))
-source("./code/ThemeBW.R") # redefine theme_bw() to have slightly darker minor gridlines
+#source("./code/ThemeBW.R") # redefine theme_bw() to have slightly darker minor gridlines
+# this is not such a good idea - there's a reason that the minor gridlines are lighter
+# right now the plots look like they are drawn on concstruction paper. 
+# Please don't get stuck playing with these defaults. 
 createSine <- function(n=200, len=1, f=f, fprime=fprime, getquadapprox=FALSE, f2prime=getquadapprox) {
   if(getquadapprox & !is.function(f2prime)) f2prime <- function(x) -1*f(x) # for backwards compatibility
   x <- seq(0, 2*pi, length=n+2)[(2:(n+1))]
@@ -295,7 +298,7 @@ p
 One illuminating demonstration of the Sine illusion comes from M. Bach's applet \citep{bach}. The applet cites perception research suggesting that the sine illusion occurs due to misapplication of perceptual experience with the three-dimensional world to a two-dimensional ``artificial" display of data. One possible three-dimensional context for similar stimuli is shown in Figure \ref{ribbon-illusion}. 
 
 \begin{figure}[h!tbp]\centering
-<<ribbon-illusion,echo=FALSE, fig.keep='none', fig.width=5, fig.height=2.6>>=
+<<ribbon-illusion,echo=FALSE, out.width='0.5\\linewidth', fig.width=5, fig.height=2.6>>=
 angle <- .02
 shift <- pi/30
 x <- seq(-1*pi, 1*pi, pi/30)
@@ -310,15 +313,13 @@ qplot(data=persp, x=xtop, xend=xbottom, y=ytop, yend=ybottom, geom="segment") +
         axis.text = element_blank()) + coord_equal(ratio=1) +
   geom_line(aes(x=xtop, y=ytop), size=1)+
   geom_line(aes(x=xbottom, y=ybottom), size=1.5)
-
-
 @
-\includegraphics[width=.5\linewidth, keepaspectratio=TRUE]{figure/fig-ribbon-illusion}
+%\includegraphics[width=.5\linewidth, keepaspectratio=TRUE]{figure/fig-ribbon-illusion}
 \caption{What the brain expects the data to look like. Experience with real-world objects suggests that the data are most similar to a slightly angled top view of a 3-dimensional strip such as a ribbon. Even though the sine illusion lines are not angled, the brain often recruits paradigms from one situation when processing novel stimuli. Optical illusions result from the mismatch between the applied heuristic and the stimulus. \citep{goldstein}} % goldstein S&P 8th edition pg 249
 \label{ribbon-illusion}
 \end{figure}
 
-An interesting facet of the sine illusion is that when the graph is examined as if it were a two-dimensional projection of a three-dimensional figure, the illusion disappears and the line widths seem once more to be constant. In addition, if the lines are considered without the surrounding context, judgments comparing two lines seem to be relatively accurate, particularly if the graph also includes horizontal reference lines, as in Figure \ref{original-grid}. 
+An interesting facet of the sine illusion is that when the graph is examined as if it were a two-dimensional projection of a three-dimensional figure, the illusion disappears and the line widths seem once more to be constant. In addition, if the lines are considered without the surrounding context, judgments comparing two lines seem to be relatively accurate, particularly if the graph also includes horizontal reference lines, as in Figure \ref{original-grid}. \newdo{this statement is in direct contradiction of the figure caption.}
 \newtext{That is, the illusion breaks down if the visual heuristic is pre-empted by an attempt to view the graph as if it were three dimensional or if each piece is considered without the surrounding context. The illusion then holds only when a significant portion of the graph is considered simultaneously without regard to the perceptual mechanisms at play. (See \cite{day:1991} for a more thorough discussion of how much surrounding context is required for the illusion to persist)}
 
 <<originalgrid, dependson='data', echo=FALSE, include=FALSE>>=
@@ -413,16 +414,20 @@ When we judge the variability of data, we must overcome both the visual bias due
 
 
 \subsection{Geometry of the Sine Illusion}
-The visual preference for judging the length of the line by the orthogonal extant suggests that the underlying illusion may be a function of geometry rather than some mysterious visual process that occurs automatically between perception of the stimulus and conscious thought. If this is the case, then it may be that by comparing the orthogonal width and the vertical length of the line it may be possible to dissect the illusion and correct the graphical display so that it is not as visually deceptive.
+The visual preference for judging the length of the line by the orthogonal extant suggests that the underlying illusion may be a function of geometry rather than some mysterious visual process that occurs automatically between perception of the stimulus and conscious thought. 
+%If this is the case, then it may be that by comparing the orthogonal width and the vertical length of the line it may be possible to dissect the illusion and correct the graphical display so that it is not as visually deceptive.
 
-Using the notation given in Figure \ref{original}, we assume a value $s$ for the sine amplitude, $\ell$ for the vertical length of line segments, and $\ell_c$ for the amount of compensation. 
-The sine curve is then given by function $f$, written as 
-\[
-f(x) = s \cdot \sin(x)
-\]
-for $x$ in $[-\pi, \pi]$. The slope of the sine curve is the steepest in its reflection point at $x=0$. We can calculate the slope as $f^\prime(x) = s \cos(x)$, which in $x=0$ yields a slope of $s/2$.
+\newtext{If this is the case, then it may be  possible to correct the graphical display for so that it is not as visually deceptive. Our first approach to this is to compare the (perceived) orthogonal width to the (information-carrying) vertical length of the line. By adjusting the vertical line such that the orthogonal width is displays the quantity of interest, we can match the audience's intuitive expectation with the data. This approach is further discussed in section \ref{hammock}.
+}
 
-These differences in the slope are the reason we perceive the lines to have different length, as we have an innate tendency to evaluate line or band widths orthogonally rather than vertically, even though the mathematical judgment requires evaluation of the vertical distance. 
+% Using the notation given in Figure~\ref{original}, we assume a value $s$ for the sine amplitude, $\ell$ for the vertical length of line segments, and $\ell_c$ for the amount of compensation. 
+% The sine curve is then given by function $f$, written as 
+% \[
+% f(x) = s \cdot \sin(x)
+% \]
+% for $x$ in $[-\pi, \pi]$. The slope of the sine curve is the steepest in its reflection point at $x=0$. We can calculate the slope as $f^\prime(x) = s \cos(x)$, which in $x=0$ yields a slope of $s/2$.
+% 
+% These differences in the slope are the reason we perceive the lines to have different length, as we have an innate tendency to evaluate line or band widths orthogonally rather than vertically, even though the mathematical judgment requires evaluation of the vertical distance. 
 
 \begin{figure}[h!tbp]
 \begin{center}
@@ -436,7 +441,7 @@ Orthogonal $w_o$ and vertical $w_v$ line widths are related -- the orthogonal li
 \begin{equation}\label{adjust}
 w_o = w_v \cos \theta,
 \end{equation}
-where $\theta$ is the acute angle between the secant line and the vertical, that is, $\theta \in (-pi, pi]$.
+where $\theta$ is the acute angle between the secant line and the vertical, that is, $\theta \in (-\pi, \pi]$.
 
 <<transform-illustration,echo=FALSE, message=FALSE, warning=FALSE, include=FALSE>>=
 f <- function(x) 2*sin(x)
@@ -642,8 +647,12 @@ qplot(x=xtrans4, xend=xtrans4, y = ystart, yend=yend, colour=I("blue"), geom="se
 \clearpage
 \subsection{Transformation of the Y-Axis}
 Another potentially less disruptive option to break the sine illusion is to transform the line length directly so that the resultant extant width appears to be constant. 
-\subsubsection{Trigonometry Method}
-This approach aims to extend the orthogonal width, which onlookers generally evaluate,  to the amount of the vertical width, which we want to represent\citep{schonlau:2003}. 
+\subsubsection{Hammock Correction}\label{hammock}
+This approach aims to extend the orthogonal width, which onlookers generally evaluate,  to the amount of the vertical width, which we want to represent \citep{schonlau:2003}. 
+
+\newdo{Careful!!!!  The Trig method has nothing to do with what Matthias Schonlau was doing! It's aseparate approach and we need to highlight its pros and cons separately}
+
+\subsubsection{Trigonometry Method}\label{trig}
 
 <<trigmethodcartoon,echo=FALSE, include=FALSE, cache=FALSE>>=
 f <- function(x) 2*sin(x)
@@ -875,7 +884,7 @@ Figure \ref{linear-GeneralCorrection} shows the linear approximation to $f(x) \p
 
 Figure \ref{GeneralLinearCorrection} shows the correction factor compared with the trigonometry-style correction and the untransformed data. As with the trigonometry correction, the linear adjustment is prone to the same overcorrection distortion shown in Figure \ref{linearFixOvercorrect}.  The asymmetric nature of the distortion suggests that we may want to use a second-order taylor polynomial approximation to $f(x)$ to account for the asymmetry in the extant widths on either side of the center trendline.
 
-\subsubsection{Quadratic Approximation to f(x)}
+\subsubsection{Quadratic Approximation to $f(x)$}
 
 Using the approximation $f(x) \approx f(x_0) + f^\prime(x_0)(x-x_0) + 1/2 f^{\prime\prime}(x_0)(x-x_0)^2$, the system of equations shown above reduces to
 \begin{align*}
@@ -932,6 +941,7 @@ qplot(x=x, xend=x, y=ellx3.u+y, yend=y-ellx3.l, geom="segment", data=dframe, lin
 @
 \caption{Adjusting the top and bottom segments of the vertical lines separately so that the extant width is constant breaks the illusion, but slightly distorts the sinusoidal shape of the peaks.}
 \todo[inline]{Check formula - this doesn't seem quite right...}
+\newdo{I'm pretty sure it's the missing correction for the length of the lines. }
 \end{figure}
 \todo[inline]{Modify formula for aspect ratio - not sure exactly how to do this, need to look at the algebra *again*}
 \clearpage
