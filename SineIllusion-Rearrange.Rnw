@@ -66,16 +66,15 @@ getSecantSegment <- function(x0, df, f, fprime, f2prime){
   dy <- diff(range(df$y))
   dx <- diff(range(df$x))
   a <- dx/(dy + 2*ell.x0) 
-#   a <- 1
-  secSlope   <- -a/fprime(x0)
   
-  #--- Actual Roots
-  #  temp       <- seq(min(df$x)-pi, max(df$x)+pi, .0001)
+  #---- Actual Roots
+  #   secSlope   <- -a/fprime(x0)
+  #   temp       <- seq(min(df$x)-pi, max(df$x)+pi, .0001)
   #   leftend    <- temp[which.min(abs(f(temp) + ell.x1 - secSlope*(temp-x1)))]
   #   rightend   <- temp[which.min(abs(f(temp) - ell.x1 - secSlope*(temp-x1)))]
-  #---
+  #----
   
-  #--- Approximation
+  #---- Approximation
   lambda1 <- (-(fprime(x0)^2 + 1) + sqrt((fprime(x0)^2 + 1)^2 - 2*fprime(x0)^2*f2prime(x0)*ell.x0))/(fprime(x0)^2*f2prime(x0))
   lambda2 <- (-(fprime(x0)^2 + 1) + sqrt((fprime(x0)^2 + 1)^2 + 2*fprime(x0)^2*f2prime(x0)*ell.x0))/(fprime(x0)^2*f2prime(x0))
   
@@ -83,8 +82,28 @@ getSecantSegment <- function(x0, df, f, fprime, f2prime){
   x2 <- lambda2*fprime(x0)+x0
   y1 <- f(x0)-lambda1
   y2 <- f(x0)-lambda2
-  #---
+  #----
   
+  #---- Approximation V2 ----
+#   dx <- fprime(x0)
+#   dx1 <- 1+dx^2   
+#   ddx <- f2prime(x0)
+#   
+#   corr1 <- 1/a*(((dx1)-sqrt(dx1^2-2*ddx*(dx1-1)^2*ell.x0))/(ddx*dx))
+#   corr2 <- 1/a*(((dx1)-sqrt(dx1^2+2*ddx*(dx1-1)^2*ell.x0))/(ddx*dx))
+#   if(abs(dx)<.01) {
+#     dx1 <- 2
+#     corr1 <- corr2 <- 0
+#   }
+#   if(abs(dx)<.01){
+#     ddx <- 1
+#   }
+#   
+#   x1 = corr1 + x0
+#   x2 = corr2 + x0
+#   y1 = f(x1)+ell.x0
+#   y2 = f(x2)-ell.x0
+  #---- 
   
   df2 <- data.frame(x=x0, y=f(x0), deriv=fprime(x0),
                     sec.xstart=x1, sec.xend = x2, 
@@ -93,6 +112,8 @@ getSecantSegment <- function(x0, df, f, fprime, f2prime){
 
   df2$sec.ell1 <- a*.5*ell.x0/with(df2, sqrt((sec.yend-y)^2+(sec.xend-x)^2))
   df2$sec.ell2 <- a*.5*ell.x0/with(df2, sqrt((y-sec.ystart)^2+(x-sec.xstart)^2))
+#   df2$sec.ell1 <- with(df2, sqrt((sec.yend-y)^2+(sec.xend-x)^2))
+#   df2$sec.ell2 <- with(df2, sqrt((y-sec.ystart)^2+(x-sec.xstart)^2))
   df2$type <- "Perceived Width"
   df2$a <- a
   return(df2)
@@ -937,7 +958,7 @@ dev.off()
 \begin{figure}[h!tbp]\centering
 <<CtsAdjustedResults,echo=FALSE, dependson='CtsQuadratic'>>=
 dframe <- createSine(n = 40, len = 1, f=f, fprime=fprime, getquadapprox=TRUE, f2prime=f2prime)
-qplot(x=x, xend=x, y=ellx3.u+y, yend=y-ellx3.l, geom="segment", data=dframe, linetype=I(1)) + coord_fixed(ratio=1) + theme_bw() + ylab("y") + 
+qplot(x=x, xend=x, y=y+ellx3.u, yend=y-ellx3.l, geom="segment", data=dframe, linetype=I(1)) + coord_fixed(ratio=1) + theme_bw() + ylab("y") + 
   scale_x_continuous(breaks=seq(0, 2*pi, by=pi/2), 
                      labels=c("0", expression(paste(pi,"/2")), expression(pi), expression(paste("3",pi, "/2")), expression(paste("2",pi))))
 @
