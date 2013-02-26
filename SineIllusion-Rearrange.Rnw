@@ -556,10 +556,12 @@ print(grid.arrange(p2, p1, nrow=2))
 Another approach to breaking the power of the sine illusion is to remove the changes in the slope of the overall trend line by transforming the $x$ axis scaling so that the absolute slope is constant. 
 Geometrically, we want to change the x-axis spacing so that the absolute slope of the underlying trend line remains constant, which will force the extant width to be constant. 
 
-\newtext{
-That is, if the $x-axis$ spans the interval $[a,b)$, the transformation of the x axis is 
-$$T(x) = (b-a)\left(\int_a^x |f^\prime(z)| dz\right)/\left(\int_a^b|f^\prime(z) dz|\right)$$ 
-}
+\newdo{introduce $f$, mention that one assumption has to be that $f^\prime$ exists.}
+
+That is, if the $x$-axis spans the interval $[a,b)$, the transformation of the $x$ axis is 
+$$T(x) = (b-a)\left(\int_a^x |f^\prime(z)| dz\right)/\left(\int_a^b|f^\prime(z)| dz\right)$$ 
+
+\newdo{the goal is to make $|f^\prime(x)|$ a constant, right? Does the above transformation achieve this? That's something that you still need to show.}
 
 This transformation can be considered as a reparameterization of the $x$ axis in terms of the slope. As the sine illusion depends on changing slope in the overall trend, it makes sense to reparameterize the axis in terms of the slope so that it is possible to see the other information contained in the graphic.This transformation is shown in Figure \ref{xtrans1}.
 
