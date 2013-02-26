@@ -9,8 +9,7 @@
 \usepackage{graphicx}
 \usepackage{amssymb}
 \usepackage{amsmath}
-
-
+\usepackage{url}
 
 % help with editing and coauthoring
 \usepackage[colorinlistoftodos]{todonotes}
@@ -134,7 +133,7 @@ qplot(data=datasub, x=jitter(Tmax), y=resid, geom="point", colour=I("grey20"), a
 @
 
 
-Figure \ref{example1} shows daily measurements of 8-hour average ozone concentration and temperature at several sites in Houston, for days in 2011 with temperatures above $45^o$ F \newdo{is Fahrenheit really used with $^o$?} and dew points of less than $60^o$ F. %(as ozone concentration is related to temperature and humidity)
+Figure \ref{example1} shows daily measurements of 8-hour average ozone concentration and temperature at several sites in Houston, for days in 2011 with temperatures above $45^\circ$ F  and dew points of less than $60^\circ$ F. %(as ozone concentration is related to temperature and humidity)
 A loess smooth line is added for reference. 
 Ozone concentrations were gathered from \Sexpr{nsite} locations in the Houston area \citep{epa}, and weather data is aggregated from the NCDC \citep{noaa} site at Hobby International Airport, which is located in the center of the Houston area. 
 
