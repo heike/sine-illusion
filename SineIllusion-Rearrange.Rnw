@@ -65,7 +65,7 @@ getSecantSegment <- function(x0, df, f, fprime, f2prime){
   
   dy <- diff(range(df$y))
   dx <- diff(range(df$x))
-  a <- dy/(dy + 2*ell.x0) 
+  a <- dx/(dy + 2*ell.x0) 
 #   a <- 1
   secSlope   <- -a/fprime(x0)
   
@@ -79,15 +79,16 @@ getSecantSegment <- function(x0, df, f, fprime, f2prime){
   lambda1 <- (-(fprime(x0)^2 + 1) + sqrt((fprime(x0)^2 + 1)^2 - 2*fprime(x0)^2*f2prime(x0)*ell.x0))/(fprime(x0)^2*f2prime(x0))
   lambda2 <- (-(fprime(x0)^2 + 1) + sqrt((fprime(x0)^2 + 1)^2 + 2*fprime(x0)^2*f2prime(x0)*ell.x0))/(fprime(x0)^2*f2prime(x0))
   
-  leftend <- lambda1*fprime(x0)+x0
-  rightend <- lambda2*fprime(x0)+x0
+  x1 <- lambda1*fprime(x0)+x0
+  x2 <- lambda2*fprime(x0)+x0
+  y1 <- f(x0)-lambda1
+  y2 <- f(x0)-lambda2
   #---
   
   
   df2 <- data.frame(x=x0, y=f(x0), deriv=fprime(x0),
-                    sec.xstart=leftend, sec.xend=rightend, 
-                    sec.ystart=f(x0) -lambda1,
-                    sec.yend = f(x0) -lambda2,
+                    sec.xstart=x1, sec.xend = x2, 
+                    sec.ystart=y1, sec.yend = y2,
                     ell.orig = 2*ell.x0)
 
   df2$sec.ell1 <- a*.5*ell.x0/with(df2, sqrt((sec.yend-y)^2+(sec.xend-x)^2))
