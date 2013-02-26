@@ -646,11 +646,11 @@ qplot(x=xtrans4, xend=xtrans4, y = ystart, yend=yend, colour=I("blue"), geom="se
 \label{xtrans4}
 \end{subfigure}
 \todo[inline]{add 2nd example (maybe in the "application" section?)}
-\caption{$X$ axis transformations. Dots at the bottom of the graph show the transformation's effect on equally spaced points.  In (a), adjusting the x-spacing of the lines mitigates the sine illusion by changing the extant width so that it is uniform in $x$. (b) - (d) shrink the transformation in (a) towards successively more uniform spacings and still break the illusion with a much less severe distortion of the $x$-axis.}
+\caption{$X$ axis transformations. Dots at the bottom of the graph show the transformation's effect on equally spaced points along the $x$-axis. \newdo{I love it!!!!!}  In (a), adjusting the $x$-spacing of the lines mitigates the sine illusion by changing the extant width so that it is uniform in $x$. (b) - (d) shrink the transformation in (a) towards successively more uniform spacings in $x$ while still breaking the effects of the illusion.}
 \label{xtrans}
 \end{figure}
 \clearpage
-\subsection{Transformation of the Y-Axis}
+\subsection{Transformation of the $Y$-Axis}
 Another potentially less disruptive option to break the sine illusion is to transform the line length directly so that the resultant extant width appears to be constant. 
 \subsubsection{Hammock Correction}\label{hammock}
 This approach aims to extend the orthogonal width, which onlookers generally evaluate,  to the amount of the vertical width, which we want to represent \citep{schonlau:2003}. 
