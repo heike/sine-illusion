@@ -429,6 +429,7 @@ The visual preference for judging the length of the line by the orthogonal extan
 % 
 % These differences in the slope are the reason we perceive the lines to have different length, as we have an innate tendency to evaluate line or band widths orthogonally rather than vertically, even though the mathematical judgment requires evaluation of the vertical distance. 
 
+
 \begin{figure}[h!tbp]
 \begin{center}
 \includegraphics[width=0.3\linewidth]{images/linewidth}
