@@ -395,10 +395,9 @@ qplot(data=persp, x=xtop, xend=xbottom, y=ytop, yend=ybottom, geom="segment") +
 \label{ribbon-illusion}
 \end{figure}
 
-An interesting facet of the sine illusion is that when the graph is examined as if it were a two-dimensional projection of a three-dimensional figure, the illusion disappears and the line widths seem once more to be constant. In addition, if the lines are considered without the surrounding context, judgments comparing two lines seem to be relatively accurate
-% , particularly if the graph also includes horizontal reference lines, as in Figure \ref{original-grid}. 
+An interesting facet of the sine illusion is that when the graph is examined as if it were a two-dimensional projection of a three-dimensional figure, the illusion disappears and the line widths seem once more to be constant. In addition, if the lines are considered without the surrounding context, judgments comparing the length of two lines seem to be relatively accurate, as in \citet{cleveland:1984}. The contextual cues of the overall trend are critical to the sine illusion's effect; without those cues (either by subtraction of the trend or by considering only one or two lines at a time) the illusion does not occur.
 \todo[inline]{Add shiny server illustration of this effect by blanking out all but 2 lines that can then be compared accurately.}
-That is, the illusion breaks down if the visual heuristic is pre-empted by an attempt to view the graph as if it were three dimensional or if each piece is considered without the surrounding context. The illusion then holds only when a significant portion of the graph is considered simultaneously without regard to the perceptual mechanisms at play. (See \cite{day:1991} for a more thorough discussion of how much surrounding context is required for the illusion to persist)
+That is, the illusion breaks down if the visual heuristic is pre-empted by an attempt to view the graph as if it were three dimensional or if each piece is considered without the surrounding context. The illusion then holds only when a significant portion of the graph is considered simultaneously without regard to the perceptual mechanisms at play (See \cite{day:1991} for a more thorough discussion of how much surrounding context is required for the illusion to persist).
 
 <<originalgrid, dependson='data', echo=FALSE, include=FALSE>>=
 f <- function(x) 2*sin(x)
@@ -571,9 +570,7 @@ print(grid.arrange(p2, p1, nrow=2))
 
 \subsection{Transformation of the X-Axis}
 Another approach to breaking the power of the sine illusion is to remove the changes in the slope of the overall trend line by transforming the $x$ axis scaling so that the absolute slope is constant. 
-Geometrically, we want to change the x-axis spacing so that the absolute slope of the underlying trend line remains constant, which will force the extant width to be constant. 
-
-\newdo{introduce $f$, mention that one assumption has to be that $f^\prime$ exists.}
+Geometrically, we want to change the x-axis spacing so that the absolute slope of the underlying trend line remains constant, which will force the extant width to be constant. \newtext{This transformation assumes that we have an underlying function $f$ (either due to prior knowledge or using a model fit) which is differentiable over the region of observed data. If data $(x_i, y_i)_{i=1, ..., N}$ have been observed, then we assume we can model $y_i = f(x_i) + \epsilon_i$ and that $f^\prime(x_i)$ exists for all $i=1, ..., N$. }
 
 That is, if the $x$-axis spans the interval $[a,b)$, the transformation of the $x$ axis is 
 $$T(x) = (b-a)\left(\int_a^x |f^\prime(z)| dz\right)/\left(\int_a^b|f^\prime(z)| dz\right)$$ 
