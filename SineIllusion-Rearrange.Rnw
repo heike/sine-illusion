@@ -160,7 +160,7 @@ Figure \ref{example1} shows daily measurements of 8-hour average ozone concentra
 A loess smooth line is added for reference. 
 Ozone concentrations were gathered from \Sexpr{nsite} locations in the Houston area \citep{epa}, and weather data is aggregated from the NCDC \citep{noaa} site at Hobby International Airport, which is located near the center of Houston. 
 
-\done{I like this example! But we still need to suggest that the trumpet shape in the residuals comes as a surprise to lots of people.}
+%\done{I like this example! But we still need to suggest that the trumpet shape in the residuals comes as a surprise to lots of people.}
 
 \begin{figure}[h!tbp]\centering
 \begin{subfigure}[b]{.45\linewidth}
@@ -179,16 +179,14 @@ Ozone concentrations were gathered from \Sexpr{nsite} locations in the Houston a
 \end{figure}
 \newtext{The increasing variance with temperature is camoflauged in the Figure \ref{example1} due to the changes in slope, but is very obvious in the residual plot in Figure \ref{example2} once the trend has been removed.}
 
-The sine illusion (also known in graphical literature as the line width illusion) is a frequent occurrence in statistical analysis, and graphical displays should be thoughtfully considered to minimize its effect visually and acknowledge its influence. Figure \ref{original} shows the classical sine illusion. \newtext{The parameters that influence the sine illusion are the amplitude of the function and the line length. The effect of these parameters can be seen at \url{http://www.michaelbach.de/ot/sze_sineIllusion/index.html}.}
+The sine illusion (also known in graphical literature as the line width illusion) is a frequent occurrence in statistical analysis, and graphical displays should be thoughtfully considered to minimize its effect visually and acknowledge its influence. Figure \ref{original} shows the classical sine illusion. \newtext{The parameters that influence the sine illusion are the amplitude of the function and the line length. An applet demonstrating the effect of changing parameter values on the strength of the illusion can be found at \url{http://www.michaelbach.de/ot/sze_sineIllusion/index.html}.}
+\todo[inline]{Add shiny applet, link to Rstudio shiny server...}
 <<functions, echo=FALSE, eval=TRUE>>=
 f <- function(x) 2*sin(x)
 fprime <- function(x) 2*cos(x)
 f2prime <- function(x) -2*sin(x)
 @
-\begin{figure}[hbtp]
-\centering
-\begin{minipage}{.49\linewidth}
-<<original, dependson='functions', echo=FALSE, results='asis', fig.width=5, fig.height=5>>=
+<<original, dependson='functions', echo=FALSE, fig.width=5, fig.height=5, include=FALSE>>=
 qplot(x=x, xend=xend, y = ystart, yend=yend, geom="segment", data=createSine(40, 1, f=f, fprime=fprime)) +
   theme(panel.grid.major=element_blank(), panel.background = element_rect(fill = "white", 
                 colour = "black"),
@@ -196,7 +194,6 @@ qplot(x=x, xend=xend, y = ystart, yend=yend, geom="segment", data=createSine(40,
        axis.title = element_blank(), axis.ticks = element_blank(), 
        axis.text = element_blank()) + coord_equal(ratio=1)
 @
-\end{minipage}\begin{minipage}{.49\linewidth}
 <<original-redo, echo=FALSE, fig.keep='none', results='hide', fig.keep='all'>>=
 cairo_pdf("./figure/fig-original-redo.pdf", width=5, height=5)
 df1 <- createSine(20,1, f=f, fprime=fprime)
@@ -222,9 +219,12 @@ qplot(x=xstart, xend=xend, y = ystart, yend=yend, geom="segment", data=df1, colo
   geom_text(aes(x=df1$x[19], y=df1$y[20], label="\u2113"), hjust=1, vjust=.5, size=10, colour="grey60")
 dev.off()
 @
-\includegraphics[keepaspectratio=true, width=\linewidth]{fig-original-redo.pdf}
-\end{minipage}
-\caption{\label{original}The original Sine Illusion. The regions of the left graph in the peak and the valley appear to be composed of longer lines than the other regions. The right graph illustrates the parameters determining the appearance of the illusion: $s$ denotes the amplitude of the function, $\ell$ the length of the line segments.}
+\begin{figure}[hbtp]
+\centering
+\includegraphics[keepaspectratio=true, width=.5\linewidth]{figure/fig-original}
+% \includegraphics[keepaspectratio=true, width=\linewidth]{fig-original-redo.pdf}
+\caption{\label{original}The original Sine Illusion. The regions of the left graph in the peak and the valley appear to be composed of longer lines than the other regions. }
+%The right graph illustrates the parameters determining the appearance of the illusion: $s$ denotes the amplitude of the function, $\ell$ the length of the line segments.
 \end{figure}
 The first documentation we could find of this illusion, \cite{day:1991} documented the illusion in the context of sinusoidal vertical lines. More recently the illusions have been documented on non-sinusoidal curves \citep{schonlau:2003, marie}, but the illusions seem to be the same.  
 
