@@ -160,7 +160,7 @@ Figure \ref{example1} shows daily measurements of 8-hour average ozone concentra
 A loess smooth line is added for reference. 
 Ozone concentrations were gathered from \Sexpr{nsite} locations in the Houston area \citep{epa}, and weather data is aggregated from the NCDC \citep{noaa} site at Hobby International Airport, which is located near the center of Houston. 
 
-\newdo{I like this example! But we still need to suggest that the trumpet shape in the residuals comes as a surprise to lots of people.}
+\done{I like this example! But we still need to suggest that the trumpet shape in the residuals comes as a surprise to lots of people.}
 
 \begin{figure}[h!tbp]\centering
 \begin{subfigure}[b]{.45\linewidth}
@@ -177,10 +177,9 @@ Ozone concentrations were gathered from \Sexpr{nsite} locations in the Houston a
 \end{subfigure}
 \caption{\label{exampleFull1} Ozone and Temperature in Houston, 2011. What seems to be the trend in overall variance? Is the variance trend in (a) consistent with the residual plot in (b)?}
 \end{figure}
-\comment{not sure how to force this bit to be below the picture so as not to give away the answers...}
-\newtext{The obvious heteroskedasticity in the residual plot in Figure \ref{example2} is not at all obvious in the original data shown in Figure \ref{example1}.} 
+\newtext{The increasing variance with temperature is camoflauged in the Figure \ref{example1} due to the changes in slope, but is very obvious in the residual plot in Figure \ref{example2} once the trend has been removed.}
 
-The sine illusion (also known in graphical literature as the line width illusion) is a frequent occurrence in statistical analysis, and graphical displays should be thoughtfully considered to minimize its effect visually and acknowledge its influence. Figure \ref{original} shows the classical sine illusion along with the parameters that determine the illusion's strength.  
+The sine illusion (also known in graphical literature as the line width illusion) is a frequent occurrence in statistical analysis, and graphical displays should be thoughtfully considered to minimize its effect visually and acknowledge its influence. Figure \ref{original} shows the classical sine illusion. \newtext{The parameters that influence the sine illusion are the amplitude of the function and the line length. The effect of these parameters can be seen at \url{http://www.michaelbach.de/ot/sze_sineIllusion/index.html}.}
 <<functions, echo=FALSE, eval=TRUE>>=
 f <- function(x) 2*sin(x)
 fprime <- function(x) 2*cos(x)
