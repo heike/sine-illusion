@@ -431,102 +431,13 @@ M Bach's applet  gives the option to compensate the line length manually for its
 When we judge the variability of data, we must overcome the visual bias due to the sine illusion. As it turns out, this illusion is incredibly difficult to overcome even when we are aware of its presence: our brains simply cannot ``un-see" the illusion. What follows is a compilation of various methods to correct for or mitigate the effect of these two illusions, intended primarily to demonstrate how pervasive the illusion is and the extreme methods necessary to remove its' effect. }
 \todo[inline]{Add in "we do not expect that these methods will be used in practice" here or at the end?}
 
-\subsection{Geometry of the Sine Illusion}
-The visual preference for judging the length of the line by the orthogonal extant suggests that the underlying illusion may be a function of geometry rather than some mysterious visual process that occurs automatically between perception of the stimulus and conscious thought. 
-%If this is the case, then it may be that by comparing the orthogonal width and the vertical length of the line it may be possible to dissect the illusion and correct the graphical display so that it is not as visually deceptive.
-
-\newtext{If this is the case, then it may be  possible to correct the graphical display for so that it is not as visually deceptive. Our first approach to this is to compare the (perceived) orthogonal width to the (information-carrying) vertical length of the line. By adjusting the vertical line such that the orthogonal width displays the quantity of interest, we can match the audience's intuitive expectation with the data. This approach is further discussed in section \ref{hammock}.
-}
-
-% Using the notation given in Figure~\ref{original}, we assume a value $s$ for the sine amplitude, $\ell$ for the vertical length of line segments, and $\ell_c$ for the amount of compensation. 
-% The sine curve is then given by function $f$, written as 
-% \[
-% f(x) = s \cdot \sin(x)
-% \]
-% for $x$ in $[-\pi, \pi]$. The slope of the sine curve is the steepest in its reflection point at $x=0$. We can calculate the slope as $f^\prime(x) = s \cos(x)$, which in $x=0$ yields a slope of $s/2$.
-% 
-% These differences in the slope are the reason we perceive the lines to have different length, as we have an innate tendency to evaluate line or band widths orthogonally rather than vertically, even though the mathematical judgment requires evaluation of the vertical distance. 
-
-
-\begin{figure}[h!tbp]
-\begin{center}
-\includegraphics[width=0.3\linewidth]{images/linewidth}
-\end{center}
-\caption{\label{fig:linewidth}Sketch of line width assessments: (a) is showing  vertical width, (b) shows  width orthogonal to the slope. \comment{From previous surveys (we could cite Marie's survey here) we know that  observers associate line width more with  orthogonal width (b) than vertical width (a).}}
-\end{figure}
-% 
-
-Orthogonal $w_o$ and vertical $w_v$ line widths are related -- the orthogonal line width depends on the angle (or, equivalently, the slope) of the line:
-\begin{equation}\label{adjust}
-w_o = w_v \cos \theta,
-\end{equation}
-where $\theta$ is the acute angle between the secant line and the vertical, that is, $\theta \in (-\pi, \pi]$.
-
-<<transform-illustration,echo=FALSE, message=FALSE, warning=FALSE, include=FALSE>>=
-f <- function(x) 2*sin(x)
-fprime <- function(x) 2*cos(x)
-f2prime <- function(x) -2*sin(x)
-library(plyr)
-dframe <- createSine(n = 150, len = 1, f=f, fprime=fprime)
-dframe$ystartcts <- dframe$ystart
-dframe$yendcts <- dframe$yend
-dframe[1:150,c(2, 3, 5, 6)] <- NA
-dframe[(1:15)*10-5, c(2, 3)] <- dframe[(1:15)*10-5, 1] 
-dframe[(1:15)*10-5, 5] <- dframe[(1:15)*10-5, 4] - .5
-dframe[(1:15)*10-5, 6] <- dframe[(1:15)*10-5, 4] + .5
-dframe$type <- "Data"
-
-
-dframe.1 <- getSecantSegment(dframe$xstart, dframe, f, fprime, f2prime)
-dframe.1$x <- dframe$x
-dframe.1$y <- dframe$y
-dframe.1$ystartcts <- dframe$ystartcts
-dframe.1$yendcts <- dframe$yendcts
-names(dframe.1) <- c("x", "y", "deriv", "xstart", "xend", "ystart", "yend", "ell", "ell.quad1", "ell.quad2", "type", "a", "ystartcts", "yendcts")
-# names(dframe.1) <- c("x", "y", "deriv", "xstart", "xend", "ystart", "yend", "ell", "ell.quad1", "ell.quad2", "type")
-# dframe.1 <- dframe.1[!is.na(dframe.1$x),]
-dframe.1$vangle <- with(dframe.1, asin((xstart-x)/ell.quad1))
-# dframe.1$x <- dframe$x
-# dframe.1$y <- dframe$y
-# dframe.1$ystartcts <- dframe$ystartcts
-# dframe.1$yendcts <- dframe$yendcts
-dframe <- rbind.fill(dframe, dframe.1)
-
-
-qplot(x=x, y=y, geom="line", data=dframe, colour=I("grey50")) + theme_bw() + 
-  geom_line(aes(y=ystartcts), colour="grey50", linetype=4) + 
-  geom_line(aes(y=yendcts), colour="grey50", linetype=4) +
-  geom_segment(data=subset(dframe, !is.na(type)), aes(x=xstart, xend = xend, y=ystart, yend=yend, colour=type))  + 
-  coord_equal(ratio=1) + scale_colour_manual("", values=c("black", "blue")) + theme(legend.position="bottom")  + 
-#   geom_text(aes(label=paste(round(vangle/pi*180), "^o", sep=""),
-#                 x=xstart*(x<pi/2 | x>1.5*pi) + xend*(x>pi/2 & x<1.5*pi), y=ystart*(x<pi/2 | x<1.5*pi) + yend*(x>pi/2 & x<1.5*pi)), 
-#             data=dframe.1, parse=TRUE, hjust=1, vjust=.5, size=2.5) + 
-  geom_text(aes(label=paste("theta", "%~~%", round(vangle/pi*180), "^o", sep=""),
-                x=xstart/2+x/2-sign(vangle)*.1, y=y-sign(vangle)*.64+.04), 
-            data=dframe.1, parse=TRUE, hjust=.75, vjust=.5, size=3) + 
-  scale_x_continuous(breaks=seq(0, 2*pi, by=pi/2), 
-                     labels=c("0", expression(paste(pi,"/2")), expression(pi), expression(paste("3",pi, "/2")), expression(paste("2",pi)))) #+ 
-  # facet_wrap(~type)
-  # + ggtitle("Changes in Perceived Orthogonal Width \ndue to Change in Secant Angle")
-@
-\begin{figure}[h!tbp]
-\centering
-\includegraphics[width=.45\linewidth, keepaspectratio=TRUE]{figure/fig-transform-illustration}
-\caption{\label{OrthogonalWidth} Changes in perceived orthogonal width due to the change in secant angle. 
-}
-\end{figure}
-The perceived length of the vertical line changes with the angle of the line perpendicular to the slope of $\sin(x)$, suggesting that the sine illusion stems from a conflict between the visual system's perception of figure width and the mathematical judgement necessary to determine the length of the vertical lines.
-% \begin{figure}[h!tbp]\centering
-% \includegraphics[keepaspectratio=TRUE, width=.8\linewidth]{figure/fig-CtsQuadratic}
-% \caption{Alternate Figure Option -- The perceived length of the lines is a function of the extant width, that is, the width of the secant line at a given point. The secant lines are of varying lengths (.4 to 1), suggesting that to counter the illusion, the line lengths must be altered such that the extant widths are perceived to be equal.}\label{altOrthogonalWidth}
-% \end{figure}
-
 
 \section{Breaking the Illusion}
 As the illusion is caused by a conflict between the vertical length and the width orthogonal to the slope, it can be resolved by making the orthogonal width constant. This can be accomplished in several ways: by separating the trend and the variability, by forcing the slope to be constant (by reparameterizing the $x$ axis), or by making the lines appear to be of the same height by adjusting their lengths to maintain a constant orthogonal width. Each of these approaches is discussed in the following section.
 
 \subsection{Trend Removal}
-One approach to breaking the sine illusion is to present the trend and variance separately, as shown in Figure \ref{trendremoval} and recommended by \cite{wainer:2000}. A Loess smooth was used to estimate the trendline, and this estimate was subtracted from the line center to produce separate graphs of the trend and the variance. While this does largely remove the sine illusion, it also makes it somewhat more difficult to parse the overall data, as judgments must be made by combining two graphs or by mentally re-composing the original graph (at which point, the sine-illusion becomes a factor). Ideally, it would be possible to tell the whole story with a single graph, to minimize cognitive demands. While this example is relatively simple, it would be much harder to create a de-trended version of Figure \ref{playfair-debt} that could be easily assessed to determine both trend and change in the size of the trade imbalance over time. 
+\newtext{
+One approach to breaking the sine illusion is to present the trend and variance separately, as shown in Figure \ref{trendremoval} and commonly recommended \citep{wainer:2000}, particularly for assessing model fit.} A Loess smooth was used to estimate the trendline, and this estimate was subtracted from the line center to produce separate graphs of the trend and the variance. While this does largely remove the sine illusion, it also makes it somewhat more difficult to parse the overall data, as judgments must be made by combining two graphs or by mentally re-composing the original graph (at which point, the sine-illusion becomes a factor). Ideally, it would be possible to tell the whole story with a single graph, to minimize cognitive demands. While this example is relatively simple, it would be much harder to create a de-trended version of Figure \ref{playfair-debt} that could be easily assessed to determine both trend and change in the size of the trade imbalance over time. 
 
 <<trend-removal, include=FALSE, fig.height=4.5, fig.width=4.5>>=
 df <- df2 <- createSine(40, 1, sin, cos)
@@ -565,8 +476,8 @@ print(grid.arrange(p2, p1, nrow=2))
 \end{subfigure}
 \caption{Separating the trend and the variability removes the Sine illusion. Figure \ref{trendremovalFit} shows the fit line compared to the original function, Figure \ref{trendremovalVariability} shows the the underlying fitted trendline and the leftover variability in the vertical lines which now appear to be of the same size.}\label{trendremoval}
 \end{figure}
-\done[inline]{Need to expand the discussion (i.e. harder to interpret graphs like this, requires more cognitive load, etc.), but don't want to make unsupported claims}
-\newtext{From a cognitive perspective, separating out the trendline and the variance creates more of a barrier to understanding the data in its original form. Additionally, removing the trend requires an initial model, and any plots produced using that fit are conditional on the assumptions made to obtain that model fit. In many situations, this may be undesireable, particularly as we typically view the data before fitting even a rudimentary model, and the sine illusion may influence even initial modeling decisions.}
+
+From a cognitive perspective, separating out the trendline and the variance creates more of a barrier to understanding the data in its original form. Additionally, removing the trend requires an initial model, and any plots produced using that fit are conditional on the assumptions made to obtain that model fit. In many situations, this may be undesireable, particularly as we typically view the data before fitting even a rudimentary model, and the sine illusion may influence even initial modeling decisions.
 
 \subsection{Transformation of the X-Axis}
 Another approach to breaking the power of the sine illusion is to remove the changes in the slope of the overall trend line by transforming the $x$ axis scaling so that the absolute slope is constant. 
@@ -575,18 +486,23 @@ Geometrically, we want to change the x-axis spacing so that the absolute slope o
 That is, if the $x$-axis spans the interval $[a,b)$, the transformation of the $x$ axis is 
 $$T(x) = (b-a)\left(\int_a^x |f^\prime(z)| dz\right)/\left(\int_a^b|f^\prime(z)| dz\right)$$ 
 
-\newdo{the goal is to make $|f^\prime(x)|$ a constant, right? Does the above transformation achieve this? That's something that you still need to show.}
-
-This transformation can be considered as a reparameterization of the $x$ axis in terms of the slope. As the sine illusion depends on changing slope in the overall trend, it makes sense to reparameterize the axis in terms of the slope so that it is possible to see the other information contained in the graphic.This transformation is shown in Figure \ref{xtrans1}.
+\newtext{
+This is equivalent to solving the following set of equations, assuming the $x$-axis spans $[a,b)$}
+\begin{align*}
+T(x) &\propto |f^\prime(x)|\\
+T(a) & = a\\
+T(b) & = b\\
+\end{align*}
+\newtext{
+This transformation can be considered as a reparameterization of the $x$ axis in terms of the slope. As the sine illusion depends on changing slope in the overall trend, by reparameterizing the $x$-axis in terms of the slope, the data seem to have constant slope, removing the illusion, while the $x$-axis shows the changing slope. The transformation is shown in Figure \ref{xtrans1}. Of course, when $f(x)$ is monotone, $T(x)$ reduces to a simple transformation of $f^\prime(x)$.}
 
 In practice we can see that the illusion can be broken by a much less severe transformation in $x$. 
 \newtext{By shrinking the transformation in Figure \ref{xtrans1} towards the original $x$ values by a factor of $w$, the illusion is still broken and the data are closer to the original function $y=f(x)$. 
 $$T(x) = \frac{w-1}{w} x + \frac{(b-a)}{w}\left(\int_a^x |f^\prime(z)| dz\right)/\left(\int_a^b|f^\prime(z) dz|\right)$$ }
 
 The extent to which this weighting holds is likely to vary with the aspect ratio and the shape of the function, but merits further investigation, as it may be possible to find an ``optimal weighting" for specific situations which minimizes distortion and maximizes the correspondence between inferences made from the data and inferences made using the visual display.\newtext{Figures \ref{xtrans2} - \ref{xtrans4} show the effect of different shrinkage coefficients $w$.} 
-\begin{figure}[h!tbp]\centering
-\begin{subfigure}[b]{.48\linewidth}\centering
-<<xtransform, echo=FALSE, fig.width=4, fig.height=2>>=
+
+<<xtransform, echo=FALSE, fig.width=4, fig.height=2, include=FALSE>>=
 correctx <- function(z, fprime, a=0, b=2*pi, shrink=0) {
   const <- integrate(function(x) abs(fprime(x)), a, b)$value
   trans <- sapply(z, function(i) integrate(function(x) abs(fprime(x)), a, i)$value*(b-a)/const)
@@ -606,12 +522,7 @@ qplot(x=xtrans, xend=xtrans, y = ystart, yend=yend, colour=I("blue"), geom="segm
   scale_x_continuous(breaks=seq(0, 2*pi, by=pi/2), minor_breaks=minor.axis.correction,
                      labels=c("0", expression(paste(pi,"/2")), expression(pi), expression(paste("3",pi, "/2")), expression(paste("2",pi)))) + 
   geom_point(data=dots, aes(x=x, y=y), inherit.aes=FALSE) 
-@
-\caption{$X$ axis transformation}
-\label{xtrans1}
-\end{subfigure}
-\begin{subfigure}[b]{.48\linewidth}\centering
-<<xtrans-mid,echo=FALSE, fig.width=4, fig.height=2>>=
+
 dots$x2 <- correctx(seq(0, 2*pi, pi/8), fprime, shrink=1)
 
 dframe$xtrans2 <- correctx(dframe$x, fprime=fprime, shrink=1)
@@ -622,13 +533,7 @@ qplot(x=xtrans2, xend=xtrans2, y = ystart, yend=yend, colour=I("blue"), geom="se
   scale_x_continuous(breaks=seq(0, 2*pi, by=pi/2), minor_breaks=minor.axis.correction,
                      labels=c("0", expression(paste(pi,"/2")), expression(pi), expression(paste("3",pi, "/2")), expression(paste("2",pi)))) + 
   geom_point(data=dots, aes(x=x2, y=y), inherit.aes=FALSE) 
-@
-\caption{Weighted Transformation, $w=1$}
-\label{xtrans2}
-\end{subfigure}
 
-\begin{subfigure}[b]{.48\linewidth}\centering
-<<xtrans-mid2,echo=FALSE, fig.width=4, fig.height=2>>=
 dots$x3 <- correctx(seq(0, 2*pi, pi/8), fprime, shrink=2)
 
 dframe$xtrans3 <- correctx(dframe$x, fprime=fprime, shrink=2)
@@ -639,12 +544,7 @@ qplot(x=xtrans3, xend=xtrans3, y = ystart, yend=yend, colour=I("blue"), geom="se
   scale_x_continuous(breaks=seq(0, 2*pi, by=pi/2), minor_breaks=minor.axis.correction,
                      labels=c("0", expression(paste(pi,"/2")), expression(pi), expression(paste("3",pi, "/2")), expression(paste("2",pi))))+ 
   geom_point(data=dots, aes(x=x3, y=y), inherit.aes=FALSE) 
-@
-\caption{Weighted Transformation, $w=2$}
-\label{xtrans3}
-\end{subfigure}
-\begin{subfigure}[b]{.48\linewidth}\centering
-<<xtrans-mid3,echo=FALSE, fig.width=4, fig.height=2>>=
+
 dots$x4 <- correctx(seq(0, 2*pi, pi/8), fprime, shrink=3)
 
 dframe$xtrans4 <- correctx(dframe$x, fprime=fprime, shrink=3)
@@ -656,23 +556,129 @@ qplot(x=xtrans4, xend=xtrans4, y = ystart, yend=yend, colour=I("blue"), geom="se
                      labels=c("0", expression(paste(pi,"/2")), expression(pi), expression(paste("3",pi, "/2")), expression(paste("2",pi))))+ 
   geom_point(data=dots, aes(x=x4, y=y), inherit.aes=FALSE) 
 @
+\begin{figure}[h!tbp]\centering
+\begin{subfigure}[b]{.48\linewidth}\centering
+\includegraphics[keepaspectratio=TRUE,width=\linewidth]{figure/fig-xtransform1}
+\caption{$X$ axis transformation}
+\label{xtrans1}
+\end{subfigure}
+\begin{subfigure}[b]{.48\linewidth}\centering
+\includegraphics[keepaspectratio=TRUE,width=\linewidth]{figure/fig-xtransform2}
+\caption{Weighted Transformation, $w=1$}
+\label{xtrans2}
+\end{subfigure}
+
+\begin{subfigure}[b]{.48\linewidth}\centering
+\includegraphics[keepaspectratio=TRUE,width=\linewidth]{figure/fig-xtransform3}
+\caption{Weighted Transformation, $w=2$}
+\label{xtrans3}
+\end{subfigure}
+\begin{subfigure}[b]{.48\linewidth}\centering
+\includegraphics[keepaspectratio=TRUE,width=\linewidth]{figure/fig-xtransform4}
 \caption{Weighted Transformation, $w=3$}
 \label{xtrans4}
 \end{subfigure}
-\todo[inline]{add 2nd example (maybe in the "application" section?)}
-\caption{$X$ axis transformations. Dots at the bottom of the graph show the transformation's effect on equally spaced points along the $x$-axis. \newdo{I love it!!!!!}  In (a), adjusting the $x$-spacing of the lines mitigates the sine illusion by changing the extant width so that it is uniform in $x$. (b) - (d) shrink the transformation in (a) towards successively more uniform spacings in $x$ while still breaking the effects of the illusion.}
+\caption{$X$ axis transformations. Dots at the bottom of the graph show the transformation's effect on equally spaced points along the $x$-axis. In (a), adjusting the $x$-spacing of the lines mitigates the sine illusion by changing the extant width so that it is uniform in $x$. (b) - (d) shrink the transformation in (a) towards successively more uniform spacings in $x$ while still breaking the effects of the illusion.}
 \label{xtrans}
 \end{figure}
+\todo[inline]{add 2nd example (maybe in the "application" section?)}
 \clearpage
 \subsection{Transformation of the $Y$-Axis}
-Another potentially less disruptive option to break the sine illusion is to transform the line length directly so that the resultant extant width appears to be constant. 
-\subsubsection{Hammock Correction}\label{hammock}
-This approach aims to extend the orthogonal width, which onlookers generally evaluate,  to the amount of the vertical width, which we want to represent \citep{schonlau:2003}. 
+Understanding the geometry of the sine illusion leads to another approach to disrupting the conflict between the extant width and the actual height of the segment. 
 
-\newdo{Careful!!!!  The Trig method has nothing to do with what Matthias Schonlau was doing! It's aseparate approach and we need to highlight its pros and cons separately}
-\comment{I'm confused - the Trig section is just the previously named hammock section, but it was renamed because you didn't want to over-emphasize the hammock plots?}
+<<geometry,echo=FALSE, fig.height=3, fig.width=5, include=FALSE>>=
+f <- function(x, a=1, b=0) a*x + b
+x  <- seq(-.2,.2, .1)
+ell <- .1
+a <- 1
+intx <- ell/(a + 1/a)
+ribbon <- data.frame(x = x, ytop = f(x) + ell, ybottom = f(x)-ell)
+aline <- data.frame(xtop = 0,    xbottom = 0,   ytop = f(0) + ell,  ybottom = f(0) - ell, label="vertical width")
+bline <- data.frame(xtop = -intx, xbottom = intx, ytop = f(-intx)+ell, ybottom = f(intx)-ell, label="extant width")
+widths <- rbind(aline, bline)
+qplot(data=ribbon, x=x, ymin=ybottom, ymax=ytop, geom="ribbon", fill=I("grey")) + 
+  theme_minimal() + 
+  theme(axis.title=element_blank(), axis.text=element_blank(), axis.ticks=element_blank(), 
+        axis.line=element_blank(), panel.grid=element_blank(), legend.position="right", legend.direction="vertical") + 
+  geom_segment(data=widths, aes(x=xbottom, xend = xtop, y=ybottom, yend=ytop, linetype=label)) +
+  geom_text(data=widths, aes(x=mean(c(xbottom[1], xbottom[2], 0)), y=mean(c(ybottom[1], ybottom[2], ybottom[2])), label="theta"), parse=TRUE) +
+  coord_equal(ratio=1) + scale_linetype_discrete("")
+@
+\begin{figure}[h!tbp]
+\begin{center}
+% \includegraphics[width=0.3\linewidth]{images/linewidth}
+\includegraphics[width=.5\linewidth]{figure/fig-geometry}
+\end{center}
+\caption{\label{fig:linewidth}Sketch of line width assessments: The solid line shows vertical width, the dotted line shows  width orthogonal to the slope. \comment{From previous surveys (we could cite Marie's survey here) we know that  observers associate line width more with  orthogonal width than vertical width.}}
+\end{figure}
+% 
+
+Orthogonal $w_o$ and vertical $w_v$ line widths are related -- the orthogonal line width depends on the angle (or, equivalently, the slope) of the line:
+\begin{equation}\label{adjust}
+w_o = w_v \cos \theta,
+\end{equation}
+where $\theta$ is the acute angle between the secant line and the vertical, that is, $\theta \in (-\pi, \pi]$.
+
+<<transform-illustration,echo=FALSE, message=FALSE, warning=FALSE, include=FALSE>>=
+f <- function(x) 2*sin(x)
+fprime <- function(x) 2*cos(x)
+f2prime <- function(x) -2*sin(x)
+library(plyr)
+dframe <- createSine(n = 150, len = 1, f=f, fprime=fprime)
+dframe$ystartcts <- dframe$ystart
+dframe$yendcts <- dframe$yend
+dframe[1:150,c(2, 3, 5, 6)] <- NA
+dframe[(1:15)*10-5, c(2, 3)] <- dframe[(1:15)*10-5, 1] 
+dframe[(1:15)*10-5, 5] <- dframe[(1:15)*10-5, 4] - .5
+dframe[(1:15)*10-5, 6] <- dframe[(1:15)*10-5, 4] + .5
+dframe$type <- "Data"
+
+
+dframe.1 <- getSecantSegment(dframe$xstart, dframe, f, fprime, f2prime)
+dframe.1$x <- dframe$x
+dframe.1$y <- dframe$y
+dframe.1$ystartcts <- dframe$ystartcts
+dframe.1$yendcts <- dframe$yendcts
+names(dframe.1) <- c("x", "y", "deriv", "xstart", "xend", "ystart", "yend", "ell", "ell.quad1", "ell.quad2", "type", "a", "ystartcts", "yendcts")
+# names(dframe.1) <- c("x", "y", "deriv", "xstart", "xend", "ystart", "yend", "ell", "ell.quad1", "ell.quad2", "type")
+# dframe.1 <- dframe.1[!is.na(dframe.1$x),]
+dframe.1$vangle <- with(dframe.1, atan(deriv))
+# dframe.1$x <- dframe$x
+# dframe.1$y <- dframe$y
+# dframe.1$ystartcts <- dframe$ystartcts
+# dframe.1$yendcts <- dframe$yendcts
+dframe <- rbind.fill(dframe, dframe.1)
+
+
+qplot(x=x, y=y, geom="line", data=dframe, colour=I("grey50")) + theme_bw() + 
+  geom_line(aes(y=ystartcts), colour="grey50", linetype=4) + 
+  geom_line(aes(y=yendcts), colour="grey50", linetype=4) +
+  geom_segment(data=subset(dframe, !is.na(type)), aes(x=xstart, xend = xend, y=ystart, yend=yend, colour=type))  + 
+  coord_equal(ratio=1) + scale_colour_manual("", values=c("black", "blue")) + theme(legend.position="bottom")  + 
+#   geom_text(aes(label=paste(round(vangle/pi*180), "^o", sep=""),
+#                 x=xstart*(x<pi/2 | x>1.5*pi) + xend*(x>pi/2 & x<1.5*pi), y=ystart*(x<pi/2 | x<1.5*pi) + yend*(x>pi/2 & x<1.5*pi)), 
+#             data=dframe.1, parse=TRUE, hjust=1, vjust=.5, size=2.5) + 
+  geom_text(aes(label=paste("theta", "%~~%", round(abs(vangle)/pi*180), "^o", sep=""),
+                x=pmax(xstart, xend)/2+x/2+.2, y=y-sign(vangle)*.6+.02), 
+            data=dframe.1, parse=TRUE, hjust=.9, vjust=.5, size=3) + 
+  scale_x_continuous(breaks=seq(0, 2*pi, by=pi/2), 
+                     labels=c("0", expression(paste(pi,"/2")), expression(pi), expression(paste("3",pi, "/2")), expression(paste("2",pi)))) #+ 
+  # facet_wrap(~type)
+  # + ggtitle("Changes in Perceived Orthogonal Width \ndue to Change in Secant Angle")
+@
+\begin{figure}[h!tbp]
+\centering
+\includegraphics[width=.45\linewidth, keepaspectratio=TRUE]{figure/fig-transform-illustration}
+\caption{\label{OrthogonalWidth} Changes in perceived orthogonal width due to the change in secant angle. 
+}
+\end{figure}
+The perceived length of the vertical line changes with the angle of the line perpendicular to the slope of $\sin(x)$, suggesting that the sine illusion stems from a conflict between the visual system's perception of figure width and the mathematical judgement necessary to determine the length of the vertical lines.
+
+The visual preference for judging the length of the line by the orthogonal extant suggests that the underlying illusion may be a function of geometry rather than some mysterious visual process that occurs automatically between perception of the stimulus and conscious thought. 
+
+\newtext{If this is the case, then it may be  possible to correct the graphical display for so that it is not as visually deceptive. Our first approach to this is to compare the (perceived) orthogonal width to the (information-carrying) vertical length of the line. By adjusting the vertical line such that the orthogonal width displays the quantity of interest, we can match the audience's intuitive expectation with the data. This is still dependent on having a functional form for $f(x)$ which has derivative $f^\prime(x)$ on the range of $x$ within the data, as we will determine $\theta$ based on the slope of the secant line, $-1/f^\prime(x)$.} 
 \subsubsection{Trigonometry Method}\label{trig}
-
+This approach aims to extend the orthogonal width, which onlookers generally evaluate,  to the amount of the vertical width, which we want to represent. While previous work in \citet{schonlau:2003} used this adjustment for a line with constant slope, we must extend this approach to $f(x)$ with non-constant derivative $f^\prime(x)$ which may vary continuously. 
 <<trigmethodcartoon,echo=FALSE, include=FALSE, cache=FALSE>>=
 f <- function(x) 2*sin(x)
 fprime <- function(x) 2*cos(x)
@@ -683,35 +689,69 @@ dfsec <- getSecantSegment(df$x[a], df, f, fprime, f2prime)
 dfslope <- data.frame(xstart=df$x[a]+.5, xend=df$x[a]-.9, ystart=fprime(df$x[a])*.5+df$y[a], yend=-.9*fprime(df$x[a])+df$y[a])
 dfslope2 <- data.frame(xstart=df$x[a]+.5, xend=df$x[a]-.3, ystart=fprime(df$x[a])*.5+df$y[a]+.5, yend=-.3*fprime(df$x[a])+df$y[a]+.5)
 ftsize <- 4
+
+df <- createSine(40 , len=1, f=f, fprime=fprime)[5:16,]
+
+a <- 9
+df.real <- data.frame(x=seq(df$x[1], df$x[12], by=.001))
+df.real$y <- f(df.real$x)
+df.real$yupper <- fprime(df$x[a])*(df.real$x-df$x[a])+f(df$x[a])+.5
+df.real$yupper[which(abs(df.real$x-2)>.5)] <- NA
+df.real$ylower <- fprime(df$x[a])*(df.real$x-df$x[a])+f(df$x[a])-.5
+df.real$ylower[which(abs(df.real$x-2)>.5)] <- NA
+df.real$sec <- -1/fprime(df$x[a])*(df.real$x-df$x[a])+f(df$x[a])
+df.real$sec[which(abs(df.real$x-2)>.5)] <- NA
+dfslope <- data.frame(xstart=df$x[a]+.5, xend=df$x[a]-.9, ystart=fprime(df$x[a])*.5+df$y[a], yend=-.9*fprime(df$x[a])+df$y[a])
+dfslope2 <- data.frame(xstart=df$x[a]+.5, xend=df$x[a]-.3, ystart=fprime(df$x[a])*.5+df$y[a]+.5, yend=-.3*fprime(df$x[a])+df$y[a]+.5)
+
 cairo_pdf("./figure/fig-trigmethodcartoon.pdf", width=5, height=5)
-ggplot(data=df, aes(x=xstart, xend=xend, y=ystart, yend=yend)) + theme_bw() + coord_fixed(ratio=1) + 
-  geom_segment(colour="grey30") + 
-  geom_segment(data=df[a,], aes(x=xend-.008, xend=x-.008, y=yend, yend=y), colour="grey50") + 
-  geom_point(aes(x=x, y=y)) + 
-  geom_segment(data=df[a,], aes(x=xstart, xend=xend, y=ystart, yend=yend)) + 
-  geom_segment(data=dfsec, aes(x=sec.xstart+.005, xend=x+.005, y=sec.ystart-.005, yend=y-.005), colour="grey50") + 
-  geom_segment(data=dfsec, aes(x=sec.xstart, xend=sec.xend, y=sec.ystart, yend=sec.yend)) + 
-  geom_text(aes(x=dfsec$sec.xend, y=dfsec$sec.yend-.05, 
-                label="slope: -1/paste(f, \"'\", (x))"), parse=TRUE, hjust=.75, vjust=1) +
-  geom_segment(data=dfslope, linetype=2) + 
-  geom_segment(data=dfslope2, linetype=2) + 
+qplot(data=df.real, x=x, y=y, geom="line") + theme_minimal() + coord_equal(ratio=1) +
+  geom_line(data=df.real,aes(y=yupper), linetype=3) + 
+  geom_line(data=df.real,aes(y=ylower), linetype=4) + 
+  geom_segment(data=df, aes(x=xstart, y=ystart, xend=xend, yend=yend), colour="grey50") + 
+  geom_segment(data=df[a,], aes(x=xstart, y=ystart, xend=xend, yend=yend), colour="black", size=1.5)+
+  geom_line(data=df.real, aes(y=sec)) + 
   geom_text(data=dfslope, aes(x=xend+.1, y=yend+.05, label="slope: paste(f, \"'\", (x))"), parse=TRUE, hjust=0, vjust=1) +
-  geom_text(aes(x=mean(c(dfsec$sec.xstart, df$xend[a], df$x[a], df$x[a])), 
-                y=mean(c(dfsec$sec.ystart, df$yend[a], df$y[a], df$y[a])), 
-                label="theta"), parse=TRUE, size=ftsize) +
-#   geom_text(aes(x=dfslope$xend,  y=dfslope$yend+.075, 
-#                 label=paste("paste(y == f, \"'\", (x[0]) (x-x[0]) + f(x[0]))")), 
-#             parse=TRUE, hjust=.25, size=ftsize) + 
-  geom_text(data=df[a,], aes(x=.5*xend-.03 + .5*x, y=.5*yend+.5*y, label="\u2113"), size=ftsize+1, face="bold") +
-  geom_text(aes(x=.5*dfsec$sec.xstart+ .5*dfsec$x +.05 , y=.5*dfsec$sec.ystart+.5*dfsec$y-0.05, label="italic(m)"), parse=TRUE, face="plain") + 
-  xlab("x") + ylab("y") 
+  geom_text(aes(x=mean(c(dfsec$sec.xstart, df$xend[a], df$x[a], df$x[a]))+.04, 
+                y=mean(c(dfsec$sec.ystart, df$yend[a], df$y[a], df$y[a]))+.04, 
+                label="theta"), parse=TRUE, size=ftsize+1) +
+  geom_text(aes(x=df.real$x[which.min(df.real$sec)], y=min(df.real$sec, na.rm=TRUE)-.05, 
+                label="slope: paste(-1/f, \"'\", (x))"), parse=TRUE, hjust=.75, vjust=1) +
+  geom_text(data=df[a,], aes(x=.5*xend-.05 + .5*x, y=.5*yend+.5*y, label="paste(frac(\u2113, 2))"), size=ftsize+1, face="bold", parse=TRUE) +
+  geom_text(aes(x=.5*dfsec$sec.xstart+ .5*dfsec$x +.05 , y=.5*dfsec$sec.ystart+.5*dfsec$y-0.03, label="italic(m)"), parse=TRUE, face="plain") + 
+  xlab("x") + ylab("y") +
+  geom_segment(data=dfslope, aes(x=xstart, y=ystart, xend=xend, yend=yend), linetype=2) + theme(axis.title=element_blank(), axis.text=element_blank(), axis.ticks=element_blank(), axis.line=element_blank(), panel.grid=element_blank())
+
 dev.off()
+# ggplot(data=df, aes(x=xstart, xend=xend, y=ystart, yend=yend)) + theme_bw() + coord_fixed(ratio=1) + 
+#   geom_segment(colour="grey30") + 
+#   geom_segment(data=df[a,], aes(x=xend-.008, xend=x-.008, y=yend, yend=y), colour="grey50") + 
+#   geom_point(aes(x=x, y=y)) + 
+#   geom_segment(data=df[a,], aes(x=xstart, xend=xend, y=ystart, yend=yend)) + 
+#   geom_segment(data=dfsec, aes(x=sec.xstart+.005, xend=x+.005, y=sec.ystart-.005, yend=y-.005), colour="grey50") + 
+#   geom_segment(data=dfsec, aes(x=sec.xstart, xend=sec.xend, y=sec.ystart, yend=sec.yend)) + 
+# 
+#   geom_segment(data=dfslope, linetype=2) + 
+#   geom_segment(data=dfslope2, linetype=2) + 
+#   geom_text(data=dfslope, aes(x=xend+.1, y=yend+.05, label="slope: paste(f, \"'\", (x))"), parse=TRUE, hjust=0, vjust=1) +
+#   geom_text(aes(x=mean(c(dfsec$sec.xstart, df$xend[a], df$x[a], df$x[a])), 
+#                 y=mean(c(dfsec$sec.ystart, df$yend[a], df$y[a], df$y[a])), 
+#                 label="theta"), parse=TRUE, size=ftsize) +
+# #   geom_text(aes(x=dfslope$xend,  y=dfslope$yend+.075, 
+# #                 label=paste("paste(y == f, \"'\", (x[0]) (x-x[0]) + f(x[0]))")), 
+# #             parse=TRUE, hjust=.25, size=ftsize) + 
+#   geom_text(data=df[a,], aes(x=.5*xend-.03 + .5*x, y=.5*yend+.5*y, label="\u2113"), size=ftsize+1, face="bold") +
+#   geom_text(aes(x=.5*dfsec$sec.xstart+ .5*dfsec$x +.05 , y=.5*dfsec$sec.ystart+.5*dfsec$y-0.05, label="italic(m)"), parse=TRUE, face="plain") + 
+#   xlab("x") + ylab("y") 
+
 @
 \begin{figure}[h!tbp]\centering
 \includegraphics[keepaspectratio=TRUE,width=.5\linewidth]{figure/fig-trigmethodcartoon}
-\caption{Geometry of the trigonometry correction approach.}
+\caption{Geometry of the trigonometry correction approach. $\ell$ denotes the length of the entire vertical segment, hence, $\ell/2$ is the length of the portion above the mean function.}
 \end{figure}
-\comment{The picture is wrong here, but I can't figure out how the extant width in the trig method was actually calculated. It seems like it should be like this, but either we're assuming a right angle and shouldn't be (use law of cosines instead) or I'm being an idiot, but the picture looks exactly like that for linear fix, and I know it isn't the same method!}
+\todo[inline]{
+%The picture is wrong here, but I can't figure out how the extant width in the trig method was actually calculated. It seems like it should be like this, but either we're assuming a right angle and shouldn't be (use law of cosines instead) or I'm being an idiot, but the picture looks exactly like that for linear fix, and I know it isn't the same method!
+For the time being, I'm using the linear approximation picture, but we need to add the math in to justify them as the same correction (and also need to fix the aspect ratio correction in the functions)}
 
 Our goal is to make the segment $m$ appear as long as the segment $\ell$. As the angle $\theta$ is determined by the slope of the tangent line, that is, 
 $$\tan \theta = \left|f^\prime(x)\right|$$ 
@@ -719,7 +759,7 @@ we can solve for $\theta$ to get $\atan{\left|f^\prime(x)\right|} = \theta$.
 Then 
 $\cos(\theta) = \cos(\atan{\left|f^\prime(x)\right|}) = m/\ell$ and 
 $$\left[\cos(\atan{\left|f^\prime(x)\right|})\right]^{-1} = \ell/m$$ That is, we have to scale $\ell$ by a factor of 
-$\left[\cos(\atan{\left|f^\prime(x)\right|})\right]^{-1}$ to make the extant width appear as long as $\ell$ in the original graph. 
+$\left[\cos(\atan{\left|f^\prime(x)\right|})\right]^{-1}$ to make the extant width $m$ appear as long as $\ell$ in the original graph. 
 % We first multiply the vertical width by a factor of $1/\cos\theta$, where $\theta$ is the angle under which the line is drawn. This angle is given by the slope of the function, mathematically we know that in position $x$ the angle $\theta(x)$ of function $f(x)$ is given as:
 % \[
 % \tan \theta (x) = f^\prime (x).
@@ -760,24 +800,46 @@ qplot(x=x, xend=xend, y = f(x) -ellx2/2, yend=f(x) +ellx2/2, geom="segment", dat
 \end{subfigure}
 \begin{subfigure}[b]{.48\linewidth}\centering
 \includegraphics[width=\linewidth,keepaspectratio=TRUE]{figure/fig-trigFix2}
-\caption{Trigonometry correction}
+\caption{Trigonometic correction}
 \end{subfigure}
 \caption{Fix of the sine illusion by using the factor of $1/\cos\left(\atan{|\cos(x)|}\right)$} to adjust the vertical extent of the lines.  
 \label{trigFix} 
 \end{figure}
+
 \subsubsection{A General Correction Method}
-Another method for adjusting the vertical length to ensure constant extant width is to solve the system of equations
+\begin{figure}[h!]\centering
+\begin{subfigure}[c]{.6\linewidth}
+\includegraphics[keepaspectratio=TRUE,width=\linewidth]{figure/fig-generalcorrectioncartoon1}
+\caption{General Correction}
+\label{GeneralCorrection}
+\end{subfigure}
+\begin{minipage}[c]{.38\linewidth}\centering
+\begin{subfigure}[b]{\linewidth}\centering
+\includegraphics[keepaspectratio=TRUE,width=\linewidth]{figure/fig-generalcorrectioncartoon2}
+\caption{Linear Approximation}\label{linear-GeneralCorrection}
+\end{subfigure}
+\begin{subfigure}[b]{\linewidth}\centering
+\includegraphics[keepaspectratio=TRUE,width=\linewidth]{figure/fig-generalcorrectioncartoon3}
+\caption{Quadratic Approximation}\label{quadratic-GeneralCorrection}
+\end{subfigure}
+\end{minipage}
+\caption{General correction approach. (a) may require numerical optimization to obtain exact solutions for $(x_u, y_u)$ and $(x_l, y_l)$. (b) uses a first-order taylor series approximation to $f(x)$ and (c) uses a second-order taylor series approximation to $f(x)$. The intersection of the function $f(x) \pm \ell/2$ and the secant line,  $(x_u, y_u), (x_l, y_l)$ must be obtained to determine the necessary correction factor.}\label{GeneralCorrection-all}
+\end{figure}
+
+As shown in Figure \ref{GeneralCorrection-all}, another method for adjusting the vertical length to ensure constant extant width is to solve the systems of equations\\
+\begin{minipage}[t]{.495\linewidth}
 \begin{align*}
 y_u & = f(x_u) + \ell/2\\
 y_u & = \left(-1/f^\prime(x_0)\right) x_u + f(x_0) + x_0/f^\prime(x_0)
-\end{align*}
-for the upper endpoint $(x_u,y_u)$ at which the secant line intersects the top portion of the graph. Similarly, we would need to solve 
+\end{align*}\vspace{8pt}
+\end{minipage}
+\begin{minipage}[t]{.495\linewidth}
 \begin{align*}
 y_l & = f(x_l) - \ell/2\\
 y_l & = \left(-1/f^\prime(x_0)\right) x_l + f(x_0) + x_0/f^\prime(x_0)
 \end{align*}
-
-to obtain the lower endpoint $(x_l, y_l)$. This processis illustrated in Figure \ref{GeneralCorrection}. With these two endpoints, we can correct separately for the top and bottom portions of the line, as the extant width is not symmetric when reflected across the original function f(x). 
+\end{minipage}\\
+to obtain  $(x_u,y_u)$, the point at which the secant line intersects $f(x) + \ell/2$, and $(x_l, y_l)$, thet point at which the secant line intersects $f(x) -\ell/2$. With these two endpoints, we can correct separately for the top and bottom portions of the line, as the extant width is not symmetric when reflected across the original function f(x). 
 
 <<generalcorrectioncartoon,echo=FALSE, include=FALSE, fig.width=4, fig.height=4>>=
 f <- function(x) 2*sin(x)
@@ -793,20 +855,18 @@ df.real$ylower <- df.real$y-.5
 dfsec <- getSecantSegment(df$x[a], df, f, fprime, f2prime)
 dfslope <- data.frame(xstart=df$x[a]+.5, xend=df$x[a]-.9, ystart=fprime(df$x[a])*.5+df$y[a], yend=-.9*fprime(df$x[a])+df$y[a])
 dfslope2 <- data.frame(xstart=df$x[a]+.5, xend=df$x[a]-.3, ystart=fprime(df$x[a])*.5+df$y[a]+.5, yend=-.3*fprime(df$x[a])+df$y[a]+.5)
-qplot(data=df.real, x=x, y=y, geom="line") + theme_bw() +
+qplot(data=df.real, x=x, y=y, geom="line") + theme_minimal() +
   geom_line(data=df.real,aes(y=yupper), linetype=3) + 
   geom_line(data=df.real,aes(y=ylower), linetype=4) + 
   geom_segment(data=df, aes(x=xstart, y=ystart, xend=xend, yend=yend), colour="grey50") + 
   geom_segment(data=df[a,], aes(x=xstart, y=ystart, xend=xend, yend=yend), colour="black", size=1.5)+
-  geom_segment(data=dfsec, aes(x=sec.xstart+.005, xend=x+.005, y=sec.ystart-.005, yend=y-.005), colour="grey50") + 
   geom_segment(data=dfsec, aes(x=sec.xstart, xend=sec.xend, y=sec.ystart, yend=sec.yend)) + 
-#   geom_text(aes(x=dfsec$sec.xend, y=dfsec$sec.yend-.05, 
-#                 label="slope: -1/paste(f, \"'\", (x))"), parse=TRUE, hjust=.75, vjust=1) +
+  geom_point(data=dfsec, aes(x=sec.xstart, y=sec.ystart)) + geom_point(data=dfsec, aes(x=sec.xend, y=sec.yend)) +
   geom_segment(data=dfslope, aes(x=xstart, y=ystart, xend=xend, yend=yend), linetype=2) + 
-  geom_text(data=dfsec, aes(x=sec.xstart+.02, y=sec.ystart+.04, label="paste(group('(',list(x[u],y[u]),')'))"), parse=TRUE, hjust=0) + 
-  geom_text(data=dfsec, aes(x=sec.xend, y=sec.yend-.06, label="paste(group('(',list(x[l],y[l]),')'))"), parse=TRUE, hjust=.9) +   
-  geom_text(data=dfslope, aes(x=xend+.1, y=yend+.05, label="slope: paste(f, \"'\", (x))"), parse=TRUE, hjust=0, vjust=1) +
-  coord_equal(ratio=1)
+  geom_text(data=dfsec, aes(x=sec.xstart, y=sec.ystart+.05, label="paste(group('(',list(x[u],y[u]),')'))"), parse=TRUE, hjust=0) + 
+  geom_text(data=dfsec, aes(x=sec.xend, y=sec.yend-.08, label="paste(group('(',list(x[l],y[l]),')'))"), parse=TRUE, hjust=.9) +   
+  geom_text(data=dfslope, aes(x=xend+.1, y=yend+.1, label="slope: paste(f, \"'\", (x))"), parse=TRUE, hjust=.75, vjust=1) +
+  coord_equal(ratio=1) + theme(axis.title=element_blank(), axis.text=element_blank(), axis.ticks=element_blank(), axis.line=element_blank(), panel.grid=element_blank())
 
 df <- createSine(40 , len=1, f=f, fprime=fprime)[5:16,]
 
@@ -819,19 +879,24 @@ df.real$ylower <- fprime(df$x[a])*(df.real$x-df$x[a])+f(df$x[a])-.5
 df.real$ylower[which(abs(df.real$x-2)>.5)] <- NA
 df.real$sec <- -1/fprime(df$x[a])*(df.real$x-df$x[a])+f(df$x[a])
 df.real$sec[which(abs(df.real$x-2)>.5)] <- NA
+df.real$sec[which(df.real$sec>df.real$yupper | df.real$sec<df.real$ylower)] <- NA
 dfslope <- data.frame(xstart=df$x[a]+.5, xend=df$x[a]-.9, ystart=fprime(df$x[a])*.5+df$y[a], yend=-.9*fprime(df$x[a])+df$y[a])
 dfslope2 <- data.frame(xstart=df$x[a]+.5, xend=df$x[a]-.3, ystart=fprime(df$x[a])*.5+df$y[a]+.5, yend=-.3*fprime(df$x[a])+df$y[a]+.5)
-qplot(data=df.real, x=x, y=y, geom="line") + theme_bw() + coord_equal(ratio=1) +
+qplot(data=df.real, x=x, y=y, geom="line") + theme_minimal() + coord_equal(ratio=1) +
   geom_line(data=df.real,aes(y=yupper), linetype=3) + 
   geom_line(data=df.real,aes(y=ylower), linetype=4) + 
   geom_segment(data=df, aes(x=xstart, y=ystart, xend=xend, yend=yend), colour="grey50") + 
   geom_segment(data=df[a,], aes(x=xstart, y=ystart, xend=xend, yend=yend), colour="black", size=1.5)+
   geom_line(data=df.real, aes(y=sec)) + 
-#   geom_text(aes(x=dfsec$sec.xend, y=dfsec$sec.yend-.05, 
-#                 label="slope: -1/paste(f, \"'\", (x))"), parse=TRUE, hjust=.75, vjust=1) +
+  geom_point(data=df.real[which.min(df.real$sec),], aes(x=x, y=sec), size=2) + 
+  geom_point(data=df.real[which.max(df.real$sec),], aes(x=x, y=sec), size=2) +
   geom_segment(data=dfslope, aes(x=xstart, y=ystart, xend=xend, yend=yend), linetype=2) + 
-  geom_text(data=dfsec, aes(x=sec.xstart+.44, y=sec.ystart, label="paste(group('(',list(x[u],y[u]),')'))"), parse=TRUE, hjust=1, vjust=.25) + 
-  geom_text(data=dfsec, aes(x=sec.xend-.34, y=sec.yend, label="paste(group('(',list(x[l],y[l]),')'))"), parse=TRUE, hjust=0, vjust=.25) 
+  geom_text(data=df.real[which.min(df.real$sec),], aes(x=x, y=sec-0.08, label="paste(group('(',list(x[l],y[l]),')'))"), 
+            parse=TRUE, hjust=1, vjust=.25) + 
+  geom_text(data=df.real[which.max(df.real$sec),], aes(x=x-.05, y=sec+.05, label="paste(group('(',list(x[u],y[u]),')'))"), 
+            parse=TRUE, hjust=0, vjust=.25)  + 
+  theme(axis.title=element_blank(), axis.text=element_blank(), axis.ticks=element_blank(), axis.line=element_blank(), panel.grid=element_blank())
+
 
 df <- createSine(40 , len=1, f=f, fprime=fprime)[5:16,]
 
@@ -844,35 +909,24 @@ df.real$ylower <- .5*f2prime(df$x[a])*(df.real$x-df$x[a])^2 + fprime(df$x[a])*(d
 df.real$ylower[which(abs(df.real$x-2)>.5)] <- NA
 df.real$sec <- -1/fprime(df$x[a])*(df.real$x-df$x[a])+f(df$x[a])
 df.real$sec[which(abs(df.real$x-2)>.5)] <- NA
+df.real$sec[which(df.real$sec>df.real$yupper | df.real$sec<df.real$ylower)] <- NA
 dfslope <- data.frame(xstart=df$x[a]+.5, xend=df$x[a]-.9, ystart=fprime(df$x[a])*.5+df$y[a], yend=-.9*fprime(df$x[a])+df$y[a])
 dfslope2 <- data.frame(xstart=df$x[a]+.5, xend=df$x[a]-.3, ystart=fprime(df$x[a])*.5+df$y[a]+.5, yend=-.3*fprime(df$x[a])+df$y[a]+.5)
-qplot(data=df.real, x=x, y=y, geom="line") + theme_bw() + coord_equal(ratio=1) +
+qplot(data=df.real, x=x, y=y, geom="line") + theme_minimal() + coord_equal(ratio=1) +
   geom_line(data=df.real,aes(y=yupper), linetype=3) + 
   geom_line(data=df.real,aes(y=ylower), linetype=4) + 
   geom_segment(data=df, aes(x=xstart, y=ystart, xend=xend, yend=yend), colour="grey50") + 
   geom_segment(data=df[a,], aes(x=xstart, y=ystart, xend=xend, yend=yend), colour="black", size=1.5)+
   geom_line(data=df.real, aes(y=sec)) + 
-#   geom_text(aes(x=dfsec$sec.xend, y=dfsec$sec.yend-.05, 
-#                 label="slope: -1/paste(f, \"'\", (x))"), parse=TRUE, hjust=.75, vjust=1) +
+  geom_point(data=df.real[which.min(df.real$sec),], aes(x=x, y=sec), size=2) + 
+  geom_point(data=df.real[which.max(df.real$sec),], aes(x=x, y=sec), size=2) +
   geom_segment(data=dfslope, aes(x=xstart, y=ystart, xend=xend, yend=yend), linetype=2) + 
-  geom_text(data=dfsec, aes(x=sec.xstart+.4, y=sec.ystart, label="paste(group('(',list(x[u],y[u]),')'))"), parse=TRUE, hjust=1, vjust=.25) + 
-  geom_text(data=dfsec, aes(x=sec.xend-.34, y=sec.yend-.075, label="paste(group('(',list(x[l],y[l]),')'))"), parse=TRUE, hjust=0, vjust=.25) 
+  geom_text(data=df.real[which.min(df.real$sec),], aes(x=x, y=sec-0.08, label="paste(group('(',list(x[l],y[l]),')'))"), 
+            parse=TRUE, hjust=1, vjust=.25) + 
+  geom_text(data=df.real[which.max(df.real$sec),], aes(x=x-.05, y=sec+.05, label="paste(group('(',list(x[u],y[u]),')'))"), 
+            parse=TRUE, hjust=0, vjust=.25)  + 
+  theme(axis.title=element_blank(), axis.text=element_blank(), axis.ticks=element_blank(), axis.line=element_blank(), panel.grid=element_blank())
 @
-\begin{figure}[h!tbp]\centering
-\begin{subfigure}[b]{.32\linewidth}\centering
-\includegraphics[keepaspectratio=TRUE,width=\linewidth]{figure/fig-generalcorrectioncartoon1}
-\caption{General Correction}\label{GeneralCorrection}
-\end{subfigure}
-\begin{subfigure}[b]{.32\linewidth}\centering
-\includegraphics[keepaspectratio=TRUE,width=\linewidth]{figure/fig-generalcorrectioncartoon2}
-\caption{Linear Approximation}\label{linear-GeneralCorrection}
-\end{subfigure}
-\begin{subfigure}[b]{.32\linewidth}\centering
-\includegraphics[keepaspectratio=TRUE,width=\linewidth]{figure/fig-generalcorrectioncartoon3}
-\caption{Quadratic Approximation}\label{quadratic-GeneralCorrection}
-\end{subfigure}
-\caption{General correction approach. (a) may require numerical optimization to obtain an exact solution, (b) uses a first-order taylor series approximation to $f(x)$ and (c) uses a second-order taylor series approximation to $f(x)$. The intersection of the function $f(x) \pm \ell/2$ and the secant line,  $(x_u, y_u), (x_l, y_l)$ must be obtained to determine the necessary correction factor.}
-\end{figure}
 
 As the solutions to these two sets of equations requires numerical optimization to obtain, at least for $f(x) = sin(x)$, Taylor approximations can be employed to reduce the computational requirements. Approximations derived from the first and second-order taylor approximations are described in the following sections.
 
@@ -885,7 +939,7 @@ y & = \left(-1/f^\prime(x_0)\right) x + f(x_0) + x_0/f^\prime(x_0)
 
 Figure \ref{linear-GeneralCorrection} shows the linear approximation to $f(x) \pm \ell/2$ and the secant line. Solving the system of equations provides endpoints $(x_l, y_l)$ and $(x_u, y_u)$ which can then be used to compute the extant width of the line connecting $(x_l, y_l)$ and $(x_u, y_u)$. We then scale the vertical line length so that the extant width is equal to the original value of $\ell/2$. This correction factor is 
 \begin{equation}\label{LinearApprox}
-1/\left(\sqrt{1 + f^\prime(x)^2}\right)
+1/\left(\sqrt{1 + f^\prime(x)^2}\right) = (\atan(f^\prime(x)))^\prime/f^{\prime\prime}(x)
 \end{equation}
 
 \begin{figure}[h!btp]
@@ -911,7 +965,7 @@ y & = f(x_0) + f(x_0) + f^\prime(x_0)(x-x_0) + 1/2 f^{\prime\prime}(x_0)(x-x_0)^
 y & = \left(-1/f^\prime(x_0)\right) x + f(x_0) + x_0/f^\prime(x_0)
 \end{align*}
 
-As shown in Figure \ref{quadratic-GeneralCorrection}, solving the system of equations provides endpoints $(x_l, y_l)$ and $(x_u, y_u)$ which can then be used to compute the extant width of each half-segment $\ell_\perp$. Unlike the linear solution, the half-segments here are not of the same length, as shown in Figure \ref{HalfSegLength}, and thus there are separate correction factors for each half-segment. The correction factors are $(\ell/2)/(\ell_{\perp_u})$ and $(\ell/2)/(\ell_{\perp_l})$ respectively. 
+As shown in Figure \ref{quadratic-GeneralCorrection}, solving the system of equations provides endpoints $(x_l, y_l)$ and $(x_u, y_u)$ which can then be used to compute the extant width of each half-segment $m$. Unlike the linear solution, the half-segments here are not of the same length, as shown in Figure \ref{HalfSegLength}, and thus there are separate correction factors for each half-segment. The correction factors are $(\ell/2)/(m_u)$ and $(\ell/2)/(m_l)$ respectively. 
 <<CtsQuadratic, echo=FALSE, include=FALSE>>=
 f <- function(x) 2*sin(x)
 fprime <- function(x) 2*cos(x)
