@@ -430,7 +430,7 @@ M Bach's applet  gives the option to compensate the line length manually for its
 \newtext{
 When we judge the variability of data, we must overcome the visual bias due to the sine illusion. As it turns out, this illusion is incredibly difficult to overcome even when we are aware of its presence: our brains simply cannot ``un-see" the illusion. What follows is a compilation of various methods to correct for or mitigate the effect of these two illusions, intended primarily to demonstrate how pervasive the illusion is and the extreme methods necessary to remove its' effect. }
 \todo[inline]{Add in "we do not expect that these methods will be used in practice" here or at the end?}
-
+\newdo{let's put that to the end - we don't want to take the wind out of the readers' sails now.}
 
 \section{Breaking the Illusion}
 As the illusion is caused by a conflict between the vertical length and the width orthogonal to the slope, it can be resolved by making the orthogonal width constant. This can be accomplished in several ways: by separating the trend and the variability, by forcing the slope to be constant (by reparameterizing the $x$ axis), or by making the lines appear to be of the same height by adjusting their lengths to maintain a constant orthogonal width. Each of these approaches is discussed in the following section.
@@ -486,8 +486,50 @@ Geometrically, we want to change the x-axis spacing so that the absolute slope o
 That is, if the $x$-axis spans the interval $[a,b)$, the transformation of the $x$ axis is 
 $$T(x) = a + (b-a)\left(\int_a^x |f^\prime(z)| dz\right)/\left(\int_a^b|f^\prime(z)| dz\right)$$ 
 
+\newdo{the \$\$ way of defining math environments is easy, but make a habit of actually numbering and naming important equations so that you can refer to it. }
+
+\begin{equation}\label{eq.x.transformation}
+T(x) = ...
+\end{equation}
+
+\newdo{the above definition of $T(x)$ still is not reflecting what you actually do in the code. Let's look at it from the other end:}
+
+The idea of correcting for the illusion is to make all lines appear under the same slope, i.e. we want to find a transformation $\tilde{x}$ of $x$, such that $f(\tilde{x})$ is a  piece-wise linear function, where each piece has the same absolute slope. Since the slope is determined by the aspect ratio, we are free to choose it and w.l.o.g. we get for each piece $T_i$: 
+\[
+f(T_i(x)) = \pm a x + b_i.
+\]
+This means that $T_i$ is essentially an inverse of function $f$, with each piece defined by the   intervals on which the inverse of $f$ exists: let ${x_0, ..., x_K}$ be the set of values, for which the derivative of $f$ is zero, i.e. $f^\prime(x_i) = 0$ for all $i = 0, ... , K$. 
+Then each interval of the form $(x_{i-1}, x_i)$ defines one piece $T_i$ of the transfomation function $T(x)$. We will define $T_i$ now as a combination of a linear scaling function and the inverse of $f$, which we know exists for interval $(x_{i-1}, x_i)$.
+
+Let function $s$ be the linear scaling function that maps  the interval $(c, d)$ linearly to the interval  defined by the end points $f(x_{i-1})$ and $f(x_i))$. Function $s$ is given as :
+\[
+s_{[c,d]}(x) = f(x_{i-1}) + (x-c)/(d-c) \cdot (f(x_{i}) - f(x_{i-1}))).
+\]
+Note that $s$ has either a positive or negative slope depending on whether $f(x_{i-1})$ is smaller or larger than $f(x_i)$, respectively.
+
+Then the transformation in the $x$-axis, $T(x)$ is defined piecewise as a combination of $T_i$, where each $T_i$ is given as:
+\begin{eqnarray}\label{eq.x.transformation}
+T_i(x) &=& f^{-1}\left( s_{[c_i,d_i]}(x) \right). 
+\end{eqnarray}
+
+\newdo{still need to show that $f(T(x)$ is a linear function, i.e. compute $a$ (in particular this $a$ has to be the same for all $i$ -- here it will turn out to be 1) and $b_i$)}
+
+Note that parameters $c$ and $d$ determine the speed with which the transfomation happens, i.e. for $x \in (c,d)$ we have
+\[
+f(T(x)) = f (f^{-1}(s_{[c_i,d_i]} (x))) = f(x_{i-1}) + (x-c_i)/(d_i-c_i) \cdot (f(x_{i}) - f(x_{i-1}))).
+\]
+Correspondingly, the slope of $f(T_i(x))$ is given as $(f(x_{i}) - f(x_{i-1})))/(d_i-c_i)$.
+In order to make the slope the same on all pieces $T_i$, we need to define $c_i$ and $d_i$ with respect to the function values on the interval $(x_{i-1}, x_i)$. There are various options, depending on how closely our $x$-range should reflect the original range:
+\begin{itemize}
+\item for $c_i = \min{f({x_{i-1}), f(x_i))$ and $d_i = \max{f({x_{i-1}), f(x_i))$ the new $x$-range is the original $y$ range. 
+
+\item an additional scaling reflecting the ratio of original $y$- and $x$-ranges will result in the  $x$-range being preserved. This happens  for $c_i = \range(x)/\range(f(x)) \min{f({x_{i-1}), f(x_i))$ and $d_i = \range(x)/\range(f(x)) \max{f({x_{i-1}), f(x_i))$. 
+\end{itemize}
+
+\newdo{this is a good motivation, but put it before the math.}
 \newtext{
 This transformation can be considered as a reparameterization of the $x$ axis in terms of the slope. As the sine illusion depends on changing slope in the overall trend, by reparameterizing the $x$-axis in terms of the slope, the data seem to have constant slope, removing the illusion, while the $x$-axis shows the changing slope. The transformation is shown in Figure \ref{xtrans1}. An analysis of $T(x)$ is shown in appendix \ref{XtransAppendix}.}
+
 
 In practice we can see that the illusion can be broken by a much less severe transformation in $x$. 
 \newtext{By shrinking the transformation in Figure \ref{xtrans1} towards the original $x$ values by a factor of $w$, the illusion is still broken and the data are closer to the original function $y=f(x)$. 
