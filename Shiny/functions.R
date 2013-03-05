@@ -1,6 +1,7 @@
+library(gridExtra)
 
 createSine <- function(n=200, len=1, f=f, fprime=fprime, f2prime=f2prime) {
-  x <- seq(0, 2*pi, length=n)
+  x <- seq(-pi, pi, length=n)
   l <- rep(len, length=length(x))
   fx <- f(x)
   ystart <- fx - .5*l
@@ -19,15 +20,39 @@ createSine <- function(n=200, len=1, f=f, fprime=fprime, f2prime=f2prime) {
   dframe
 }
 
+correctx <- function(z, fprime, a=-pi, b=pi, w=1) {
+  const <- integrate(function(x) abs(fprime(x)), a, b)$value
+  trans <- sapply(z, function(i) integrate(function(x) abs(fprime(x)), a, i)$value*(b-a)/const+a)
+  rowMeans(matrix(c(rep(z, times=w-1), trans), nrow=length(z), byrow=FALSE))
+}
 
-adjLinear <- function(df, f=f, fprime=fprime, f2prime=f2prime){
+adjx <- function(df, fprime=fprime, w=1){
+  df$xend <- df$xstart <- correctx(df$x, fprime=fprime, w=w)
+  df
+}
+
+adjNone <- function(df, f=f, fprime=fprime, f2prime=f2prime){
   df2 <- cbind(df, 
-               sec.ell1 = df$ell/2*sqrt(1+fprime(df$x)^2), 
-               sec.ell2 = df$ell/2*sqrt(1+fprime(df$x)^2))
+               sec.ell1 = df$ell/2, 
+               sec.ell2 = df$ell/2)
   with(df2, cbind(rbind(df, df), 
                   rbind(data.frame(seg.ystart=y-sec.ell1, seg.yend=y+sec.ell2, type="Segment"), 
                         data.frame(seg.ystart=-sec.ell1, seg.yend=+sec.ell2, type="Adjustment")), 
-                  adj="Linear")
+                  adj="Correction: None")
+  )
+}
+
+adjLinear <- function(df, f=f, fprime=fprime, f2prime=f2prime){
+  dy <- diff(range(df$y))
+  dx <- diff(range(df$x))
+  a <- dy/(dy+df$ell)
+  df2 <- cbind(df, 
+               sec.ell1 = df$ell/2*sqrt(1+a^2*fprime(df$x)^2), 
+               sec.ell2 = df$ell/2*sqrt(1+a^2*fprime(df$x)^2))
+  with(df2, cbind(rbind(df, df), 
+                  rbind(data.frame(seg.ystart=y-sec.ell1, seg.yend=y+sec.ell2, type="Segment"), 
+                        data.frame(seg.ystart=-sec.ell1, seg.yend=+sec.ell2, type="Adjustment")), 
+                  adj="Correction: Linear")
        )
 }
 
@@ -42,13 +67,16 @@ adjGeom <- function(df, f=f, fprime=fprime, f2prime=f2prime){
   with(df2, cbind(rbind(df, df), 
                   rbind(data.frame(seg.ystart=y-sec.ell1, seg.yend=y+sec.ell2, type="Segment"), 
                         data.frame(seg.ystart=-sec.ell1, seg.yend=sec.ell2, type="Adjustment")), 
-                  adj="Geometric"))
+                  adj="Correction: Trigonometric"))
 }
 
 
 adjQuad <- function(df, f=f, fprime=fprime, f2prime=f2prime){
+  dy <- diff(range(df$y))
+  dx <- diff(range(df$x))
+  a <- dy/(dy+df$ell[1])
   x0 <- df$x
-  secSlope   <- -1/fprime(x0)
+  secSlope   <- -a/fprime(x0)
   ell.x0     <- df$ell/2
   lambda1 <- (-(fprime(x0)^2 + 1) + sqrt((fprime(x0)^2 + 1)^2 - 
                                            2* fprime(x0)^2*f2prime(x0)*ell.x0))/(fprime(x0)^2*f2prime(x0))
@@ -75,5 +103,5 @@ adjQuad <- function(df, f=f, fprime=fprime, f2prime=f2prime){
               data.frame(seg.ystart= df2$ell/2*(1+cos(theta))-df2$sec.ell1*cos(theta), 
                          seg.yend=-df2$ell/2*(1+cos(theta))+df2$sec.ell2*cos(theta),
                          type="Adjustment")), 
-        adj="Quadratic")
+        adj="Correction: Quadratic")
 }
