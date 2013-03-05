@@ -11,7 +11,7 @@ shinyServer(function(input, output) {
     dframe <- createSine(n=input$obs+2, len=input$ell, f, fprime, f2prime)[c(2:(input$obs+1)),]
     p1 <- qplot(x=x, xend=x, y=ystart, yend=yend, geom="segment", data=dframe) +
       theme_bw() + 
-      scale_x_continuous(breaks=seq(-pi, pi, by=pi/2), minor_breaks=minor.axis.correction,
+      scale_x_continuous(breaks=seq(-pi, pi, by=pi/2), 
                          labels=c(expression(-pi), expression(paste(-pi, "/2")), 0, 
                                   expression(paste(pi,"/2")), expression(pi))) +
       coord_equal(ratio=1) + xlab("x") + ylab("y")
@@ -39,13 +39,13 @@ shinyServer(function(input, output) {
     pa <- qplot(x=xstart, xend=xend, y=ystart, yend=yend, geom="segment", data=dframe, main="Correction: None") + theme_bw() +
             scale_x_continuous(breaks=seq(-pi, pi, by=pi/2), minor_breaks=minor.axis.correction,
                                labels=c(expression(-pi), expression(paste(-pi, "/2")), 0, expression(paste(pi,"/2")), expression(pi))) +
-            geom_point(data=dots, aes(x=x, y=y), inherit.aes=FALSE) +
+            geom_point(data=subset(dots, adj=="Correction: None"), aes(x=x, y=y), inherit.aes=FALSE) +
             coord_equal(ratio=1) + xlab("x") + ylab("y") 
     pb <- qplot(x=xstart, xend=xend, y=ystart, yend=yend, geom="segment", data=adjx(dframe, fprime=fprime, w=input$weight),
-                main=paste("Correction: X, weight =", w)) + theme_bw() +
+                main=paste("Correction: X, weight =", input$weight)) + theme_bw() +
             scale_x_continuous(breaks=seq(-pi, pi, by=pi/2), minor_breaks=minor.axis.correction,
                                labels=c(expression(-pi), expression(paste(-pi, "/2")), 0, expression(paste(pi,"/2")), expression(pi))) +
-            geom_point(data=dots, aes(x=x, y=y), inherit.aes=FALSE) +
+            geom_point(data=subset(dots, adj!="Correction: None"), aes(x=x, y=y), inherit.aes=FALSE) +
             coord_equal(ratio=1) + xlab("x") + ylab("y")
     p1 <- grid.arrange(pa, pb, nrow=1)
     print(p1)
@@ -60,18 +60,25 @@ shinyServer(function(input, output) {
     rat <- input$ell/(2*input$amp+input$ell)
     
     dframeAdj <- cbind(rbind(dframe, dframe), with(dframe, rbind(data.frame(seg.ystart=y-ell/2, seg.yend=y+ell/2, type="Segment"), data.frame(seg.ystart=ell/2, seg.yend=-ell/2, type="Adjustment"))), adj="Original Data")
+    pa <- qplot(x=x, xend=x, y=seg.ystart, yend=seg.yend, geom="segment", data=dframeAdj, main="Uncorrected Data") +
+      theme_bw() + coord_equal(ratio=1) + facet_grid(type~., scales="free_y") + 
+      scale_x_continuous(breaks=seq(-pi, pi, by=pi/2), 
+                         labels=c(expression(-pi), expression(paste(-pi, "/2")), 0, 
+                                  expression(paste(pi,"/2")), expression(pi))) +
+      xlab("x") + ylab("y")
+    
     pa1 <- qplot(x=x, xend=x, y=seg.ystart, yend=seg.yend, geom="segment", data=subset(dframeAdj, type=="Segment"), main="Uncorrected Data") +
             theme_bw() + coord_equal(ratio=1) + 
-            scale_x_continuous(breaks=seq(-pi, pi, by=pi/2), minor_breaks=minor.axis.correction,
+            scale_x_continuous(breaks=seq(-pi, pi, by=pi/2), 
                                labels=c(expression(-pi), expression(paste(-pi, "/2")), 0, 
                                         expression(paste(pi,"/2")), expression(pi))) +
             xlab("x") + ylab("y")
     pa2 <- qplot(x=x, xend=x, y=seg.ystart, yend=seg.yend, geom="segment", 
                  data=subset(dframeAdj, type=="Adjustment"), main="Uncorrected Segment Length") + theme_bw() + 
-                  scale_x_continuous(breaks=seq(-pi, pi, by=pi/2), minor_breaks=minor.axis.correction,
+                  scale_x_continuous(breaks=seq(-pi, pi, by=pi/2),
                                      labels=c(expression(-pi), expression(paste(-pi, "/2")), 0, 
                                               expression(paste(pi,"/2")), expression(pi))) +
-                  xlab("x") + ylab("y")
+                  xlab("x") + ylab("y") + coord_equal(ratio=1)
     if(corr==4){
       dframeAdj1 <- adjQuad(dframe, f, fprime, f2prime)
       title = "Correction: Quadratic"
@@ -88,28 +95,35 @@ shinyServer(function(input, output) {
     limits <- range(c(subset(dframeAdj1, type=="Adjustment")$seg.ystart, subset(dframeAdj, type=="Adjustment")$seg.ystart, 
                       subset(dframeAdj1, type=="Adjustment")$seg.yend, subset(dframeAdj, type=="Adjustment")$seg.yend))
     if(corr==1) { 
-      pb1 <- pb2 <- ggplot(dframeAdj1, aes(x = x, y = y)) + geom_blank() + theme_minimal() + 
+      pb1 <- pb2 <- pb <- ggplot(dframeAdj1, aes(x = x, y = y)) + geom_blank() + theme_minimal() + 
                       theme(axis.title=element_blank(), axis.text=element_blank(), 
                             axis.ticks=element_blank(),  axis.line=element_blank(), 
                             panel.grid=element_blank()) 
     } else{
+        pb <- qplot(x=x, xend=x, y=seg.ystart, yend=seg.yend, geom="segment", data=dframeAdj1, main=title) +
+          theme_bw() + coord_equal(ratio=1) + facet_grid(type~., scales="free_y")+
+          scale_x_continuous(breaks=seq(-pi, pi, by=pi/2), 
+                             labels=c(expression(-pi), expression(paste(-pi, "/2")), 0, 
+                                      expression(paste(pi,"/2")), expression(pi))) +
+          xlab("x") + ylab("y")
         pb1 <- qplot(x=x, xend=x, y=seg.ystart, yend=seg.yend, geom="segment", data=subset(dframeAdj1, type=="Segment"), main=title) +
                 theme_bw() + coord_equal(ratio=1) + 
-                scale_x_continuous(breaks=seq(-pi, pi, by=pi/2), minor_breaks=minor.axis.correction,
+                scale_x_continuous(breaks=seq(-pi, pi, by=pi/2), 
                                    labels=c(expression(-pi), expression(paste(-pi, "/2")), 0, 
                                             expression(paste(pi,"/2")), expression(pi))) +
                 xlab("x") + ylab("y")
         pb2 <- qplot(x=x, xend=x, y=seg.ystart, yend=seg.yend, geom="segment", 
                      data=subset(dframeAdj1, type=="Adjustment"), main="Corrected Segment Length") +
                      theme_bw() + 
-                     scale_x_continuous(breaks=seq(-pi, pi, by=pi/2), minor_breaks=minor.axis.correction,
+                     scale_x_continuous(breaks=seq(-pi, pi, by=pi/2), 
                                         labels=c(expression(-pi), expression(paste(-pi, "/2")), 0, 
                                                  expression(paste(pi,"/2")), expression(pi))) +
-                     xlab("x") + ylab("y") + ylim(limits)
+                     xlab("x") + ylab("y") + ylim(limits) + coord_equal(ratio=1)
         pa2 <- pa2 + ylim(limits)
     }
 
-    p1 <- grid.arrange(pa1, pb1, pa2, pb2, widths=c(.5, .5, .5, .5), heights=c(1-rat, 1-rat, rat, rat), ncol=2)
+    p1 <- grid.arrange(pa, pb, widths=c(.5, .5), nrow=1)
+    #     p1 <- grid.arrange(arrangeGrob(pa1, pb1, nrow=1, widths=c(.5, .5)), arrangeGrob(pa2, pb2, nrow=1, widths=c(.5, .5)), heights=c(input$ell+input$amp*2, input$ell), nrow=2)
     print(p1)
   })
 })

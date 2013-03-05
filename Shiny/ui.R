@@ -22,14 +22,14 @@ shinyUI(pageWithSidebar(
                    selected="No Correction")
     ),
     conditionalPanel(condition="input.whichtab==2", 
-      sliderInput("weight", "Shrink by 1/w", min=1, max=10, value=1, step=1)
+      sliderInput("weight", "Shrink by (w-1)/w", min=1, max=10, value=1, step=1)
     )
   ),
   mainPanel(
     tabsetPanel(id="whichtab", 
       tabPanel("Sine Illusion", plotOutput("illusion", width="auto"), value=1),
       tabPanel("Correct X Axis", plotOutput("xcorrect", width="auto"), value=2),
-      tabPanel("Correct Y Axis", plotOutput("ycorrect", width="auto", height="800px"), value=3)#,
+      tabPanel("Correct Y Axis", plotOutput("ycorrect", width="auto", height="600px"), value=3)#,
       #tabPanel("Temporary Transformation", plotOutput("temptransform"), value=4)      
       )
   )
