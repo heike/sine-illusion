@@ -34,7 +34,7 @@ createSine <- function(n=200, len=1, f=f, fprime=fprime, getquadapprox=FALSE, f2
 
 correctx <- function(z, fprime, a=0, b=2*pi, shrink=0) {
   const <- integrate(function(x) abs(fprime(x)), a, b)$value
-  trans <- sapply(z, function(i) integrate(function(x) abs(fprime(x)), a, i)$value*(b-a)/const)
+  trans <- sapply(z, function(i) integrate(function(x) abs(fprime(x)), a, i)$value*(b-a)/const+a)
   rowMeans(matrix(c(rep(z, times=shrink), trans), nrow=length(z), byrow=FALSE))
 }
 
@@ -52,3 +52,24 @@ dframe$xtrans <- correctx(dframe$x, fprime=fprime)
 dots <- data.frame(x = rep(minor.axis.correction, times=1), y=rep(c(0), each=length(minor.axis.correction)))
 
 qplot(x=xtrans, xend=xtrans, y = ystart, yend=yend, colour=I("blue"), geom="segment", data=dframe) + theme_bw() + xlab("x") + ylab("y")+ geom_point(data=dots, aes(x=x, y=y), inherit.aes=FALSE) 
+
+
+
+f <- function(x) (x-.5)*(x-2)^2
+fprime <- function(x) (x-2)^2 + 2*(x)*(x-2) - x + 2
+dframe <- data.frame(x=seq(0, 3, by=.1), y=f(seq(0, 3, by=.1)))
+dframe$yend <- dframe$y-.5
+dframe$ystart <- dframe$y+.5
+dframe$xstart <- dframe$x
+dframe$xend <- dframe$x
+minor.axis.correction <- correctx(seq(0, 3, .1), fprime, a=0, b=3)
+major.breaks <- correctx(seq(0, 3, .5), fprime, a=0, b=3)
+
+dframe$xtrans <- correctx(dframe$x, fprime=fprime, a=0, b=3, shrink=0)
+dframe$xint.f <- dframe$x*(f(dframe$x)==0)
+dframe$xint.fprime <- dframe$x*(fprime(dframe$x)==0)
+
+dots <- data.frame(x = rep(minor.axis.correction, times=1), y=rep(c(0), each=length(minor.axis.correction)))
+
+qplot(x=x, xend=x, y=ystart, yend=yend, colour=I("blue"), geom="segment", data=dframe) + theme_bw() + xlab("x") + ylab("y") 
+qplot(x=xtrans, xend=xtrans, y = ystart, yend=yend, colour=I("blue"), geom="segment", data=dframe) + theme_bw() + xlab("x") + ylab("y")+ geom_point(data=dots, aes(x=x, y=y), inherit.aes=FALSE) + scale_x_continuous(minor_breaks=minor.axis.correction, breaks=major.breaks, labels=seq(0, 3, .5))
