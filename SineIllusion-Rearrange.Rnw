@@ -484,17 +484,10 @@ Another approach to breaking the power of the sine illusion is to remove the cha
 Geometrically, we want to change the x-axis spacing so that the absolute slope of the underlying trend line remains constant, which will force the extant width to be constant. \newtext{This transformation assumes that we have an underlying function $f$ (either due to prior knowledge or using a model fit) which is differentiable over the region of observed data. If data $(x_i, y_i)_{i=1, ..., N}$ have been observed, then we assume we can model $y_i = f(x_i) + \epsilon_i$ and that $f^\prime(x_i)$ exists for all $i=1, ..., N$. }
 
 That is, if the $x$-axis spans the interval $[a,b)$, the transformation of the $x$ axis is 
-$$T(x) = (b-a)\left(\int_a^x |f^\prime(z)| dz\right)/\left(\int_a^b|f^\prime(z)| dz\right)$$ 
+$$T(x) = a + (b-a)\left(\int_a^x |f^\prime(z)| dz\right)/\left(\int_a^b|f^\prime(z)| dz\right)$$ 
 
 \newtext{
-This is equivalent to solving the following set of equations, assuming the $x$-axis spans $[a,b)$}
-\begin{align*}
-T(x) &\propto |f^\prime(x)|\\
-T(a) & = a\\
-T(b) & = b\\
-\end{align*}
-\newtext{
-This transformation can be considered as a reparameterization of the $x$ axis in terms of the slope. As the sine illusion depends on changing slope in the overall trend, by reparameterizing the $x$-axis in terms of the slope, the data seem to have constant slope, removing the illusion, while the $x$-axis shows the changing slope. The transformation is shown in Figure \ref{xtrans1}. Of course, when $f(x)$ is monotone, $T(x)$ reduces to a simple transformation of $f^\prime(x)$.}
+This transformation can be considered as a reparameterization of the $x$ axis in terms of the slope. As the sine illusion depends on changing slope in the overall trend, by reparameterizing the $x$-axis in terms of the slope, the data seem to have constant slope, removing the illusion, while the $x$-axis shows the changing slope. The transformation is shown in Figure \ref{xtrans1}. An analysis of $T(x)$ is shown in appendix \ref{XtransAppendix}.}
 
 In practice we can see that the illusion can be broken by a much less severe transformation in $x$. 
 \newtext{By shrinking the transformation in Figure \ref{xtrans1} towards the original $x$ values by a factor of $w$, the illusion is still broken and the data are closer to the original function $y=f(x)$. 
@@ -751,7 +744,7 @@ dev.off()
 \end{figure}
 \todo[inline]{
 %The picture is wrong here, but I can't figure out how the extant width in the trig method was actually calculated. It seems like it should be like this, but either we're assuming a right angle and shouldn't be (use law of cosines instead) or I'm being an idiot, but the picture looks exactly like that for linear fix, and I know it isn't the same method!
-For the time being, I'm using the linear approximation picture, but we need to add the math in to justify them as the same correction (and also need to fix the aspect ratio correction in the functions)}
+For the time being, I'm using an annotated version of the linear approximation picture, but we need to add the math in to justify them as the same correction (and also need to fix the aspect ratio correction in the functions)}
 
 Our goal is to make the segment $m$ appear as long as the segment $\ell$. As the angle $\theta$ is determined by the slope of the tangent line, that is, 
 $$\tan \theta = \left|f^\prime(x)\right|$$ 
@@ -1224,6 +1217,36 @@ Figures \ref{raw-temp} and \ref{resid-temp} show temperature data from 422 stati
 \bibliographystyle{asa}
 % argument is your BibTeX string definitions and bibliography database(s)
 \bibliography{references}
+\clearpage
+\appendix
+\section{X Transformation Math}\label{XtransAppendix}
+Suppose that 
+\begin{itemize}
+\item $f(x)$ is defined on $[a,b)$
+\item $f^\prime(x)$ exists on $[a,b)$
+\item countable regions $[a_i, a_{i+1})$ exist such that $\bigcup_{i=1}^\infty [a_i, a_{i+1}) = [a,b)$ and either $f^\prime(x) \geq 0$ or $f^\prime(x) \leq 0$ for all $x\in [a_i, a_{i+1})$.
+\end{itemize}
+Then for $$T(x) = \frac{(a_\infty-a_0)}{\int_{a_0}^{a_\infty} |f^\prime(z)| dz} \int_{a_0}^x|f^\prime(z)| dz + a$$
+\begin{align*}
+T(x) & = a + \frac{a_{\infty}-a_{0}}{\int_{a_0}^{a_{\infty}} |f^\prime(z)| dz}\left(\sum_{i=1}^\infty \left|\int_{a_i}^{a_{i+1}} f^\prime(z) I(z<x) dz \right|\right)\\
+& = a + \frac{a_{\infty}-a_{0}}{\sum_{i=1}^{M} \left|\int_{a_i}^{a_{i+1}} f^\prime(z) I(z<x)\right| dz}\left(\sum_{i=1}^{M-1} \left|f(a_{i+1}) -  f(a_i)\right| + \left|f(x) - f(a_{M}) \right|\right)\\
+&\qquad\qquad\text{where } a_{M} < x < a_{M+1}
+\end{align*}
+So on any single $[a_i, a_{i+1})$, assuming WLOG $x<x_0$
+\begin{align*}
+T_i(x) & = c_{i1} + c_{i2}|f(x) - f(a_i)|\\
+f^\prime_i(x) & = \lim_{x\rightarrow x_0} \frac{f(x) - f(x_0)}{T_i(x) - T_i(x_0)} I(a_i \leq x < x_0 < a_{i+1})\\
+& = \lim_{x\rightarrow x_0} \frac{f(x) - f(x_0)}{c_{i1} + c_{i2}\cdot s \cdot (f(x) - f(a_i)) - c_{i1} - c_{i2}\cdot s \cdot(f(x_0) - f(a_i))} I(a_i \leq x < x_0 < a_{i+1})\\
+& \qquad\qquad\text{where } s = sign(f^\prime(x)) \text{ on } x\in [a_i, a_{i+1})\\
+& = \lim_{x\rightarrow x_0} \frac{f(x) - f(x_0)}{c_{i2}\cdot s \cdot (f(x_0) - f(x))} I(a_i \leq x < x_0 < a_{i+1})\\
+& = \lim_{x\rightarrow x_0} \frac{f(x) - f(x_0)}{c_{i2}\left|f(x_0) - f(x)\right|} I(a_i \leq x < x_0 < a_{i+1})\\
+& = \frac{1}{c_{i2}}
+\end{align*}
+Hence $f^\prime(x)$ is constant on $[a_i, a_{i+1})$. 
+
+Furthermore, by definition, $c_{i2}$ is equal to $$c_{i2} = \pm \sum_{i=0}^{\infty} \frac{a_{i+1}-a_i}{a_\infty-a_0}\left(\frac{\left|f(a_{i+1})-f(a_i)\right|}{a_{i+1}-a_i}\right)$$ that is, the weighted average of $|\triangle f(x)|/(\triangle x)$ over the $[a_i, a_{i+1})$ 
+
+Also, $c_{01} = a_0$, $c_{i1} = a_{i+1}-a_i$. Hence the piecewise definition can be made to look like the original definition, but with the $c_{i2}$ differing only by a sign and the cumulative $c_{i1}$ tracking the left endpoint of the segment. 
 \end{document}
 
 
