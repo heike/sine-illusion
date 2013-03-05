@@ -17,6 +17,7 @@
 
 \graphicspath{{figure/}}
 
+\newcommand{\range}{{\text{range}}}
 
 <<setup, fig.keep='all', cache=FALSE, echo=FALSE, eval=TRUE>>=
 rm(list=ls())
@@ -521,9 +522,9 @@ f(T(x)) = f (f^{-1}(s_{[c_i,d_i]} (x))) = f(x_{i-1}) + (x-c_i)/(d_i-c_i) \cdot (
 Correspondingly, the slope of $f(T_i(x))$ is given as $(f(x_{i}) - f(x_{i-1})))/(d_i-c_i)$.
 In order to make the slope the same on all pieces $T_i$, we need to define $c_i$ and $d_i$ with respect to the function values on the interval $(x_{i-1}, x_i)$. There are various options, depending on how closely our $x$-range should reflect the original range:
 \begin{itemize}
-\item for $c_i = \min{f({x_{i-1}), f(x_i))$ and $d_i = \max{f({x_{i-1}), f(x_i))$ the new $x$-range is the original $y$ range. 
+\item for $c_i = \min{(f(x_{i-1}), f(x_i))}$ and $d_i = \max{(f(x_{i-1}), f(x_i))}$ the new $x$-range is the original $y$ range. 
 
-\item an additional scaling reflecting the ratio of original $y$- and $x$-ranges will result in the  $x$-range being preserved. This happens  for $c_i = \range(x)/\range(f(x)) \min{f({x_{i-1}), f(x_i))$ and $d_i = \range(x)/\range(f(x)) \max{f({x_{i-1}), f(x_i))$. 
+\item an additional scaling reflecting the ratio of original $y$- and $x$-ranges will result in the  $x$-range being preserved. This happens  for $c_i = \range(x)/\range(f(x)) \cdot \min{(f(x_{i-1}), f(x_i))}$ and $d_i = \range(x)/\range(f(x)) \cdot \max{(f(x_{i-1}), f(x_i))}$. 
 \end{itemize}
 
 \newdo{this is a good motivation, but put it before the math.}
