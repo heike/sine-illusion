@@ -145,7 +145,7 @@ The sine illusion, which is part of a set of optical illusions which occur based
 
 \section{Introduction}
 Graphics are powerful tools for summarizing large or complex data. The main premise in our dealings with statistical graphics is that
-graphics have to be true to the data (e.g. \cite{wainer:2000}). \newtext{Generally, we see a lot of discussion on keeping true to the data in the framework of (ab)using three dimensional effects in graphics. \citep{tufte} goes as far as defining a {\it lie-factor} -- the ratio of the size of an effect in the data compared to the size of an effect shown, with the premise that any large deviations from one indicate a misuse of graphical techniques.} Computational tools help us ensure technical trueness -- but this brings up the additional question of how we deal with situations that involve innate inability or trigger learned misperceptions? In this paper we want to raise awareness for one of these situations, show that it occurs frequently in our dealings with graphics and provide different attempts at solving or avoiding it.
+graphics have to be true to the data (e.g. \cite{tufte, wainer:2000, robbins:2005}). Generally, we see a lot of discussion on keeping true to the data in the framework of (ab)using three dimensional effects in graphics. \citep{tufte} goes as far as defining a {\it lie-factor} -- the ratio of the size of an effect in the data compared to the size of an effect shown, with the premise that any large deviations from one indicate a misuse of graphical techniques. Computational tools help us ensure technical trueness -- but this brings up the additional question of how we deal with situations that involve innate inability or trigger learned misperceptions. In this paper we want to raise awareness for one of these situations, show that it occurs frequently in our dealings with graphics and provide different attempts at solving or avoiding it.
 
 
 <<example,echo=FALSE, include=FALSE>>=
@@ -157,7 +157,7 @@ qplot(data=datasub, x=jitter(Tmax), y=resid, geom="point", colour=I("grey20"), a
 @
 
 
-Figure \ref{example1} shows daily measurements of 8-hour average ozone concentration and temperature at several sites in Houston, for days in 2011 with temperatures above $45^\circ$ F  and dew points of less than $60^\circ$ F. %(as ozone concentration is related to temperature and humidity)
+Figure \ref{example1} shows daily measurements of 8-hour average ozone concentration and temperature at several sites in Houston, for days in 2011 with temperatures above $45^\circ$F  and dew points of less than $60^\circ$F. %(as ozone concentration is related to temperature and humidity)
 A loess smooth line is added for reference. 
 Ozone concentrations were gathered from \Sexpr{nsite} locations in the Houston area \citep{epa}, and weather data is aggregated from the NCDC \citep{noaa} site at Hobby International Airport, which is located near the center of Houston. 
 
@@ -178,9 +178,12 @@ Ozone concentrations were gathered from \Sexpr{nsite} locations in the Houston a
 \end{subfigure}
 \caption{\label{exampleFull1} Ozone and Temperature in Houston, 2011. What seems to be the trend in overall variance? Is the variance trend in (a) consistent with the residual plot in (b)?}
 \end{figure}
+\newdo{this is still no description of the second plot. you're only sneaking this into the back of the findings. make it explicit and move it to the front. }
 \newtext{The increasing variance with temperature is camoflauged in the Figure \ref{example1} due to the changes in slope, but is very obvious in the residual plot in Figure \ref{example2} once the trend has been removed.}
 
-The sine illusion (also known in graphical literature as the line width illusion) is a frequent occurrence in statistical analysis, and graphical displays should be thoughtfully considered to minimize its effect visually and acknowledge its influence. Figure \ref{original} shows the classical sine illusion. \newtext{The parameters that influence the sine illusion are the amplitude of the function and the line length. An applet demonstrating the effect of changing parameter values on the strength of the illusion can be found at \url{http://www.michaelbach.de/ot/sze_sineIllusion/index.html}. An applet demonstrating not only the effect of parameters on the illusion but also the various correction factors we propose in this paper can be found at \url{http://vanderplas.dyndns-remote.com/SineIllusion}}
+The sine illusion (also known in graphical literature as the line width illusion) is a frequent occurrence in statistical analysis, and graphical displays should be thoughtfully considered to minimize its effect visually and acknowledge its influence. Figure \ref{original} shows the classical sine illusion. The parameters that influence the sine illusion are the amplitude of the function and the line length. 
+\newdo{how do amplitude and line length impact the illusion - just put one sentence here.}
+An applet demonstrating the effect of changing parameter values on the strength of the illusion can be found at \url{http://www.michaelbach.de/ot/sze_sineIllusion/index.html}. An applet demonstrating not only the effect of parameters on the illusion but also the various correction factors we propose in this paper can be found at \url{http://vanderplas.dyndns-remote.com/SineIllusion}
 \todo[inline]{When applet is in quasi-final form, will change this to rstudio's server.}
 <<functions, echo=FALSE, eval=TRUE>>=
 f <- function(x) 2*sin(x)
@@ -481,8 +484,16 @@ print(grid.arrange(p2, p1, nrow=2))
 From a cognitive perspective, separating out the trendline and the variance creates more of a barrier to understanding the data in its original form. Additionally, removing the trend requires an initial model, and any plots produced using that fit are conditional on the assumptions made to obtain that model fit. In many situations, this may be undesireable, particularly as we typically view the data before fitting even a rudimentary model, and the sine illusion may influence even initial modeling decisions.
 
 \subsection{Transformation of the X-Axis}
-Another approach to breaking the power of the sine illusion is to remove the changes in the slope of the overall trend line by transforming the $x$ axis scaling so that the absolute slope is constant. 
-Geometrically, we want to change the x-axis spacing so that the absolute slope of the underlying trend line remains constant, which will force the extant width to be constant. \newtext{This transformation assumes that we have an underlying function $f$ (either due to prior knowledge or using a model fit) which is differentiable over the region of observed data. If data $(x_i, y_i)_{i=1, ..., N}$ have been observed, then we assume we can model $y_i = f(x_i) + \epsilon_i$ and that $f^\prime(x_i)$ exists for all $i=1, ..., N$. }
+Another approach to breaking the power of the sine illusion is to remove the changes in the slope of the overall trend line by transforming the $x$-axis such that the absolute value of the slope is constant. 
+This will force the corresponding extant width to be constant. 
+
+\newtext{Let us assume that we can describe the relationship between variables $X$ and $Y$ by a model of the form 
+\[
+y = f(x) + \varepsilon,
+\]
+where $f$ is some underlying function (either due to prior knowledge or using a model fit). Further let us assume that the function $f$ is differentiable over the region of observed data.}
+
+% \newtext{This transformation assumes that we have an underlying function $f$ (either due to prior knowledge or using a model fit) which is differentiable over the region of observed data. If data $(x_i, y_i)_{i=1, ..., N}$ have been observed, then we assume we can model $y_i = f(x_i) + \epsilon_i$ and that $f^\prime(x_i)$ exists for all $i=1, ..., N$. }
 
 That is, if the $x$-axis spans the interval $[a,b)$, the transformation of the $x$ axis is 
 $$T(x) = a + (b-a)\left(\int_a^x |f^\prime(z)| dz\right)/\left(\int_a^b|f^\prime(z)| dz\right)$$ 
@@ -502,29 +513,40 @@ f(T_i(x)) = \pm a x + b_i.
 This means that $T_i$ is essentially an inverse of function $f$, with each piece defined by the   intervals on which the inverse of $f$ exists: let ${x_0, ..., x_K}$ be the set of values, for which the derivative of $f$ is zero, i.e. $f^\prime(x_i) = 0$ for all $i = 0, ... , K$. 
 Then each interval of the form $(x_{i-1}, x_i)$ defines one piece $T_i$ of the transfomation function $T(x)$. We will define $T_i$ now as a combination of a linear scaling function and the inverse of $f$, which we know exists for interval $(x_{i-1}, x_i)$.
 
-Let function $s$ be the linear scaling function that maps  the interval $(c, d)$ linearly to the interval  defined by the end points $f(x_{i-1})$ and $f(x_i))$. Function $s$ is given as :
+Let function $s = s_{[a,b]}^{[c,d]}$ be the linear scaling function that maps  the interval $(a,b)$ linearly to the interval $(c,d)$. This function is defined as
 \[
-s_{[c,d]}(x) = f(x_{i-1}) + (x-c)/(d-c) \cdot (f(x_{i}) - f(x_{i-1}))).
+s(x) = s_{[a,b]}^{[c,d]} (x) = (x-a)/(b-a) \cdot (d-c) + c.
+\]
+
+Two scaling functions can be evaluated one after the other, only if the image of the first coincides with the range of the second. Then they form another linear scaling 
+\[
+s_{[e,f]}^{[c,d]} \otimes s_{[a,b]}^{[e,f]} = s_{[a,b]}^{[c,d]}
+\]
+
+
+In our situation let the scaling Function $s$ be given as :
+\[
+s_{[c,d]}^{\range{f(x)}}(x) = f(x_{i-1}) + (x-c)/(d-c) \cdot (f(x_{i}) - f(x_{i-1}))).
 \]
 Note that $s$ has either a positive or negative slope depending on whether $f(x_{i-1})$ is smaller or larger than $f(x_i)$, respectively.
 
 Then the transformation in the $x$-axis, $T(x)$ is defined piecewise as a combination of $T_i$, where each $T_i$ is given as:
 \begin{eqnarray}\label{eq.x.transformation}
-T_i(x) &=& f^{-1}\left( s_{[c_i,d_i]}(x) \right). 
+T_i(x) &=& f^{-1}\left( s_{[c_i,d_i]}^{\range({f(x)}})(x) \right). 
 \end{eqnarray}
 
 \newdo{still need to show that $f(T(x)$ is a linear function, i.e. compute $a$ (in particular this $a$ has to be the same for all $i$ -- here it will turn out to be 1) and $b_i$)}
 
 Note that parameters $c$ and $d$ determine the speed with which the transfomation happens, i.e. for $x \in (c,d)$ we have
 \[
-f(T(x)) = f (f^{-1}(s_{[c_i,d_i]} (x))) = f(x_{i-1}) + (x-c_i)/(d_i-c_i) \cdot (f(x_{i}) - f(x_{i-1}))).
+f(T(x)) = f (f^{-1}(s_{[c_i,d_i]}^{\range({f(x)}}) (x))) = f(x_{i-1}) + (x-c_i)/(d_i-c_i) \cdot (f(x_{i}) - f(x_{i-1}))).
 \]
 Correspondingly, the slope of $f(T_i(x))$ is given as $(f(x_{i}) - f(x_{i-1})))/(d_i-c_i)$.
 In order to make the slope the same on all pieces $T_i$, we need to define $c_i$ and $d_i$ with respect to the function values on the interval $(x_{i-1}, x_i)$. There are various options, depending on how closely our $x$-range should reflect the original range:
 \begin{itemize}
-\item for $c_i = \min{(f(x_{i-1}), f(x_i))}$ and $d_i = \max{(f(x_{i-1}), f(x_i))}$ the new $x$-range is the original $y$ range. 
+\item for $[c_i, d_i] = \range(f(x))$ the new $x$-range is the original $y$ range, but the scaling function simplifies to the identity.
 
-\item an additional scaling reflecting the ratio of original $y$- and $x$-ranges will result in the  $x$-range being preserved. This happens  for $c_i = \range(x)/\range(f(x)) \cdot \min{(f(x_{i-1}), f(x_i))}$ and $d_i = \range(x)/\range(f(x)) \cdot \max{(f(x_{i-1}), f(x_i))}$. 
+\item in order to preserve the original $x$-range, we can choose $[c_i, d_i]$ as .... . 
 \end{itemize}
 
 \newdo{this is a good motivation, but put it before the math.}
