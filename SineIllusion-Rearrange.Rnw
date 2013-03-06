@@ -919,6 +919,8 @@ By setting the above equation equal to the graphs of $f_u$ and $f_\ell$ we find 
 (I) && x - x_o = \lambda f^\prime(x_o)\\ \label{eqn.general.2}
 (II) && f(x) - f(x_o) = -\lambda \pm \ell/2
 \end{eqnarray}
+
+\comment{Why do these need roman numerals and equation numbers? Seems like the double references could get confusing/annoying?}
 With these two endpoints, we can  separately correct for the top and bottom portions of the vertical width. Note that the extant width generally is   not symmetric when reflected across the original function $f(x)$ (as can be seen in figure \ref{GeneralCorrection}). 
 
 Note that  the above system of equations involves function values $f(x)$, which implies that solving this system  requires numerical optimization for any but the most simple functions $f$.
