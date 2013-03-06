@@ -17,7 +17,8 @@
 
 \graphicspath{{figure/}}
 
-\newcommand{\range}{{\text{range}}}
+\newcommand{\range}[1]{{\text{range}\left(#1\right)}}
+\newcommand{\s}[2]{{_{#1}s^{ #2}}}
 
 <<setup, fig.keep='all', cache=FALSE, echo=FALSE, eval=TRUE>>=
 rm(list=ls())
@@ -431,17 +432,74 @@ Though it is typically a bad idea to use three-dimensional representations when 
 While not thoroughly examined in the sensation and perception literature, the sine illusion seems to have been classified as part of a group of geometrical optical misperceptions which may be related to the M\"uller-Lyer illusion \citep{day:1991} or the Poggendorf illusion \citep{poggendorf}.  Figure \ref{original} shows a reproduction of Bach's applet \citep{bach} displaying the sine illusion. The sine illusion is closely related to the line width phenomenon -- the line segments along the steepest slopes of the sine curve appear to be the shortest: ``The illusion is explained in terms of a perceptual compromise between the vertical extent and the greater overall dimensions of the section at the turn of the sine-wave figure and is thereby held to be the same in principle as the M\"uller-Lyer illusion." \citep{day:1991}.
 M Bach's applet  gives the option to compensate the line length manually for its perceived shortcoming. The amount of compensation chosen turns out to be highly dependent on both the length of the vertical line segments and the amplitude of the sine function. While the applet does not provide details on the compensation function, it does suggest that it may be possible to correct the graphical display so that the brain interprets the stimuli in a manner consistent with the numerical data. 
 
+\subsection{Geometry of the Illusion}
+\newdo{Figure \ref{OrthogonalWidth} is beautiful and deserves some detailed discussion here. Do not orphan it again.}
+
+<<transform-illustration,echo=FALSE, message=FALSE, warning=FALSE, include=FALSE>>=
+f <- function(x) 2*sin(x)
+fprime <- function(x) 2*cos(x)
+f2prime <- function(x) -2*sin(x)
+library(plyr)
+dframe <- createSine(n = 150, len = 1, f=f, fprime=fprime)
+dframe$ystartcts <- dframe$ystart
+dframe$yendcts <- dframe$yend
+dframe[1:150,c(2, 3, 5, 6)] <- NA
+dframe[(1:15)*10-5, c(2, 3)] <- dframe[(1:15)*10-5, 1] 
+dframe[(1:15)*10-5, 5] <- dframe[(1:15)*10-5, 4] - .5
+dframe[(1:15)*10-5, 6] <- dframe[(1:15)*10-5, 4] + .5
+dframe$type <- "Data"
+
+
+dframe.1 <- getSecantSegment(dframe$xstart, dframe, f, fprime, f2prime)
+dframe.1$x <- dframe$x
+dframe.1$y <- dframe$y
+dframe.1$ystartcts <- dframe$ystartcts
+dframe.1$yendcts <- dframe$yendcts
+names(dframe.1) <- c("x", "y", "deriv", "xstart", "xend", "ystart", "yend", "ell", "ell.quad1", "ell.quad2", "type", "a", "ystartcts", "yendcts")
+# names(dframe.1) <- c("x", "y", "deriv", "xstart", "xend", "ystart", "yend", "ell", "ell.quad1", "ell.quad2", "type")
+# dframe.1 <- dframe.1[!is.na(dframe.1$x),]
+dframe.1$vangle <- with(dframe.1, atan(deriv))
+# dframe.1$x <- dframe$x
+# dframe.1$y <- dframe$y
+# dframe.1$ystartcts <- dframe$ystartcts
+# dframe.1$yendcts <- dframe$yendcts
+dframe <- rbind.fill(dframe, dframe.1)
+
+
+qplot(x=x, y=y, geom="line", data=dframe, colour=I("grey50")) + theme_bw() + 
+  geom_line(aes(y=ystartcts), colour="grey50", linetype=4) + 
+  geom_line(aes(y=yendcts), colour="grey50", linetype=4) +
+  geom_segment(data=subset(dframe, !is.na(type)), aes(x=xstart, xend = xend, y=ystart, yend=yend, colour=type))  + 
+  coord_equal(ratio=1) + scale_colour_manual("", values=c("black", "blue")) + theme(legend.position="bottom")  + 
+#   geom_text(aes(label=paste(round(vangle/pi*180), "^o", sep=""),
+#                 x=xstart*(x<pi/2 | x>1.5*pi) + xend*(x>pi/2 & x<1.5*pi), y=ystart*(x<pi/2 | x<1.5*pi) + yend*(x>pi/2 & x<1.5*pi)), 
+#             data=dframe.1, parse=TRUE, hjust=1, vjust=.5, size=2.5) + 
+  geom_text(aes(label=paste("theta", "%~~%", round(abs(vangle)/pi*180), "^o", sep=""),
+                x=pmax(xstart, xend)/2+x/2+.2, y=y-sign(vangle)*.6+.02), 
+            data=dframe.1, parse=TRUE, hjust=.9, vjust=.5, size=3) + 
+  scale_x_continuous(breaks=seq(0, 2*pi, by=pi/2), 
+                     labels=c("0", expression(paste(pi,"/2")), expression(pi), expression(paste("3",pi, "/2")), expression(paste("2",pi)))) #+ 
+  # facet_wrap(~type)
+  # + ggtitle("Changes in Perceived Orthogonal Width \ndue to Change in Secant Angle")
+@
+\begin{figure}[h!tbp]
+\centering
+\includegraphics[width=.45\linewidth, keepaspectratio=TRUE]{figure/fig-transform-illustration}
+\caption{\label{OrthogonalWidth} Changes in perceived orthogonal width due to the change in secant angle. 
+}
+\end{figure}
+
 \newtext{
 When we judge the variability of data, we must overcome the visual bias due to the sine illusion. As it turns out, this illusion is incredibly difficult to overcome even when we are aware of its presence: our brains simply cannot ``un-see" the illusion. What follows is a compilation of various methods to correct for or mitigate the effect of these two illusions, intended primarily to demonstrate how pervasive the illusion is and the extreme methods necessary to remove its' effect. }
-\todo[inline]{Add in "we do not expect that these methods will be used in practice" here or at the end?}
-\newdo{let's put that to the end - we don't want to take the wind out of the readers' sails now.}
+%\todo[inline]{Add in "we do not expect that these methods will be used in practice" here or at the end?}
+%\newdo{let's put that to the end - we don't want to take the wind out of the readers' sails now.}
 
 \section{Breaking the Illusion}
 As the illusion is caused by a conflict between the vertical length and the width orthogonal to the slope, it can be resolved by making the orthogonal width constant. This can be accomplished in several ways: by separating the trend and the variability, by forcing the slope to be constant (by reparameterizing the $x$ axis), or by making the lines appear to be of the same height by adjusting their lengths to maintain a constant orthogonal width. Each of these approaches is discussed in the following section.
 
 \subsection{Trend Removal}
 \newtext{
-One approach to breaking the sine illusion is to present the trend and variance separately, as shown in Figure \ref{trendremoval} and commonly recommended \citep{wainer:2000}, particularly for assessing model fit.} A Loess smooth was used to estimate the trendline, and this estimate was subtracted from the line center to produce separate graphs of the trend and the variance. While this does largely remove the sine illusion, it also makes it somewhat more difficult to parse the overall data, as judgments must be made by combining two graphs or by mentally re-composing the original graph (at which point, the sine-illusion becomes a factor). Ideally, it would be possible to tell the whole story with a single graph, to minimize cognitive demands. While this example is relatively simple, it would be much harder to create a de-trended version of Figure \ref{playfair-debt} that could be easily assessed to determine both trend and change in the size of the trade imbalance over time. 
+One approach to breaking the sine illusion is to present the trend and variance separately, as shown in Figure \ref{trendremoval} and commonly recommended \citep{wainer:2000}, particularly for assessing model fit.} A loess smooth was used to estimate the trendline, and this estimate was subtracted from the line center to produce separate graphs of the trend and the variance. While this does largely remove the sine illusion, it also makes it somewhat more difficult to parse the overall data, as judgments must be made by combining two graphs or by mentally re-composing the original graph (at which point, the sine-illusion becomes a factor). Ideally, it would be possible to tell the whole story with a single graph, to minimize cognitive demands. While this example is relatively simple, it would be much harder to create a de-trended version of Figure \ref{playfair-debt} that could be easily assessed to determine both trend and change in the size of the trade imbalance over time. 
 
 <<trend-removal, include=FALSE, fig.height=4.5, fig.width=4.5>>=
 df <- df2 <- createSine(40, 1, sin, cos)
@@ -495,64 +553,63 @@ where $f$ is some underlying function (either due to prior knowledge or using a 
 
 % \newtext{This transformation assumes that we have an underlying function $f$ (either due to prior knowledge or using a model fit) which is differentiable over the region of observed data. If data $(x_i, y_i)_{i=1, ..., N}$ have been observed, then we assume we can model $y_i = f(x_i) + \epsilon_i$ and that $f^\prime(x_i)$ exists for all $i=1, ..., N$. }
 
-That is, if the $x$-axis spans the interval $[a,b)$, the transformation of the $x$ axis is 
-$$T(x) = a + (b-a)\left(\int_a^x |f^\prime(z)| dz\right)/\left(\int_a^b|f^\prime(z)| dz\right)$$ 
+%This transformation can be considered as a reparameterization of the $x$ axis in terms of the slope.
+% The transformation is shown in Figure \ref{xtrans1}. An analysis of $T(x)$ is shown in appendix \ref{XtransAppendix}.
 
-\newdo{the \$\$ way of defining math environments is easy, but make a habit of actually numbering and naming important equations so that you can refer to it. }
-
-\begin{equation}\label{eq.x.transformation}
-T(x) = ...
-\end{equation}
-
-\newdo{the above definition of $T(x)$ still is not reflecting what you actually do in the code. Let's look at it from the other end:}
-
-The idea of correcting for the illusion is to make all lines appear under the same slope, i.e. we want to find a transformation $\tilde{x}$ of $x$, such that $f(\tilde{x})$ is a  piece-wise linear function, where each piece has the same absolute slope. Since the slope is determined by the aspect ratio, we are free to choose it and w.l.o.g. we get for each piece $T_i$: 
+The idea of correcting for the illusion is to make all lines appear under the same slope, i.e. we want to find a transformation $\tilde{x}$ of $x$, such that $f(\tilde{x})$ is a  piece-wise linear function, where each piece has the same absolute slope. 
+As the sine illusion depends on changing slope in the overall trend, by reparameterizing the $x$-axis in terms of the slope, the data seem to have constant slope, removing the illusion, while the $x$-axis shows the changing slope.
+Since the slope is determined by the aspect ratio, we are free to choose it and w.l.o.g. we get for each piece $T_i$: 
 \[
 f(T_i(x)) = \pm a x + b_i.
 \]
 This means that $T_i$ is essentially an inverse of function $f$, with each piece defined by the   intervals on which the inverse of $f$ exists: let ${x_0, ..., x_K}$ be the set of values, for which the derivative of $f$ is zero, i.e. $f^\prime(x_i) = 0$ for all $i = 0, ... , K$. 
 Then each interval of the form $(x_{i-1}, x_i)$ defines one piece $T_i$ of the transfomation function $T(x)$. We will define $T_i$ now as a combination of a linear scaling function and the inverse of $f$, which we know exists for interval $(x_{i-1}, x_i)$.
 
-Let function $s = s_{[a,b]}^{[c,d]}$ be the linear scaling function that maps  the interval $(a,b)$ linearly to the interval $(c,d)$. This function is defined as
+Let function $s = \s{[a,b]}{[c,d]}$ be the linear scaling function that maps  the interval $(a,b)$ linearly to the interval $(c,d)$. This function is defined as
 \[
-s(x) = s_{[a,b]}^{[c,d]} (x) = (x-a)/(b-a) \cdot (d-c) + c.
+s(x) = \s{[a,b]}{[c,d]} (x) = (x-a)/(b-a) \cdot (d-c) + c.
+\]
+Note that the slope of function $s$ is given as
+\[
+s^\prime(x) = (d-c)/(b-a).
 \]
 
-Two scaling functions can be evaluated one after the other, only if the image of the first coincides with the range of the second. Then they form another linear scaling 
+Two scaling functions can be evaluated one after the other, only if the image of the first coincides with the range of the second. Then they form another linear scaling: 
 \[
-s_{[e,f]}^{[c,d]} \otimes s_{[a,b]}^{[e,f]} = s_{[a,b]}^{[c,d]}
+\s{[e,f]}{[c,d]}  \left(  \s{[a,b]}{[e,f]}(x) \right) = \s{[a,b]}{[c,d]} (x)
 \]
 
 
-In our situation let the scaling Function $s$ be given as :
+
+
+In our situation let the scaling function $s$ be given as :
 \[
-s_{[c,d]}^{\range{f(x)}}(x) = f(x_{i-1}) + (x-c)/(d-c) \cdot (f(x_{i}) - f(x_{i-1}))).
+\s{[c,d]}{\range{f([x_{i-1}, x_i])}}(x) = f(x_{i-1}) + (x-c)/(d-c) \cdot (f(x_{i}) - f(x_{i-1}))).
 \]
 Note that $s$ has either a positive or negative slope depending on whether $f(x_{i-1})$ is smaller or larger than $f(x_i)$, respectively.
 
 Then the transformation in the $x$-axis, $T(x)$ is defined piecewise as a combination of $T_i$, where each $T_i$ is given as:
 \begin{eqnarray}\label{eq.x.transformation}
-T_i(x) &=& f^{-1}\left( s_{[c_i,d_i]}^{\range({f(x)}})(x) \right). 
+T_i(x) &=& f^{-1}\left( \s{[c_i,d_i]}{\range{f([x_{i-1}, x_i])}}(x) \right). 
 \end{eqnarray}
-
-\newdo{still need to show that $f(T(x)$ is a linear function, i.e. compute $a$ (in particular this $a$ has to be the same for all $i$ -- here it will turn out to be 1) and $b_i$)}
-
-Note that parameters $c$ and $d$ determine the speed with which the transfomation happens, i.e. for $x \in (c,d)$ we have
+%
+Using this definition for the transformation makes $f(T(x))$ a piece-wise linear function, with parameters $c_i$ and $d_i$ determining the speed, i.e. for $x \in (c_i,d_i)$ we have
 \[
-f(T(x)) = f (f^{-1}(s_{[c_i,d_i]}^{\range({f(x)}}) (x))) = f(x_{i-1}) + (x-c_i)/(d_i-c_i) \cdot (f(x_{i}) - f(x_{i-1}))).
+f(T(x)) = f (f^{-1}(\s{[c_i,d_i]}{\range{f([x_{i-1}, x_i])}}(x))) = \s{[c_i,d_i]}{\range{f([x_{i-1}, x_i])}}(x).
 \]
-Correspondingly, the slope of $f(T_i(x))$ is given as $(f(x_{i}) - f(x_{i-1})))/(d_i-c_i)$.
-In order to make the slope the same on all pieces $T_i$, we need to define $c_i$ and $d_i$ with respect to the function values on the interval $(x_{i-1}, x_i)$. There are various options, depending on how closely our $x$-range should reflect the original range:
+Correspondingly, the slope of $f(T_i(x))$ is $(f(x_{i}) - f(x_{i-1})))/(d_i-c_i)$.
+In order to make the slope the same on all pieces $T_i$, we need to define $c_i$ and $d_i$ with respect to the function values on the interval $(x_{i-1}, x_i)$. There are various options, depending on how closely our $x$-range should reflect the original range.
 \begin{itemize}
-\item for $[c_i, d_i] = \range(f(x))$ the new $x$-range is the original $y$ range, but the scaling function simplifies to the identity.
+\item for $[c_i, d_i] = \range(f(x))$ the new $x$-range is the range of $f(y)$, but the scaling function simplifies to the identity.
 
 \item in order to preserve the original $x$-range, we can choose $[c_i, d_i]$ as .... . 
 \end{itemize}
 
-\newdo{this is a good motivation, but put it before the math.}
-\newtext{
-This transformation can be considered as a reparameterization of the $x$ axis in terms of the slope. As the sine illusion depends on changing slope in the overall trend, by reparameterizing the $x$-axis in terms of the slope, the data seem to have constant slope, removing the illusion, while the $x$-axis shows the changing slope. The transformation is shown in Figure \ref{xtrans1}. An analysis of $T(x)$ is shown in appendix \ref{XtransAppendix}.}
+\newdo{this needs to be re-written in terms of $s$, $c_i$ and $d_i$s - but it's the same idea.}
+That is, if the $x$-axis spans the interval $[a,b)$, the transformation of the $x$ axis is 
+$$T(x) = a + (b-a)\left(\int_a^x |f^\prime(z)| dz\right)/\left(\int_a^b|f^\prime(z)| dz\right)$$ 
 
+The transformation is shown in Figure \ref{xtrans1}. An analysis of $T(x)$ is shown in appendix \ref{XtransAppendix}.
 
 In practice we can see that the illusion can be broken by a much less severe transformation in $x$. 
 \newtext{By shrinking the transformation in Figure \ref{xtrans1} towards the original $x$ values by a factor of $w$, the illusion is still broken and the data are closer to the original function $y=f(x)$. 
@@ -677,59 +734,7 @@ w_o = w_v \cos \theta,
 \end{equation}
 where $\theta$ is the acute angle between the secant line and the vertical, that is, $\theta \in (-\pi, \pi]$.
 
-<<transform-illustration,echo=FALSE, message=FALSE, warning=FALSE, include=FALSE>>=
-f <- function(x) 2*sin(x)
-fprime <- function(x) 2*cos(x)
-f2prime <- function(x) -2*sin(x)
-library(plyr)
-dframe <- createSine(n = 150, len = 1, f=f, fprime=fprime)
-dframe$ystartcts <- dframe$ystart
-dframe$yendcts <- dframe$yend
-dframe[1:150,c(2, 3, 5, 6)] <- NA
-dframe[(1:15)*10-5, c(2, 3)] <- dframe[(1:15)*10-5, 1] 
-dframe[(1:15)*10-5, 5] <- dframe[(1:15)*10-5, 4] - .5
-dframe[(1:15)*10-5, 6] <- dframe[(1:15)*10-5, 4] + .5
-dframe$type <- "Data"
 
-
-dframe.1 <- getSecantSegment(dframe$xstart, dframe, f, fprime, f2prime)
-dframe.1$x <- dframe$x
-dframe.1$y <- dframe$y
-dframe.1$ystartcts <- dframe$ystartcts
-dframe.1$yendcts <- dframe$yendcts
-names(dframe.1) <- c("x", "y", "deriv", "xstart", "xend", "ystart", "yend", "ell", "ell.quad1", "ell.quad2", "type", "a", "ystartcts", "yendcts")
-# names(dframe.1) <- c("x", "y", "deriv", "xstart", "xend", "ystart", "yend", "ell", "ell.quad1", "ell.quad2", "type")
-# dframe.1 <- dframe.1[!is.na(dframe.1$x),]
-dframe.1$vangle <- with(dframe.1, atan(deriv))
-# dframe.1$x <- dframe$x
-# dframe.1$y <- dframe$y
-# dframe.1$ystartcts <- dframe$ystartcts
-# dframe.1$yendcts <- dframe$yendcts
-dframe <- rbind.fill(dframe, dframe.1)
-
-
-qplot(x=x, y=y, geom="line", data=dframe, colour=I("grey50")) + theme_bw() + 
-  geom_line(aes(y=ystartcts), colour="grey50", linetype=4) + 
-  geom_line(aes(y=yendcts), colour="grey50", linetype=4) +
-  geom_segment(data=subset(dframe, !is.na(type)), aes(x=xstart, xend = xend, y=ystart, yend=yend, colour=type))  + 
-  coord_equal(ratio=1) + scale_colour_manual("", values=c("black", "blue")) + theme(legend.position="bottom")  + 
-#   geom_text(aes(label=paste(round(vangle/pi*180), "^o", sep=""),
-#                 x=xstart*(x<pi/2 | x>1.5*pi) + xend*(x>pi/2 & x<1.5*pi), y=ystart*(x<pi/2 | x<1.5*pi) + yend*(x>pi/2 & x<1.5*pi)), 
-#             data=dframe.1, parse=TRUE, hjust=1, vjust=.5, size=2.5) + 
-  geom_text(aes(label=paste("theta", "%~~%", round(abs(vangle)/pi*180), "^o", sep=""),
-                x=pmax(xstart, xend)/2+x/2+.2, y=y-sign(vangle)*.6+.02), 
-            data=dframe.1, parse=TRUE, hjust=.9, vjust=.5, size=3) + 
-  scale_x_continuous(breaks=seq(0, 2*pi, by=pi/2), 
-                     labels=c("0", expression(paste(pi,"/2")), expression(pi), expression(paste("3",pi, "/2")), expression(paste("2",pi)))) #+ 
-  # facet_wrap(~type)
-  # + ggtitle("Changes in Perceived Orthogonal Width \ndue to Change in Secant Angle")
-@
-\begin{figure}[h!tbp]
-\centering
-\includegraphics[width=.45\linewidth, keepaspectratio=TRUE]{figure/fig-transform-illustration}
-\caption{\label{OrthogonalWidth} Changes in perceived orthogonal width due to the change in secant angle. 
-}
-\end{figure}
 The perceived length of the vertical line changes with the angle of the line perpendicular to the slope of $\sin(x)$, suggesting that the sine illusion stems from a conflict between the visual system's perception of figure width and the mathematical judgement necessary to determine the length of the vertical lines.
 
 The visual preference for judging the length of the line by the orthogonal extant suggests that the underlying illusion may be a function of geometry rather than some mysterious visual process that occurs automatically between perception of the stimulus and conscious thought. 
