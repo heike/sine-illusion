@@ -1091,13 +1091,14 @@ The asymmetric nature of the distortion suggests that we may want to use a secon
 
 \subsubsection{Quadratic Approximation to $f(x)$}
 
-Using the approximation $f(x) \approx f(x_0) + f^\prime(x_0)(x-x_0) + 1/2 f^{\prime\prime}(x_0)(x-x_0)^2$, the system of equations shown above reduces to
-\begin{align*}
-y & = f(x_0) + f(x_0) + f^\prime(x_0)(x-x_0) + 1/2 f^{\prime\prime}(x_0)(x-x_0)^2 \pm \ell/2\\
-y & = \left(-1/f^\prime(x_0)\right) x + f(x_0) + x_0/f^\prime(x_0)
-\end{align*}
+Using the approximation $f(x) \approx f(x_0) + f^\prime(x_0)(x-x_0) + 1/2 f^{\prime\prime}(x_0)(x-x_0)^2$, the system of equations  \ref{en.general} and \ref{en.general.2}  simplifies to the following  quadratic equation in $x$:
+\begin{eqnarray*}
+(x-x_0)  f^\prime(x_0) + 1/2 (x-x_0)^2 f^{\prime\prime}(x_0) = - (x-x_0) \left(f^\prime(x_0)\right)^{-1} \pm \ell/2.
+\end{eqnarray*}
 
-As shown in Figure \ref{quadratic-GeneralCorrection}, solving the system of equations provides endpoints $(x_l, y_l)$ and $(x_u, y_u)$ which can then be used to compute the extant width of each half-segment $m$. Unlike the linear solution, the half-segments here are not of the same length, as shown in Figure \ref{HalfSegLength}, and thus there are separate correction factors for each half-segment. The correction factors are $(\ell/2)/(m_u)$ and $(\ell/2)/(m_l)$ respectively. 
+
+As shown in Figure \ref{quadratic-GeneralCorrection}, the solution of this equation provides endpoints $(x_l, y_l)$ and $(x_u, y_u)$ which can then be used to compute the extant width of each half-segment $m$. Unlike the linear solution, the half-segments here are not necessarily of the same length, and thus there are separate correction factors for each half-segment. 
+%The correction factors are $(\ell/2)/(m_u)$ and $(\ell/2)/(m_l)$ respectively. 
 <<CtsQuadratic, echo=FALSE, include=FALSE>>=
 f <- function(x) 2*sin(x)
 fprime <- function(x) 2*cos(x)
