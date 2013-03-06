@@ -885,12 +885,14 @@ qplot(x=x, xend=xend, y = f(x) -ellx2/2, yend=f(x) +ellx2/2, geom="segment", dat
 
 \newdo{Figure \ref{trigFix} deserves a mentioning here.}
 
-$f(x)$ with non-constant derivative $f^\prime(x)$ which may vary continuously. 
+The assumption underlying this correction is the existence of a differentiable function $f$ describing the relationship between $X$ and $Y$,
+ as we the correction is based on the slope of the secant line given by $-1/f^\prime(x)$.
 
- This is still dependent on having a functional form for $f(x)$ which has derivative $f^\prime(x)$ on the range of $x$ within the data, as we will determine $\theta$ based on the slope of the secant line, $-1/f^\prime(x)$.
-
+\newtext{The correction factor seems to over-correct. Is this just something that happens to the trained eye? We might need people to test for it.}
 
 \subsubsection{A General Correction Method}
+The idea for the general correction method is sketched out in figure \ref{GeneralCorrection}. Based on function $f$ that describes the overall trend of the relationship between $X$ and $Y$ we want to first want to find the perceived width, and then correct the vertical width accordingly to match with the audience's expectation.
+
 \begin{figure}[hbtp]
 \centering
 \includegraphics[keepaspectratio=TRUE,width=.5\linewidth]{figure/fig-generalcorrectioncartoon1}
@@ -898,33 +900,43 @@ $f(x)$ with non-constant derivative $f^\prime(x)$ which may vary continuously.
 General correction approach. This approach may require numerical optimization to obtain exact solutions for $(x_u, y_u)$ and $(x_l, y_l)$.}
 \end{figure}
 
+The orthogonal width is given as the line segment between endpoints $(x_u, f_u(x_u))$ and $(x_\ell, f_\ell(x_\ell))$, where $f_\ell$ and $f_u$ denote the vertical shifts of function $f$ by $-\ell/2$ and $\ell/2$, respectively.
+These endpoints are determined as the intersection of the line  orthogonal to the tangent line in $(x, f(x))$ and the graphs resulting from vertical shifts of $f$ by $\pm \ell/2$.
 
-As shown in Figure \ref{GeneralCorrection}, another method for adjusting the vertical length to ensure constant extant width is to solve the systems of equations\\
-\begin{minipage}[t]{.495\linewidth}
-\begin{align*}
-y_u & = f(x_u) + \ell/2\\
-y_u & = \left(-1/f^\prime(x_0)\right) x_u + f(x_0) + x_0/f^\prime(x_0)
-\end{align*}\vspace{8pt}
-\end{minipage}
-\begin{minipage}[t]{.495\linewidth}
-\begin{align*}
-y_l & = f(x_l) - \ell/2\\
-y_l & = \left(-1/f^\prime(x_0)\right) x_l + f(x_0) + x_0/f^\prime(x_0)
-\end{align*}
-\end{minipage}\\
-to obtain  $(x_u,y_u)$, the point at which the secant line intersects $f(x) + \ell/2$, and $(x_l, y_l)$, thet point at which the secant line intersects $f(x) -\ell/2$. With these two endpoints, we can correct separately for the top and bottom portions of the line, as the extant width is not symmetric when reflected across the original function f(x). 
+The function describing the orthogonal line through $(x_o, f(x_o))$ is given in intrinsic form as 
+\[
+{x_o \choose f(x_o)} + \lambda {f^\prime(x_o) \choose 1}, 
+\]
+for any real-valued $\lambda$.
+By setting the above equation equal to the graphs of $f_u$ and $f_\ell$ we find end points of the line segment as solutions in $x$ and $\lambda$ of the system of equations:
+\begin{eqnarray}\label{eqn.general}
+(I) && x - x_o = \lambda f^\prime(x_o)\\
+(II) && f(x) - f(x_o) = -\lambda \pm \ell/2
+\end{eqnarray}
+With these two endpoints, we can  separately correct for the top and bottom portions of the vertical width. Note that the extant width generally is   not symmetric when reflected across the original function $f(x)$ (as can be seen in figure \ref{GeneralCorrection}). 
 
-\begin{figure}[h!]\centering
-\begin{subfigure}[a]{0.49\linewidth}\centering
-\includegraphics[keepaspectratio=TRUE,width=\linewidth]{figure/fig-generalcorrectioncartoon2}
-\caption{Linear Approximation}\label{linear-GeneralCorrection}
-\end{subfigure}
-\begin{subfigure}[b]{0.49\linewidth}\centering
-\includegraphics[keepaspectratio=TRUE,width=\linewidth]{figure/fig-generalcorrectioncartoon3}
-\caption{Quadratic Approximation}\label{quadratic-GeneralCorrection}
-\end{subfigure}
-\caption{\label{linear.quadratic} (a) uses a first-order taylor series approximation to $f(x)$ and (b) uses a second-order taylor series approximation to $f(x)$. The intersection of the function $f(x) \pm \ell/2$ and the secant line,  $(x_u, y_u), (x_l, y_l)$ must be obtained to determine the necessary correction factor.}
-\end{figure}
+Note that  the above system of equations involves function values $f(x)$, which implies that solving this system  requires numerical optimization for any but the most simple functions $f$.
+
+Taylor approximations can be employed to reduce the computational requirements. Approximations derived from the first and second-order taylor approximations are described in the following sections.
+
+
+
+% 
+% As shown in Figure \ref{GeneralCorrection}, another method for adjusting the vertical length to ensure constant extant width is to solve the systems of equations\\
+% \begin{minipage}[t]{.495\linewidth}
+% \begin{align*}
+% y_u & = f(x_u) + \ell/2\\
+% y_u & = \left(-1/f^\prime(x_0)\right) x_u + f(x_0) + x_0/f^\prime(x_0)
+% \end{align*}\vspace{8pt}
+% \end{minipage}
+% \begin{minipage}[t]{.495\linewidth}
+% \begin{align*}
+% y_l & = f(x_l) - \ell/2\\
+% y_l & = \left(-1/f^\prime(x_0)\right) x_l + f(x_0) + x_0/f^\prime(x_0)
+% \end{align*}
+% \end{minipage}\\
+% to obtain  $(x_u,y_u)$, the point at which the secant line intersects $f(x) + \ell/2$, and $(x_l, y_l)$, thet point at which the secant line intersects $f(x) -\ell/2$. With these two endpoints, we can correct separately for the top and bottom portions of the line, as the extant width is not symmetric when reflected across the original function f(x). 
+
 
 <<generalcorrectioncartoon,echo=FALSE, include=FALSE, fig.width=4, fig.height=4>>=
 f <- function(x) 2*sin(x)
@@ -1013,7 +1025,8 @@ qplot(data=df.real, x=x, y=y, geom="line") + theme_minimal() + coord_equal(ratio
   theme(axis.title=element_blank(), axis.text=element_blank(), axis.ticks=element_blank(), axis.line=element_blank(), panel.grid=element_blank())
 @
 
-As the solutions to these two sets of equations requires numerical optimization to obtain, at least for $f(x) = sin(x)$, Taylor approximations can be employed to reduce the computational requirements. Approximations derived from the first and second-order taylor approximations are described in the following sections.
+
+
 
 \paragraph{Linear Approximation to $f(x)$}
 Using the approximation $f(x) \approx f(x_0) + f^\prime(x_0)(x-x_0)$, the system of equations shown above reduces to
@@ -1021,11 +1034,25 @@ Using the approximation $f(x) \approx f(x_0) + f^\prime(x_0)(x-x_0)$, the system
 y & = f(x_0) + f^\prime(x_0)(x-x_0) \pm \ell/2\\
 y & = \left(-1/f^\prime(x_0)\right) x + f(x_0) + x_0/f^\prime(x_0)
 \end{align*}
+\newdo{we need the steps in between, too - right now the solution is just a statement, we need an explanation.}
 
+\begin{figure}[h!]\centering
+\begin{subfigure}[a]{0.49\linewidth}\centering
+\includegraphics[keepaspectratio=TRUE,width=\linewidth]{figure/fig-generalcorrectioncartoon2}
+\caption{Linear Approximation}\label{linear-GeneralCorrection}
+\end{subfigure}
+\begin{subfigure}[b]{0.49\linewidth}\centering
+\includegraphics[keepaspectratio=TRUE,width=\linewidth]{figure/fig-generalcorrectioncartoon3}
+\caption{Quadratic Approximation}\label{quadratic-GeneralCorrection}
+\end{subfigure}
+\caption{\label{linear.quadratic} (a) uses a first-order taylor series approximation to $f(x)$ and (b) uses a second-order taylor series approximation to $f(x)$. The intersection of the function $f(x) \pm \ell/2$ and the secant line,  $(x_u, y_u), (x_l, y_l)$ must be obtained to determine the necessary correction factor.}
+\end{figure}
 Figure \ref{linear-GeneralCorrection} shows the linear approximation to $f(x) \pm \ell/2$ and the secant line. Solving the system of equations provides endpoints $(x_l, y_l)$ and $(x_u, y_u)$ which can then be used to compute the extant width of the line connecting $(x_l, y_l)$ and $(x_u, y_u)$. We then scale the vertical line length so that the extant width is equal to the original value of $\ell/2$. This correction factor is 
 \begin{equation}\label{LinearApprox}
-1/\left(\sqrt{1 + f^\prime(x)^2}\right) = (\atan(f^\prime(x)))^\prime/f^{\prime\prime}(x)
+\ell_{new} = \ell \cdot \left(\sqrt{1 + f^\prime(x)^2}\right) 
 \end{equation}
+
+%= (\atan{f^\prime(x))}^\prime/f^{\prime\prime}(x)
 
 \begin{figure}[h!btp]
 \begin{subfigure}[b]{.45\linewidth}\centering
