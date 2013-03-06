@@ -910,7 +910,7 @@ The function describing the orthogonal line through $(x_o, f(x_o))$ is given in 
 for any real-valued $\lambda$.
 By setting the above equation equal to the graphs of $f_u$ and $f_\ell$ we find end points of the line segment as solutions in $x$ and $\lambda$ of the system of equations:
 \begin{eqnarray}\label{eqn.general}
-(I) && x - x_o = \lambda f^\prime(x_o)\\
+(I) && x - x_o = \lambda f^\prime(x_o)\\ \label{eqn.general.2}
 (II) && f(x) - f(x_o) = -\lambda \pm \ell/2
 \end{eqnarray}
 With these two endpoints, we can  separately correct for the top and bottom portions of the vertical width. Note that the extant width generally is   not symmetric when reflected across the original function $f(x)$ (as can be seen in figure \ref{GeneralCorrection}). 
@@ -1029,12 +1029,18 @@ qplot(data=df.real, x=x, y=y, geom="line") + theme_minimal() + coord_equal(ratio
 
 
 \paragraph{Linear Approximation to $f(x)$}
-Using the approximation $f(x) \approx f(x_0) + f^\prime(x_0)(x-x_0)$, the system of equations shown above reduces to
-\begin{align*}
-y & = f(x_0) + f^\prime(x_0)(x-x_0) \pm \ell/2\\
-y & = \left(-1/f^\prime(x_0)\right) x + f(x_0) + x_0/f^\prime(x_0)
-\end{align*}
-\newdo{we need the steps in between, too - right now the solution is just a statement, we need an explanation.}
+Using a linear approximation of $f(x)$ in value $x_0$, i.e.  
+ $f(x) \approx f(x_0) + f^\prime(x_0)(x-x_0)$, changes equation \ref{eqn.general.2}  to
+ \begin{eqnarray*}
+ (II)  &&  f^\prime(x_0)(x-x_0) = -\lambda \pm \ell/2,
+ \end{eqnarray*}
+which makes the system linear, and allows a  straightforward solution, and leads to a correction factor of:  
+
+% \begin{align*}
+% y & = f(x_0) + f^\prime(x_0)(x-x_0) \pm \ell/2\\
+% y & = \left(-1/f^\prime(x_0)\right) x + f(x_0) + x_0/f^\prime(x_0)
+% \end{align*}
+% \newdo{we need the steps in between, too - right now the solution is just a statement, we need an explanation.}
 
 \begin{figure}[h!]\centering
 \begin{subfigure}[a]{0.49\linewidth}\centering
@@ -1047,10 +1053,11 @@ y & = \left(-1/f^\prime(x_0)\right) x + f(x_0) + x_0/f^\prime(x_0)
 \end{subfigure}
 \caption{\label{linear.quadratic} (a) uses a first-order taylor series approximation to $f(x)$ and (b) uses a second-order taylor series approximation to $f(x)$. The intersection of the function $f(x) \pm \ell/2$ and the secant line,  $(x_u, y_u), (x_l, y_l)$ must be obtained to determine the necessary correction factor.}
 \end{figure}
-Figure \ref{linear-GeneralCorrection} shows the linear approximation to $f(x) \pm \ell/2$ and the secant line. Solving the system of equations provides endpoints $(x_l, y_l)$ and $(x_u, y_u)$ which can then be used to compute the extant width of the line connecting $(x_l, y_l)$ and $(x_u, y_u)$. We then scale the vertical line length so that the extant width is equal to the original value of $\ell/2$. This correction factor is 
+% Figure \ref{linear-GeneralCorrection} shows the linear approximation to $f(x) \pm \ell/2$ and the secant line. Solving the system of equations provides endpoints $(x_l, y_l)$ and $(x_u, y_u)$ which can then be used to compute the extant width of the line connecting $(x_l, y_l)$ and $(x_u, y_u)$. We then scale the vertical line length so that the extant width is equal to the original value of $\ell/2$. This correction factor is 
 \begin{equation}\label{LinearApprox}
-\ell_{new} = \ell \cdot \left(\sqrt{1 + f^\prime(x)^2}\right) 
+\ell_{new} = \ell \cdot \sqrt{1 + \left(f^\prime(x)\right)^2}
 \end{equation}
+
 
 %= (\atan{f^\prime(x))}^\prime/f^{\prime\prime}(x)
 
@@ -1067,7 +1074,20 @@ Figure \ref{linear-GeneralCorrection} shows the linear approximation to $f(x) \p
 \label{GeneralLinearCorrection} 
 \end{figure}
 
-Figure \ref{GeneralLinearCorrection} shows the correction factor compared with the trigonometry-style correction and the untransformed data. As with the trigonometry correction, the linear adjustment is prone to the same overcorrection distortion shown in Figure \ref{linearFixOvercorrect}.  The asymmetric nature of the distortion suggests that we may want to use a second-order taylor polynomial approximation to $f(x)$ to account for the asymmetry in the extant widths on either side of the center trendline.
+Figure \ref{GeneralLinearCorrection} shows the correction factor compared with the trigonometry-style correction and the untransformed data. 
+
+Note that while this solution looks different from the trigonometric approach, they are actually the same, since
+\[
+\cos (\atan{|f^\prime(x)}) = \sqrt{1 + |f^\prime(x)^2|}.
+\]
+This follows directly for $y = \atan{|f^\prime(x|}$ in the formula below:
+\begin{eqnarray*}
+\cos(y) = 1/sec(y) = 1/\sqrt(1+ \tan^2 y).\\
+\end{eqnarray*}
+
+\newdo{why are our solutions in the code not the same? they are only linearly dependent values. }
+
+The asymmetric nature of the distortion suggests that we may want to use a second-order taylor polynomial approximation to $f(x)$ to account for the asymmetry in the extant widths on either side of the center trendline.
 
 \subsubsection{Quadratic Approximation to $f(x)$}
 
@@ -1134,6 +1154,9 @@ qplot(x=x, xend=x, y=y+ellx3.u, yend=y-ellx3.l, geom="segment", data=dframe, lin
 \subsection{Discussion of Transformations}
 \todo[inline]{Add pictures comparing the 3 transformations to the untransformed data under both normal and extreme conditions.}
 \todo[inline]{Discussion: Hammock/Trig breaks first, linear breaks next, quadratic breaks eventually}
+As with the trigonometry correction, the linear adjustment is prone to the same overcorrection distortion shown in Figure \ref{linearFixOvercorrect}.
+
+
 Some modifications are necessary to implement the correction factor in a realistic situation in which it might not be practical for the aspect ratio of the graph to be fixed at 1. As in \todo{Cite Marie's paper}, the correction factor necessary to remove the illusion depends on the aspect ratio of the graphs. Figure \ref{trigFix-aspectRatio} demonstrates the relative effectiveness of the correction factor.
 <<aspectratio, echo=FALSE, include=FALSE>>=
 f <- function(x) 2*sin(x)
