@@ -891,26 +891,15 @@ $f(x)$ with non-constant derivative $f^\prime(x)$ which may vary continuously.
 
 
 \subsubsection{A General Correction Method}
-\begin{figure}[h!]\centering
-\begin{subfigure}[c]{.6\linewidth}
-\includegraphics[keepaspectratio=TRUE,width=\linewidth]{figure/fig-generalcorrectioncartoon1}
-\caption{General Correction}
-\label{GeneralCorrection}
-\end{subfigure}
-\begin{minipage}[c]{.38\linewidth}\centering
-\begin{subfigure}[b]{\linewidth}\centering
-\includegraphics[keepaspectratio=TRUE,width=\linewidth]{figure/fig-generalcorrectioncartoon2}
-\caption{Linear Approximation}\label{linear-GeneralCorrection}
-\end{subfigure}
-\begin{subfigure}[b]{\linewidth}\centering
-\includegraphics[keepaspectratio=TRUE,width=\linewidth]{figure/fig-generalcorrectioncartoon3}
-\caption{Quadratic Approximation}\label{quadratic-GeneralCorrection}
-\end{subfigure}
-\end{minipage}
-\caption{General correction approach. (a) may require numerical optimization to obtain exact solutions for $(x_u, y_u)$ and $(x_l, y_l)$. (b) uses a first-order taylor series approximation to $f(x)$ and (c) uses a second-order taylor series approximation to $f(x)$. The intersection of the function $f(x) \pm \ell/2$ and the secant line,  $(x_u, y_u), (x_l, y_l)$ must be obtained to determine the necessary correction factor.}\label{GeneralCorrection-all}
+\begin{figure}[hbtp]
+\centering
+\includegraphics[keepaspectratio=TRUE,width=.5\linewidth]{figure/fig-generalcorrectioncartoon1}
+\caption{\label{GeneralCorrection}
+General correction approach. This approach may require numerical optimization to obtain exact solutions for $(x_u, y_u)$ and $(x_l, y_l)$.}
 \end{figure}
 
-As shown in Figure \ref{GeneralCorrection-all}, another method for adjusting the vertical length to ensure constant extant width is to solve the systems of equations\\
+
+As shown in Figure \ref{GeneralCorrection}, another method for adjusting the vertical length to ensure constant extant width is to solve the systems of equations\\
 \begin{minipage}[t]{.495\linewidth}
 \begin{align*}
 y_u & = f(x_u) + \ell/2\\
@@ -924,6 +913,18 @@ y_l & = \left(-1/f^\prime(x_0)\right) x_l + f(x_0) + x_0/f^\prime(x_0)
 \end{align*}
 \end{minipage}\\
 to obtain  $(x_u,y_u)$, the point at which the secant line intersects $f(x) + \ell/2$, and $(x_l, y_l)$, thet point at which the secant line intersects $f(x) -\ell/2$. With these two endpoints, we can correct separately for the top and bottom portions of the line, as the extant width is not symmetric when reflected across the original function f(x). 
+
+\begin{figure}[h!]\centering
+\begin{subfigure}[a]{0.49\linewidth}\centering
+\includegraphics[keepaspectratio=TRUE,width=\linewidth]{figure/fig-generalcorrectioncartoon2}
+\caption{Linear Approximation}\label{linear-GeneralCorrection}
+\end{subfigure}
+\begin{subfigure}[b]{0.49\linewidth}\centering
+\includegraphics[keepaspectratio=TRUE,width=\linewidth]{figure/fig-generalcorrectioncartoon3}
+\caption{Quadratic Approximation}\label{quadratic-GeneralCorrection}
+\end{subfigure}
+\caption{\label{linear.quadratic} (a) uses a first-order taylor series approximation to $f(x)$ and (b) uses a second-order taylor series approximation to $f(x)$. The intersection of the function $f(x) \pm \ell/2$ and the secant line,  $(x_u, y_u), (x_l, y_l)$ must be obtained to determine the necessary correction factor.}
+\end{figure}
 
 <<generalcorrectioncartoon,echo=FALSE, include=FALSE, fig.width=4, fig.height=4>>=
 f <- function(x) 2*sin(x)
