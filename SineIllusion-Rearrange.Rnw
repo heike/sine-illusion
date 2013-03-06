@@ -19,6 +19,15 @@
 
 \newcommand{\range}[1]{{\text{range}\left(#1\right)}}
 \newcommand{\s}[2]{{_{#1}s^{ #2}}}
+\newcommand{\atan}[1]{\text{atan}\left({#1}\right)}
+\newcommand{\done}[2][inline]{\todo[color=SpringGreen, #1]{#2}}  % for todos that have been seen and dealt with
+\newcommand{\meh}[2][inline]{\todo[color=White, #1]{#2}}   % for todos that may no longer be relevant 
+\newcommand{\comment}[2][inline]{\todo[color=SkyBlue, #1]{#2}} % for comments that may not be "to-do"s
+\newcommand{\mcomment}[1]{\todo[color=SkyBlue]{#1}} % for margin comments
+
+\newcommand{\newtext}[1]{\todo[inline, color=White]{ \color{OliveGreen}{#1}}} % new text - not necessarily something to be done
+\newcommand{\newdo}[1]{\todo[inline, color=Plum]{#1}} % new to do item
+
 
 <<setup, fig.keep='all', cache=FALSE, echo=FALSE, eval=TRUE>>=
 rm(list=ls())
@@ -124,14 +133,6 @@ getSecantSegment <- function(x0, df, f, fprime, f2prime){
 @
 
 
-\newcommand{\atan}[1]{\text{atan }\left({#1}\right)}
-\newcommand{\done}[2][inline]{\todo[color=SpringGreen, #1]{#2}}  % for todos that have been seen and dealt with
-\newcommand{\meh}[2][inline]{\todo[color=White, #1]{#2}}   % for todos that may no longer be relevant 
-\newcommand{\comment}[2][inline]{\todo[color=SkyBlue, #1]{#2}} % for comments that may not be "to-do"s
-\newcommand{\mcomment}[1]{\todo[color=SkyBlue]{#1}} % for margin comments
-
-\newcommand{\newtext}[1]{\todo[inline, color=White]{ \color{OliveGreen}{#1}}} % new text - not necessarily something to be done
-\newcommand{\newdo}[1]{\todo[inline, color=Plum]{#1}} % new to do item
 
 
 \title{Signs of the Sine Illusion -- why we need to care}
@@ -435,6 +436,12 @@ M Bach's applet  gives the option to compensate the line length manually for its
 \subsection{Geometry of the Illusion}
 \newdo{Figure \ref{OrthogonalWidth} is beautiful and deserves some detailed discussion here. Do not orphan it again.}
 
+The perceived length of the vertical line changes with the angle of the line perpendicular to the slope of $\sin(x)$, suggesting that the sine illusion stems from a conflict between the visual system's perception of figure width and the mathematical judgement necessary to determine the length of the vertical lines.
+
+The visual preference for judging the length of the line by the orthogonal extant suggests that the underlying illusion may be a function of geometry rather than some mysterious visual process that occurs automatically between perception of the stimulus and conscious thought. 
+
+If this is the case, then it may be  possible to correct the graphical display for so that it is not as visually deceptive. 
+
 <<transform-illustration,echo=FALSE, message=FALSE, warning=FALSE, include=FALSE>>=
 f <- function(x) 2*sin(x)
 fprime <- function(x) 2*cos(x)
@@ -697,9 +704,15 @@ qplot(x=xtrans4, xend=xtrans4, y = ystart, yend=yend, colour=I("blue"), geom="se
 \label{xtrans}
 \end{figure}
 \todo[inline]{add 2nd example (maybe in the "application" section?)}
+\newdo{add a 2nd example here - how about a correction for the ozone data from the beginning?}
 \clearpage
+
 \subsection{Transformation of the $Y$-Axis}
 Understanding the geometry of the sine illusion leads to another approach to disrupting the conflict between the extant width and the actual height of the segment. 
+
+All of our approaches in this section are based on a comparison of the orthogonal width to the vertical width of lines. 
+Studies have shown \cite{XXX, YYY} that onlookers generally evaluate orthogonal width rather than vertical or horizontal widths of lines.
+By adjusting the vertical width in such a way that the (perceived) orthogonal width displays the quantity of interest, we can match an onlooker's intuitive evaluation of a situation  with the data values we want to present.
 
 <<geometry,echo=FALSE, fig.height=3, fig.width=5, include=FALSE>>=
 f <- function(x, a=1, b=0) a*x + b
@@ -717,31 +730,28 @@ qplot(data=ribbon, x=x, ymin=ybottom, ymax=ytop, geom="ribbon", fill=I("grey")) 
         axis.line=element_blank(), panel.grid=element_blank(), legend.position="right", legend.direction="vertical") + 
   geom_segment(data=widths, aes(x=xbottom, xend = xtop, y=ybottom, yend=ytop, linetype=label)) +
   geom_text(data=widths, aes(x=mean(c(xbottom[1], xbottom[2], 0)), y=mean(c(ybottom[1], ybottom[2], ybottom[2])), label="theta"), parse=TRUE) +
-  coord_equal(ratio=1) + scale_linetype_discrete("")
+  coord_equal(ratio=1) + scale_linetype_discrete("") + theme(plot.margin = unit(c(-1,-1,-2,-2), "lines"))
 @
 \begin{figure}[h!tbp]
 \begin{center}
 % \includegraphics[width=0.3\linewidth]{images/linewidth}
 \includegraphics[width=.5\linewidth]{figure/fig-geometry}
 \end{center}
-\caption{\label{fig:linewidth}Sketch of line width assessments: The solid line shows vertical width, the dotted line shows  width orthogonal to the slope. \comment{From previous surveys (we could cite Marie's survey here) we know that  observers associate line width more with  orthogonal width than vertical width.}}
+\caption{\label{fig:linewidth}Sketch of line width assessments: The solid line shows vertical width, the dotted line shows  width orthogonal to the slope. }
 \end{figure}
 % 
 
-Orthogonal $w_o$ and vertical $w_v$ line widths are related -- the orthogonal line width depends on the angle (or, equivalently, the slope) of the line:
-\begin{equation}\label{adjust}
+As sketch \ref{fig:linewidth} shows, orthogonal $w_o$ and vertical $w_v$ line widths are related -- the orthogonal line width depends on the angle under which the line is drawn. Mathematically, we have:
+\begin{equation}\label{eqn.adjust}
 w_o = w_v \cos \theta,
 \end{equation}
 where $\theta$ is the acute angle between the secant line and the vertical, that is, $\theta \in (-\pi, \pi]$.
 
+Previous work in \citet{schonlau:2003, marie:2013} used the adjustment in eqn.(\ref{eqn.adjust}) for a line with constant slope. We have to extend this approach to a functional form with varying slope. This is the approach taken in the next sections.
 
-The perceived length of the vertical line changes with the angle of the line perpendicular to the slope of $\sin(x)$, suggesting that the sine illusion stems from a conflict between the visual system's perception of figure width and the mathematical judgement necessary to determine the length of the vertical lines.
-
-The visual preference for judging the length of the line by the orthogonal extant suggests that the underlying illusion may be a function of geometry rather than some mysterious visual process that occurs automatically between perception of the stimulus and conscious thought. 
-
-\newtext{If this is the case, then it may be  possible to correct the graphical display for so that it is not as visually deceptive. Our first approach to this is to compare the (perceived) orthogonal width to the (information-carrying) vertical length of the line. By adjusting the vertical line such that the orthogonal width displays the quantity of interest, we can match the audience's intuitive expectation with the data. This is still dependent on having a functional form for $f(x)$ which has derivative $f^\prime(x)$ on the range of $x$ within the data, as we will determine $\theta$ based on the slope of the secant line, $-1/f^\prime(x)$.} 
 \subsubsection{Trigonometry Method}\label{trig}
-This approach aims to extend the orthogonal width, which onlookers generally evaluate,  to the amount of the vertical width, which we want to represent. While previous work in \citet{schonlau:2003} used this adjustment for a line with constant slope, we must extend this approach to $f(x)$ with non-constant derivative $f^\prime(x)$ which may vary continuously. 
+The approach that we take here is sketched out in figure \ref{fig:trig}: we evaluate the slope of function $f$ in position $x$, find an approximation of the extant width as $m = \ell \cos{\theta}$, where angle $\theta$ is determined by the slope of function $f$ in $x$, i.e.
+%
 <<trigmethodcartoon,echo=FALSE, include=FALSE, cache=FALSE>>=
 f <- function(x) 2*sin(x)
 fprime <- function(x) 2*cos(x)
@@ -768,7 +778,8 @@ dfslope <- data.frame(xstart=df$x[a]+.5, xend=df$x[a]-.9, ystart=fprime(df$x[a])
 dfslope2 <- data.frame(xstart=df$x[a]+.5, xend=df$x[a]-.3, ystart=fprime(df$x[a])*.5+df$y[a]+.5, yend=-.3*fprime(df$x[a])+df$y[a]+.5)
 
 cairo_pdf("./figure/fig-trigmethodcartoon.pdf", width=5, height=5)
-qplot(data=df.real, x=x, y=y, geom="line") + theme_minimal() + coord_equal(ratio=1) +
+qplot(data=df.real, x=x, y=y, geom="line") + #theme_minimal() + 
+  coord_equal(ratio=1) +
   geom_line(data=df.real,aes(y=yupper), linetype=3) + 
   geom_line(data=df.real,aes(y=ylower), linetype=4) + 
   geom_segment(data=df, aes(x=xstart, y=ystart, xend=xend, yend=yend), colour="grey50") + 
@@ -776,12 +787,12 @@ qplot(data=df.real, x=x, y=y, geom="line") + theme_minimal() + coord_equal(ratio
   geom_line(data=df.real, aes(y=sec)) + 
   geom_text(data=dfslope, aes(x=xend+.1, y=yend+.05, label="slope: paste(f, \"'\", (x))"), parse=TRUE, hjust=0, vjust=1) +
   geom_text(aes(x=mean(c(dfsec$sec.xstart, df$xend[a], df$x[a], df$x[a]))+.04, 
-                y=mean(c(dfsec$sec.ystart, df$yend[a], df$y[a], df$y[a]))+.04, 
-                label="theta"), parse=TRUE, size=ftsize+1) +
-  geom_text(aes(x=df.real$x[which.min(df.real$sec)], y=min(df.real$sec, na.rm=TRUE)-.05, 
-                label="slope: paste(-1/f, \"'\", (x))"), parse=TRUE, hjust=.75, vjust=1) +
+                y=mean(c(dfsec$sec.ystart, df$yend[a], df$y[a], df$y[a]))+.04 
+                ), label="theta", parse=TRUE, size=ftsize+1, data=data.frame()) +
+  geom_text(aes(x=df.real$x[which.min(df.real$sec)], y=min(df.real$sec, na.rm=TRUE)-.05), 
+                label="slope: paste(-1/f, \"'\", (x))", parse=TRUE, hjust=.75, vjust=1, data=data.frame()) +
   geom_text(data=df[a,], aes(x=.5*xend-.05 + .5*x, y=.5*yend+.5*y, label="paste(frac(\u2113, 2))"), size=ftsize+1, face="bold", parse=TRUE) +
-  geom_text(aes(x=.5*dfsec$sec.xstart+ .5*dfsec$x +.05 , y=.5*dfsec$sec.ystart+.5*dfsec$y-0.03, label="italic(m)"), parse=TRUE, face="plain") + 
+  geom_text(aes(x=.5*dfsec$sec.xstart+ .5*dfsec$x +.05 , y=.5*dfsec$sec.ystart+.5*dfsec$y-0.03), label="paste(frac(m, 2))", parse=TRUE, face="plain", data=data.frame()) + 
   xlab("x") + ylab("y") +
   geom_segment(data=dfslope, aes(x=xstart, y=ystart, xend=xend, yend=yend), linetype=2) + theme(axis.title=element_blank(), axis.text=element_blank(), axis.ticks=element_blank(), axis.line=element_blank(), panel.grid=element_blank())
 
@@ -810,19 +821,22 @@ dev.off()
 @
 \begin{figure}[h!tbp]\centering
 \includegraphics[keepaspectratio=TRUE,width=.5\linewidth]{figure/fig-trigmethodcartoon}
-\caption{Geometry of the trigonometry correction approach. $\ell$ denotes the length of the entire vertical segment, hence, $\ell/2$ is the length of the portion above the mean function.}
+\caption{\label{fig:trig} Geometry of the trigonometry correction approach. $\ell$ denotes the length of the entire vertical segment, hence, $\ell/2$ is the length of the portion above the mean function.
+\newdo{{\tt theme\_minimal} is not defined; there was a $1/2$ missing for $m$ -- either we use $\ell$ and $m$ or $\ell/2$ and $m/2$. Mixing those makes the math more complicated.}
+}
 \end{figure}
-\todo[inline]{
-%The picture is wrong here, but I can't figure out how the extant width in the trig method was actually calculated. It seems like it should be like this, but either we're assuming a right angle and shouldn't be (use law of cosines instead) or I'm being an idiot, but the picture looks exactly like that for linear fix, and I know it isn't the same method!
-For the time being, I'm using an annotated version of the linear approximation picture, but we need to add the math in to justify them as the same correction (and also need to fix the aspect ratio correction in the functions)}
+% \todo[inline]{
+% %The picture is wrong here, but I can't figure out how the extant width in the trig method was actually calculated. It seems like it should be like this, but either we're assuming a right angle and shouldn't be (use law of cosines instead) or I'm being an idiot, but the picture looks exactly like that for linear fix, and I know it isn't the same method!
+% For the time being, I'm using an annotated version of the linear approximation picture, but we need to add the math in to justify them as the same correction (and also need to fix the aspect ratio correction in the functions)}
+% 
+% Our goal is to make the segment $m$ appear as long as the segment $\ell$. As the angle $\theta$ is determined by the slope of the tangent line, that is, 
+$$\tan \theta = \left|f^\prime(x)\right|.$$ 
+Solving for $\theta$ leaves us with a ratio of orthogonal and vertical width of 
+$$\left[\cos(\atan{\left|f^\prime(x)\right|})\right]^{-1} = \ell/m.$$ 
 
-Our goal is to make the segment $m$ appear as long as the segment $\ell$. As the angle $\theta$ is determined by the slope of the tangent line, that is, 
-$$\tan \theta = \left|f^\prime(x)\right|$$ 
-we can solve for $\theta$ to get $\atan{\left|f^\prime(x)\right|} = \theta$. 
-Then 
-$\cos(\theta) = \cos(\atan{\left|f^\prime(x)\right|}) = m/\ell$ and 
-$$\left[\cos(\atan{\left|f^\prime(x)\right|})\right]^{-1} = \ell/m$$ That is, we have to scale $\ell$ by a factor of 
-$\left[\cos(\atan{\left|f^\prime(x)\right|})\right]^{-1}$ to make the extant width $m$ appear as long as $\ell$ in the original graph. 
+That is, we have to scale $\ell$ by a factor of 
+$\left[\cos(\atan{\left|f^\prime(x)\right|})\right]^{-1}$
+to make the extant width $m$ appear as long as $\ell$ in the original graph: 
 % We first multiply the vertical width by a factor of $1/\cos\theta$, where $\theta$ is the angle under which the line is drawn. This angle is given by the slope of the function, mathematically we know that in position $x$ the angle $\theta(x)$ of function $f(x)$ is given as:
 % \[
 % \tan \theta (x) = f^\prime (x).
@@ -863,11 +877,18 @@ qplot(x=x, xend=xend, y = f(x) -ellx2/2, yend=f(x) +ellx2/2, geom="segment", dat
 \end{subfigure}
 \begin{subfigure}[b]{.48\linewidth}\centering
 \includegraphics[width=\linewidth,keepaspectratio=TRUE]{figure/fig-trigFix2}
-\caption{Trigonometic correction}
+\caption{Trigonometric correction}
 \end{subfigure}
 \caption{Fix of the sine illusion by using the factor of $1/\cos\left(\atan{|\cos(x)|}\right)$} to adjust the vertical extent of the lines.  
 \label{trigFix} 
 \end{figure}
+
+\newdo{Figure \ref{trigFix} deserves a mentioning here.}
+
+$f(x)$ with non-constant derivative $f^\prime(x)$ which may vary continuously. 
+
+ This is still dependent on having a functional form for $f(x)$ which has derivative $f^\prime(x)$ on the range of $x$ within the data, as we will determine $\theta$ based on the slope of the secant line, $-1/f^\prime(x)$.
+
 
 \subsubsection{A General Correction Method}
 \begin{figure}[h!]\centering
