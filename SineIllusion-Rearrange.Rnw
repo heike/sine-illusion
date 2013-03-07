@@ -42,27 +42,27 @@ suppressMessages(library(gridExtra))
 createSine <- function(n=200, len=1, f=f, fprime=fprime, getquadapprox=FALSE, f2prime=getquadapprox) {
   if(getquadapprox & !is.function(f2prime)) f2prime <- function(x) -1*f(x) # for backwards compatibility
   x <- seq(0, 2*pi, length=n+2)[(2:(n+1))]
-  l <- rep(len, length=length(x))
+  ell <- rep(len, length=length(x))
   fx <- f(x)
-  ystart <- fx - .5*l
-  yend <- fx + .5*l
-  ell <- yend-ystart
+  ystart <- fx - .5*ell
+  yend <- fx + .5*ell
+
   # now correct for line illusion in vertical direction
   dy <- diff(range(fx))
   dx <- diff(range(x))
-# fprime works in framework of dx and dy, but we represent it in framework of dx and dy+len
-# needs to be fixed by factor a:  
+  # fprime works in framework of dx and dy, but we represent it in framework of dx and dy+len
+  # needs to be fixed by factor a:  
   a <- dy/(dy + len) 
-# ellx is based on the "trig" correction
+  # ellx is based on the "trig" correction
   ellx <- ell / cos(atan(abs(a*fprime(x))))
-# ellx2 is based on linear approximation of f  
-  ellx2 <- ell * sqrt(1 + a*fprime(x)^2)
-
+  # ellx2 is based on linear approximation of f  
+  ellx2 <- ell * sqrt(1 + a^2*fprime(x)^2)
+  
   # make this a data frame - ggplot2 doesn't do well with floating vectors
   dframe <- data.frame(x=x, xstart=x, xend=x, y=fx, ystart=ystart, yend=yend, ell=ell, ellx = ellx, ellx2=ellx2)
-
-# third adjustment is based on quadratic approximation of f.
-# this needs two parts: correction above and below f(x)  
+  
+  # third adjustment is based on quadratic approximation of f.
+  # this needs two parts: correction above and below f(x)  
   if(getquadapprox & is.function(f2prime)){
     secseg <- do.call("rbind", lapply(dframe$x, function(i) getSecantSegment(i, dframe, f, fprime, f2prime)))
     dframe$ellx3.u <- secseg$sec.ell1
