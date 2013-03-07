@@ -57,7 +57,7 @@ createSine <- function(n=200, len=1, f=f, fprime=fprime, getquadapprox=FALSE, f2
   ellx <- ell / cos(atan(abs(a*fprime(x))))
   # ellx2 is based on linear approximation of f  
   ellx2 <- ell * sqrt(1 + a^2*fprime(x)^2)
-  
+
   # make this a data frame - ggplot2 doesn't do well with floating vectors
   dframe <- data.frame(x=x, xstart=x, xend=x, y=fx, ystart=ystart, yend=yend, ell=ell, ellx = ellx, ellx2=ellx2)
   
@@ -703,7 +703,6 @@ qplot(x=xtrans4, xend=xtrans4, y = ystart, yend=yend, colour=I("blue"), geom="se
 \caption{$X$ axis transformations. Dots at the bottom of the graph show the transformation's effect on equally spaced points along the $x$-axis. In (a), adjusting the $x$-spacing of the lines mitigates the sine illusion by changing the extant width so that it is uniform in $x$. (b) - (d) shrink the transformation in (a) towards successively more uniform spacings in $x$ while still breaking the effects of the illusion.}
 \label{xtrans}
 \end{figure}
-\todo[inline]{add 2nd example (maybe in the "application" section?)}
 \newdo{add a 2nd example here - how about a correction for the ozone data from the beginning?}
 \clearpage
 
@@ -724,10 +723,12 @@ ribbon <- data.frame(x = x, ytop = f(x) + ell, ybottom = f(x)-ell)
 aline <- data.frame(xtop = 0,    xbottom = 0,   ytop = f(0) + ell,  ybottom = f(0) - ell, label="vertical width")
 bline <- data.frame(xtop = -intx, xbottom = intx, ytop = f(-intx)+ell, ybottom = f(intx)-ell, label="extant width")
 widths <- rbind(aline, bline)
-qplot(data=ribbon, x=x, ymin=ybottom, ymax=ytop, geom="ribbon", fill=I("grey")) + 
-  theme_minimal() + 
-  theme(axis.title=element_blank(), axis.text=element_blank(), axis.ticks=element_blank(), 
-        axis.line=element_blank(), panel.grid=element_blank(), legend.position="right", legend.direction="vertical") + 
+qplot(data=ribbon, x=x, ymin=ybottom, ymax=ytop, geom="ribbon", fill=I("grey")) +
+  theme(panel.grid.major=element_blank(), 
+        panel.background = element_rect(fill = "white", colour = "black"),
+        panel.grid.minor=element_blank(), panel.background=element_blank(),
+        axis.title = element_blank(), axis.ticks = element_blank(), 
+        axis.text = element_blank()) +  
   geom_segment(data=widths, aes(x=xbottom, xend = xtop, y=ybottom, yend=ytop, linetype=label)) +
   geom_text(data=widths, aes(x=mean(c(xbottom[1], xbottom[2], 0)), y=mean(c(ybottom[1], ybottom[2], ybottom[2])), label="theta"), parse=TRUE) +
   coord_equal(ratio=1) + scale_linetype_discrete("") + theme(plot.margin = unit(c(-1,-1,-2,-2), "lines"))
@@ -778,7 +779,12 @@ dfslope <- data.frame(xstart=df$x[a]+.5, xend=df$x[a]-.9, ystart=fprime(df$x[a])
 dfslope2 <- data.frame(xstart=df$x[a]+.5, xend=df$x[a]-.3, ystart=fprime(df$x[a])*.5+df$y[a]+.5, yend=-.3*fprime(df$x[a])+df$y[a]+.5)
 
 cairo_pdf("./figure/fig-trigmethodcartoon.pdf", width=5, height=5)
-qplot(data=df.real, x=x, y=y, geom="line") + #theme_minimal() + 
+qplot(data=df.real, x=x, y=y, geom="line") +
+  theme(panel.grid.major=element_blank(), 
+      panel.background = element_rect(fill = "white", colour = "black"),
+      panel.grid.minor=element_blank(), panel.background=element_blank(),
+      axis.title = element_blank(), axis.ticks = element_blank(), 
+      axis.text = element_blank()) +  
   coord_equal(ratio=1) +
   geom_line(data=df.real,aes(y=yupper), linetype=3) + 
   geom_line(data=df.real,aes(y=ylower), linetype=4) + 
@@ -913,6 +919,8 @@ By setting the above equation equal to the graphs of $f_u$ and $f_\ell$ we find 
 (I) && x - x_o = \lambda f^\prime(x_o)\\ \label{eqn.general.2}
 (II) && f(x) - f(x_o) = -\lambda \pm \ell/2
 \end{eqnarray}
+
+\comment{Why do these need roman numerals and equation numbers? Seems like the double references could get confusing/annoying?}
 With these two endpoints, we can  separately correct for the top and bottom portions of the vertical width. Note that the extant width generally is   not symmetric when reflected across the original function $f(x)$ (as can be seen in figure \ref{GeneralCorrection}). 
 
 Note that  the above system of equations involves function values $f(x)$, which implies that solving this system  requires numerical optimization for any but the most simple functions $f$.
@@ -952,7 +960,12 @@ df.real$ylower <- df.real$y-.5
 dfsec <- getSecantSegment(df$x[a], df, f, fprime, f2prime)
 dfslope <- data.frame(xstart=df$x[a]+.5, xend=df$x[a]-.9, ystart=fprime(df$x[a])*.5+df$y[a], yend=-.9*fprime(df$x[a])+df$y[a])
 dfslope2 <- data.frame(xstart=df$x[a]+.5, xend=df$x[a]-.3, ystart=fprime(df$x[a])*.5+df$y[a]+.5, yend=-.3*fprime(df$x[a])+df$y[a]+.5)
-qplot(data=df.real, x=x, y=y, geom="line") + theme_minimal() +
+qplot(data=df.real, x=x, y=y, geom="line") + 
+  theme(panel.grid.major=element_blank(), 
+        panel.background = element_rect(fill = "white", colour = "black"),
+        panel.grid.minor=element_blank(), panel.background=element_blank(),
+        axis.title = element_blank(), axis.ticks = element_blank(), 
+        axis.text = element_blank()) +  
   geom_line(data=df.real,aes(y=yupper), linetype=3) + 
   geom_line(data=df.real,aes(y=ylower), linetype=4) + 
   geom_segment(data=df, aes(x=xstart, y=ystart, xend=xend, yend=yend), colour="grey50") + 
@@ -979,7 +992,13 @@ df.real$sec[which(abs(df.real$x-2)>.5)] <- NA
 df.real$sec[which(df.real$sec>df.real$yupper | df.real$sec<df.real$ylower)] <- NA
 dfslope <- data.frame(xstart=df$x[a]+.5, xend=df$x[a]-.9, ystart=fprime(df$x[a])*.5+df$y[a], yend=-.9*fprime(df$x[a])+df$y[a])
 dfslope2 <- data.frame(xstart=df$x[a]+.5, xend=df$x[a]-.3, ystart=fprime(df$x[a])*.5+df$y[a]+.5, yend=-.3*fprime(df$x[a])+df$y[a]+.5)
-qplot(data=df.real, x=x, y=y, geom="line") + theme_minimal() + coord_equal(ratio=1) +
+qplot(data=df.real, x=x, y=y, geom="line")+
+  theme(panel.grid.major=element_blank(), 
+        panel.background = element_rect(fill = "white", colour = "black"),
+        panel.grid.minor=element_blank(), panel.background=element_blank(),
+        axis.title = element_blank(), axis.ticks = element_blank(), 
+        axis.text = element_blank()) +
+  coord_equal(ratio=1) +
   geom_line(data=df.real,aes(y=yupper), linetype=3) + 
   geom_line(data=df.real,aes(y=ylower), linetype=4) + 
   geom_segment(data=df, aes(x=xstart, y=ystart, xend=xend, yend=yend), colour="grey50") + 
@@ -1009,7 +1028,13 @@ df.real$sec[which(abs(df.real$x-2)>.5)] <- NA
 df.real$sec[which(df.real$sec>df.real$yupper | df.real$sec<df.real$ylower)] <- NA
 dfslope <- data.frame(xstart=df$x[a]+.5, xend=df$x[a]-.9, ystart=fprime(df$x[a])*.5+df$y[a], yend=-.9*fprime(df$x[a])+df$y[a])
 dfslope2 <- data.frame(xstart=df$x[a]+.5, xend=df$x[a]-.3, ystart=fprime(df$x[a])*.5+df$y[a]+.5, yend=-.3*fprime(df$x[a])+df$y[a]+.5)
-qplot(data=df.real, x=x, y=y, geom="line") + theme_minimal() + coord_equal(ratio=1) +
+qplot(data=df.real, x=x, y=y, geom="line") + 
+  theme(panel.grid.major=element_blank(), 
+        panel.background = element_rect(fill = "white", colour = "black"),
+        panel.grid.minor=element_blank(), panel.background=element_blank(),
+        axis.title = element_blank(), axis.ticks = element_blank(), 
+        axis.text = element_blank()) +  
+  coord_equal(ratio=1) +
   geom_line(data=df.real,aes(y=yupper), linetype=3) + 
   geom_line(data=df.real,aes(y=ylower), linetype=4) + 
   geom_segment(data=df, aes(x=xstart, y=ystart, xend=xend, yend=yend), colour="grey50") + 
@@ -1082,10 +1107,11 @@ Note that while this solution looks different from the trigonometric approach, t
 \]
 This follows directly for $y = \atan{|f^\prime(x|}$ in the formula below:
 \begin{eqnarray*}
-\cos(y) = 1/sec(y) = 1/\sqrt(1+ \tan^2 y).\\
+\cos(y) = 1/sec(y) = 1/\sqrt{1+ \tan^2 y}.\\
 \end{eqnarray*}
 
-\newdo{why are our solutions in the code not the same? they are only linearly dependent values. }
+\newdo{why are our solutions in the code not the same? they are only linearly dependent values. \\
+--I think they are now.}
 
 The asymmetric nature of the distortion suggests that we may want to use a second-order taylor polynomial approximation to $f(x)$ to account for the asymmetry in the extant widths on either side of the center trendline.
 
