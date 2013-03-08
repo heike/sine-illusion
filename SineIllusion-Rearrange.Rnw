@@ -639,7 +639,7 @@ The extent to which this weighting holds is likely to vary with the aspect ratio
 <<xtransform, echo=FALSE, fig.width=4, fig.height=2, include=FALSE>>=
 correctx <- function(z, fprime, a=0, b=2*pi, shrink=0) {
   const <- integrate(function(x) abs(fprime(x)), a, b)$value
-  trans <- sapply(z, function(i) integrate(function(x) abs(fprime(x)), a, i)$value*(b-a)/const)
+  trans <- sapply(z, function(i) integrate(function(x) abs(fprime(x)), a, i)$value*(b-a)/const + a)
   rowMeans(matrix(c(rep(z, times=shrink), trans), nrow=length(z), byrow=FALSE))
 }
 f <- sin
@@ -693,26 +693,26 @@ qplot(x=xtrans4, xend=xtrans4, y = ystart, yend=yend, colour=I("blue"), geom="se
 \begin{figure}[h!tbp]\centering
 \begin{subfigure}[b]{.48\linewidth}\centering
 \includegraphics[keepaspectratio=TRUE,width=\linewidth]{figure/fig-xtransform1}
-\caption{$X$ axis transformation}
+\caption[X axis transformation]{$X$ axis transformation}
 \label{xtrans1}
 \end{subfigure}
 \begin{subfigure}[b]{.48\linewidth}\centering
 \includegraphics[keepaspectratio=TRUE,width=\linewidth]{figure/fig-xtransform2}
-\caption{Weighted Transformation, $w=1$}
+\caption[Weighted transformation]{Weighted Transformation, $w=1$}
 \label{xtrans2}
 \end{subfigure}
 
 \begin{subfigure}[b]{.48\linewidth}\centering
 \includegraphics[keepaspectratio=TRUE,width=\linewidth]{figure/fig-xtransform3}
-\caption{Weighted Transformation, $w=2$}
+\caption[Weighted transformation]{Weighted Transformation, $w=2$}
 \label{xtrans3}
 \end{subfigure}
 \begin{subfigure}[b]{.48\linewidth}\centering
 \includegraphics[keepaspectratio=TRUE,width=\linewidth]{figure/fig-xtransform4}
-\caption{Weighted Transformation, $w=3$}
+\caption[Weighted transformation]{Weighted Transformation, $w=3$}
 \label{xtrans4}
 \end{subfigure}
-\caption{$X$ axis transformations. Dots at the bottom of the graph show the transformation's effect on equally spaced points along the $x$-axis. In (a), adjusting the $x$-spacing of the lines mitigates the sine illusion by changing the extant width so that it is uniform in $x$. (b) - (d) shrink the transformation in (a) towards successively more uniform spacings in $x$ while still breaking the effects of the illusion.}
+\caption[X axis transformations]{$X$ axis transformations. Dots at the bottom of the graph show the transformation's effect on equally spaced points along the $x$-axis. In (a), adjusting the $x$-spacing of the lines mitigates the sine illusion by changing the extant width so that it is uniform in $x$. (b) - (d) shrink the transformation in (a) towards successively more uniform spacings in $x$ while still breaking the effects of the illusion.}
 \label{xtrans}
 \end{figure}
 \newdo{add a 2nd example here - how about a correction for the ozone data from the beginning?}
@@ -839,7 +839,7 @@ dev.off()
 @
 \begin{figure}[h!tbp]\centering
 \includegraphics[keepaspectratio=TRUE,width=.5\linewidth]{figure/fig-trigmethodcartoon}
-\caption{\label{fig:trig} Geometry of the trigonometry correction approach. $\ell$ denotes the length of the entire vertical segment, hence, $\ell/2$ is the length of the portion above the mean function.
+\caption[Geometry of the trig correction approach]{\label{fig:trig} Geometry of the trigonometry correction approach. $\ell$ denotes the length of the entire vertical segment, hence, $\ell/2$ is the length of the portion above the mean function.
 \newdo{{\tt theme\_minimal} is not defined; there was a $1/2$ missing for $m$ -- either we use $\ell$ and $m$ or $\ell/2$ and $m/2$. Mixing those makes the math more complicated.}
 }
 \end{figure}
@@ -897,7 +897,7 @@ qplot(x=x, xend=xend, y = f(x) -ellx2/2, yend=f(x) +ellx2/2, geom="segment", dat
 \includegraphics[width=\linewidth,keepaspectratio=TRUE]{figure/fig-trigFix2}
 \caption{Trigonometric correction}
 \end{subfigure}
-\caption{Fix of the sine illusion by using the factor of $1/\cos\left(\atan{|\cos(x)|}\right)$} to adjust the vertical extent of the lines.  
+\caption[Demonstration of Trig Correction Fix]{Fix of the sine illusion by using the factor of $1/\cos\left(\atan{|\cos(x)|}\right)$ to adjust the vertical extent of the lines.}
 \label{trigFix} 
 \end{figure}
 
@@ -914,8 +914,7 @@ The idea for the general correction method is sketched out in figure \ref{Genera
 \begin{figure}[hbtp]
 \centering
 \includegraphics[keepaspectratio=TRUE,width=.5\linewidth]{figure/fig-generalcorrectioncartoon1}
-\caption{\label{GeneralCorrection}
-General correction approach. This approach may require numerical optimization to obtain exact solutions for $(x_u, y_u)$ and $(x_l, y_l)$.}
+\caption[General correction approach]{General correction approach. This approach may require numerical optimization to obtain exact solutions for $(x_u, y_u)$ and $(x_l, y_l)$.}\label{GeneralCorrection}
 \end{figure}
 
 The orthogonal width is given as the line segment between endpoints $(x_u, f_u(x_u))$ and $(x_\ell, f_\ell(x_\ell))$, where $f_\ell$ and $f_u$ denote the vertical shifts of function $f$ by $-\ell/2$ and $\ell/2$, respectively.
@@ -1087,15 +1086,15 @@ which makes the system linear, and allows a  straightforward solution, and leads
 % \newdo{we need the steps in between, too - right now the solution is just a statement, we need an explanation.}
 
 \begin{figure}[h!]\centering
-\begin{subfigure}[a]{0.49\linewidth}\centering
+\begin{subfigure}[t]{0.495\linewidth}\centering
 \includegraphics[keepaspectratio=TRUE,width=\linewidth]{figure/fig-generalcorrectioncartoon2}
 \caption{Linear Approximation}\label{linear-GeneralCorrection}
 \end{subfigure}
-\begin{subfigure}[b]{0.49\linewidth}\centering
+\begin{subfigure}[t]{0.4955\linewidth}\centering
 \includegraphics[keepaspectratio=TRUE,width=\linewidth]{figure/fig-generalcorrectioncartoon3}
 \caption{Quadratic Approximation}\label{quadratic-GeneralCorrection}
 \end{subfigure}
-\caption{\label{linear.quadratic} (a) uses a first-order taylor series approximation to $f(x)$ and (b) uses a second-order taylor series approximation to $f(x)$. The intersection of the function $f(x) \pm \ell/2$ and the secant line,  $(x_u, y_u), (x_l, y_l)$ must be obtained to determine the necessary correction factor.}
+\caption[Methods based on Approximations to f(x)]{(a) uses a first-order taylor series approximation to $f(x)$ and (b) uses a second-order taylor series approximation to $f(x)$. The intersection of the function $f(x) \pm \ell/2$ and the secant line,  $(x_u, y_u), (x_l, y_l)$ must be obtained to determine the necessary correction factor.}\label{linear.quadratic} 
 \end{figure}
 % Figure \ref{linear-GeneralCorrection} shows the linear approximation to $f(x) \pm \ell/2$ and the secant line. Solving the system of equations provides endpoints $(x_l, y_l)$ and $(x_u, y_u)$ which can then be used to compute the extant width of the line connecting $(x_l, y_l)$ and $(x_u, y_u)$. We then scale the vertical line length so that the extant width is equal to the original value of $\ell/2$. This correction factor is 
 \begin{equation}\label{LinearApprox}
@@ -1106,15 +1105,15 @@ which makes the system linear, and allows a  straightforward solution, and leads
 %= (\atan{f^\prime(x))}^\prime/f^{\prime\prime}(x)
 
 \begin{figure}[h!btp]
-\begin{subfigure}[b]{.45\linewidth}\centering
+\begin{subfigure}[b]{.495\linewidth}\centering
 \includegraphics[width=\linewidth,keepaspectratio=TRUE]{figure/fig-trigFix1}
 \caption{Uncorrected}
 \end{subfigure}
-\begin{subfigure}[b]{.45\linewidth}\centering
+\begin{subfigure}[b]{.495\linewidth}\centering
 \includegraphics[width=\linewidth,keepaspectratio=TRUE]{figure/fig-trigFix3}
 \caption{Correction factor in Eqn. \ref{LinearApprox}}
 \end{subfigure}
-\caption{Fix of the sine illusion by using the factor of $\sqrt{1 + f^\prime(x)^2}$} to adjust the vertical extent of the lines.  
+\caption[Linear Approximation]{Fix of the sine illusion by using the factor of $\sqrt{1 + f^\prime(x)^2}$ to adjust the vertical extent of the lines.  }
 \label{GeneralLinearCorrection} 
 \end{figure}
 
