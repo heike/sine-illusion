@@ -627,7 +627,7 @@ The extent to which this weighting holds is likely to vary with the aspect ratio
 <<xtransform, echo=FALSE, fig.width=4, fig.height=2, include=FALSE>>=
 correctx <- function(z, fprime, a=0, b=2*pi, shrink=0) {
   const <- integrate(function(x) abs(fprime(x)), a, b)$value
-  trans <- sapply(z, function(i) integrate(function(x) abs(fprime(x)), a, i)$value*(b-a)/const)
+  trans <- sapply(z, function(i) integrate(function(x) abs(fprime(x)), a, i)$value*(b-a)/const + a)
   rowMeans(matrix(c(rep(z, times=shrink), trans), nrow=length(z), byrow=FALSE))
 }
 f <- sin
