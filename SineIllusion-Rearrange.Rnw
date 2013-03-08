@@ -16,6 +16,7 @@
 \usepackage[colorinlistoftodos]{todonotes}
 
 \graphicspath{{figure/}}
+\renewcommand{\floatpagefraction}{.99}
 
 \newcommand{\range}[1]{{\text{range}\left(#1\right)}}
 \newcommand{\s}[2]{{_{#1}s^{ #2}}}
@@ -155,7 +156,7 @@ getSecantSegment <- function(x0, df, f, fprime, f2prime){
 \begin{abstract}
 The sine illusion, which is part of a set of optical illusions which occur based on a conflict between a stimuli and the real-world situation which can cause similar stimuli, has a notable impact on perception of time-series data with a seasonal component. In this paper, we discuss the reasons for the illusion and various strategies which might be useful to break the illusion or reduce its' strength, demonstrating the presence of the illusion in real-world and theoretical situations. We also present data from user studies which demonstrate the dramatic effect the sine illusion can have on conclusions drawn from displayed data.
 \end{abstract}
-\tableofcontents
+%\tableofcontents
 
 \section{Introduction}
 Graphics are powerful tools for summarizing large or complex data. The main premise in our dealings with statistical graphics is that
@@ -322,7 +323,7 @@ qplot(data=df, x=x, y=y, geom="line") + geom_line(aes(y=y2)) + theme_bw()
 @
 \begin{figure}[h!tbp]
 \centering
-\includegraphics[width=.5\linewidth]{figure/fig-effectivegraphsfig}
+\includegraphics[width=.45\linewidth]{figure/fig-effectivegraphsfig}
 \caption{A replication of Figure 2.16 in \cite{robbins:2005}. The line width illusion seems to be related to increasing slope - as the slope increases, the apparent distance between the two lines decreases, even though the lines represent a constant vertical shift.}
 \label{robbins-graph}
 \end{figure}
@@ -385,7 +386,7 @@ p
 \end{figure}
 
 
-\clearpage
+%\clearpage
 
 
 \subsection{Perceptual Explanations for the Sine Illusion}\label{perceptualexplanations}
@@ -716,7 +717,7 @@ qplot(x=xtrans4, xend=xtrans4, y = ystart, yend=yend, colour=I("blue"), geom="se
 \label{xtrans}
 \end{figure}
 \newdo{add a 2nd example here - how about a correction for the ozone data from the beginning?}
-\clearpage
+%\clearpage
 
 \subsection{Transformation of the $Y$-Axis}
 Understanding the geometry of the sine illusion leads to another approach to disrupting the conflict between the extant width and the actual height of the segment. 
@@ -840,7 +841,6 @@ dev.off()
 \begin{figure}[h!tbp]\centering
 \includegraphics[keepaspectratio=TRUE,width=.5\linewidth]{figure/fig-trigmethodcartoon}
 \caption[Geometry of the trig correction approach]{\label{fig:trig} Geometry of the trigonometry correction approach. $\ell$ denotes the length of the entire vertical segment, hence, $\ell/2$ is the length of the portion above the mean function.
-\newdo{{\tt theme\_minimal} is not defined; there was a $1/2$ missing for $m$ -- either we use $\ell$ and $m$ or $\ell/2$ and $m/2$. Mixing those makes the math more complicated.}
 }
 \end{figure}
 % \todo[inline]{
@@ -913,7 +913,7 @@ The idea for the general correction method is sketched out in figure \ref{Genera
 
 \begin{figure}[hbtp]
 \centering
-\includegraphics[keepaspectratio=TRUE,width=.5\linewidth]{figure/fig-generalcorrectioncartoon1}
+\includegraphics[keepaspectratio=TRUE,width=.4\linewidth]{figure/fig-generalcorrectioncartoon1}
 \caption[General correction approach]{General correction approach. This approach may require numerical optimization to obtain exact solutions for $(x_u, y_u)$ and $(x_l, y_l)$.}\label{GeneralCorrection}
 \end{figure}
 
@@ -994,7 +994,7 @@ qplot(data=df.real, x=x, y=y, geom="line") +
   geom_text(data=dfsec, aes(x=sec.xstart, y=sec.ystart+.05, label="paste(group('(',list(x[u],y[u]),')'))"), parse=TRUE, hjust=0) + 
   geom_text(data=dfsec, aes(x=sec.xend, y=sec.yend-.08, label="paste(group('(',list(x[l],y[l]),')'))"), parse=TRUE, hjust=.9) +   
   geom_text(data=dfslope, aes(x=xend+.1, y=yend+.1, label="slope: paste(f, \"'\", (x))"), parse=TRUE, hjust=.75, vjust=1) +
-  coord_equal(ratio=1) + theme(axis.title=element_blank(), axis.text=element_blank(), axis.ticks=element_blank(), axis.line=element_blank(), panel.grid=element_blank())
+  coord_equal(ratio=1) + theme(axis.title=element_blank(), axis.text=element_blank(), axis.ticks=element_blank(), axis.line=element_blank(), panel.grid=element_blank(), plot.margin = unit(c(-1,-1,-2,-2), "lines")) 
 
 df <- createSine(40 , len=1, f=f, fprime=fprime)[5:16,]
 
@@ -1015,7 +1015,8 @@ qplot(data=df.real, x=x, y=y, geom="line")+
         panel.background = element_rect(fill = "white", colour = "black"),
         panel.grid.minor=element_blank(), panel.background=element_blank(),
         axis.title = element_blank(), axis.ticks = element_blank(), 
-        axis.text = element_blank()) +
+        axis.text = element_blank(),
+        plot.margin = unit(rep(0,4), "lines")) +
   coord_equal(ratio=1) +
   geom_line(data=df.real,aes(y=yupper), linetype=3) + 
   geom_line(data=df.real,aes(y=ylower), linetype=4) + 
@@ -1051,7 +1052,8 @@ qplot(data=df.real, x=x, y=y, geom="line") +
         panel.background = element_rect(fill = "white", colour = "black"),
         panel.grid.minor=element_blank(), panel.background=element_blank(),
         axis.title = element_blank(), axis.ticks = element_blank(), 
-        axis.text = element_blank()) +  
+        axis.text = element_blank(),
+        plot.margin = unit(rep(0,4), "lines")) +  
   coord_equal(ratio=1) +
   geom_line(data=df.real,aes(y=yupper), linetype=3) + 
   geom_line(data=df.real,aes(y=ylower), linetype=4) + 
@@ -1086,12 +1088,12 @@ which makes the system linear, and allows a  straightforward solution, and leads
 % \newdo{we need the steps in between, too - right now the solution is just a statement, we need an explanation.}
 
 \begin{figure}[h!]\centering
-\begin{subfigure}[t]{0.495\linewidth}\centering
-\includegraphics[keepaspectratio=TRUE,width=\linewidth]{figure/fig-generalcorrectioncartoon2}
+\begin{subfigure}[t]{0.495\textwidth}\centering
+\includegraphics[keepaspectratio=TRUE,width=0.9\textwidth]{figure/fig-generalcorrectioncartoon2}
 \caption{Linear Approximation}\label{linear-GeneralCorrection}
 \end{subfigure}
-\begin{subfigure}[t]{0.4955\linewidth}\centering
-\includegraphics[keepaspectratio=TRUE,width=\linewidth]{figure/fig-generalcorrectioncartoon3}
+\begin{subfigure}[t]{0.495\textwidth}\centering
+\includegraphics[keepaspectratio=TRUE,width=0.9\textwidth]{figure/fig-generalcorrectioncartoon3}
 \caption{Quadratic Approximation}\label{quadratic-GeneralCorrection}
 \end{subfigure}
 \caption[Methods based on Approximations to f(x)]{(a) uses a first-order taylor series approximation to $f(x)$ and (b) uses a second-order taylor series approximation to $f(x)$. The intersection of the function $f(x) \pm \ell/2$ and the secant line,  $(x_u, y_u), (x_l, y_l)$ must be obtained to determine the necessary correction factor.}\label{linear.quadratic} 
@@ -1220,7 +1222,7 @@ dev.off()
 
 
 
-\clearpage
+%\clearpage
 
 \subsection{Discussion of Transformations}
 \todo[inline]{Add pictures comparing the 3 transformations to the untransformed data under both normal and extreme conditions.}
@@ -1423,14 +1425,14 @@ ggplot()  + geom_boxplot(aes(Year+(Month-1)/12, resid/100, group=Year+(Month-1)/
 \todo[inline]{Add Citations for USHCN website, data, etc.}
 Figures \ref{raw-temp} and \ref{resid-temp} show temperature data from 422 stations across the US with similar elevation and latitude. The first plot shows raw temperatures, the second residuals from a `baseline' model. The caption for the raw temperature plot suggests that the baseline model is not quite able to capture all of the variability in summer and winter peaks. However, the model used is actually based on averages in each time point. This model is not  susceptible to shrinking values, and it is our perception of the plot rather than the data that makes us see any higher variability in the peaks. After removing the averages in Figure \ref{boxplot-temp} to yield Figure \ref{boxplot-resid-temp} the impression of higher variability in the peaks is only partially confirmed: there is higher variability in the winter, and lower variability in the summer, though there are more outliers in the summer than in the winter.
 
-\clearpage
+%\clearpage
 \section{Conclusion}
 \begin{itemize}\item Raise Awareness\item ``Fixing" data is tricky and usually beyond a statistician's comfort zone, but we could see this as part of an applet where the ``fix" is done temporarily as a diagnostic measure\end{itemize}
 \clearpage
 \bibliographystyle{asa}
 % argument is your BibTeX string definitions and bibliography database(s)
 \bibliography{references}
-\clearpage
+%\clearpage
 \appendix
 \section{X Transformation Math}\label{XtransAppendix}
 Suppose that 
