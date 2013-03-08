@@ -40,9 +40,9 @@ suppressMessages(library(ggplot2))
 library(plyr)
 suppressMessages(library(gridExtra))
 
-createSine <- function(n=200, len=1, f=f, fprime=fprime, getquadapprox=FALSE, f2prime=getquadapprox) {
+createSine <- function(n=200, len=1, f=f, fprime=fprime, getquadapprox=FALSE, f2prime=getquadapprox, a=0, b=2*pi) {
   if(getquadapprox & !is.function(f2prime)) f2prime <- function(x) -1*f(x) # for backwards compatibility
-  x <- seq(0, 2*pi, length=n+2)[(2:(n+1))]
+  x <- seq(a, b, length=n+2)[(2:(n+1))]
   ell <- rep(len, length=length(x))
   fx <- f(x)
   ystart <- fx - .5*ell
@@ -70,8 +70,6 @@ createSine <- function(n=200, len=1, f=f, fprime=fprime, getquadapprox=FALSE, f2
     dframe$ellx3.l <- secseg$sec.ell2
   }
   
-  # quadratic approximation of f
-  # this needs two parts: correction above and below f(x)  
   fp <- a*fprime(x)
   f2p <- a*f2prime(x)
   lambdap <- (sqrt((fp^2+1)^2-f2p*fp^2*ell) + fp^2 + 1)^-1    
@@ -518,8 +516,8 @@ When we judge the variability of data, we must overcome the visual bias due to t
 As the illusion is caused by a conflict between the vertical length and the width orthogonal to the slope, it can be resolved by making the orthogonal width constant. This can be accomplished in several ways: by separating the trend and the variability, by forcing the slope to be constant (by reparameterizing the $x$ axis), or by making the lines appear to be of the same height by adjusting their lengths to maintain a constant orthogonal width. Each of these approaches is discussed in the following section.
 
 \subsection{Trend Removal}
-\newtext{
-One approach to breaking the sine illusion is to present the trend and variance separately, as shown in Figure \ref{trendremoval} and commonly recommended \citep{wainer:2000}, particularly for assessing model fit.} A loess smooth was used to estimate the trendline, and this estimate was subtracted from the line center to produce separate graphs of the trend and the variance. While this does largely remove the sine illusion, it also makes it somewhat more difficult to parse the overall data, as judgments must be made by combining two graphs or by mentally re-composing the original graph (at which point, the sine-illusion becomes a factor). Ideally, it would be possible to tell the whole story with a single graph, to minimize cognitive demands. While this example is relatively simple, it would be much harder to create a de-trended version of Figure \ref{playfair-debt} that could be easily assessed to determine both trend and change in the size of the trade imbalance over time. 
+One approach to breaking the sine illusion is to present the trend and variance separately, as shown in Figure \ref{trendremoval}. A loess smooth was used to estimate the trendline, and this estimate was subtracted from the line center to produce separate graphs of the trend and the variance. This is in line with  recommendations  for good graphics to `show the data' rather than make the reader derive some aspect of it (e.g. \cite{wainer:2000}). In particular, this is the generally accepted procedure for assessing model fit. 
+While removing the trend and showing variability separately does largely remove the sine illusion, it also makes it  more difficult to parse the overall data, as judgments must be made by combining two graphs or by mentally re-composing the original graph (at which point, the sine-illusion becomes a factor). Ideally, it would be possible to tell the whole story with a single graph, to minimize cognitive demands. While this example is relatively simple, it would be much harder to create a de-trended version of Figure \ref{playfair-debt} that could be easily assessed to determine both trend and change in the size of the trade imbalance over time. 
 
 <<trend-removal, include=FALSE, fig.height=4.5, fig.width=4.5>>=
 df <- df2 <- createSine(40, 1, sin, cos)
@@ -565,11 +563,11 @@ From a cognitive perspective, separating out the trendline and the variance crea
 Another approach to breaking the power of the sine illusion is to remove the changes in the slope of the overall trend line by transforming the $x$-axis such that the absolute value of the slope is constant. 
 This will force the corresponding extant width to be constant. 
 
-\newtext{Let us assume that we can describe the relationship between variables $X$ and $Y$ by a model of the form 
+Let us assume that we can describe the relationship between variables $X$ and $Y$ by a model of the form 
 \[
 y = f(x) + \varepsilon,
 \]
-where $f$ is some underlying function (either due to prior knowledge or using a model fit). Further let us assume that the function $f$ is differentiable over the region of observed data.}
+where $f$ is some underlying function (either due to prior knowledge or using a model fit). Further let us assume that the function $f$ is differentiable over the region of observed data.
 
 % \newtext{This transformation assumes that we have an underlying function $f$ (either due to prior knowledge or using a model fit) which is differentiable over the region of observed data. If data $(x_i, y_i)_{i=1, ..., N}$ have been observed, then we assume we can model $y_i = f(x_i) + \epsilon_i$ and that $f^\prime(x_i)$ exists for all $i=1, ..., N$. }
 
@@ -582,24 +580,22 @@ Since the slope is determined by the aspect ratio, we are free to choose it and 
 \[
 f(T_i(x)) = \pm a x + b_i.
 \]
-This means that $T_i$ is essentially an inverse of function $f$, with each piece defined by the   intervals on which the inverse of $f$ exists: let ${x_0, ..., x_K}$ be the set of values, for which the derivative of $f$ is zero, i.e. $f^\prime(x_i) = 0$ for all $i = 0, ... , K$. 
+This means that $T_i$ is essentially an inverse of function $f$, with each piece defined by the   intervals on which the inverse of $f$ exists: let $\left\{x_0 = \min(x), x_1, ..., x_{K-1}, x_K = \max(x) \right\}$ be the set of values with local extrema enhanced by the boundaries of the $x$-range, i.e.  $f^\prime(x_i) = 0$ for  $i = 1, ... , K-1$ and $f^\prime(x) \neq 0$ for any other values of $x$. 
 Then each interval of the form $(x_{i-1}, x_i)$ defines one piece $T_i$ of the transfomation function $T(x)$. We will define $T_i$ now as a combination of a linear scaling function and the inverse of $f$, which we know exists for interval $(x_{i-1}, x_i)$.
 
-Let function $s = \s{[a,b]}{[c,d]}$ be the linear scaling function that maps  the interval $(a,b)$ linearly to the interval $(c,d)$. This function is defined as
+Let function $s = \s{[a,b]}{[c,d]}$ be the linear scaling function that maps  the interval $(a,b)$ linearly to the interval $(c,d)$. This function is formally defined as
 \[
-s(x) = \s{[a,b]}{[c,d]} (x) = (x-a)/(b-a) \cdot (d-c) + c.
+s(x) = \s{[a,b]}{[c,d]} (x) = (x-a)/(b-a) \cdot (d-c) + c \text{ for all } x \in (a,b).
 \]
 Note that the slope of function $s$ is given as
 \[
 s^\prime(x) = (d-c)/(b-a).
 \]
-
-Two scaling functions can be evaluated one after the other, only if the image of the first coincides with the range of the second. Then they form another linear scaling: 
+%
+Two scaling functions can be evaluated one after the other, only if the image (i.e. $y$-range) of the first coincides with the domain (i.e. $x$-range) of the second. This consecutive execution results in another linear scaling: 
 \[
 \s{[e,f]}{[c,d]}  \left(  \s{[a,b]}{[e,f]}(x) \right) = \s{[a,b]}{[c,d]} (x)
 \]
-
-
 
 
 In our situation let the scaling function $s$ be given as :
@@ -613,17 +609,26 @@ Then the transformation in the $x$-axis, $T(x)$ is defined piecewise as a combin
 T_i(x) &=& f^{-1}\left( \s{[c_i,d_i]}{\range{f([x_{i-1}, x_i])}}(x) \right). 
 \end{eqnarray}
 %
-Using this definition for the transformation makes $f(T(x))$ a piece-wise linear function, with parameters $c_i$ and $d_i$ determining the speed, i.e. for $x \in (c_i,d_i)$ we have
+Using this definition for the transformation makes $f(T(x))$ a piece-wise linear function with parameters $c_i$ and $d_i$, i.e. for $x \in (c_i,d_i)$ we have
 \[
 f(T(x)) = f (f^{-1}(\s{[c_i,d_i]}{\range{f([x_{i-1}, x_i])}}(x))) = \s{[c_i,d_i]}{\range{f([x_{i-1}, x_i])}}(x).
 \]
 Correspondingly, the slope of $f(T_i(x))$ is $(f(x_{i}) - f(x_{i-1})))/(d_i-c_i)$.
-In order to make the slope the same on all pieces $T_i$, we need to define $c_i$ and $d_i$ with respect to the function values on the interval $(x_{i-1}, x_i)$. There are various options, depending on how closely our $x$-range should reflect the original range.
-\begin{itemize}
-\item for $[c_i, d_i] = \range(f(x))$ the new $x$-range is the range of $f(y)$, but the scaling function simplifies to the identity.
+In order to make the slope the same on all pieces $T_i$ of $T$, we need to define $c_i$ and $d_i$ with respect to the function values on the interval $(x_{i-1}, x_i)$. There are various options, depending on how closely the $x$-range of $T$ should reflect the original range:
+for $[c_i, d_i] = \range {f([x_{i-1}, x_i])}$ the new $x$-range is the range of $f$ on $(x_{i-1}, x_i)$, but with the advantage that the scaling function simplifies to the identity or a simple shift.
 
-\item in order to preserve the original $x$-range, we can choose $[c_i, d_i]$ as .... . 
-\end{itemize}
+In order to preserve the original $x$-range, we need to invest into a bit more work for the scaling. With an identity scaling, each $T_i$ maps from the range of $f$ on $(x_{i-1}, x_i)$ to the same range. Overall we can therefore set up the function $T$ to map from the interval given by the sum of the function's `ups' and `downs', i.e.
+$(0, \sum_{i=0}^K |f(x_i) - f(x_{i-1})|)$, to the range of $f$ on $(x_0, x_K)$.  This ensures that all pieces $f(T_i)$ have the same slope (of $|1|$). We can then use another - global - linear scaling function to map from the range of $x$, i.e. interval $(x_0, x_K)$ to $(0, \sum_{i=0}^K |f(x_i) - f(x_{i-1})|)$, yielding a transformation function $T$ of
+
+\[
+T (x) =  (f^{-1} \circ \s{[c_i,d_i]}{\range{f([x_{i-1}, x_i])}} \circ \s{(x_0, x_K)}{(0, \sum_{i=0}^K |f(x_i) - f(x_{i-1})|)}) (x),  
+\]
+where $c_i$ and $d_i$ are given as 
+\[
+c_i = \sum_{j=0}^{i-1} |f(x_j) - f(x_{j-1})| \text{ and } d_i = \sum_{j=0}^{i} |f(x_j) - f(x_{j-1})|.
+\]
+This transformation is shown in Figure \ref{xtrans1}.
+
 
 \newdo{this needs to be re-written in terms of $s$, $c_i$ and $d_i$s - but it's the same idea.}
 That is, if the $x$-axis spans the interval $[a,b)$, the transformation of the $x$ axis is 
