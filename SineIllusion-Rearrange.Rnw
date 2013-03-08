@@ -1104,20 +1104,6 @@ which makes the system linear, and allows a  straightforward solution, and leads
 
 %= (\atan{f^\prime(x))}^\prime/f^{\prime\prime}(x)
 
-\begin{figure}[h!btp]
-\begin{subfigure}[b]{.495\linewidth}\centering
-\includegraphics[width=\linewidth,keepaspectratio=TRUE]{figure/fig-trigFix1}
-\caption{Uncorrected}
-\end{subfigure}
-\begin{subfigure}[b]{.495\linewidth}\centering
-\includegraphics[width=\linewidth,keepaspectratio=TRUE]{figure/fig-trigFix3}
-\caption{Correction factor in Eqn. \ref{LinearApprox}}
-\end{subfigure}
-\caption[Linear Approximation]{Fix of the sine illusion by using the factor of $\sqrt{1 + f^\prime(x)^2}$ to adjust the vertical extent of the lines.  }
-\label{GeneralLinearCorrection} 
-\end{figure}
-
-Figure \ref{GeneralLinearCorrection} shows the correction factor compared with the trigonometry-style correction and the untransformed data. 
 
 Note that while this solution looks different from the trigonometric approach, they are actually the same, since
 \[
@@ -1145,42 +1131,48 @@ which leads us to solutions for $\lambda$ as
 \lambda_{1/2} = \left(  f^{\prime\prime}(x_0)  f^\prime(x_0)^2 \right)^{-1} \left( -(f^\prime(x_0)^2 + 1) + \sqrt{ (f^\prime(x_0)^2 + 1)^2 -  f^{\prime\prime}(x_0)  f^\prime(x_0)^2 \cdot (\pm \ell)} \right).
 \]
 We can reduce this further to 
-\[
+\begin{equation}\label{eqn.quadratic}
 \lambda_{1/2} = \pm \ell \cdot \left( \sqrt{ (f^\prime(x_0)^2 + 1)^2 -  f^{\prime\prime}(x_0)  f^\prime(x_0)^2 \cdot (\pm \ell)} + (f^\prime(x_0)^2 + 1) \right)^{-1}
-\]
+\end{equation}
 
 % \begin{eqnarray*}
 % \left(  f^{\prime\prime}(x_0)  f^\prime(x_0)^2 \right)^{-1} \left( -b + a \right) = \\
 % \left(  f^{\prime\prime}(x_0)  f^\prime(x_0)^2 \right)^{-1} \left( -b^2 + a^2 \right) \left( a + b \right)^{-1} = \\
 %  \pm \ell \cdot \left( \sqrt{ (f^\prime(x_0)^2 + 1)^2 -  f^{\prime\prime}(x_0)  f^\prime(x_0)^2 \cdot (\pm \ell)} + (f^\prime(x_0)^2 + 1) \right)^{-1} = \\
 % \end{eqnarray*}
-% 
-% As discussed before, solutions do not exist for $f^\prime(x) = 0$ and $f^{\prime\prime}(x) = 0$. But we also need to take special care in situations where we come close to those values. We do this by using L'Hospital's rule:
-% 
-% For $h = f^{\prime\prime}(x)$ we have
-% \begin{eqnarray*}
-% \lim_{h \rightarrow 0} \left(  h  f^\prime(x)^2 \right)^{-1} \left( -(f^\prime(x)^2 + 1) \pm \sqrt{ (f^\prime(x)^2 + 1)^2 -  h  f^\prime(x)^2 \cdot (\pm \ell)} \right) &\stackrel{\text{L'Hosp.}}{=}& \\
-% \lim_{h \rightarrow 0} \left(   f^\prime(x)^2 \right)^{-1} \left(  (\pm 0.5) \cdot \left( (f^\prime(x)^2 + 1)^2 -  h  f^\prime(x)^2 \cdot (\pm \ell) \right)^{-1/2} \cdot \left( - f^\prime(x)^2 \cdot (\pm \ell) \right) \right) &=&\\
-% \left(   f^\prime(x)^2 \right)^{-1} \left(  (\pm 0.5) \cdot \left( f^\prime(x)^2 + 1 \right) \cdot \left( - f^\prime(x)^2 \cdot (\pm \ell) \right) \right) &=& \\
-% \pm 0.5 \cdot \left( f^\prime(x)^2 + 1 \right) \cdot  \ell   &=& \lambda.
-% \end{eqnarray*}
-% %
-% For $h = f^{\prime}(x)^2$ the limit is
-% \begin{eqnarray*}
-% \lim_{h \rightarrow 0} \left(  f^{\prime\prime}(x)  \cdot h \right)^{-1} \left( -(h + 1) \pm \sqrt{ (h + 1)^2 -  f^{\prime\prime}(x)  \cdot h \cdot (\pm \ell)} \right)
-% &\stackrel{\text{L'Hosp.}}{=}& \\
-% \lim_{h \rightarrow 0} \left(  f^{\prime\prime}(x)  \right)^{-1} \left( -1 \pm 0.5 \cdot \left( (h + 1)^2 -  f^{\prime\prime}(x)  \cdot h \cdot (\pm \ell) \right)^{-1/2} \cdot \left( 2(h + 1) -  f^{\prime\prime}(x) \cdot (\pm \ell) \right) \right) &=&\\
-%  \left(  f^{\prime\prime}(x)  \right)^{-1} \left( -1 \pm  \left( 1 -  f^{\prime\prime}(x) \cdot (\pm \ell/2) \right) \right) &=& \lambda.\\
-%  \end{eqnarray*}
-% \begin{eqnarray*}
-% \lim_{f^{\prime}(x)^2 \rightarrow 0} \left(  f^{\prime\prime}(x)  f^\prime(x)^2 \right)^{-1} \left( -(f^\prime(x)^2 + 1) \pm \sqrt{ (f^\prime(x)^2 + 1)^2 -  f^{\prime\prime}(x)  f^\prime(x)^2 \cdot (\pm \ell)} \right) = (L'Hosp.)\\
-% \lim_{f^{\prime}(x)^2 \rightarrow 0} \left(  f^{\prime\prime}(x)  \right)^{-1} \left( -1 \pm 0.5 \left({ (f^\prime(x)^2 + 1)^2 -  f^{\prime\prime}(x)  f^\prime(x)^2 \cdot (\pm \ell)}\right)^{-1/2} \cdot \left( 2\cdot (f^\prime(x)^2 + 1) -  f^{\prime\prime}(x)  \cdot (\pm \ell)\right) \right) 
-% = \\
-%  \left(  f^{\prime\prime}(x)  \right)^{-1} \left( -1 \pm 0.5\right)  \cdot \left( 2 -  f^{\prime\prime}(x)  \cdot (\pm \ell)\right) 
-% = 
-% \end{eqnarray*}
 
-As shown in Figure \ref{quadratic-GeneralCorrection}, the solution of this equation provides endpoints $(x_l, y_l)$ and $(x_u, y_u)$ which can then be used to compute the extant width of each half-segment $m$. Unlike the linear solution, the half-segments here are not necessarily of the same length, and thus there are separate correction factors for each half-segment. 
+
+\begin{figure}[h!btp]
+\begin{subfigure}[h]{.495\linewidth}\centering
+\includegraphics[width=\linewidth,keepaspectratio=TRUE]{figure/fig-trigFix1}
+\caption{Uncorrected}
+\end{subfigure}
+\begin{subfigure}[h]{.495\linewidth}\centering
+<<CtsAdjustedResults,echo=FALSE, dependson='CtsQuadratic', fig.width=4, fig.height=3>>=
+dframe <- createSine(n = 40, len = 1, f=f, fprime=fprime, getquadapprox=TRUE, f2prime=f2prime) 
+qplot(x=x, xend=x, y=y+ellx4.u, yend=y-ellx4.l, geom="segment", data=dframe, linetype=I(1)) +   
+  theme(panel.grid.major=element_blank(), panel.background = element_rect(fill = "white", 
+                colour = "black"),
+       panel.grid.minor=element_blank(), panel.background=element_blank(),
+       axis.title = element_blank(), axis.ticks = element_blank(), 
+       axis.text = element_blank()) + coord_equal(ratio=1)
+@
+\caption{Quadratic approximation based on eqn (\ref{eqn.quadratic}).}
+\end{subfigure}
+\caption[Quadratic Approximation]{
+In the quadratic approximation top and bottom segments of the vertical lines are adjusted separately.
+}
+\label{GeneralQuadraticCorrection} 
+\end{figure}
+
+Adjusting the top and bottom segments of the vertical lines separately so that the extant width is constant breaks the illusion, but slightly distorts the sinusoidal shape of the peaks.
+
+Figure \ref{GeneralQuadraticCorrection} shows the correction factor based on a quadratic approximation compared to the untransformed data. 
+
+
+%As shown in Figure \ref{quadratic-GeneralCorrection}, the solution of this equation provides endpoints $(x_l, y_l)$ and $(x_u, y_u)$ which can then be used to compute the extant width of each half-segment $m$. 
+
+Unlike the linear solution, the half-segments here are not necessarily of the same length, and thus there are separate correction factors for each half-segment. 
 %The correction factors are $(\ell/2)/(m_u)$ and $(\ell/2)/(m_l)$ respectively. 
 <<CtsQuadratic, echo=FALSE, include=FALSE>>=
 f <- function(x) 2*sin(x)
@@ -1221,18 +1213,13 @@ dev.off()
 \todo[inline]{Something's strange here - minimum length should be 0.5, not 0.4, and the aspect ratio wouldn't account for that discrepancy. I'm pretty sure if I can hunt this bug down, it might fix most of what's wrong.}
 \end{figure}
 
-\begin{figure}[h!tbp]\centering
-<<CtsAdjustedResults,echo=FALSE, dependson='CtsQuadratic'>>=
-dframe <- createSine(n = 40, len = 1, f=f, fprime=fprime, getquadapprox=TRUE, f2prime=f2prime) 
-qplot(x=x, xend=x, y=y+ellx4.u, yend=y-ellx4.l, geom="segment", data=dframe, linetype=I(1)) + coord_fixed(ratio=1) + theme_bw() + ylab("y") + 
-  scale_x_continuous(breaks=seq(0, 2*pi, by=pi/2), 
-                     labels=c("0", expression(paste(pi,"/2")), expression(pi), expression(paste("3",pi, "/2")), expression(paste("2",pi))))
-@
-\caption{Adjusting the top and bottom segments of the vertical lines separately so that the extant width is constant breaks the illusion, but slightly distorts the sinusoidal shape of the peaks.}
-\todo[inline]{Check formula - this doesn't seem quite right...}
-\newdo{I'm pretty sure it's the missing correction for the length of the lines. }
-\end{figure}
-\todo[inline]{Modify formula for aspect ratio - not sure exactly how to do this, need to look at the algebra *again*}
+
+
+
+
+
+
+
 \clearpage
 
 \subsection{Discussion of Transformations}
