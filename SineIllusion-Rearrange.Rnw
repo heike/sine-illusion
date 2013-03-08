@@ -57,7 +57,7 @@ createSine <- function(n=200, len=1, f=f, fprime=fprime, getquadapprox=FALSE, f2
   ellx <- ell / cos(atan(abs(a*fprime(x))))
   # ellx2 is based on linear approximation of f  
   ellx2 <- ell * sqrt(1 + a^2*fprime(x)^2)
-
+  
   # make this a data frame - ggplot2 doesn't do well with floating vectors
   dframe <- data.frame(x=x, xstart=x, xend=x, y=fx, ystart=ystart, yend=yend, ell=ell, ellx = ellx, ellx2=ellx2)
   
@@ -68,6 +68,18 @@ createSine <- function(n=200, len=1, f=f, fprime=fprime, getquadapprox=FALSE, f2
     dframe$ellx3.u <- secseg$sec.ell1
     dframe$ellx3.l <- secseg$sec.ell2
   }
+  
+  # quadratic approximation of f
+  # this needs two parts: correction above and below f(x)  
+  fp <- a*fprime(x)
+  f2p <- a*f2prime(x)
+  lambdap <- (sqrt((fp^2+1)^2-f2p*fp^2*ell) + fp^2 + 1)^-1    
+  lambdam <- -(sqrt((fp^2+1)^2+f2p*fp^2*ell) + fp^2 + 1)^-1    
+  
+  
+  dframe$ellx4.l <- (4*abs(lambdap)*sqrt(1+fp^2))^-1
+  dframe$ellx4.u <- (4*abs(lambdam)*sqrt(1+fp^2))^-1
+  
   dframe
 }
 
@@ -909,24 +921,31 @@ General correction approach. This approach may require numerical optimization to
 The orthogonal width is given as the line segment between endpoints $(x_u, f_u(x_u))$ and $(x_\ell, f_\ell(x_\ell))$, where $f_\ell$ and $f_u$ denote the vertical shifts of function $f$ by $-\ell/2$ and $\ell/2$, respectively.
 These endpoints are determined as the intersection of the line  orthogonal to the tangent line in $(x, f(x))$ and the graphs resulting from vertical shifts of $f$ by $\pm \ell/2$.
 
-The function describing the orthogonal line through $(x_o, f(x_o))$ is given in intrinsic form as 
+The function describing the orthogonal line through $(x_o, f(x_o))$ is given in point-vector form as 
 \[
 {x_o \choose f(x_o)} + \lambda {f^\prime(x_o) \choose 1}, 
 \]
 for any real-valued $\lambda$.
-By setting the above equation equal to the graphs of $f_u$ and $f_\ell$ we find end points of the line segment as solutions in $x$ and $\lambda$ of the system of equations:
+The advantage of using point vector form is that it allows us to solve for parameter $\lambda$ easily, which gives us easy access to the extant (half-)widths, which are given as 
+\[
+|\lambda| \sqrt{1 + f^\prime(x_o)^2}.
+\]
+This expression describes the quantity that we perceive rather than the quantity that we want to display ($\ell/2$), which leads us to a general expression of the correction factor as
+\begin{eqnarray*}
+ \ell/2 \cdot \left(|\lambda| \sqrt{1 + f^\prime(x_o)^2}\right)^{-1}.
+\end{eqnarray*}
+Note that this yields in general two solutions: one for positive, one for negative lambda corresponding to upper and lower (half-)extant width.
+
+In order to get  actual numeric values for $\lambda$, we need to find end points of the extant line width as solutions of intersecting the orthogonal line and  the graphs of $f_u$ and $f_\ell$. We find these end points  as solutions in $x$ and $\lambda$ of the system of equations:
 \begin{eqnarray}\label{eqn.general}
-(I) && x - x_o = \lambda f^\prime(x_o)\\ \label{eqn.general.2}
-(II) && f(x) - f(x_o) = -\lambda \pm \ell/2
+ x - x_o &=& \lambda f^\prime(x_o)\\ \label{eqn.general.2}
+ f(x) - f(x_o) &=& -\lambda \pm \ell/2
 \end{eqnarray}
 
-\comment{Why do these need roman numerals and equation numbers? Seems like the double references could get confusing/annoying?}
-With these two endpoints, we can  separately correct for the top and bottom portions of the vertical width. Note that the extant width generally is   not symmetric when reflected across the original function $f(x)$ (as can be seen in figure \ref{GeneralCorrection}). 
 
 Note that  the above system of equations involves function values $f(x)$, which implies that solving this system  requires numerical optimization for any but the most simple functions $f$.
 
-Taylor approximations can be employed to reduce the computational requirements. Approximations derived from the first and second-order taylor approximations are described in the following sections.
-
+In the following two sections we are going to use Taylor approximations of first and second order to find approximate solutions to the end points.
 
 
 % 
@@ -1057,7 +1076,7 @@ qplot(data=df.real, x=x, y=y, geom="line") +
 Using a linear approximation of $f(x)$ in value $x_0$, i.e.  
  $f(x) \approx f(x_0) + f^\prime(x_0)(x-x_0)$, changes equation \ref{eqn.general.2}  to
  \begin{eqnarray*}
- (II)  &&  f^\prime(x_0)(x-x_0) = -\lambda \pm \ell/2,
+   f^\prime(x_0)(x-x_0) = -\lambda \pm \ell/2,
  \end{eqnarray*}
 which makes the system linear, and allows a  straightforward solution, and leads to a correction factor of:  
 
@@ -1110,18 +1129,57 @@ This follows directly for $y = \atan{|f^\prime(x|}$ in the formula below:
 \cos(y) = 1/sec(y) = 1/\sqrt{1+ \tan^2 y}.\\
 \end{eqnarray*}
 
-\newdo{why are our solutions in the code not the same? they are only linearly dependent values. \\
---I think they are now.}
-
 The asymmetric nature of the distortion suggests that we may want to use a second-order taylor polynomial approximation to $f(x)$ to account for the asymmetry in the extant widths on either side of the center trendline.
 
 \subsubsection{Quadratic Approximation to $f(x)$}
 
-Using the approximation $f(x) \approx f(x_0) + f^\prime(x_0)(x-x_0) + 1/2 f^{\prime\prime}(x_0)(x-x_0)^2$, the system of equations  \ref{en.general} and \ref{en.general.2}  simplifies to the following  quadratic equation in $x$:
+Using the approximation $f(x) \approx f(x_0) + f^\prime(x_0)(x-x_0) + 1/2 f^{\prime\prime}(x_0)(x-x_0)^2$, the system of equations~\ref{eqn.general} and~\ref{eqn.general.2}  simplifies to the following  quadratic equation in $\lambda$:
 \begin{eqnarray*}
-(x-x_0)  f^\prime(x_0) + 1/2 (x-x_0)^2 f^{\prime\prime}(x_0) = - (x-x_0) \left(f^\prime(x_0)\right)^{-1} \pm \ell/2.
+f^{\prime\prime}(x_0)  f^\prime(x_0)^2 \lambda^2  + 2(f^\prime(x_0)^2 + 1) \lambda  \pm \ell = 0,
 \end{eqnarray*}
+% Note that for values of $x$ with $f^\prime(x) = 0$ or  $f^{\prime\prime}(x)$ the equation simplifies: for local minima or maxima, i.e. $f^\prime(x) = 0$, the extant width coincides with the vertical width, so no correction is needed. In an inflection point, i.e. $f^{\prime\prime}(x) = 0$, the quadratic correction factor simplifies to the solution of the linear approximation and is given as $\sqrt{1 + f^\prime(x_0)^2}$.
+% 
+% For all other cases, we have the following set of solutions:
+% 
+which leads us to solutions for $\lambda$ as
+\[
+\lambda_{1/2} = \left(  f^{\prime\prime}(x_0)  f^\prime(x_0)^2 \right)^{-1} \left( -(f^\prime(x_0)^2 + 1) + \sqrt{ (f^\prime(x_0)^2 + 1)^2 -  f^{\prime\prime}(x_0)  f^\prime(x_0)^2 \cdot (\pm \ell)} \right).
+\]
+We can reduce this further to 
+\[
+\lambda_{1/2} = \pm \ell \cdot \left( \sqrt{ (f^\prime(x_0)^2 + 1)^2 -  f^{\prime\prime}(x_0)  f^\prime(x_0)^2 \cdot (\pm \ell)} + (f^\prime(x_0)^2 + 1) \right)^{-1}
+\]
 
+% \begin{eqnarray*}
+% \left(  f^{\prime\prime}(x_0)  f^\prime(x_0)^2 \right)^{-1} \left( -b + a \right) = \\
+% \left(  f^{\prime\prime}(x_0)  f^\prime(x_0)^2 \right)^{-1} \left( -b^2 + a^2 \right) \left( a + b \right)^{-1} = \\
+%  \pm \ell \cdot \left( \sqrt{ (f^\prime(x_0)^2 + 1)^2 -  f^{\prime\prime}(x_0)  f^\prime(x_0)^2 \cdot (\pm \ell)} + (f^\prime(x_0)^2 + 1) \right)^{-1} = \\
+% \end{eqnarray*}
+% 
+% As discussed before, solutions do not exist for $f^\prime(x) = 0$ and $f^{\prime\prime}(x) = 0$. But we also need to take special care in situations where we come close to those values. We do this by using L'Hospital's rule:
+% 
+% For $h = f^{\prime\prime}(x)$ we have
+% \begin{eqnarray*}
+% \lim_{h \rightarrow 0} \left(  h  f^\prime(x)^2 \right)^{-1} \left( -(f^\prime(x)^2 + 1) \pm \sqrt{ (f^\prime(x)^2 + 1)^2 -  h  f^\prime(x)^2 \cdot (\pm \ell)} \right) &\stackrel{\text{L'Hosp.}}{=}& \\
+% \lim_{h \rightarrow 0} \left(   f^\prime(x)^2 \right)^{-1} \left(  (\pm 0.5) \cdot \left( (f^\prime(x)^2 + 1)^2 -  h  f^\prime(x)^2 \cdot (\pm \ell) \right)^{-1/2} \cdot \left( - f^\prime(x)^2 \cdot (\pm \ell) \right) \right) &=&\\
+% \left(   f^\prime(x)^2 \right)^{-1} \left(  (\pm 0.5) \cdot \left( f^\prime(x)^2 + 1 \right) \cdot \left( - f^\prime(x)^2 \cdot (\pm \ell) \right) \right) &=& \\
+% \pm 0.5 \cdot \left( f^\prime(x)^2 + 1 \right) \cdot  \ell   &=& \lambda.
+% \end{eqnarray*}
+% %
+% For $h = f^{\prime}(x)^2$ the limit is
+% \begin{eqnarray*}
+% \lim_{h \rightarrow 0} \left(  f^{\prime\prime}(x)  \cdot h \right)^{-1} \left( -(h + 1) \pm \sqrt{ (h + 1)^2 -  f^{\prime\prime}(x)  \cdot h \cdot (\pm \ell)} \right)
+% &\stackrel{\text{L'Hosp.}}{=}& \\
+% \lim_{h \rightarrow 0} \left(  f^{\prime\prime}(x)  \right)^{-1} \left( -1 \pm 0.5 \cdot \left( (h + 1)^2 -  f^{\prime\prime}(x)  \cdot h \cdot (\pm \ell) \right)^{-1/2} \cdot \left( 2(h + 1) -  f^{\prime\prime}(x) \cdot (\pm \ell) \right) \right) &=&\\
+%  \left(  f^{\prime\prime}(x)  \right)^{-1} \left( -1 \pm  \left( 1 -  f^{\prime\prime}(x) \cdot (\pm \ell/2) \right) \right) &=& \lambda.\\
+%  \end{eqnarray*}
+% \begin{eqnarray*}
+% \lim_{f^{\prime}(x)^2 \rightarrow 0} \left(  f^{\prime\prime}(x)  f^\prime(x)^2 \right)^{-1} \left( -(f^\prime(x)^2 + 1) \pm \sqrt{ (f^\prime(x)^2 + 1)^2 -  f^{\prime\prime}(x)  f^\prime(x)^2 \cdot (\pm \ell)} \right) = (L'Hosp.)\\
+% \lim_{f^{\prime}(x)^2 \rightarrow 0} \left(  f^{\prime\prime}(x)  \right)^{-1} \left( -1 \pm 0.5 \left({ (f^\prime(x)^2 + 1)^2 -  f^{\prime\prime}(x)  f^\prime(x)^2 \cdot (\pm \ell)}\right)^{-1/2} \cdot \left( 2\cdot (f^\prime(x)^2 + 1) -  f^{\prime\prime}(x)  \cdot (\pm \ell)\right) \right) 
+% = \\
+%  \left(  f^{\prime\prime}(x)  \right)^{-1} \left( -1 \pm 0.5\right)  \cdot \left( 2 -  f^{\prime\prime}(x)  \cdot (\pm \ell)\right) 
+% = 
+% \end{eqnarray*}
 
 As shown in Figure \ref{quadratic-GeneralCorrection}, the solution of this equation provides endpoints $(x_l, y_l)$ and $(x_u, y_u)$ which can then be used to compute the extant width of each half-segment $m$. Unlike the linear solution, the half-segments here are not necessarily of the same length, and thus there are separate correction factors for each half-segment. 
 %The correction factors are $(\ell/2)/(m_u)$ and $(\ell/2)/(m_l)$ respectively. 
@@ -1166,8 +1224,8 @@ dev.off()
 
 \begin{figure}[h!tbp]\centering
 <<CtsAdjustedResults,echo=FALSE, dependson='CtsQuadratic'>>=
-dframe <- createSine(n = 40, len = 1, f=f, fprime=fprime, getquadapprox=TRUE, f2prime=f2prime)
-qplot(x=x, xend=x, y=y+ellx3.u, yend=y-ellx3.l, geom="segment", data=dframe, linetype=I(1)) + coord_fixed(ratio=1) + theme_bw() + ylab("y") + 
+dframe <- createSine(n = 40, len = 1, f=f, fprime=fprime, getquadapprox=TRUE, f2prime=f2prime) 
+qplot(x=x, xend=x, y=y+ellx4.u, yend=y-ellx4.l, geom="segment", data=dframe, linetype=I(1)) + coord_fixed(ratio=1) + theme_bw() + ylab("y") + 
   scale_x_continuous(breaks=seq(0, 2*pi, by=pi/2), 
                      labels=c("0", expression(paste(pi,"/2")), expression(pi), expression(paste("3",pi, "/2")), expression(paste("2",pi))))
 @
