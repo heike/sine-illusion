@@ -191,8 +191,8 @@ Ozone concentrations were gathered from \Sexpr{nsite} locations in the Houston a
 \end{subfigure}
 \caption{\label{exampleFull1} Ozone and Temperature in Houston, 2011. What seems to be the trend in overall variance? Is the variance trend in (a) consistent with the residual plot in (b)?}
 \end{figure}
-\newdo{this is still no description of the second plot. you're only sneaking this into the back of the findings. make it explicit and move it to the front. }
-\newtext{The increasing variance with temperature is camouflaged in the Figure \ref{example1} due to the changes in slope, but is very obvious in the residual plot in Figure \ref{example2} once the trend has been removed.}
+Figure \ref{example2} shows a residual plot of the same data, where the trend based on the loess smooth has been removed.
+The increasing variance with temperature is camouflaged in the Figure \ref{example1} due to the changes in slope, but is very obvious in the residual plot in Figure \ref{example2}.
 
 The sine illusion (also known in graphical literature as the line width illusion) is a frequent occurrence in statistical analysis, and graphical displays should be thoughtfully considered to minimize its effect visually and acknowledge its influence. Figure \ref{original} shows the classical sine illusion. The parameters that influence the sine illusion are the amplitude of the function and the line length. 
 \newdo{how do amplitude and line length impact the illusion - just put one sentence here.}
@@ -243,7 +243,8 @@ dev.off()
 \caption{\label{original}The original Sine Illusion. The regions of the left graph in the peak and the valley appear to be composed of longer lines than the other regions. }
 %The right graph illustrates the parameters determining the appearance of the illusion: $s$ denotes the amplitude of the function, $\ell$ the length of the line segments.
 \end{figure}
-The first documentation we could find of this illusion, \cite{day:1991} documented the illusion in the context of sinusoidal vertical lines. More recently the illusions have been documented on non-sinusoidal curves \citep{schonlau:2003, marie}, but the underlying effect seems to be the same, \newtext{that is, the illusion does not rely on the periodic nature of the underlying trendline, as demonstrated in Figure \ref{twoillusions-simulation}. The ``line width illusion" and the ``sine illusion" are the same phenomenon, even though the psychological literature and the graphics literature refer to the illusion differently.} 
+%The first documentation we could find of this illusion,
+In the cognitive literature, \cite{day:1991} first documented the illusion in the context of sinusoidal vertical lines. More recently the illusion has been documented on non-sinusoidal curves \citep{schonlau:2003, marie}, but the underlying effect seems to be the same,  that is, the illusion does not rely on the periodic nature of the underlying trendline but only on its slope and  changes to it, as demonstrated in Figure \ref{twoillusions-simulation}. The ``line width illusion" and the ``sine illusion" are symptoms of the same phenomenon, even though the cognitive literature and the graphics literature refer to the illusion differently. 
 
 
 <<simulation1Sine, echo=FALSE, fig.width=4, fig.height=4, include=FALSE>>=
@@ -388,7 +389,13 @@ p
 
 
 \subsection{Perceptual Explanations for the Sine Illusion}\label{perceptualexplanations}
-One illuminating demonstration of the Sine illusion comes from M. Bach's applet \citep{bach}. The applet cites perception research suggesting that the sine illusion occurs due to misapplication of perceptual experience with the three-dimensional world to a two-dimensional ``artificial" display of data. One possible three-dimensional context for similar stimuli is shown in Figure \ref{ribbon-illusion}. 
+Figure \ref{original} shows a reproduction of Bach's applet \citep{bach} displaying the sine illusion. 
+%The sine illusion is closely related to the line width phenomenon -- 
+% The line segments along the steepest slopes of the sine curve appear to be the shortest: ``The illusion is explained in terms of a perceptual compromise between the vertical extent and the greater overall dimensions of the section at the turn of the sine-wave figure and is thereby held to be the same in principle as the M\"uller-Lyer illusion." \citep{day:1991}.
+% applet 3 dimensional
+While not thoroughly examined in the sensation and perception literature, the sine illusion has been classified as part of a group of geometrical optical misperceptions  related to the M\"uller-Lyer illusion \citep{day:1991} or the Poggendorf illusion \citep{poggendorf}, which puts the illusion into the framework of context-based illusions.
+\cite{day:1991} suggest that
+the sine illusion occurs due to misapplication of perceptual experience with the three-dimensional world to a two-dimensional ``artificial" display of data. One possible three-dimensional context for similar stimuli is shown in Figure \ref{ribbon-illusion}. 
 
 \begin{figure}[h!tbp]\centering
 <<ribbon-illusion,echo=FALSE, out.width='0.5\\linewidth', fig.width=5, fig.height=2.6>>=
@@ -408,13 +415,13 @@ qplot(data=persp, x=xtop, xend=xbottom, y=ytop, yend=ybottom, geom="segment") +
   geom_line(aes(x=xbottom, y=ybottom), size=1.5)
 @
 %\includegraphics[width=.5\linewidth, keepaspectratio=TRUE]{figure/fig-ribbon-illusion}
-\caption{What the brain expects the data to look like. Experience with real-world objects suggests that the data are most similar to a slightly angled top view of a 3-dimensional strip such as a ribbon. Even though the sine illusion lines are not angled, the brain often recruits paradigms from one situation when processing novel stimuli. Optical illusions result from the mismatch between the applied heuristic and the stimulus. \citep{goldstein}} % goldstein S&P 8th edition pg 249
+\caption{What the brain expects the data to look like. Experience with real-world objects suggests that the data are most similar to a slightly angled top view of a 3-dimensional strip such as a ribbon. Even though the sine illusion lines are not angled, the brain often recruits paradigms from one situation when processing novel stimuli. Optical illusions result from the mismatch between the applied heuristic and the stimulus. \citep[p. 249]{goldstein}} % goldstein S&P 8th edition pg 249
 \label{ribbon-illusion}
 \end{figure}
 
-An interesting facet of the sine illusion is that when the graph is examined as if it were a two-dimensional projection of a three-dimensional figure, the illusion disappears and the line widths seem once more to be constant. In addition, if the lines are considered without the surrounding context, judgments comparing the length of two lines seem to be relatively accurate, as in \citet{cleveland:1984}. The contextual cues of the overall trend are critical to the sine illusion's effect; without those cues (either by subtraction of the trend or by considering only one or two lines at a time) the illusion does not occur.
-\todo[inline]{Add shiny server illustration of this effect by blanking out all but 2 lines that can then be compared accurately.}
-That is, the illusion breaks down if the visual heuristic is pre-empted by an attempt to view the graph as if it were three dimensional or if each piece is considered without the surrounding context. The illusion then holds only when a significant portion of the graph is considered simultaneously without regard to the perceptual mechanisms at play (See \cite{day:1991} for a more thorough discussion of how much surrounding context is required for the illusion to persist).
+%An interesting facet of the sine illusion is that when the graph is examined as if it were 
+By treating the graph as a two-dimensional projection of a three-dimensional figure, 
+the illusion disappears and the line widths seem once more to be constant.
 
 <<originalgrid, dependson='data', echo=FALSE, include=FALSE>>=
 f <- function(x) 2*sin(x)
@@ -441,8 +448,15 @@ qplot(x=x, xend=xend, y = ystart*ell, yend=yend*ell, geom="segment", data=dframe
 
 Though it is typically a bad idea to use three-dimensional representations when two dimensions are adequate to display the data \citep{tufte}, counteracting a visual heuristic might make that approach more viable. However, a three-dimensional projection of two-dimensional data is not easy to create and would likely lead to distortions and instability in the visual display. In particular, there does not seem to be an easy guideline for determining the projection angle or color gradient that would be necessary to create the illusory depth that would remove the optical illusion. 
 
-While not thoroughly examined in the sensation and perception literature, the sine illusion seems to have been classified as part of a group of geometrical optical misperceptions which may be related to the M\"uller-Lyer illusion \citep{day:1991} or the Poggendorf illusion \citep{poggendorf}.  Figure \ref{original} shows a reproduction of Bach's applet \citep{bach} displaying the sine illusion. The sine illusion is closely related to the line width phenomenon -- the line segments along the steepest slopes of the sine curve appear to be the shortest: ``The illusion is explained in terms of a perceptual compromise between the vertical extent and the greater overall dimensions of the section at the turn of the sine-wave figure and is thereby held to be the same in principle as the M\"uller-Lyer illusion." \citep{day:1991}.
+%That is, the illusion breaks down if the visual heuristic is pre-empted by an attempt to view the graph as if it were three dimensional or if each piece is considered without the surrounding context. 
+
+Further, the illusion  only  holds when a significant portion of the graph is considered simultaneously without regard to the perceptual mechanisms at play, The contextual cues of the overall trend are critical to the sine illusion's effect; without those cues (either by subtraction of the trend or by considering only one or two lines at a time) the illusion does not occur. In particular, our judgment in comparing the lengths of two lines is relatively accurate, as e.g. discussed in \citet{cleveland:1984}. See \cite{day:1991} for a more thorough discussion of how much surrounding context is required for the illusion to persist
+
+
+\todo[inline]{Add shiny server illustration of this effect by blanking out all but 2 lines that can then be compared accurately.}
+
 M Bach's applet  gives the option to compensate the line length manually for its perceived shortcoming. The amount of compensation chosen turns out to be highly dependent on both the length of the vertical line segments and the amplitude of the sine function. While the applet does not provide details on the compensation function, it does suggest that it may be possible to correct the graphical display so that the brain interprets the stimuli in a manner consistent with the numerical data. 
+\newdo{ conclusion from the last paragraph is idea underlying this paper: we want to compensate the illusion. need to emphasize this a bit more.}
 
 \subsection{Geometry of the Illusion}
 \newdo{Figure \ref{OrthogonalWidth} is beautiful and deserves some detailed discussion here. Do not orphan it again.}
