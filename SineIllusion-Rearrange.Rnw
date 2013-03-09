@@ -192,7 +192,7 @@ Ozone concentrations were gathered from \Sexpr{nsite} locations in the Houston a
 \caption{\label{exampleFull1} Ozone and Temperature in Houston, 2011. What seems to be the trend in overall variance? Is the variance trend in (a) consistent with the residual plot in (b)?}
 \end{figure}
 \newdo{this is still no description of the second plot. you're only sneaking this into the back of the findings. make it explicit and move it to the front. }
-\newtext{The increasing variance with temperature is camoflauged in the Figure \ref{example1} due to the changes in slope, but is very obvious in the residual plot in Figure \ref{example2} once the trend has been removed.}
+\newtext{The increasing variance with temperature is camouflaged in the Figure \ref{example1} due to the changes in slope, but is very obvious in the residual plot in Figure \ref{example2} once the trend has been removed.}
 
 The sine illusion (also known in graphical literature as the line width illusion) is a frequent occurrence in statistical analysis, and graphical displays should be thoughtfully considered to minimize its effect visually and acknowledge its influence. Figure \ref{original} shows the classical sine illusion. The parameters that influence the sine illusion are the amplitude of the function and the line length. 
 \newdo{how do amplitude and line length impact the illusion - just put one sentence here.}
@@ -559,7 +559,7 @@ print(grid.arrange(p2, p1, nrow=2))
 
 From a cognitive perspective, separating out the trendline and the variance creates more of a barrier to understanding the data in its original form. Additionally, removing the trend requires an initial model, and any plots produced using that fit are conditional on the assumptions made to obtain that model fit. In many situations, this may be undesireable, particularly as we typically view the data before fitting even a rudimentary model, and the sine illusion may influence even initial modeling decisions.
 
-\subsection{Transformation of the X-Axis}
+\subsection{Transformation of the $X$-Axis}
 Another approach to breaking the power of the sine illusion is to remove the changes in the slope of the overall trend line by transforming the $x$-axis such that the absolute value of the slope is constant. 
 This will force the corresponding extant width to be constant. 
 
@@ -627,25 +627,40 @@ where $c_i$ and $d_i$ are given as
 \[
 c_i = \sum_{j=0}^{i-1} |f(x_j) - f(x_{j-1})| \text{ and } d_i = \sum_{j=0}^{i} |f(x_j) - f(x_{j-1})|.
 \]
+Since we can write $|f(x_j) - f(x_{j-1})| = \int_{x_{j-1}}^{x_j} |f^\prime(z)|dz$ we get a more concise expression for the transformation as
+\begin{equation}\label{eqn.xtrans}
+(f \circ T)(x) = x_0 + (x_K-x_0)\left(\int_{x_0}^x |f^\prime(z)| dz\right)/\left(\int_{x_0}^{x_K}|f^\prime(z)| dz\right)
+\end{equation}
 This transformation is shown in Figure \ref{xtrans1}.
 
 
-\newdo{this needs to be re-written in terms of $s$, $c_i$ and $d_i$s - but it's the same idea.}
-That is, if the $x$-axis spans the interval $[a,b)$, the transformation of the $x$ axis is 
-$$T(x) = a + (b-a)\left(\int_a^x |f^\prime(z)| dz\right)/\left(\int_a^b|f^\prime(z)| dz\right)$$ 
+% \newdo{this needs to be re-written in terms of $s$, $c_i$ and $d_i$s - but it's the same idea.}
+% That is, if the $x$-axis spans the interval $[a,b)$, the transformation of the $x$ axis is 
+% $$T(x) = a + (b-a)\left(\int_a^x |f^\prime(z)| dz\right)/\left(\int_a^b|f^\prime(z)| dz\right)$$ 
+% 
+% The transformation is shown in Figure \ref{xtrans1}. An analysis of $T(x)$ is shown in appendix \ref{XtransAppendix}.
 
-The transformation is shown in Figure \ref{xtrans1}. An analysis of $T(x)$ is shown in appendix \ref{XtransAppendix}.
+In practice we can see that the illusion can be broken by a much less severe transformation of the $x$ values. 
+By shrinking the transformation in Figure \ref{xtrans1} towards the original $x$ values by a factor of $w \in (0,1)$, the illusion remains broken but the data is reflecting the  original function of $f(x)$ much more closely. We use the following equation for this: 
+% \begin{equation}\label{eqn.xtrans.weighted}
+% (f \circ T_w)(x) = \frac{w-1}{w} x + \frac{(b-a)}{w}\left(\int_a^x |f^\prime(z)| dz\right)/\left(\int_a^b|f^\prime(z) dz|\right)
+% \end{equation}
+\begin{equation}\label{eqn.xtrans.weighted}
+(f \circ T_w)(x) = w \cdot x + (1-w) \cdot (f \circ T)(x)
+\end{equation}
 
-In practice we can see that the illusion can be broken by a much less severe transformation in $x$. 
-\newtext{By shrinking the transformation in Figure \ref{xtrans1} towards the original $x$ values by a factor of $w$, the illusion is still broken and the data are closer to the original function $y=f(x)$. 
-$$T(x) = \frac{w-1}{w} x + \frac{(b-a)}{w}\left(\int_a^x |f^\prime(z)| dz\right)/\left(\int_a^b|f^\prime(z) dz|\right)$$ }
+Figures \ref{xtrans2} - \ref{xtrans4} show the effect of different shrinkage coefficients $w$. The extent to which this weighting holds varies with the aspect ratio of the chart and the shape of the function. It also depends on the audience's experience with the sine illusion, resulting in very subjective choices of an
+%, but merits further investigation, as it may be possible to find an 
+``optimal weighting" for specific situations which minimizes distortion and maximizes the correspondence between inferences made from the data and inferences made using the visual display.
 
-The extent to which this weighting holds is likely to vary with the aspect ratio and the shape of the function, but merits further investigation, as it may be possible to find an ``optimal weighting" for specific situations which minimizes distortion and maximizes the correspondence between inferences made from the data and inferences made using the visual display.\newtext{Figures \ref{xtrans2} - \ref{xtrans4} show the effect of different shrinkage coefficients $w$.} 
 
 <<xtransform, echo=FALSE, fig.width=4, fig.height=2, include=FALSE>>=
 correctx <- function(z, fprime, a=0, b=2*pi, shrink=0) {
+  # w = 1/(shrink+1)
   const <- integrate(function(x) abs(fprime(x)), a, b)$value
   trans <- sapply(z, function(i) integrate(function(x) abs(fprime(x)), a, i)$value*(b-a)/const + a)
+  # alternatively to the rowMeans, you could report back  
+  # trans*(1-w) + z*w
   rowMeans(matrix(c(rep(z, times=shrink), trans), nrow=length(z), byrow=FALSE))
 }
 f <- sin
@@ -699,23 +714,23 @@ qplot(x=xtrans4, xend=xtrans4, y = ystart, yend=yend, colour=I("blue"), geom="se
 \begin{figure}[h!tbp]\centering
 \begin{subfigure}[b]{.48\linewidth}\centering
 \includegraphics[keepaspectratio=TRUE,width=\linewidth]{figure/fig-xtransform1}
-\caption[X axis transformation]{$X$ axis transformation}
+\caption[X axis transformation]{$X$ axis transformation based on eqn. (\ref{eqn.xtrans}), corresponding to weighting of $w=0$.}
 \label{xtrans1}
 \end{subfigure}
 \begin{subfigure}[b]{.48\linewidth}\centering
 \includegraphics[keepaspectratio=TRUE,width=\linewidth]{figure/fig-xtransform2}
-\caption[Weighted transformation]{Weighted Transformation, $w=1$}
+\caption[Weighted transformation]{Weighted Transformation, $w=1/2$ (based on eqn. (\ref{eqn.xtrans.weighted}))}
 \label{xtrans2}
 \end{subfigure}
 
 \begin{subfigure}[b]{.48\linewidth}\centering
 \includegraphics[keepaspectratio=TRUE,width=\linewidth]{figure/fig-xtransform3}
-\caption[Weighted transformation]{Weighted Transformation, $w=2$}
+\caption[Weighted transformation]{Weighted Transformation, $w=1/3$}
 \label{xtrans3}
 \end{subfigure}
 \begin{subfigure}[b]{.48\linewidth}\centering
 \includegraphics[keepaspectratio=TRUE,width=\linewidth]{figure/fig-xtransform4}
-\caption[Weighted transformation]{Weighted Transformation, $w=3$}
+\caption[Weighted transformation]{Weighted Transformation, $w=1/4$}
 \label{xtrans4}
 \end{subfigure}
 \caption[X axis transformations]{$X$ axis transformations. Dots at the bottom of the graph show the transformation's effect on equally spaced points along the $x$-axis. In (a), adjusting the $x$-spacing of the lines mitigates the sine illusion by changing the extant width so that it is uniform in $x$. (b) - (d) shrink the transformation in (a) towards successively more uniform spacings in $x$ while still breaking the effects of the illusion.}
@@ -1438,35 +1453,35 @@ Figures \ref{raw-temp} and \ref{resid-temp} show temperature data from 422 stati
 % argument is your BibTeX string definitions and bibliography database(s)
 \bibliography{references}
 %\clearpage
-\appendix
-\section{X Transformation Math}\label{XtransAppendix}
-Suppose that 
-\begin{itemize}
-\item $f(x)$ is defined on $[a,b)$
-\item $f^\prime(x)$ exists on $[a,b)$
-\item countable regions $[a_i, a_{i+1})$ exist such that $\bigcup_{i=1}^\infty [a_i, a_{i+1}) = [a,b)$ and either $f^\prime(x) \geq 0$ or $f^\prime(x) \leq 0$ for all $x\in [a_i, a_{i+1})$.
-\end{itemize}
-Then for $$T(x) = \frac{(a_\infty-a_0)}{\int_{a_0}^{a_\infty} |f^\prime(z)| dz} \int_{a_0}^x|f^\prime(z)| dz + a$$
-\begin{align*}
-T(x) & = a + \frac{a_{\infty}-a_{0}}{\int_{a_0}^{a_{\infty}} |f^\prime(z)| dz}\left(\sum_{i=1}^\infty \left|\int_{a_i}^{a_{i+1}} f^\prime(z) I(z<x) dz \right|\right)\\
-& = a + \frac{a_{\infty}-a_{0}}{\sum_{i=1}^{M} \left|\int_{a_i}^{a_{i+1}} f^\prime(z) I(z<x)\right| dz}\left(\sum_{i=1}^{M-1} \left|f(a_{i+1}) -  f(a_i)\right| + \left|f(x) - f(a_{M}) \right|\right)\\
-&\qquad\qquad\text{where } a_{M} < x < a_{M+1}
-\end{align*}
-So on any single $[a_i, a_{i+1})$, assuming WLOG $x<x_0$
-\begin{align*}
-T_i(x) & = c_{i1} + c_{i2}|f(x) - f(a_i)|\\
-f^\prime_i(x) & = \lim_{x\rightarrow x_0} \frac{f(x) - f(x_0)}{T_i(x) - T_i(x_0)} I(a_i \leq x < x_0 < a_{i+1})\\
-& = \lim_{x\rightarrow x_0} \frac{f(x) - f(x_0)}{c_{i1} + c_{i2}\cdot s \cdot (f(x) - f(a_i)) - c_{i1} - c_{i2}\cdot s \cdot(f(x_0) - f(a_i))} I(a_i \leq x < x_0 < a_{i+1})\\
-& \qquad\qquad\text{where } s = sign(f^\prime(x)) \text{ on } x\in [a_i, a_{i+1})\\
-& = \lim_{x\rightarrow x_0} \frac{f(x) - f(x_0)}{c_{i2}\cdot s \cdot (f(x_0) - f(x))} I(a_i \leq x < x_0 < a_{i+1})\\
-& = \lim_{x\rightarrow x_0} \frac{f(x) - f(x_0)}{c_{i2}\left|f(x_0) - f(x)\right|} I(a_i \leq x < x_0 < a_{i+1})\\
-& = \frac{1}{c_{i2}}
-\end{align*}
-Hence $f^\prime(x)$ is constant on $[a_i, a_{i+1})$. 
-
-Furthermore, by definition, $c_{i2}$ is equal to $$c_{i2} = \pm \sum_{i=0}^{\infty} \frac{a_{i+1}-a_i}{a_\infty-a_0}\left(\frac{\left|f(a_{i+1})-f(a_i)\right|}{a_{i+1}-a_i}\right)$$ that is, the weighted average of $|\triangle f(x)|/(\triangle x)$ over the $[a_i, a_{i+1})$ 
-
-Also, $c_{01} = a_0$, $c_{i1} = a_{i+1}-a_i$. Hence the piecewise definition can be made to look like the original definition, but with the $c_{i2}$ differing only by a sign and the cumulative $c_{i1}$ tracking the left endpoint of the segment. 
+% \appendix
+% \section{X Transformation Math}\label{XtransAppendix}
+% Suppose that 
+% \begin{itemize}
+% \item $f(x)$ is defined on $[a,b)$
+% \item $f^\prime(x)$ exists on $[a,b)$
+% \item countable regions $[a_i, a_{i+1})$ exist such that $\bigcup_{i=1}^\infty [a_i, a_{i+1}) = [a,b)$ and either $f^\prime(x) \geq 0$ or $f^\prime(x) \leq 0$ for all $x\in [a_i, a_{i+1})$.
+% \end{itemize}
+% Then for $$T(x) = \frac{(a_\infty-a_0)}{\int_{a_0}^{a_\infty} |f^\prime(z)| dz} \int_{a_0}^x|f^\prime(z)| dz + a$$
+% \begin{align*}
+% T(x) & = a + \frac{a_{\infty}-a_{0}}{\int_{a_0}^{a_{\infty}} |f^\prime(z)| dz}\left(\sum_{i=1}^\infty \left|\int_{a_i}^{a_{i+1}} f^\prime(z) I(z<x) dz \right|\right)\\
+% & = a + \frac{a_{\infty}-a_{0}}{\sum_{i=1}^{M} \left|\int_{a_i}^{a_{i+1}} f^\prime(z) I(z<x)\right| dz}\left(\sum_{i=1}^{M-1} \left|f(a_{i+1}) -  f(a_i)\right| + \left|f(x) - f(a_{M}) \right|\right)\\
+% &\qquad\qquad\text{where } a_{M} < x < a_{M+1}
+% \end{align*}
+% So on any single $[a_i, a_{i+1})$, assuming WLOG $x<x_0$
+% \begin{align*}
+% T_i(x) & = c_{i1} + c_{i2}|f(x) - f(a_i)|\\
+% f^\prime_i(x) & = \lim_{x\rightarrow x_0} \frac{f(x) - f(x_0)}{T_i(x) - T_i(x_0)} I(a_i \leq x < x_0 < a_{i+1})\\
+% & = \lim_{x\rightarrow x_0} \frac{f(x) - f(x_0)}{c_{i1} + c_{i2}\cdot s \cdot (f(x) - f(a_i)) - c_{i1} - c_{i2}\cdot s \cdot(f(x_0) - f(a_i))} I(a_i \leq x < x_0 < a_{i+1})\\
+% & \qquad\qquad\text{where } s = sign(f^\prime(x)) \text{ on } x\in [a_i, a_{i+1})\\
+% & = \lim_{x\rightarrow x_0} \frac{f(x) - f(x_0)}{c_{i2}\cdot s \cdot (f(x_0) - f(x))} I(a_i \leq x < x_0 < a_{i+1})\\
+% & = \lim_{x\rightarrow x_0} \frac{f(x) - f(x_0)}{c_{i2}\left|f(x_0) - f(x)\right|} I(a_i \leq x < x_0 < a_{i+1})\\
+% & = \frac{1}{c_{i2}}
+% \end{align*}
+% Hence $f^\prime(x)$ is constant on $[a_i, a_{i+1})$. 
+% 
+% Furthermore, by definition, $c_{i2}$ is equal to $$c_{i2} = \pm \sum_{i=0}^{\infty} \frac{a_{i+1}-a_i}{a_\infty-a_0}\left(\frac{\left|f(a_{i+1})-f(a_i)\right|}{a_{i+1}-a_i}\right)$$ that is, the weighted average of $|\triangle f(x)|/(\triangle x)$ over the $[a_i, a_{i+1})$ 
+% 
+% Also, $c_{01} = a_0$, $c_{i1} = a_{i+1}-a_i$. Hence the piecewise definition can be made to look like the original definition, but with the $c_{i2}$ differing only by a sign and the cumulative $c_{i1}$ tracking the left endpoint of the segment. 
 \end{document}
 
 
