@@ -1,3 +1,4 @@
+% !TeX program = pdfLaTeX
 \documentclass[11pt]{article}
 \usepackage{natbib}
 \usepackage{fullpage}
