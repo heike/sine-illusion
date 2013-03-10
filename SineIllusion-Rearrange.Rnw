@@ -12,6 +12,7 @@
 \usepackage{url}
 \usepackage{ulem}
 
+% test change
 % help with editing and coauthoring
 \usepackage[colorinlistoftodos]{todonotes}
 
@@ -753,7 +754,7 @@ qplot(x=xtrans4, xend=xtrans4, y = ystart, yend=yend, colour=I("blue"), geom="se
 \newdo{add a 2nd example here - how about a correction for the ozone data from the beginning?}
 %\clearpage
 
-\subsection{Transformation of the $Y$-Axis}
+\subsection{Transformations in $Y$}
 Understanding the geometry of the sine illusion leads to another approach to disrupting the conflict between the extant width and the actual height of the segment. 
 
 All of our approaches in this section are based on a comparison of the orthogonal width to the vertical width of lines. 
