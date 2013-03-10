@@ -1,4 +1,5 @@
 library(shiny)
+library(ggplot2)
 source("./functions.R")
 
 shinyServer(function(input, output) {
@@ -9,8 +10,13 @@ shinyServer(function(input, output) {
     fprime <- function(x) input$amp*cos(x)
     f2prime <- function(x) -input$amp*sin(x)
     dframe <- createSine(n=input$obs+2, len=input$ell, f, fprime, f2prime)[c(2:(input$obs+1)),]
-    p1 <- qplot(x=x, xend=x, y=ystart, yend=yend, geom="segment", data=dframe) +
-      theme_bw() + 
+    dframe$color <- "black"
+    if(input$hidelines){
+      dframe$color <- "grey"
+      dframe$color[sample(1:input$obs, 2)] <- "black"
+    }
+    p1 <- qplot(x=x, xend=x, y=ystart, yend=yend, geom="segment", data=dframe, color=color) +
+      theme_bw() + scale_color_manual(values=c("black" = "black", "grey" = "grey90"), guide="none") +
       scale_x_continuous(breaks=seq(-pi, pi, by=pi/2), 
                          labels=c(expression(-pi), expression(paste(-pi, "/2")), 0, 
                                   expression(paste(pi,"/2")), expression(pi))) +
