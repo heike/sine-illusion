@@ -443,12 +443,13 @@ qplot(x=x, xend=xend, y = ystart*ell, yend=yend*ell, geom="segment", data=dframe
                 colour = "black"),
        panel.grid.minor.x=element_blank(), panel.background=element_blank(),
        axis.title = element_blank(), axis.ticks = element_blank(), 
-       axis.text = element_blank()) + coord_equal(ratio=1)
+       axis.text = element_blank()) + coord_equal(ratio=1) + 
+  geom_segment(size=1.5, data=dframe[c(31, 38),])
 @
 \begin{figure}[hbtp]
 \centering
 \includegraphics[width=.5\linewidth]{figure/fig-originalgrid}
-\caption{\label{fig:original-grid} Horizontal grid lines do not help  to resolve the illusion, even though they provide a clear basis for comparison of line lengths.}
+\caption{\label{fig:original-grid} Horizontal grid lines do not help  to resolve the illusion, even though they provide a clear basis for comparison of line lengths. Readers are able to correctly assess the lengths of the two singled out line segments as being equal. \newdo{the statement in the last sentence might be a bit strong.} }
 \end{figure}
 
 Though it is typically a bad idea to use three-dimensional representations when two dimensions are adequate to display the data \citep{tufte}, counteracting a visual heuristic might make that approach more viable. However, a three-dimensional projection of two-dimensional data is not easy to create and would likely lead to distortions and instability in the visual display. In particular, there does not seem to be an easy guideline for determining the projection angle or color gradient that would be necessary to create the illusory depth that would remove the optical illusion. 
