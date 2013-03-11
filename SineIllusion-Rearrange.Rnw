@@ -796,7 +796,7 @@ As Figure \ref{fig:linewidth} shows, orthogonal $w_o$ and vertical $w_v$ line wi
 \begin{equation}\label{eqn.adjust}
 w_o = w_v \cos \theta,
 \end{equation}
-where $\theta$ is the acute angle between the secant line and the vertical, that is, $\theta \in (-\pi, \pi]$.
+where $\theta$ is the acute angle between the secant line and the vertical, that is, $\theta \in (-\pi, \pi]$. The relationship between $\theta$ and extant width for $y = \sin(x)$ can be seen in Figure\ref{fig:OrthogonalWidth}.
 
 Previous work in \citet{schonlau:2003, marie:2013} used the adjustment in eqn.(\ref{eqn.adjust}) for a line with constant slope. We have to extend this approach to a functional form with varying slope. This is the approach taken in the next sections.
 
