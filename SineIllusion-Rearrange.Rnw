@@ -678,9 +678,9 @@ This transformation is shown in Figure \ref{fig:xtrans1}.
 
 In practice we can see that the illusion can be broken by a much less severe transformation of the $x$ values. 
 By shrinking the transformation in Figure \ref{fig:xtrans1} towards the original $x$ values by a factor of $w \in (0,1)$, the illusion remains broken but the data is reflecting the  original function of $f(x)$ much more closely. We use the following equation for this: 
-% \begin{equation}\label{eqn.xtrans.weighted}
-% (f \circ T_w)(x) = \frac{w-1}{w} x + \frac{(b-a)}{w}\left(\int_a^x |f^\prime(z)| dz\right)/\left(\int_a^b|f^\prime(z) dz|\right)
-% \end{equation}
+%  \begin{equation}\label{eqn.xtrans.weighted}
+%  (f \circ T_w)(x) = \frac{w-1}{w} x + \frac{(b-a)}{w}\left(\int_a^x |f^\prime(z)| dz\right)/\left(\int_a^b|f^\prime(z) dz|\right)
+%  \end{equation}
 \begin{equation}\label{eqn.xtrans.weighted}
 (f \circ T_w)(x) = w \cdot x + (1-w) \cdot (f \circ T)(x)
 \end{equation}
@@ -808,7 +808,7 @@ qplot(data=datasub, x=TmaxCorrect, y=Ozone, geom="jitter", colour=I("grey20"), a
       xlab="Temperature (F)", ylab="8-hour Average Ozone Concentration (ppm)") + 
   geom_line(aes(x=TmaxCorrect, y=fit), size=1.25, colour="steelblue") + theme_bw() + 
   geom_point(data=dots) + 
-  scale_x_continuous(breaks=breaks$breaks1, minor_breaks=dots$TmaxCorrect, labels=breaks$labels)
+  scale_x_continuous(breaks=breaks$breaks1, minor_breaks=dots$TmaxCorrect, labels=breaks$labels) 
 qplot(data=datasub, x=TmaxCorrect2, y=Ozone, geom="jitter", colour=I("grey20"), alpha=I(.5), 
       xlab="Temperature (F)", ylab="8-hour Average Ozone Concentration (ppm)") + 
   geom_line(aes(x=TmaxCorrect2, y=fit), size=1.25, colour="steelblue") + theme_bw() + 
@@ -1526,7 +1526,10 @@ Figures \ref{fig:raw-temp} and \ref{fig:resid-temp} show temperature data from 4
 
 %\clearpage
 \section{Conclusion}
-\begin{itemize}\item Raise Awareness\item ``Fixing" data is tricky and usually beyond a statistician's comfort zone, but we could see this as part of an applet where the ``fix" is done temporarily as a diagnostic measure\end{itemize}
+\begin{itemize}\item Raise Awareness\item ``Fixing" data is tricky and usually beyond a statistician's comfort zone, but we could see this as part of an applet where the ``fix" is done temporarily as a diagnostic measure
+\item iterative process - we're only doing first step. but then we don't have an explicit functional expression anymore
+\item we're only extending -- some normalization might help
+\end{itemize}
 \clearpage
 \bibliographystyle{asa}
 % argument is your BibTeX string definitions and bibliography database(s)
