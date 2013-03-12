@@ -794,7 +794,7 @@ dots <- data.frame(Tmax=seq(45, 95, length=11), Ozone=0)
 dots$TmaxCorrect <- correctx(dots$Tmax, fprime, a=45, b=95, shrink=0)
 dots$TmaxCorrect2 <- correctx(dots$Tmax, fprime, a=45, b=95, shrink=1)
 
-breaks <- data.frame(labels=as.character(seq(50, 90, 10)), breaks=seq(50, 90, 10))
+breaks <- data.frame(labels=as.character(seq(50, 90, 5)), breaks=seq(50, 90, 5))
 breaks$breaks1 <- correctx(breaks$breaks, fprime, a=45, b=95, shrink=0)
 breaks$breaks2 <- correctx(breaks$breaks, fprime, a=45, b=95, shrink=1)
 
@@ -806,18 +806,18 @@ qplot(data=datasub, x=Tmax, y=Ozone, geom="jitter", colour=I("grey30"), alpha=I(
   geom_point(data=dots, aes(x=Tmax))
 qplot(data=datasub, x=TmaxCorrect, y=Ozone, geom="jitter", colour=I("grey20"), alpha=I(.5), 
       xlab="Temperature (F)", ylab="8-hour Average Ozone Concentration (ppm)") + 
-  geom_line(aes(x=Tmax, y=fit), size=1.25, colour="steelblue") + theme_bw() + 
+  geom_line(aes(x=TmaxCorrect, y=fit), size=1.25, colour="steelblue") + theme_bw() + 
   geom_point(data=dots) + 
   scale_x_continuous(breaks=breaks$breaks1, minor_breaks=dots$TmaxCorrect, labels=breaks$labels)
 qplot(data=datasub, x=TmaxCorrect2, y=Ozone, geom="jitter", colour=I("grey20"), alpha=I(.5), 
       xlab="Temperature (F)", ylab="8-hour Average Ozone Concentration (ppm)") + 
-  geom_line(aes(x=Tmax, y=fit), size=1.25, colour="steelblue") + theme_bw() + 
+  geom_line(aes(x=TmaxCorrect2, y=fit), size=1.25, colour="steelblue") + theme_bw() + 
   geom_point(data=dots) + 
   scale_x_continuous(breaks=breaks$breaks2, minor_breaks=dots$TmaxCorrect, labels=breaks$labels)
 
 @
 
-Returning to the Ozone data in Figure \ref{fig:exampleFull1}, we can apply the x-correction fairly easily as loess enforces continuity conditions that include differentiability of the smooth function. Figure \ref{fig:xtrans-example} shows the original data and the transformed $x$ axis.
+Returning to the Ozone data in Figure \ref{fig:exampleFull1}, we can apply the $x$-correction fairly easily as loess enforces continuity conditions that include differentiability of the smooth function. Figure \ref{fig:xtrans-example} shows the original data and the transformed $x$ axis.
 
 \begin{figure}[h!]\centering
 \begin{subfigure}[b]{.48\linewidth}\centering
@@ -826,7 +826,7 @@ Returning to the Ozone data in Figure \ref{fig:exampleFull1}, we can apply the x
 \end{subfigure}
 \begin{subfigure}[b]{.48\linewidth}\centering
 \includegraphics[keepaspectratio=TRUE,width=\linewidth]{figure/fig-xtrans-example2}
-\caption{Transformed X Axis}\label{fig:xtrans-example-trans}
+\caption{Transformed $X$ Axis}\label{fig:xtrans-example-trans}
 \end{subfigure}
 \caption{The increasing variance is easier to see when $x$ has been transformed, because the function seems more linear.}\label{fig:xtrans-example}
 \end{figure}
