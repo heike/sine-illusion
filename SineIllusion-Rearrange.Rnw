@@ -44,8 +44,7 @@ suppressMessages(library(ggplot2))
 library(plyr)
 suppressMessages(library(gridExtra))
 
-createSine <- function(n=200, len=1, f=f, fprime=fprime, getquadapprox=FALSE, f2prime=getquadapprox, a=0, b=2*pi) {
-  if(getquadapprox & !is.function(f2prime)) f2prime <- function(x) -1*f(x) # for backwards compatibility
+createSine <- function(n=200, len=1, f=f, fprime=fprime, f2prime=f2prime, a=0, b=2*pi) {
   x <- seq(a, b, length=n+2)[(2:(n+1))]
   ell <- rep(len, length=length(x))
   fx <- f(x)
@@ -68,12 +67,7 @@ createSine <- function(n=200, len=1, f=f, fprime=fprime, getquadapprox=FALSE, f2
   
   # third adjustment is based on quadratic approximation of f.
   # this needs two parts: correction above and below f(x)  
-  if(getquadapprox & is.function(f2prime)){
-    secseg <- do.call("rbind", lapply(dframe$x, function(i) getSecantSegment(i, dframe, f, fprime, f2prime)))
-    dframe$ellx3.u <- secseg$sec.ell1
-    dframe$ellx3.l <- secseg$sec.ell2
-  }
-  
+ 
   fp <- a*fprime(x)
   f2p <- a*f2prime(x)
   lambdap <- (sqrt((fp^2+1)^2-f2p*fp^2*ell) + fp^2 + 1)^-1    
@@ -87,59 +81,34 @@ createSine <- function(n=200, len=1, f=f, fprime=fprime, getquadapprox=FALSE, f2
 }
 
 getSecantSegment <- function(x0, df, f, fprime, f2prime){
-  ell.x0     <- df$ell[which.min(abs(df$x-x0))]/2
+  ell     <- sapply(x0, function(i) df$ell[which.min(abs(i-df$x))]/2)
   
   dy <- diff(range(df$y))
   dx <- diff(range(df$x))
-  a <- dx/(dy + 2*ell.x0) 
+  a <- dx/(dy + 2*ell) 
   
-  #---- Actual Roots
-  #   secSlope   <- -a/fprime(x0)
-  #   temp       <- seq(min(df$x)-pi, max(df$x)+pi, .0001)
-  #   leftend    <- temp[which.min(abs(f(temp) + ell.x1 - secSlope*(temp-x1)))]
-  #   rightend   <- temp[which.min(abs(f(temp) - ell.x1 - secSlope*(temp-x1)))]
-  #----
-  
+  fp <- a*fprime(x0)
+  f2p <- a*f2prime(x0)
+  lambdap <- (sqrt((fp^2+1)^2-f2p*fp^2*ell) + fp^2 + 1)^-1    
+  lambdam <- -(sqrt((fp^2+1)^2+f2p*fp^2*ell) + fp^2 + 1)^-1    
+
   #---- Approximation
-  lambda1 <- (-(fprime(x0)^2 + 1) + sqrt((fprime(x0)^2 + 1)^2 - 2*fprime(x0)^2*f2prime(x0)*ell.x0))/(fprime(x0)^2*f2prime(x0))
-  lambda2 <- (-(fprime(x0)^2 + 1) + sqrt((fprime(x0)^2 + 1)^2 + 2*fprime(x0)^2*f2prime(x0)*ell.x0))/(fprime(x0)^2*f2prime(x0))
   
-  x1 <- lambda1*fprime(x0)+x0
-  x2 <- lambda2*fprime(x0)+x0
-  y1 <- f(x0)-lambda1
-  y2 <- f(x0)-lambda2
+  x2 <- lambdap*fprime(x0)+x0
+  x1 <- lambdam*fprime(x0)+x0
+  y2 <- f(x0)-lambdap
+  y1 <- f(x0)-lambdam
   #----
-  
-  #---- Approximation V2 ----
-#   dx <- fprime(x0)
-#   dx1 <- 1+dx^2   
-#   ddx <- f2prime(x0)
-#   
-#   corr1 <- 1/a*(((dx1)-sqrt(dx1^2-2*ddx*(dx1-1)^2*ell.x0))/(ddx*dx))
-#   corr2 <- 1/a*(((dx1)-sqrt(dx1^2+2*ddx*(dx1-1)^2*ell.x0))/(ddx*dx))
-#   if(abs(dx)<.01) {
-#     dx1 <- 2
-#     corr1 <- corr2 <- 0
-#   }
-#   if(abs(dx)<.01){
-#     ddx <- 1
-#   }
-#   
-#   x1 = corr1 + x0
-#   x2 = corr2 + x0
-#   y1 = f(x1)+ell.x0
-#   y2 = f(x2)-ell.x0
-  #---- 
-  
+ 
   df2 <- data.frame(x=x0, y=f(x0), deriv=fprime(x0),
                     sec.xstart=x1, sec.xend = x2, 
                     sec.ystart=y1, sec.yend = y2,
-                    ell.orig = 2*ell.x0)
+                    ell = 2*ell)
 
-  df2$sec.ell1 <- a*.5*ell.x0/with(df2, sqrt((sec.yend-y)^2+(sec.xend-x)^2))
-  df2$sec.ell2 <- a*.5*ell.x0/with(df2, sqrt((y-sec.ystart)^2+(x-sec.xstart)^2))
-#   df2$sec.ell1 <- with(df2, sqrt((sec.yend-y)^2+(sec.xend-x)^2))
-#   df2$sec.ell2 <- with(df2, sqrt((y-sec.ystart)^2+(x-sec.xstart)^2))
+  df2$sec.ellp <- (4*abs(lambdap)*sqrt(1+fp^2))^-1
+  df2$sec.ellm <- (4*abs(lambdam)*sqrt(1+fp^2))^-1
+#   df2$sec.ellp <- with(df2, sqrt((sec.yend-y)^2+(sec.xend-x)^2))
+#   df2$sec.ellm <- with(df2, sqrt((y-sec.ystart)^2+(x-sec.xstart)^2))
   df2$type <- "Perceived Width"
   df2$a <- a
   return(df2)
@@ -433,7 +402,7 @@ f <- function(x) 2*sin(x)
 fprime <- function(x) 2*cos(x)
 f2prime <- function(x) -2*sin(x)
 
-dframe <- createSine(n = 40, len = 1, f=f, fprime=fprime)
+dframe <- createSine(n = 40, len = 1, f=f, fprime=fprime, f2prime)
 
 qplot(x=x, xend=xend, y = ystart*ell, yend=yend*ell, geom="segment", data=dframe) +
   theme(panel.grid.major.y=element_line(colour="grey75"), 
@@ -554,7 +523,7 @@ One approach to breaking the sine illusion is to present the trend and variance 
 While removing the trend and showing variability separately does largely remove the sine illusion, it also makes it  more difficult to parse the overall data, as judgments must be made by combining two graphs or by mentally re-composing the original graph (at which point, the sine-illusion becomes a factor). Ideally, it would be possible to tell the whole story with a single graph, to minimize cognitive demands. While this example is relatively simple, it would be much harder to create a de-trended version of Figure \ref{fig:playfair-debt} that could be easily assessed to determine both trend and change in the size of the trade imbalance over time. 
 
 <<trend-removal, include=FALSE, fig.height=4.5, fig.width=4.5>>=
-df <- df2 <- createSine(40, 1, sin, cos)
+df <- df2 <- createSine(40, 1, sin, cos, f2prime=function(x) -sin(x))
 df2$y <- loess(df$y~df$x)$fitted
 df2$type <- "Loess Fit"
 df$type <- "Original Function"
@@ -870,14 +839,14 @@ The approach that we take here is sketched out in figure \ref{fig:trig}: we eval
 f <- function(x) 2*sin(x)
 fprime <- function(x) 2*cos(x)
 f2prime <- function(x) -2*sin(x)
-df <- createSine(40 , len=1, f=f, fprime=fprime)[5:16,]
+df <- createSine(40 , len=1, f=f, fprime=fprime, f2prime=f2prime)[5:16,]
 a <- 9
-dfsec <- getSecantSegment(df$x[a], df, f, fprime, f2prime)
+dfsec <- getSecantSegment(df$x[a], df=df, f, fprime, f2prime)
 dfslope <- data.frame(xstart=df$x[a]+.5, xend=df$x[a]-.9, ystart=fprime(df$x[a])*.5+df$y[a], yend=-.9*fprime(df$x[a])+df$y[a])
 dfslope2 <- data.frame(xstart=df$x[a]+.5, xend=df$x[a]-.3, ystart=fprime(df$x[a])*.5+df$y[a]+.5, yend=-.3*fprime(df$x[a])+df$y[a]+.5)
 ftsize <- 4
 
-df <- createSine(40 , len=1, f=f, fprime=fprime)[5:16,]
+df <- createSine(40 , len=1, f=f, fprime=fprime, f2prime=f2prime)[5:16,]
 
 a <- 9
 df.real <- data.frame(x=seq(df$x[1], df$x[12], by=.001))
@@ -911,32 +880,10 @@ qplot(data=df.real, x=x, y=y, geom="line") +
   geom_text(aes(x=df.real$x[which.min(df.real$sec)], y=min(df.real$sec, na.rm=TRUE)-.05), 
                 label="slope: paste(-1/f, \"'\", (x))", parse=TRUE, hjust=.75, vjust=1, data=data.frame()) +
   geom_text(data=df[a,], aes(x=.5*xend-.05 + .5*x, y=.5*yend+.5*y, label="paste(frac(\u2113, 2))"), size=ftsize+1, face="bold", parse=TRUE) +
-  geom_text(aes(x=.5*dfsec$sec.xstart+ .5*dfsec$x +.05 , y=.5*dfsec$sec.ystart+.5*dfsec$y-0.03), label="paste(frac(m, 2))", parse=TRUE, face="plain", data=data.frame()) + 
+  geom_text(aes(x=.5*dfsec$sec.xstart+ .5*dfsec$x +.1 , y=.5*dfsec$sec.ystart+.5*dfsec$y-0.04), label="paste(frac(m, 2))", parse=TRUE, face="plain", data=data.frame()) + 
   xlab("x") + ylab("y") +
   geom_segment(data=dfslope, aes(x=xstart, y=ystart, xend=xend, yend=yend), linetype=2) + theme(axis.title=element_blank(), axis.text=element_blank(), axis.ticks=element_blank(), axis.line=element_blank(), panel.grid=element_blank())
-
 dev.off()
-# ggplot(data=df, aes(x=xstart, xend=xend, y=ystart, yend=yend)) + theme_bw() + coord_fixed(ratio=1) + 
-#   geom_segment(colour="grey30") + 
-#   geom_segment(data=df[a,], aes(x=xend-.008, xend=x-.008, y=yend, yend=y), colour="grey50") + 
-#   geom_point(aes(x=x, y=y)) + 
-#   geom_segment(data=df[a,], aes(x=xstart, xend=xend, y=ystart, yend=yend)) + 
-#   geom_segment(data=dfsec, aes(x=sec.xstart+.005, xend=x+.005, y=sec.ystart-.005, yend=y-.005), colour="grey50") + 
-#   geom_segment(data=dfsec, aes(x=sec.xstart, xend=sec.xend, y=sec.ystart, yend=sec.yend)) + 
-# 
-#   geom_segment(data=dfslope, linetype=2) + 
-#   geom_segment(data=dfslope2, linetype=2) + 
-#   geom_text(data=dfslope, aes(x=xend+.1, y=yend+.05, label="slope: paste(f, \"'\", (x))"), parse=TRUE, hjust=0, vjust=1) +
-#   geom_text(aes(x=mean(c(dfsec$sec.xstart, df$xend[a], df$x[a], df$x[a])), 
-#                 y=mean(c(dfsec$sec.ystart, df$yend[a], df$y[a], df$y[a])), 
-#                 label="theta"), parse=TRUE, size=ftsize) +
-# #   geom_text(aes(x=dfslope$xend,  y=dfslope$yend+.075, 
-# #                 label=paste("paste(y == f, \"'\", (x[0]) (x-x[0]) + f(x[0]))")), 
-# #             parse=TRUE, hjust=.25, size=ftsize) + 
-#   geom_text(data=df[a,], aes(x=.5*xend-.03 + .5*x, y=.5*yend+.5*y, label="\u2113"), size=ftsize+1, face="bold") +
-#   geom_text(aes(x=.5*dfsec$sec.xstart+ .5*dfsec$x +.05 , y=.5*dfsec$sec.ystart+.5*dfsec$y-0.05, label="italic(m)"), parse=TRUE, face="plain") + 
-#   xlab("x") + ylab("y") 
-
 @
 \begin{figure}[h!tbp]\centering
 \includegraphics[keepaspectratio=TRUE,width=.5\linewidth]{figure/fig-trigmethodcartoon}
@@ -1250,7 +1197,7 @@ We can reduce this further to
 \end{subfigure}
 \begin{subfigure}[h]{.495\linewidth}\centering
 <<CtsAdjustedResults,echo=FALSE, dependson='CtsQuadratic', fig.width=4, fig.height=3>>=
-dframe <- createSine(n = 40, len = 1, f=f, fprime=fprime, getquadapprox=TRUE, f2prime=f2prime) 
+dframe <- createSine(n = 40, len = 1, f=f, fprime=fprime, f2prime=f2prime) 
 qplot(x=x, xend=x, y=y+ellx4.u, yend=y-ellx4.l, geom="segment", data=dframe, linetype=I(1)) +   
   theme(panel.grid.major=element_blank(), panel.background = element_rect(fill = "white", 
                 colour = "black"),
@@ -1281,14 +1228,14 @@ fprime <- function(x) 2*cos(x)
 f2prime <- function(x) -2*sin(x)
 
 suppressMessages(library(ggplot2))
-dframe <- createSine(n = 40, len = 1, f=f, fprime=fprime)
+dframe <- createSine(n = 40, len = 1, f=f, fprime=fprime, f2prime=f2prime)
 dframe$type <- "Data"
-dframe.real <- createSine(n = 4000, len = 1, f=f, fprime=fprime, getquadapprox=TRUE, f2prime=f2prime)
-secantlines <- do.call("rbind", lapply(dframe.real$x, function(i) getSecantSegment(i, dframe, f, fprime, f2prime)))
+dframe.real <- createSine(n = 4000, len = 1, f=f, fprime=fprime, f2prime=f2prime)
+secantlines <- getSecantSegment(dframe.real$x, dframe, f, fprime, f2prime)
 # secantlines2 <- getAdjLength(secantlines)
 
 dframe2 <- secantlines
-names(dframe2) <- c("x", "y", "deriv", "xstart", "xend", "ystart", "yend", "ell", "ell1", "ell2", "type", "a")
+names(dframe2) <- c("x", "y", "deriv", "xstart", "xend", "ystart", "yend", "ell", "ellp", "ellm", "type", "a")
 
 library(plyr)
 dframe2 <- rbind.fill(dframe, dframe2)
@@ -1298,30 +1245,22 @@ library(reshape2)
 secantlines.long <- melt(secantlines, measure.vars=c("Bottom.Segment", "Top.Segment"),  variable.name="Line", value.name="len")
 names(secantlines.long)[11:12] <- c("Line", "len")
 secantlines.long <- subset(secantlines.long, abs(x-pi)<pi)
-cairo_pdf("figure/fig-wtf.pdf", width=6, height=6)
+cairo_pdf("figure/fig-wtf.pdf", width=8, height=4)
 ggplot(aes(x=x, y=len, linetype=Line), data=secantlines.long) + geom_line()+
   scale_x_continuous(breaks=seq(0, 2*pi, by=pi/2), 
                      labels=c("0", expression(paste(pi,"/2")), 
                               expression(pi), 
                               expression(paste("3",pi, "/2")), 
                               expression(paste("2",pi)))) + 
-  theme_bw() + theme(legend.position="bottom") + scale_linetype_discrete("Adjusted \u2113/2")
+  ylab(expression(frac('\u2113', 2))) +
+  theme_bw() + theme(legend.position="bottom", axis.title.y=element_text(angle=0)) + scale_linetype_discrete("Adjusted \u2113/2")
 dev.off()
 @
 \begin{figure}[h!tbp]\centering
 \includegraphics[keepaspectratio=TRUE, width=.8\linewidth]{figure/fig-wtf}
 \caption{Extant Half-segment Length. The secant  line segments are not symmetrical around the center line, so symmetric correction as employed in Figure \ref{fig:linear-GeneralCorrection} leads to simultaneous over- and under-correcting.}\label{fig:HalfSegLength}
-\todo[inline]{Something's strange here - minimum length should be 0.5, not 0.6, and the aspect ratio wouldn't account for that discrepancy. I'm pretty sure if I can hunt this bug down, it might fix most of what's wrong.}
 \end{figure}
 
-
-
-
-
-
-
-
-%\clearpage
 
 \subsection{Discussion of Transformations}
 \todo[inline]{Add pictures comparing the 3 transformations to the untransformed data under both normal and extreme conditions.}
