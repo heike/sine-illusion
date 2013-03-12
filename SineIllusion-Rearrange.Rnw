@@ -560,17 +560,17 @@ df2$type <- "Loess Fit"
 df$type <- "Original Function"
 df <- rbind(df, df2)
 
-ggplot(data=df,aes(x=x, y=y)) + geom_segment(aes(x=xstart, xend=xend, y=ystart, yend=yend)) + geom_line(aes(group=type, linetype=type)) + scale_linetype_discrete("") + theme_bw() + theme(legend.position="bottom") 
-  scale_x_continuous(breaks=seq(0, 2*pi, by=pi/2), 
-                     labels=c("0", expression(paste(pi,"/2")), expression(pi), expression(paste("3",pi, "/2")), expression(paste("2",pi))))
+ggplot(data=df,aes(x=x, y=y)) + geom_segment(aes(x=xstart, xend=xend, y=ystart, yend=yend)) + geom_line(aes(group=type, linetype=type)) + scale_linetype_discrete("") + theme_bw()  + theme(legend.position="none") + 
+  scale_x_continuous("", breaks=seq(0, 2*pi, by=pi/2), 
+                     labels=c("0", expression(paste(pi,"/2")), expression(pi), expression(paste("3",pi, "/2")), expression(paste("2",pi)))) + ylab("") 
 
 p1 <- qplot(data=subset(df, type=="Loess Fit"), x=xstart, xend=xend, y=ystart-y, yend=yend-y, geom="segment", linetype=type)  + xlab("x")+ ylim(c(-1.5, 1.5)) + theme_bw()+ scale_linetype(guide="none") + 
-  scale_x_continuous(breaks=seq(0, 2*pi, by=pi/2), 
-                     labels=c("0", expression(paste(pi,"/2")), expression(pi), expression(paste("3",pi, "/2")), expression(paste("2",pi)))) + ylab("Variability")
+  scale_x_continuous("", breaks=seq(0, 2*pi, by=pi/2), 
+                     labels=c("0", expression(paste(pi,"/2")), expression(pi), expression(paste("3",pi, "/2")), expression(paste("2",pi)))) + ylab("Trend")
 
 p2 <- qplot(data=subset(df, type=="Loess Fit"), x=x, y=y, geom="line", linetype=type) + xlab("x") + ylim(c(-1.5, 1.5)) + theme_bw() + scale_linetype(guide="none") +
-  scale_x_continuous(breaks=seq(0, 2*pi, by=pi/2), 
-                     labels=c("0", expression(paste(pi,"/2")), expression(pi), expression(paste("3",pi, "/2")), expression(paste("2",pi))))
+  scale_x_continuous("", breaks=seq(0, 2*pi, by=pi/2), 
+                     labels=c("0", expression(paste(pi,"/2")), expression(pi), expression(paste("3",pi, "/2")), expression(paste("2",pi)))) + ylab("Variability")
 
 print(grid.arrange(p2, p1, nrow=2))
 @
@@ -588,7 +588,7 @@ print(grid.arrange(p2, p1, nrow=2))
   \caption{\small Trend and Variability}
   \label{fig:trendremovalVariability}
 \end{subfigure}
-\caption{Separating the trend and the variability removes the Sine illusion. Figure \ref{fig:trendremovalFit} shows the fit line compared to the original function, Figure \ref{fig:trendremovalVariability} shows the the underlying fitted trendline and the leftover variability in the vertical lines which now appear to be of the same size.}\label{fig:trendremoval}
+\caption{Separating the trend and the variability removes the Sine illusion. Figure \ref{fig:trendremovalFit} shows the fit line  compared to the original function (dashed), Figure \ref{fig:trendremovalVariability} shows the the underlying fitted trendline and the leftover variability in the vertical lines which now appear to be of the same size.}\label{fig:trendremoval}
 \end{figure}
 
 From a cognitive perspective, separating out the trendline and the variance creates more of a barrier to understanding the data in its original form. Additionally, removing the trend requires an initial model, and any plots produced using that fit are conditional on the assumptions made to obtain that model fit. In many situations, this may be undesireable, particularly as we typically view the data before fitting even a rudimentary model, and the sine illusion may influence even initial modeling decisions.
