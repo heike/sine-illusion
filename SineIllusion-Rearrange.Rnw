@@ -828,9 +828,9 @@ Returning to the Ozone data in Figure \ref{fig:exampleFull1}, we can apply the $
 \includegraphics[keepaspectratio=TRUE,width=\linewidth]{figure/fig-xtrans-example2}
 \caption{Transformed $X$ Axis}\label{fig:xtrans-example-trans}
 \end{subfigure}
-\caption{The increasing variance is easier to see when $x$ has been transformed, because the function seems more linear.}\label{fig:xtrans-example}
+\caption{The increasing variance is easier to see when $x$ has been transformed, because the slope is now uniform.}\label{fig:xtrans-example}
 \end{figure}
-Figure \ref{fig:xtrans-example} demonstrates not only the effect of transformation of the $x$-axis, but also that the transformation is not particularly misleading, as the granularity of the data in this example provide an implicit measure of the strength of the transformation along the x-axis and the transformation is also clearly evident in the labels along the $x$-axis. While we typically prefer that our axis transformations are monotone, this transformation provides additional utility that a monotone transformation does not.
+Figure \ref{fig:xtrans-example} demonstrates not only the effect of transformation of the $x$-axis, but also that the transformation is not particularly misleading, as the granularity of the data in this example provide an implicit measure of the strength of the transformation along the $x$-axis and the transformation is also clearly evident in the labels along the $x$-axis. While we typically prefer that our axis transformations are monotone, this transformation provides additional utility that a monotone transformation does not. \newdo{ the transformation is monotone - it only goes up and doesn't reverse the temperatures. it's even continuous, but it is not differentiable. }
 
 \todo[inline]{add more explanation, etc here so that it's not orphaned.}
 \subsection{Transformations in $Y$}
