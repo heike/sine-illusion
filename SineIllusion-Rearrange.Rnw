@@ -912,7 +912,7 @@ to make the extant width $m$ appear as long as $\ell$ in the original graph:
 \end{equation}
 
 <<trigFix, dependson='data', echo=FALSE, include=FALSE, fig.width=4, fig.height=3>>=
-dframe <- createSine(40,1, f=f, fprime=fprime)
+dframe <- createSine(40,1, f=f, fprime=fprime, f2prime=f2prime)
 qplot(x=x, xend=xend, y = f(x) -ell/2, yend=f(x) +ell/2, geom="segment", data=dframe) +
   theme(panel.grid.major=element_blank(), panel.background = element_rect(fill = "white", 
                 colour = "black"),
