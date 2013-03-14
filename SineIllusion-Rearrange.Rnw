@@ -1468,7 +1468,9 @@ Figures \ref{fig:raw-temp} and \ref{fig:resid-temp} show temperature data from 4
 \section{Conclusion}
 \begin{itemize}\item Raise Awareness\item ``Fixing" data is tricky and usually beyond a statistician's comfort zone, but we could see this as part of an applet where the ``fix" is done temporarily as a diagnostic measure
 \item iterative process - we're only doing first step. but then we don't have an explicit functional expression anymore
-\item we're only extending -- some normalization might help
+\item we're only extending line lengths -- some normalization might help
+\item there's a long tradition in other disciplines of adjusting work for human cognition, e.g. painters correct (what exactly? forgot), rchitecture: columns of Parthenon are curved to appear straight,  floor and top are curved inwardly to appear straight from a distance.
+
 \end{itemize}
 \clearpage
 \bibliographystyle{asa}
