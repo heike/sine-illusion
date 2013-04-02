@@ -2,6 +2,8 @@ library(shiny)
 library(ggplot2)
 source("./functions.R")
 
+#' Look at https://groups.google.com/forum/?fromgroups=#!topic/shiny-discuss/THb1Ql5E20s for shiny server user-level data collection
+
 shinyServer(function(input, output) {
   suppressMessages(library(ggplot2))
   
