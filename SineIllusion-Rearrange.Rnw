@@ -180,7 +180,7 @@ fprime <- function(x) 2*cos(x)
 f2prime <- function(x) -2*sin(x)
 @
 <<original, dependson='functions', echo=FALSE, fig.width=5, fig.height=5, include=FALSE>>=
-qplot(x=x, xend=xend, y = ystart, yend=yend, geom="segment", data=createSine(40, 1, f=f, fprime=fprime)) +
+qplot(x=x, xend=xend, y = ystart, yend=yend, geom="segment", data=createSine(40, 1, f=f, fprime=fprime, f2prime)) +
   theme(panel.grid.major=element_blank(), panel.background = element_rect(fill = "white", 
                 colour = "black"),
        panel.grid.minor=element_blank(), panel.background=element_blank(),
@@ -438,7 +438,7 @@ f <- function(x) 2*sin(x)
 fprime <- function(x) 2*cos(x)
 f2prime <- function(x) -2*sin(x)
 library(plyr)
-dframe <- createSine(n = 150, len = 1, f=f, fprime=fprime)
+dframe <- createSine(n = 150, len = 1, f=f, fprime=fprime, f2prime=f2prime)
 dframe$ystartcts <- dframe$ystart
 dframe$yendcts <- dframe$yend
 dframe[1:150,c(2, 3, 5, 6)] <- NA
