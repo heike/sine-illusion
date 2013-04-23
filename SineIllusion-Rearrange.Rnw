@@ -468,12 +468,12 @@ dframe[(1:15)*10-5, 5] <- dframe[(1:15)*10-5, 4] - .5
 dframe[(1:15)*10-5, 6] <- dframe[(1:15)*10-5, 4] + .5
 dframe$type <- "Data"
 
-
-dframe.1 <- getSecantSegment(dframe$xstart, dframe, f, fprime, f2prime)
-dframe.1$x <- dframe$x
-dframe.1$y <- dframe$y
-dframe.1$ystartcts <- dframe$ystartcts
-dframe.1$yendcts <- dframe$yendcts
+idx <- which(!is.na(dframe$xstart))
+dframe.1 <- getSecantSegment(dframe$xstart[idx], dframe, f, fprime, f2prime)
+dframe.1$x <- dframe$x[idx]
+dframe.1$y <- dframe$y[idx]
+dframe.1$ystartcts <- dframe$ystartcts[idx]
+dframe.1$yendcts <- dframe$yendcts[idx]
 names(dframe.1) <- c("x", "y", "deriv", "xstart", "xend", "ystart", "yend", "ell", "ell.quad1", "ell.quad2", "type", "a", "ystartcts", "yendcts")
 # names(dframe.1) <- c("x", "y", "deriv", "xstart", "xend", "ystart", "yend", "ell", "ell.quad1", "ell.quad2", "type")
 # dframe.1 <- dframe.1[!is.na(dframe.1$x),]
