@@ -386,7 +386,7 @@ Though it is typically a bad idea to use three-dimensional representations when 
 
 Further, the illusion  only  holds when a significant portion of the graph is considered simultaneously without regard to the perceptual mechanisms at play, The contextual cues of the overall trend are critical to the sine illusion's effect; without those cues (either by subtraction of the trend or by considering only one or two lines at a time) the illusion does not occur. In particular, our judgment in comparing the lengths of two lines is relatively accurate, as e.g. discussed in \citet{cleveland:1984}. See \cite{day:1991} for a more thorough discussion of how much surrounding context is required for the illusion to persist. \newtext{The bold lines in figure \ref{fig:original-grid} are clearly the same length, as comparing individual lines is a fairly simple task. The illusion arises when sufficient context is available to induce an ambiguously three-dimensional figure.}
 
-M Bach's applet  gives the option to compensate the line length manually for its perceived shortcoming. The amount of compensation chosen turns out to be highly dependent on both the length of the vertical line segments and the amplitude of the sine function. While the applet does not provide details on the compensation function, it does suggest that it may be possible to correct the graphical display so that the brain interprets the stimuli in a manner consistent with the numerical data. 
+
 What follows are several methods to ``break" the illusion's effect and allow for more accurate graphical conclusions.
 
 \clearpage
@@ -1340,6 +1340,8 @@ qplot(x=x, xend=xend, y = g(x) -ellx2/2, yend=g(x) +ellx2/2, geom="segment", dat
 An applet demonstrating the effect of changing parameter values on the strength of the illusion can be found at \url{http://www.michaelbach.de/ot/sze_sineIllusion/index.html}. An applet demonstrating not only the effect of parameters on the illusion but also the various correction factors we propose in this paper can be found at \url{http://vanderplas.dyndns-remote.com/SineIllusion}
 \todo[inline]{When applet is in quasi-final form, will change this to rstudio's server.}
 }
+
+M Bach's applet  gives the option to compensate the line length manually for its perceived shortcoming. The amount of compensation chosen turns out to be highly dependent on both the length of the vertical line segments and the amplitude of the sine function. While the applet does not provide details on the compensation function, it does suggest that it may be possible to correct the graphical display so that the brain interprets the stimuli in a manner consistent with the numerical data. 
 \subsubsection{Study Design}
 \subsubsection{Method}
 \subsubsection{Results}
