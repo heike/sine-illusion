@@ -389,7 +389,7 @@ What follows are several methods to ``break" the illusion's effect and allow for
 
 %\clearpage
 \subsection{Geometry of the Illusion}
-<<transform-illustration,echo=FALSE, message=FALSE, warning=FALSE, include=FALSE>>=
+<<transform-illustration,echo=FALSE, message=FALSE, warning=FALSE, include=FALSE, fig.width=6, fig.height=4>>=
 f <- function(x) 2*sin(x)
 fprime <- function(x) 2*cos(x)
 f2prime <- function(x) -2*sin(x)
@@ -423,8 +423,8 @@ dframe <- rbind.fill(dframe, dframe.1)
 qplot(x=x, y=y, geom="line", data=dframe, colour=I("grey50")) + theme_bw() + 
   geom_line(aes(y=ystartcts), colour="grey50", linetype=4) + 
   geom_line(aes(y=yendcts), colour="grey50", linetype=4) +
-  geom_segment(data=subset(dframe, !is.na(type)), aes(x=xstart, xend = xend, y=ystart, yend=yend, colour=type))  + 
-  coord_equal(ratio=1) + scale_colour_manual("", values=c("black", "blue")) + theme(legend.position="bottom")  + 
+  geom_segment(data=subset(dframe, !is.na(type)), aes(x=xstart, xend = xend, y=ystart, yend=yend, colour=type))  + xlab("") + ylab("") +
+  coord_equal(ratio=1) + scale_colour_manual("", values=c("black", "blue")) + 
 #   geom_text(aes(label=paste(round(vangle/pi*180), "^o", sep=""),
 #                 x=xstart*(x<pi/2 | x>1.5*pi) + xend*(x>pi/2 & x<1.5*pi), y=ystart*(x<pi/2 | x<1.5*pi) + yend*(x>pi/2 & x<1.5*pi)), 
 #             data=dframe.1, parse=TRUE, hjust=1, vjust=.5, size=2.5) + 
@@ -438,7 +438,7 @@ qplot(x=x, y=y, geom="line", data=dframe, colour=I("grey50")) + theme_bw() +
 @
 \begin{figure}[h!tbp]
 \centering
-\includegraphics[width=.45\linewidth, keepaspectratio=TRUE]{figure/fig-transform-illustration}
+\includegraphics[width=.65\linewidth, keepaspectratio=TRUE]{figure/fig-transform-illustration}
 \caption{\label{fig:OrthogonalWidth} Changes in perceived orthogonal width due to the change in secant angle. 
 }
 \end{figure}
