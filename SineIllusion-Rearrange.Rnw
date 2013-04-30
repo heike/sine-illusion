@@ -215,7 +215,7 @@ dev.off()
 \centering
 \includegraphics[keepaspectratio=true, width=.5\linewidth]{figure/fig-original}
 % \includegraphics[keepaspectratio=true, width=\linewidth]{fig-original-redo.pdf}
-\caption{The original Sine Illusion, which consists of evenly spaced vertical lines centered around the line $y=\sin(x)$. The peak and trough of the curve appear to be composed of longer lines than the other regions.}\label{fig:original}
+\caption{The original Sine Illusion consists of evenly spaced vertical lines centered around the graph of $y=\sin(x)$. The lines in the peak and trough of the curve appear to be longer than in the other regions.}\label{fig:original}
 %The right graph illustrates the parameters determining the appearance of the illusion: $s$ denotes the amplitude of the function, $\ell$ the length of the line segments.
 \end{figure}
 %The first documentation we could find of this illusion,
@@ -295,12 +295,11 @@ y2 <- exp(x)+1
 df <- data.frame(x=x, y=y1, y2=y2)
 qplot(data=df, x=x, y=y, geom="line") + geom_line(aes(y=y2)) + theme_bw()
 @
-\begin{figure}[h!tbp]
+\begin{SCfigure}
 \centering
 \includegraphics[width=.45\linewidth]{figure/fig-effectivegraphsfig}
-\caption{A replication of Figure 2.16 in \cite{robbins:2005}. Lines $y=e^x$ and $y=e^x+1$ appear  to converge as $x$ increases due to the line width illusion.}
-\label{fig:robbins-graph}
-\end{figure}
+\caption{A replication of Figure 2.16 in \cite{robbins:2005}. Lines $y=e^x$ and $y=e^x+1$ appear  to converge as $x$ increases due to the line width illusion.\label{fig:robbins-graph}}
+\end{SCfigure}
 
 %\FloatBarrier
 \subsection{Perceptual Explanations for the Sine Illusion}\label{perceptualexplanations}
@@ -354,13 +353,13 @@ persp(x, z, data.persp,  xlab="", ylab="", zlab="", theta=0, phi=45, border="bla
 Experience with real-world objects suggests that the data are most similar to a slightly angled top view of a 3-dimensional strip such as a ribbon, as shown in figure \ref{fig: ribbon-ilusion}(a).  % goldstein S&P 8th edition pg 249
 As the vanishing point moves further away from the viewer, as in figure \ref{fig: ribbon-ilusion}(b), the ribbon plot more closely resembles the sine illusion. By treating the graph as a two-dimensional projection of a three-dimensional figure, the illusion disappears and the line widths seem once more to be constant.
 
-<<originalgrid, dependson='data', echo=FALSE, include=FALSE>>=
+<<originalgrid, dependson='data', echo=FALSE, include=FALSE, fig.width=5, fig.height=4>>=
 f <- function(x) 2*sin(x)
 fprime <- function(x) 2*cos(x)
 f2prime <- function(x) -2*sin(x)
 
 dframe <- createSine(n = 40, len = 1, f=f, fprime=fprime, f2prime)
-
+require(grid)
 qplot(x=x, xend=xend, y = ystart*ell, yend=yend*ell, geom="segment", data=dframe) +
   theme(panel.grid.major.y=element_line(colour="grey75"), 
         panel.grid.minor.y=element_line(colour="grey85"), 
@@ -369,14 +368,15 @@ qplot(x=x, xend=xend, y = ystart*ell, yend=yend*ell, geom="segment", data=dframe
                 colour = "black"),
        panel.grid.minor.x=element_blank(), panel.background=element_blank(),
        axis.title = element_blank(), axis.ticks = element_blank(), 
-       axis.text = element_blank()) + coord_equal(ratio=1) + 
-  geom_segment(size=1.5, data=dframe[c(31, 38),])
+       axis.text = element_blank(), 
+        plot.margin = unit(c(.1,.1,.1,.1), "cm")) + coord_equal(ratio=1) + 
+  geom_segment(size=1.5, data=dframe[c(31, 38),]) 
 @
-\begin{figure}[hbtp]
+\begin{SCfigure}
 \centering
-\includegraphics[width=.5\linewidth]{figure/fig-originalgrid}
 \caption{\label{fig:original-grid} The sine illusion with two individual lines highlighted. Horizontal grid lines do not help  to resolve the illusion, even though they provide a clear basis for comparison of line lengths. Readers are much better at assessing the length of the two singled out line segments; they are equal.}
-\end{figure}
+\includegraphics[width=.5\linewidth]{figure/fig-originalgrid}
+\end{SCfigure}
 
 Though it is typically a bad idea to use three-dimensional representations when two dimensions are adequate to display the data \citep{tufte}, counteracting a visual heuristic might make that approach more viable. However, a three-dimensional projection of two-dimensional data is not easy to create and would likely lead to distortions and instability in the visual display. In particular, there does not seem to be an simple guideline for determining the projection angle or color gradient  to create the illusory depth to remove the optical illusion. 
 
@@ -825,11 +825,12 @@ qplot(data=df.real, x=x, y=y, geom="line") +
   geom_segment(data=dfslope, aes(x=xstart, y=ystart, xend=xend, yend=yend), linetype=2) + theme(axis.title=element_blank(), axis.text=element_blank(), axis.ticks=element_blank(), axis.line=element_blank(), panel.grid=element_blank())
 dev.off()
 @
-\begin{figure}[h!tbp]\centering
+\begin{SCfigure}
+\centering
 \includegraphics[keepaspectratio=TRUE,width=.5\linewidth]{figure/fig-trigmethodcartoon}
 \caption[Geometry of the trig correction approach]{Geometry of the trigonometry correction approach. $\ell$ denotes the length of the entire vertical segment, hence, $\ell/2$ is the length of the portion above the mean function.
 \label{fig:trig}}
-\end{figure}
+\end{SCfigure}
 % \todo[inline]{
 % %The picture is wrong here, but I can't figure out how the extant width in the trig method was actually calculated. It seems like it should be like this, but either we're assuming a right angle and shouldn't be (use law of cosines instead) or I'm being an idiot, but the picture looks exactly like that for linear fix, and I know it isn't the same method!
 % For the time being, I'm using an annotated version of the linear approximation picture, but we need to add the math in to justify them as the same correction (and also need to fix the aspect ratio correction in the functions)}
@@ -858,24 +859,27 @@ The last equality follows directly when using $y = \atan{|f^\prime(x|}$ in the f
 <<trigFix, dependson='data', echo=FALSE, include=FALSE, fig.width=4, fig.height=3>>=
 dframe <- createSine(40,1, f=f, fprime=fprime, f2prime=f2prime)
 qplot(x=x, xend=xend, y = f(x) -ell/2, yend=f(x) +ell/2, geom="segment", data=dframe) +
-  theme(panel.grid.major=element_blank(), 
-      #  panel.background = element_rect(fill = "white", colour = "black"),
-       panel.background=element_blank(),
-        panel.grid.minor=element_blank(), 
-       axis.title = element_blank(), axis.ticks = element_blank(), 
-       axis.text = element_blank()) + coord_equal(ratio=1)
+ theme_bw() + coord_fixed(ratio=1) + 
+  xlab("x") + ylab("y") +
+  scale_x_continuous(breaks=seq(0, 2*pi, by=pi/2), minor_breaks=minor.axis.correction,
+                     labels=c("0", expression(paste(pi,"/2")), expression(pi), expression(paste("3",pi, "/2")), expression(paste("2",pi))))
 
 qplot(x=x, xend=xend, y = f(x) -ellx/2, yend=f(x) +ellx/2, geom="segment", data=dframe) +
-  theme(panel.grid.major=element_blank(), 
-       panel.grid.minor=element_blank(), panel.background=element_blank(),
-       axis.title = element_blank(), axis.ticks = element_blank(), 
-       axis.text = element_blank()) + coord_equal(ratio=1)
+ theme_bw() + coord_fixed(ratio=1) + 
+  xlab("x") + ylab("y") +
+  scale_x_continuous(breaks=seq(0, 2*pi, by=pi/2), minor_breaks=minor.axis.correction,
+                     labels=c("0", expression(paste(pi,"/2")), expression(pi), expression(paste("3",pi, "/2")), expression(paste("2",pi))))
+
 
 qplot(x=x, xend=xend, y = f(x) -ellx2/2, yend=f(x) +ellx2/2, geom="segment", data=dframe) +
-  theme(panel.grid.major=element_blank(), 
-       panel.grid.minor=element_blank(), panel.background=element_blank(),
-       axis.title = element_blank(), axis.ticks = element_blank(), 
-       axis.text = element_blank()) + coord_equal(ratio=1)
+  theme(#panel.grid.major=element_blank(), 
+#       panel.grid.minor=element_blank(), 
+    panel.background=element_blank(),
+       axis.title = element_blank()
+#    , axis.ticks = element_blank(), 
+#       axis.text = element_blank()
+    ) + 
+  coord_equal(ratio=1)
 
 @
 \begin{figure}[h!btp]
@@ -900,11 +904,11 @@ The assumption underlying this correction is the existence of a differentiable f
 \subsubsection{A General Correction Method}
 The idea for the general correction method is sketched out in figure \ref{fig:GeneralCorrection}. Based on function $f$ that describes the overall trend of the relationship between $X$ and $Y$ we want to first want to find the perceived width, and then correct the vertical width accordingly to match with the audience's expectation.
 
-\begin{figure}[hbtp]
+\begin{SCfigure}
 \centering
 \includegraphics[keepaspectratio=TRUE,width=.4\linewidth]{figure/fig-generalcorrectioncartoon1}
 \caption[General correction approach]{General correction approach. This approach may require numerical optimization to obtain exact solutions for $(x_u, y_u)$ and $(x_l, y_l)$.}\label{fig:GeneralCorrection}
-\end{figure}
+\end{SCfigure}
 
 The orthogonal width is given as the line segment between endpoints $(x_u, f_u(x_u))$ and $(x_\ell, f_\ell(x_\ell))$, where $f_\ell$ and $f_u$ denote the vertical shifts of function $f$ by $-\ell/2$ and $\ell/2$, respectively.
 These endpoints are determined as the intersection of the line  orthogonal to the tangent line in $(x, f(x))$ and the graphs resulting from vertical shifts of $f$ by $\pm \ell/2$.
@@ -1144,10 +1148,10 @@ This results in a correction factor for the half lengths as:
 <<CtsAdjustedResults,echo=FALSE, dependson='CtsQuadratic', fig.width=4, fig.height=3>>=
 dframe <- createSine(n = 40, len = 1, f=f, fprime=fprime, f2prime=f2prime) 
 qplot(x=x, xend=x, y=y+ellx4.u, yend=y-ellx4.l, geom="segment", data=dframe, linetype=I(1)) +   
-  theme(panel.grid.major=element_blank(), 
-       panel.grid.minor=element_blank(), panel.background=element_blank(),
-       axis.title = element_blank(), axis.ticks = element_blank(), 
-       axis.text = element_blank()) + coord_equal(ratio=1)
+ theme_bw() + coord_fixed(ratio=1) + 
+  xlab("x") + ylab("y") +
+  scale_x_continuous(breaks=seq(0, 2*pi, by=pi/2), minor_breaks=minor.axis.correction,
+                     labels=c("0", expression(paste(pi,"/2")), expression(pi), expression(paste("3",pi, "/2")), expression(paste("2",pi))))
 @
 \caption{Quadratic approximation based on eqn (\ref{eqn.quadratic}).}
 \end{subfigure}
