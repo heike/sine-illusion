@@ -907,7 +907,7 @@ The idea for the general correction method is sketched out in figure \ref{fig:Ge
 \begin{SCfigure}
 \centering
 \includegraphics[keepaspectratio=TRUE,width=.4\linewidth]{figure/fig-generalcorrectioncartoon1}
-\caption[General correction approach]{General correction approach. This approach may require numerical optimization to obtain exact solutions for $(x_u, y_u)$ and $(x_l, y_l)$.}\label{fig:GeneralCorrection}
+\caption[General correction approach]{\comment{This looks wrong - could you check the code, again?} General correction approach. This approach may require numerical optimization to obtain exact solutions for $(x_u, y_u)$ and $(x_l, y_l)$.}\label{fig:GeneralCorrection}
 \end{SCfigure}
 
 The orthogonal width is given as the line segment between endpoints $(x_u, f_u(x_u))$ and $(x_\ell, f_\ell(x_\ell))$, where $f_\ell$ and $f_u$ denote the vertical shifts of function $f$ by $-\ell/2$ and $\ell/2$, respectively.
