@@ -163,7 +163,7 @@ Figure~\ref{fig:example2} shows a residual plot of the same data, created by sub
   \caption{\small Residuals}
   \label{fig:example2}
 \end{subfigure}
-\caption{\label{fig:exampleFull1} Ozone and Temperature in Houston, 2011. What seems to be the trend in overall variance? Is the variance trend in (a) consistent with the residual plot in (b)?}
+\caption{\label{fig:exampleFull1} Ozone and Temperature in Houston, 2011. Loess fit is shown in (a); (b) shows the residuals from the line fit. What seems to be the trend in overall variance? Is the variance trend in (a) consistent with the residual plot in (b)?}
 \end{figure}
 
 The increasing variance with temperature is camouflaged in the Figure \ref{fig:example1} due to the changes in slope, but is very obvious in the residual plot in Figure \ref{fig:example2}. The sine illusion is responsible for the appearance of constant variance in Figure \ref{fig:example1}, but once the trend has been removed, and thus the corresponding changes in slope are no longer a factor, the increasing variance is visible.
@@ -214,7 +214,7 @@ dev.off()
 \centering
 \includegraphics[keepaspectratio=true, width=.5\linewidth]{figure/fig-original}
 % \includegraphics[keepaspectratio=true, width=\linewidth]{fig-original-redo.pdf}
-\caption{The original Sine Illusion. The regions of the left graph in the peak and the valley appear to be composed of longer lines than the other regions.}\label{fig:original}
+\caption{The original Sine Illusion, which consists of evenly spaced vertical lines centered around the line $y=\sin(x)$. The peak and trough of the curve appear to be composed of longer lines than the other regions.}\label{fig:original}
 %The right graph illustrates the parameters determining the appearance of the illusion: $s$ denotes the amplitude of the function, $\ell$ the length of the line segments.
 \end{figure}
 %The first documentation we could find of this illusion,
@@ -271,7 +271,7 @@ qplot(x,y, geom="jitter", alpha=I(alph))+
   \caption{\small Trend, No Seasonality}
   \label{simulation3}
 \end{subfigure}
-\caption{(a) shows seasonality without any underlying trend, (b) shows seasonality superimposed on a quadratic trend, and (c) shows a quadratic trend without seasonality. Though all three sets of simulated data have constant variance, none of the variances appear constant due to the sine illusion.}\label{fig:twoillusions-simulation}
+\caption{Set of three scatterplots of simulated data with constant variance. Plot (a) shows seasonality without any underlying trend, (b) shows seasonality superimposed on a quadratic trend, and (c) shows a quadratic trend without seasonality. Though all three sets of simulated data have constant variance, none of the variances appear constant due to the sine illusion.}\label{fig:twoillusions-simulation}
 \end{figure}
 
 Sections \ref{perceptualexplanations} and \ref{statisticalgraphics} explore the perceptual and statistical literature examining this illusion.
@@ -286,7 +286,7 @@ The sine illusion demonstrated in Figures \ref{fig:exampleFull1} and \ref{fig:or
 \label{fig:playfair-debt}
 \end{figure}
 
-Another example of this phenomenon is shown in Figure \ref{fig:robbins-graph} \citep{robbins:2005}. The line-width illusion is also present in the graphs of $e^x$ and $e^x + 1$, as the lines appear to be separated by a much smaller distance at $x=2.5$ than at $x=0$.
+Another example of this phenomenon is shown in Figure \ref{fig:robbins-graph} \citep{robbins:2005}, which contains the lines $e^x$ and $e^x+1$. The lines appear to be separated by a much smaller distance at $x=2.5$ than at $x=0$, even though mathematically it is obvious that the distance between them is constant. The line width illusion seems to be related to increasing slope - as the slope increases, the apparent distance between the two lines decreases, even though the lines represent a constant vertical shift.
 <<effectivegraphsfig,echo=FALSE, include=FALSE>>=
 x <- seq(0, 2.5, .01)
 y1 <- exp(x)
@@ -297,7 +297,7 @@ qplot(data=df, x=x, y=y, geom="line") + geom_line(aes(y=y2)) + theme_bw()
 \begin{figure}[h!tbp]
 \centering
 \includegraphics[width=.45\linewidth]{figure/fig-effectivegraphsfig}
-\caption{A replication of Figure 2.16 in \cite{robbins:2005}. The line width illusion seems to be related to increasing slope - as the slope increases, the apparent distance between the two lines decreases, even though the lines represent a constant vertical shift.}
+\caption{A replication of Figure 2.16 in \cite{robbins:2005}. Lines $y=e^x$ and $y=e^x+1$ appear  to converge as $x$ increases due to the line width illusion.}
 \label{fig:robbins-graph}
 \end{figure}
 
