@@ -740,9 +740,9 @@ Figure \ref{fig:xtrans-example} demonstrates not only the effect of transformati
 % 
 % \todo[inline]{add more explanation, etc here so that it's not orphaned.}
 \subsection{Transformation in $Y$}
-Understanding the geometry of the sine illusion leads to another approach to disrupting the conflict between the extant width and the actual height of the segment. 
+Understanding the geometry of the sine illusion leads to another approach to disrupting the conflict between the orthogonal width and the vertical length of the segment. 
 
-All of our approaches in this section are based on a comparison of the orthogonal width to the vertical width of lines. 
+All of our approaches in this section are based on a comparison of the orthogonal width to the vertical length of lines. 
 Studies have shown \cite{XXX, YYY} that onlookers generally evaluate orthogonal width rather than vertical or horizontal widths of lines.
 By adjusting the vertical width in such a way that the (perceived) orthogonal width displays the quantity of interest, we can match an onlooker's intuitive evaluation of a situation  with the data values we want to present.
 
