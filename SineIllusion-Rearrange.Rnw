@@ -275,7 +275,7 @@ qplot(x,y, geom="jitter", alpha=I(alph))+
 \end{figure}
 
 Sections \ref{perceptualexplanations} and \ref{statisticalgraphics} explore the perceptual and statistical literature examining this illusion.
-
+\FloatBarrier
 \subsection{Statistical Graphics and the Sine Illusion}\label{statisticalgraphics}
 The sine illusion demonstrated in Figures \ref{fig:exampleFull1} and \ref{fig:original} has been frequently noted in statistical graphics, though usually not as an optical illusion. Rather, the problem is typically identified as the difficulty of visually subtracting two curves, and the resulting erroneous conclusions when this process goes awry. Figure \ref{fig:playfair-debt} shows one of the possibly oldest example of this common phenomenon \citep{playfair, playfair2}: the graph shows the imports to and exports from the East Indies to England between 1700 and 1780; the vertical distance between the two lines is much less visually salient than the orthogonal width of the line, that is, the width of the line segment which is perpendicular to the tangent line at a given point.
 
@@ -301,7 +301,7 @@ qplot(data=df, x=x, y=y, geom="line") + geom_line(aes(y=y2)) + theme_bw()
 \label{fig:robbins-graph}
 \end{figure}
 
-
+\FloatBarrier
 \subsection{Perceptual Explanations for the Sine Illusion}\label{perceptualexplanations}
 While not thoroughly examined in the sensation and perception literature, the sine illusion has been classified as part of a group of geometrical optical misperceptions  related to the M\"uller-Lyer illusion \citep{day:1991} or the Poggendorf illusion \citep{poggendorf}, which puts the illusion into the framework of context-based illusions.
 \cite{day:1991} suggest that
@@ -386,7 +386,7 @@ Further, the illusion  only  holds when a significant portion of the graph is co
 
 What follows are several methods to ``break" the illusion's effect and allow for more accurate graphical conclusions.
 
-%\clearpage
+\FloatBarrier
 \subsection{Geometry of the Illusion}
 We have previously alluded to the fact that the sine illusion seems to depend on the change in the slope of the underlying function; what follows is a geometric explanation of why this occurs. In particular, our perceptual system is optimized for three dimensions; leading us to perceive the orthogonal width (the shortest line between the top and bottom curves) as the vertical length. Figure \ref{fig:OrthogonalWidth} demonstrates the change in orthogonal width as the slope of the line tangent to $f(x)$ changes; these changes correspond to our perception of apparent line length. 
 <<transform-illustration,echo=FALSE, message=FALSE, warning=FALSE, include=FALSE, fig.width=6, fig.height=4>>=
@@ -573,34 +573,28 @@ where $f$ is some underlying function (either due to prior knowledge or using a 
 The idea of correcting for the illusion is to make all lines appear under the same slope, i.e. we want to find a transformation $T(x)$ of $x$, such that $f(T(x))$ is a  piece-wise linear function, where each piece has the same absolute slope. 
 As the sine illusion depends on changing slope in the overall trend, by reparameterizing the $x$-axis in terms of the slope, the data will appear under a  constant slope, removing the illusion, while the $x$-axis shows the changing slope.
 
-XXXX intro sentence
+This approach results in the transformation shown in Equation \ref{eqn.xtrans} and is demonstrated in Figure \ref{fig:xtrans1}.
 \begin{equation}\label{eqn.xtrans}
 (f \circ T)(x) = x_0 + (x_K-x_0)\left(\int_{x_0}^x |f^\prime(z)| dz\right)/\left(\int_{x_0}^{x_K}|f^\prime(z)| dz\right)
 \end{equation}
 
-XXX Proof of eqn (\ref{eqn.trans}) is given in appendix \ref{app.xtrans}.
-
-This transformation is shown in Figure \ref{fig:xtrans1}.
+Derivation of eqn (\ref{eqn.xtrans}) is provided in appendix \ref{app.xtrans}.
 
 
-% \newdo{this needs to be re-written in terms of $s$, $c_i$ and $d_i$s - but it's the same idea.}
-% That is, if the $x$-axis spans the interval $[a,b)$, the transformation of the $x$ axis is 
-% $$T(x) = a + (b-a)\left(\int_a^x |f^\prime(z)| dz\right)/\left(\int_a^b|f^\prime(z)| dz\right)$$ 
-% 
-% The transformation is shown in Figure \ref{xtrans1}. An analysis of $T(x)$ is shown in appendix \ref{XtransAppendix}.
 
-In practice we can see that the illusion can be broken by a much less severe transformation of the $x$ values. 
-By shrinking the transformation in Figure \ref{fig:xtrans1} towards the original $x$ values by a factor of $w \in (0,1)$, the illusion remains broken but the data is reflecting the  original function of $f(x)$ much more closely. We use the following equation for this: 
-%  \begin{equation}\label{eqn.xtrans.weighted}
-%  (f \circ T_w)(x) = \frac{w-1}{w} x + \frac{(b-a)}{w}\left(\int_a^x |f^\prime(z)| dz\right)/\left(\int_a^b|f^\prime(z) dz|\right)
-%  \end{equation}
+While the transformation in equation \ref{eqn.xtrans} effectively removes the appearance of changing line length resulting from the sine illusion, in practice we can see that the illusion can be broken by a much less severe transformation of the $x$ values. 
+Shrinking the transformation in Figure \ref{fig:xtrans1} towards the original $x$ values by a factor of $w \in (0,1)$ allows the effect of the illusion to be disrupted with a weaker transformation. Under the weaker transformation, the data more closely reflect the original function $f(x)$. We use the following equation for this: 
+
 \begin{equation}\label{eqn.xtrans.weighted}
 (f \circ T_w)(x) = (1-w) \cdot x + w \cdot (f \circ T)(x)
 \end{equation}
 
-Figures \ref{fig:xtrans2} - \ref{fig:xtrans4} show the effect of different shrinkage coefficients $w$. The extent to which this weighting holds varies with the aspect ratio of the chart and the shape of the function. It also depends on the audience's experience with the sine illusion, resulting in very subjective choices of an
+Figures \ref{fig:xtrans2} - \ref{fig:xtrans4} show the effect of different shrinkage coefficients $w$. As $w$ decreases, the lines become more evenly spaced and the illusion begins to return. The dots at the bottom of each plot indicate evenly spaced x-axis points that have been transformed; as $w$ decreases, the dots become more evenly spaced. 
+
+The extent to which this weighting holds varies with the aspect ratio of the chart and the shape of the function. It also depends on the audience's experience with the sine illusion, resulting in very subjective choices of an
 %, but merits further investigation, as it may be possible to find an 
 ``optimal weighting" for specific situations which minimizes distortion and maximizes the correspondence between inferences made from the data and inferences made using the visual display.
+\comment{I'm not sure we want to say it depends on the audience's experience - I suspect that people with experience are more likely to use a "when do I no longer see it" approach, rather than a "when do I see it approach", i.e. looking at the limit from 0->1 instead of the more naive approach of 1->0. We might want to do a short experiment involving "yes or no" tests instead of graduated approaches - say, 3 plots of x, 3 plots of y, 3 distractor plots for each subject. We could probably just mix this into the shiny experiment... }
 
 <<xtransform, echo=FALSE, fig.width=4, fig.height=2, include=FALSE>>=
 correctx <- function(z, fprime, a=0, b=2*pi, w=1) {
@@ -685,8 +679,8 @@ qplot(x=xtrans4, xend=xtrans4, y = ystart, yend=yend, colour=I("blue"), geom="se
 \caption[X axis transformations]{$X$ axis transformations. Dots at the bottom of the graph show the transformation's effect on equally spaced points along the $x$-axis. In (a), adjusting the $x$-spacing of the lines mitigates the sine illusion by changing the extant width so that it is uniform in $x$. (b) - (d) shrink the transformation in (a) towards successively more uniform spacings in $x$ while still breaking the effects of the illusion.}
 \label{fig:xtrans}
 \end{figure}
-Note that we only make use of the transformation $T$ in the form of $f \circ T$. This means that we do not need to explicitly calculate the transformation $T$, which in particularly would involve computing the inverse of $f$ and might be computationally very intensive.
-
+\move{Note that we only make use of the transformation $T$ in the form of $f \circ T$. This means that we do not need to explicitly calculate the transformation $T$, which in particularly would involve computing the inverse of $f$ and might be computationally very intensive.}
+\FloatBarrier
 %\clearpage
 <<xtrans-example, echo=FALSE, include=FALSE, dependson='xtransform', fig.width=6, fig.height=6>>=
 library(locfit)
@@ -729,7 +723,7 @@ qplot(data=datasub, x=TmaxCorrect2, y=Ozone, geom="jitter", colour=I("grey20"), 
 
 @
 
-Returning to the Ozone data in Figure \ref{fig:exampleFull1}, we can apply the $x$-correction fairly easily as loess enforces continuity conditions that include differentiability of the smooth function. Figure \ref{fig:xtrans-example} shows the original data and the transformed $x$ axis.
+Returning to the Ozone data in Figure \ref{fig:exampleFull1}, we will apply the x-correction to the loess fit line relating ozone concentration to daily temperature. Loess is particularly convenient for this transformation, as it enforces continuity conditions that include differentiability of the fitted function; software allows us to obtain the fitted $f^\prime(x)$ as well as $f(x)$. Figure \ref{fig:xtrans-example} shows the original data and the transformed $x$ axis.
 
 \begin{figure}[h!]\centering
 \begin{subfigure}[b]{.48\linewidth}\centering
@@ -740,13 +734,13 @@ Returning to the Ozone data in Figure \ref{fig:exampleFull1}, we can apply the $
 \includegraphics[keepaspectratio=TRUE,width=\linewidth]{figure/fig-xtrans-example2}
 \caption{Transformed $X$ Axis}\label{fig:xtrans-example-trans}
 \end{subfigure}
-\caption{The increasing variance is easier to see when $x$ has been transformed, because the slope is now uniform.}\label{fig:xtrans-example}
+\caption{Original data and data after x-transformation. The increasing variance is easier to see when $x$ has been transformed, because the slope is now uniform.}\label{fig:xtrans-example}
 \end{figure}
-Figure \ref{fig:xtrans-example} demonstrates not only the effect of transformation of the $x$-axis, but also that the transformation is not particularly misleading, as the granularity of the data in this example provide an implicit measure of the strength of the transformation along the $x$-axis and the transformation is also clearly evident in the labels along the $x$-axis. 
+Figure \ref{fig:xtrans-example} demonstrates not only the effect of transformation of the $x$-axis, but also that the transformation is not particularly misleading in this example.The granularity of the data in this example provide an implicit measure of the strength of the transformation along the $x$-axis and the transformation is also clearly evident in the labels along the $x$-axis. 
 % While we typically prefer that our axis transformations are monotone, this transformation provides additional utility that a monotone transformation does not. \newdo{ the transformation is monotone - it only goes up and doesn't reverse the temperatures. it's even continuous, but it is not differentiable. }
 % 
 % \todo[inline]{add more explanation, etc here so that it's not orphaned.}
-\subsection{Transformations in $Y$}
+\subsection{Transformation in $Y$}
 Understanding the geometry of the sine illusion leads to another approach to disrupting the conflict between the extant width and the actual height of the segment. 
 
 All of our approaches in this section are based on a comparison of the orthogonal width to the vertical width of lines. 
