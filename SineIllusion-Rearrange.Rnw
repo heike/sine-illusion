@@ -580,22 +580,6 @@ This approach results in the transformation shown in Equation \ref{eqn.xtrans} a
 
 Derivation of eqn (\ref{eqn.xtrans}) is provided in appendix \ref{app.xtrans}.
 
-
-
-While the transformation in equation \ref{eqn.xtrans} effectively removes the appearance of changing line length resulting from the sine illusion, in practice we can see that the illusion can be broken by a much less severe transformation of the $x$ values. 
-Shrinking the transformation in Figure \ref{fig:xtrans1} towards the original $x$ values by a factor of $w \in (0,1)$ allows the effect of the illusion to be disrupted with a weaker transformation. Under the weaker transformation, the data more closely reflect the original function $f(x)$. We use the following equation for this: 
-
-\begin{equation}\label{eqn.xtrans.weighted}
-(f \circ T_w)(x) = (1-w) \cdot x + w \cdot (f \circ T)(x)
-\end{equation}
-
-Figures \ref{fig:xtrans2} - \ref{fig:xtrans4} show the effect of different shrinkage coefficients $w$. As $w$ decreases, the lines become more evenly spaced and the illusion begins to return. The dots at the bottom of each plot indicate evenly spaced x-axis points that have been transformed; as $w$ decreases, the dots become more evenly spaced. 
-
-The extent to which this weighting holds varies with the aspect ratio of the chart and the shape of the function. It also depends on the audience's experience with the sine illusion, resulting in very subjective choices of an
-%, but merits further investigation, as it may be possible to find an 
-``optimal weighting" for specific situations which minimizes distortion and maximizes the correspondence between inferences made from the data and inferences made using the visual display.
-\comment{I'm not sure we want to say it depends on the audience's experience - I suspect that people with experience are more likely to use a "when do I no longer see it" approach, rather than a "when do I see it approach", i.e. looking at the limit from 0->1 instead of the more naive approach of 1->0. We might want to do a short experiment involving "yes or no" tests instead of graduated approaches - say, 3 plots of x, 3 plots of y, 3 distractor plots for each subject. We could probably just mix this into the shiny experiment... }
-
 <<xtransform, echo=FALSE, fig.width=4, fig.height=2, include=FALSE>>=
 correctx <- function(z, fprime, a=0, b=2*pi, w=1) {
   # w = 1/(shrink+1)
@@ -679,6 +663,21 @@ qplot(x=xtrans4, xend=xtrans4, y = ystart, yend=yend, colour=I("blue"), geom="se
 \caption[X axis transformations]{$X$ axis transformations. Dots at the bottom of the graph show the transformation's effect on equally spaced points along the $x$-axis. In (a), adjusting the $x$-spacing of the lines mitigates the sine illusion by changing the extant width so that it is uniform in $x$. (b) - (d) shrink the transformation in (a) towards successively more uniform spacings in $x$ while still breaking the effects of the illusion.}
 \label{fig:xtrans}
 \end{figure}
+
+While the transformation in equation \ref{eqn.xtrans} effectively removes the appearance of changing line length resulting from the sine illusion, in practice we can see that the illusion can be broken by a much less severe transformation of the $x$ values. 
+Shrinking the transformation in Figure \ref{fig:xtrans1} towards the original $x$ values by a factor of $w \in (0,1)$ allows the effect of the illusion to be disrupted with a weaker transformation. Under the weaker transformation, the data more closely reflect the original function $f(x)$. We use the following equation for this: 
+
+\begin{equation}\label{eqn.xtrans.weighted}
+(f \circ T_w)(x) = (1-w) \cdot x + w \cdot (f \circ T)(x)
+\end{equation}
+
+Figures \ref{fig:xtrans2} - \ref{fig:xtrans4} show the effect of different shrinkage coefficients $w$. As $w$ decreases, the lines become more evenly spaced and the illusion begins to return. The dots at the bottom of each plot indicate evenly spaced x-axis points that have been transformed; as $w$ decreases, the dots become more evenly spaced. 
+
+The extent to which this weighting holds varies with the aspect ratio of the chart and the shape of the function. It also depends on the audience's experience with the sine illusion, resulting in very subjective choices of an
+%, but merits further investigation, as it may be possible to find an 
+``optimal weighting" for specific situations which minimizes distortion and maximizes the correspondence between inferences made from the data and inferences made using the visual display.
+\comment{I'm not sure we want to say it depends on the audience's experience - I suspect that people with experience are more likely to use a "when do I no longer see it" approach, rather than a "when do I see it approach", i.e. looking at the limit from 0->1 instead of the more naive approach of 1->0. We might want to do a short experiment involving "yes or no" tests instead of graduated approaches - say, 3 plots of x, 3 plots of y, 3 distractor plots for each subject. We could probably just mix this into the shiny experiment... }
+
 \move{Note that we only make use of the transformation $T$ in the form of $f \circ T$. This means that we do not need to explicitly calculate the transformation $T$, which in particularly would involve computing the inverse of $f$ and might be computationally very intensive.}
 \FloatBarrier
 %\clearpage
