@@ -106,6 +106,8 @@ getSecantSegment <- function(x0, df, f, fprime, f2prime){
   f2p <- a*f2prime(x0)
   lambdap <- (sqrt((fp^2+1)^2-f2p*fp^2*ell) + fp^2 + 1)^-1    
   lambdam <- -(sqrt((fp^2+1)^2+f2p*fp^2*ell) + fp^2 + 1)^-1    
+  lambdam = (fp^2 + 1 + sqrt((fp^2 + 1)^2 + ell*f2p*fp^2))^-1
+  lambdap = (- fp^2 - 1 + sqrt((fp^2 + 1)^2 - ell*f2p*fp^2))^-1
 
   #---- Approximation
   
@@ -919,8 +921,8 @@ The idea for the general correction method is sketched out in figure \ref{fig:Ge
 
 \begin{SCfigure}
 \centering
-\includegraphics[keepaspectratio=TRUE,width=.4\linewidth]{figure/fig-generalcorrectioncartoon1}
-\caption[General correction approach]{\comment{This looks wrong - could you check the code, again?} General correction approach. This approach may require numerical optimization to obtain exact solutions for $(x_u, y_u)$ and $(x_l, y_l)$.}\label{fig:GeneralCorrection}
+\includegraphics[keepaspectratio=TRUE,width=.4\linewidth]{figure/fig-generalcorrectioncartoon3}
+\caption[General correction approach]{ General correction approach. This approach may require numerical optimization to obtain exact solutions for $(x_u, y_u)$ and $(x_l, y_l)$.}\label{fig:GeneralCorrection}
 \end{SCfigure}
 
 The orthogonal width is given as the line segment between endpoints $(x_u, f_u(x_u))$ and $(x_\ell, f_\ell(x_\ell))$, where $f_\ell$ and $f_u$ denote the vertical shifts of function $f$ by $-\ell/2$ and $\ell/2$, respectively.
@@ -1087,7 +1089,7 @@ qplot(data=df.real, x=x, y=y, geom="line") +
 \end{figure}
 
 \paragraph{Linear Approximation to $f(x)$}\hfill\newline
-\newtext{A comparison of the sketches for the linear approach (in Fig. \ref{fig:linear-GeneralCorrection}) and the trigonometric approach (in Fig. \ref{fig:trig}) shows that they are the same. They do, indeed, lead to the same correction factor.}
+A comparison of the sketches for the linear approach (in Fig. \ref{fig:linear-GeneralCorrection}) and the trigonometric approach (in Fig. \ref{fig:trig}) shows that they are the same. They do, indeed, lead to the same correction factor.
 % 
 % Using a linear approximation of $f(x)$ in value $x_0$, i.e.  
 %  $f(x) \approx f(x_0) + f^\prime(x_0)(x-x_0)$, changes equation \ref{eqn.general.2}  to
@@ -1217,87 +1219,10 @@ dev.off()
 \caption{Extant Half-segment Length. The secant  line segments are not symmetrical around the center line, so symmetric correction as employed in Figure \ref{fig:linear-GeneralCorrection} leads to simultaneous over- and under-correcting.}\label{fig:HalfSegLength}
 \end{figure}
 
-
-\section{Discussion of Transformations}
 \subsection{Mathematical Properties of Transformation}
 \todo[inline]{Add pictures comparing the 3 transformations to the untransformed data under both normal and extreme conditions.}
 \todo[inline]{Discussion: Hammock/Trig/linear breaks first,  quadratic breaks after, full optimization breaks eventually}
 As with the trigonometry correction, the linear adjustment is prone to the same overcorrection distortion shown in Figure \ref{fig:linearFixOvercorrect}.
-
-
-Some modifications are necessary to implement the correction factor in a realistic situation in which it might not be practical for the aspect ratio of the graph to be fixed at 1. As in \todo{Cite Marie's paper}, the correction factor necessary to remove the illusion depends on the aspect ratio of the graphs. Figure \ref{fig:trigFix-aspectRatio} demonstrates the relative effectiveness of the correction factor.
-% <<aspectratio, echo=FALSE, include=FALSE>>=
-% f <- function(x) 2*sin(x)
-% fprime <- function(x) 2*cos(x)
-% f2prime <- function(x) -2*sin(x)
-% 
-% 
-% adjY <- function(df){
-%   dx <- diff(df$x)
-%   dy <- diff(df$y)
-%   #aspratio <- abs(diff(range(c(df$ystart, df$yend)))/diff(range(df$x)))
-%   aspratio <- 1
-%   adj <- atan(dy/dx)
-%   adj <- c(adj, rev(adj)[1])
-%   adj <- 1/cos(atan(abs(aspratio*adj)))
-%   adj <- adj-mean(adj)+1
-%   
-%   df$ell <- df$ell*adj
-%   df$ystart <- df$y - .5*df$ell
-%   df$yend <- df$y + .5*df$ell
-%   
-%   df
-% }
-% 
-% dframe1 <- createSine(n=40, len=1, f=f, fprime=fprime)
-% dframe1 <- adjY(dframe1)
-% 
-% qplot(x=xstart, xend=xend, y = y+ellx/2, yend = y-ellx/2, geom="segment", data=dframe1) + 
-%   coord_fixed(ratio=.5) + xlab("x") + ylab("y") + theme_bw() + 
-% #  ylim(c(-pi, pi)) + 
-%   scale_x_continuous(breaks=seq(0, 2*pi, by=pi/2), 
-%                      labels=c("0", expression(paste(pi,"/2")), 
-%                               expression(pi), 
-%                               expression(paste("3",pi, "/2")), 
-%                               expression(paste("2",pi))))
-% qplot(x=xstart, xend=xend, y = y+ellx/2, yend = y-ellx/2, geom="segment", data=dframe1) + 
-%   coord_fixed(ratio=1) + xlab("x") + ylab("y") + theme_bw() + 
-% #  ylim(c(-pi, pi)) + 
-%   scale_x_continuous(breaks=seq(0, 2*pi, by=pi/2), 
-%                      labels=c("0", expression(paste(pi,"/2")), 
-%                               expression(pi), 
-%                               expression(paste("3",pi, "/2")), 
-%                               expression(paste("2",pi))))
-% qplot(x=xstart, xend=xend, y = y+ellx/2, yend = y-ellx/2, geom="segment", data=dframe1) + 
-%   coord_fixed(ratio=2) + xlab("x") + ylab("y") + theme_bw() + 
-% #  ylim(c(-pi, pi)) + 
-%   scale_x_continuous(breaks=seq(0, 2*pi, by=pi/2), 
-%                      labels=c("0", expression(paste(pi,"/2")), 
-%                               expression(pi), 
-%                               expression(paste("3",pi, "/2")), 
-%                               expression(paste("2",pi))))
-% # qplot(x=xstart, xend=xend, y = y+ellx/2, yend = y-ellx/2, geom="segment", data=dframe1) + ylim(c(-2*pi, 2*pi))+ coord_fixed(ratio=2)+ xlab("x") + ylab("y") + theme_bw()+ 
-% #   scale_x_continuous(breaks=seq(0, 2*pi, by=pi), 
-% #                      labels=c("0", expression(pi), expression(paste("2",pi))))
-% # qplot(x=xstart, xend=xend, y = y+ellx/2, yend = y-ellx/2, geom="segment",data=dframe1) + ylim(c(-4*pi, 4*pi))+ coord_fixed(ratio=2)+ xlab("x") + ylab("y") + theme_bw()+ 
-% #   scale_x_continuous(breaks=seq(0, 2*pi, by=pi), 
-% #                      labels=c("0", expression(pi), expression(paste("2",pi))))
-% @
-% \begin{figure}[h!tbp]\centering
-% \begin{subfigure}[b]{.32\linewidth}\centering
-% \includegraphics[width=\linewidth,keepaspectratio=TRUE]{figure/fig-aspectratio1}
-% \caption{Aspect Ratio of .5}
-% \end{subfigure}
-% \begin{subfigure}[b]{.32\linewidth}\centering
-% \includegraphics[width=\linewidth,keepaspectratio=TRUE]{figure/fig-aspectratio2}
-% \caption{Aspect Ratio of 1}
-% \end{subfigure}
-% \begin{subfigure}[b]{.32\linewidth}\centering
-% \includegraphics[width=\linewidth,keepaspectratio=TRUE]{figure/fig-aspectratio3}
-% \caption{Aspect Ratio of 2}
-% \end{subfigure}
-% \caption{Changing aspect ratios changes the strength of the illusion and the effectiveness of the transformation}\label{fig:trigFix-aspectRatio} 
-% \end{figure}
 
 \begin{figure}[h!tbp]
 \centering
@@ -1342,13 +1267,17 @@ qplot(x=x, xend=xend, y = g(x) -ellx2/2, yend=g(x) +ellx2/2, geom="segment", dat
 \caption{The ratio of the length of the line to amplitude of the function needs to be included in the correction. Here, the amplitude is still 1, but the length of the line is 5. The correction factor leads to a massive over correction that makes the function almost unrecognizable. The plot on the left is uncorrected, the plot on the right is `corrected'.}\label{fig:linearFixOvercorrect} 
 \end{figure}
 
+\section{Transformation in Practice}
+
+Some modifications are necessary to implement the correction factor in a realistic situation in which it might not be practical for the aspect ratio of the graph to be fixed at 1. As in \todo{Cite Marie's paper}, the correction factor necessary to remove the illusion depends on the aspect ratio of the graphs. Figure \ref{fig:trigFix-aspectRatio} demonstrates the relative effectiveness of the correction factor.
+
+
 \subsection{User Study}
 \subsubsection{Applet Description}
 
-\move{
 An applet demonstrating the effect of changing parameter values on the strength of the illusion can be found at \url{http://www.michaelbach.de/ot/sze_sineIllusion/index.html}. An applet demonstrating not only the effect of parameters on the illusion but also the various correction factors we propose in this paper can be found at \url{http://vanderplas.dyndns-remote.com/SineIllusion}
 \todo[inline]{When applet is in quasi-final form, will change this to rstudio's server.}
-}
+
 
 M Bach's applet  gives the option to compensate the line length manually for its perceived shortcoming. The amount of compensation chosen turns out to be highly dependent on both the length of the vertical line segments and the amplitude of the sine function. While the applet does not provide details on the compensation function, it does suggest that it may be possible to correct the graphical display so that the brain interprets the stimuli in a manner consistent with the numerical data. 
 \subsubsection{Study Design}
@@ -1361,22 +1290,24 @@ XXX our evidence: 0 is not in the posterior interval ...
 
 \section{Application: USHCN Data}
 <<readdata, echo=FALSE>>=
-ushcn <- na.omit(read.csv("data/ushcn.csv"))
-monthly <- read.csv("data/monthly-avgs.csv")
-write.table(gsub("#", "*", scan("http://cdiac.ornl.gov/ftp/ushcn_v2_monthly/ushcn-stations.txt", "character", sep="\n")), "data/stations", row.names=FALSE, quote=FALSE)
-stations <- read.fwf("data/stations", widths=c(6, 9, 10, 7, 3, 31, 7, 7, 7, -2, 1), skip=1, stringsAsFactors=FALSE, strip.white=TRUE)
-names(stations) <- c("ID", "Lat", "Long", "Elevation", "State", "Name", "C1", "C2", "C3", "UTCOffset")
-stations[,1] <- paste("0", as.character(stations[,1]), sep="")
-stations[,7:9] <- apply(stations[,7:9], 2, function(str) gsub("------", "", str))
-stations[,1] <- sapply(stations[,1], function(i) substr(i, nchar(i)-5, nchar(i)), USE.NAMES=FALSE)
-stations[,c(5, 6)] <- apply(stations[,5:6], 2, factor)
-stations[,c(1, 7:9)] <- apply(stations[,c(1, 7:9)], 1, function(i) paste("USH00", i, sep=""))
+ushcn <- na.omit(read.csv("data/subushcn.csv"))
+#monthly <- read.csv("data/monthly-avgs.csv")
+#write.table(gsub("#", "*", scan("http://cdiac.ornl.gov/ftp/ushcn_v2_monthly/ushcn-stations.txt", "character", sep="\n")), "data/stations", row.names=FALSE, quote=FALSE)
+#stations <- read.fwf("data/stations", widths=c(6, 9, 10, 7, 3, 31, 7, 7, 7, -2, 1), skip=1, stringsAsFactors=FALSE, strip.white=TRUE)
+#names(stations) <- c("ID", "Lat", "Long", "Elevation", "State", "Name", "C1", "C2", "C3", "UTCOffset")
+#stations[,1] <- paste("0", as.character(stations[,1]), sep="")
+#stations[,7:9] <- apply(stations[,7:9], 2, function(str) gsub("------", "", str))
+#stations[,1] <- sapply(stations[,1], function(i) substr(i, nchar(i)-5, nchar(i)), USE.NAMES=FALSE)
+#stations[,c(5, 6)] <- apply(stations[,5:6], 2, factor)
+#stations[,c(1, 7:9)] <- apply(stations[,c(1, 7:9)], 1, function(i) paste("USH00", i, sep=""))
 
-station.sub <- subset(stations, abs(Lat-35)<5 & Elevation<500)
-ushcn.full <- ushcn
-monthly.full <- monthly
+#station.sub <- subset(stations, abs(Lat-35)<5 & Elevation<500)
+#write.csv(station.sub, "data/substations.csv", row.names=FALSE)
+station.sub <- read.csv("data/substations.csv")
+#ushcn.full <- ushcn
+#monthly.full <- monthly
 
-ushcn <- subset(ushcn, ID%in%station.sub$ID)
+# ushcn <- subset(ushcn, ID%in%station.sub$ID)
 library(plyr)
 suppressMessages(require(lubridate))
 suppressMessages(require(ggplot2))
@@ -1392,12 +1323,34 @@ monthly$time <- as.Date(monthly$time)
 <<rawtemp, dependson='readdata', echo=FALSE, echo=FALSE, fig.width=12, fig.height=4.5, out.width='\\textwidth',cache=TRUE>>=
 ggplot()  + geom_jitter(aes(Time, value/100), data=subset(ushcn, Year>1995), size=1) + 
   geom_line(aes(time, avg/100), data=subset(monthly, year(time)>1995), colour="steelblue", size=1.5) + 
-  ylab("Temperature (in Celsius)") + theme_bw()
+  ylab("Temperature (in Celsius)") + theme_bw() + theme(plot.margin = unit(c(0,6,0,0), "cm"))
 # ggsave(file="figure/monthly-temps.pdf", width=12, height=4.5)
+
+suppressWarnings(require(maps))
+states <- map_data("state")
+p <- ggplot() + geom_polygon(aes(long, lat, group=group), fill="grey80", data=states) + theme_bw() + 
+  theme(panel.grid.major=element_blank(), panel.background = element_blank(),
+       panel.grid.minor=element_blank(), panel.border = element_blank(),
+       axis.title = element_blank(), axis.ticks = element_blank(), 
+       axis.text = element_blank(), plot.margin = unit(c(-1,-1,-1,-1), "cm")) +
+  geom_point(aes(Long, Lat), colour="black", size=1.25, data=station.sub)
+
+vp1 <- viewport(x = 0.95, y = 0.925, height = unit(2.5, "cm"), width =  unit(4, "cm"), just = c("right","top"))
+  
+print(p, vp = vp1)
 @
 % \includegraphics[width=\textwidth]{monthly-temps}
-\caption{Raw monthly maximum temperatures (in Celsius) between 1980 and 2012 at 422 stations across the US with similar elevation and latitude. The blue line shows fitted temperatures from a baseline model. The plot suggests that the model fails to capture the more extreme values in summer and winter. }\label{fig:raw-temp}
+\caption{Raw monthly maximum temperatures (in Celsius) between 1980 and 2012 at 422 stations across the US (as indicated on the map) with similar elevation and latitude. The blue line shows fitted temperatures from a baseline model. The plot suggests that the model fails to capture the more extreme values in summer and winter. \label{fig:raw-temp}}
 \end{figure}
+% \begin{figure}[hbtp]
+% \centering
+% <<rawmap, dependson='readdata', echo=FALSE, echo=FALSE, fig.width=4, fig.height=2.5, out.width='.3\\textwidth',cache=TRUE>>=
+% # ggsave(file="figure/monthly-temps.pdf", width=12, height=4.5)
+% @
+% % \includegraphics[width=\textwidth]{monthly-temps}
+% \caption{Map of stations across the US included.}\label{fig:raw-map}
+% \end{figure}
+
 \begin{figure}[hbtp]\centering
 <<boxtemp, dependson='readdata', echo=FALSE, fig.width=12, fig.height=4.5, out.width='\\textwidth',cache=TRUE>>=
 ggplot()  + geom_boxplot(aes(Time, value/100, group=interaction(Year, Month)), outlier.size=1, fill = "grey65", data=subset(ushcn, Year>1995)) + theme_bw() + 
