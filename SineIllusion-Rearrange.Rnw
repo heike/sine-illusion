@@ -72,12 +72,25 @@ createSine <- function(n=200, len=1, f=f, fprime=fprime, f2prime=f2prime, a=0, b
  
   fp <- a*fprime(x)
   f2p <- a*f2prime(x)
-  lambdap <- (sqrt((fp^2+1)^2-f2p*fp^2*ell) + fp^2 + 1)^-1    
-  lambdam <- -(sqrt((fp^2+1)^2+f2p*fp^2*ell) + fp^2 + 1)^-1    
+
+  lambdam = (fp^2 + 1 + sqrt((fp^2 + 1)^2 + ell*f2p*fp^2))^-1
+  lambdap = (- fp^2 - 1 + sqrt((fp^2 + 1)^2 - ell*f2p*fp^2))^-1
+  inner <- pmin(1/2*(abs(lambdap)*sqrt(fp^2 + 1))^-1, 1/2*(abs(lambdam)*sqrt(fp^2 + 1))^-1)
+  outer <- pmax(1/2*(abs(lambdap)*sqrt(fp^2 + 1))^-1, 1/2*(abs(lambdam)*sqrt(fp^2 + 1))^-1)
+
+  dframe$ellx4.l <- inner
+  dframe$ellx4.u <- outer
+  idx <- which(f2p < 0)
+  dframe$ellx4.l[idx] <- outer[idx]
+  dframe$ellx4.u[idx] <- inner[idx]
+  k <- which(diff(f2p < 0) != 0)+1
+  yoff <- max(inner+outer)/2  # not sure whether this works in practice - if 
+  # there is a vertical shift that shouldn't be there, this is why
+  dframe$ellx4.l[idx] <- dframe$ellx4.l[idx] - yoff
+  dframe$ellx4.u[idx] <- dframe$ellx4.u[idx] + yoff
   
-  
-  dframe$ellx4.l <- (4*abs(lambdap)*sqrt(1+fp^2))^-1
-  dframe$ellx4.u <- (4*abs(lambdam)*sqrt(1+fp^2))^-1
+  dframe$ellx4.l[-idx] <- dframe$ellx4.l[-idx] + yoff
+  dframe$ellx4.u[-idx] <- dframe$ellx4.u[-idx] - yoff
   
   dframe
 }
@@ -1120,24 +1133,19 @@ f^{\prime\prime}(x_0)  f^\prime(x_0)^2 \lambda^2  + 2(f^\prime(x_0)^2 + 1) \lamb
 % 
 % For all other cases, we have the following set of solutions:
 % 
-which leads us to solutions for $\lambda$ as
-% \[
-% \lambda_{1/2} = \left(  f^{\prime\prime}(x_0)  f^\prime(x_0)^2 \right)^{-1} \left( -(f^\prime(x_0)^2 + 1) + \sqrt{ (f^\prime(x_0)^2 + 1)^2 -  f^{\prime\prime}(x_0)  f^\prime(x_0)^2 \cdot (\pm \ell)} \right).
-% \]
-% We can reduce this further to 
-\begin{equation}
-\lambda_{1/2} = \pm 2 \ell \cdot \left( \sqrt{ (f^\prime(x_0)^2 + 1)^2 -  f^{\prime\prime}(x_0)  f^\prime(x_0)^2 \cdot (\pm \ell)} + (f^\prime(x_0)^2 + 1) \right)^{-1}
-\end{equation}
-This results in a correction factor for the half lengths as:
-\begin{equation}\label{eqn.quadratic}
-\ell_{\text{new}} = \left( 1 + \sqrt{1 + (\pm \ell_{\text{old}}) \frac{f^\prime(x_0)^2 f^{\prime\prime}(x_0)}{\left(1 + f^\prime(x_0)^2\right)^2})} \right) \left(1 + f^\prime(x_0)^2\right)^{-1/2}
-\end{equation}
-% \begin{eqnarray*}
-% \left(  f^{\prime\prime}(x_0)  f^\prime(x_0)^2 \right)^{-1} \left( -b + a \right) = \\
-% \left(  f^{\prime\prime}(x_0)  f^\prime(x_0)^2 \right)^{-1} \left( -b^2 + a^2 \right) \left( a + b \right)^{-1} = \\
-%  \pm \ell \cdot \left( \sqrt{ (f^\prime(x_0)^2 + 1)^2 -  f^{\prime\prime}(x_0)  f^\prime(x_0)^2 \cdot (\pm \ell)} + (f^\prime(x_0)^2 + 1) \right)^{-1} = \\
-% \end{eqnarray*}
-
+% which leads us to solutions for $\lambda$ as
+% % \[
+% % \lambda_{1/2} = \left(  f^{\prime\prime}(x_0)  f^\prime(x_0)^2 \right)^{-1} \left( -(f^\prime(x_0)^2 + 1) + \sqrt{ (f^\prime(x_0)^2 + 1)^2 -  f^{\prime\prime}(x_0)  f^\prime(x_0)^2 \cdot (\pm \ell)} \right).
+% % \]
+% % We can reduce this further to 
+% \begin{equation}
+% \lambda_{1/2} = \pm 2 \ell \cdot \left( \sqrt{ (f^\prime(x_0)^2 + 1)^2 -  f^{\prime\prime}(x_0)  f^\prime(x_0)^2 \cdot (\pm \ell)} + (f^\prime(x_0)^2 + 1) \right)^{-1}
+% \end{equation}
+which leads us to corrections for the half lengths as (see appendix \ref{app.quadratic} for details):
+\begin{eqnarray*}\label{eqn.quadratic}
+\ell_{\text{new}_1} &=& 1 /2 \cdot  \left(1 + f^\prime(x_0)^2 + \sqrt{ \left(1 + f^\prime(x_0)^2\right)^2 +  f^{\prime\prime}(x_0) f^\prime(x_0)^2\cdot  \ell_{\text{old}}}\right) \cdot \left(\sqrt{1 + f^\prime(x_0)^2}\right)^{-1} \\
+\ell_{\text{new}_2} &=& 1 /2 \cdot  \left(-(1 + f^\prime(x_0)^2) + \sqrt{ \left(1 + f^\prime(x_0)^2\right)^2 -  f^{\prime\prime}(x_0) f^\prime(x_0)^2\cdot  \ell_{\text{old}}}\right) \cdot \left(\sqrt{1 + f^\prime(x_0)^2}\right)^{-1} \\
+\end{eqnarray*}
 
 \begin{figure}[h!btp]
 \begin{subfigure}[h]{.495\linewidth}\centering
@@ -1489,6 +1497,32 @@ where $c_i$ and $d_i$ are given as
 c_i = \sum_{j=0}^{i-1} |f(x_j) - f(x_{j-1})| \text{ and } d_i = \sum_{j=0}^{i} |f(x_j) - f(x_{j-1})|.
 \]
 We can write the difference $|f(x_j) - f(x_{j-1})|$ as $\int_{x_{j-1}}^{x_j} |f^\prime(z)|dz$. This shows equation (\ref{eqn.xtrans}).
+\section{Reformulation of the quadratic approximation}\label{app.quadratic}
+For a quadratic equation with parameters $a, b, c \in R$ of the form 
+\begin{equation}\label{quadratic.equation}
+ax^2 + bx + c = 0
+\end{equation}
+we know that solutions come in the form of 
+\[
+x_{1/2} = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}  = 2c/\left(-b \pm \sqrt{b^2 - 4ac}\right)
+\]
+\paragraph{Application to quadratic approximation to $f$:}
+in the example, we have the following equivalencies:
+\begin{eqnarray*}
+a &=& f^"(x_0) f^\prime(x_0)^2 \\
+b &=& 2(1 + f^\prime(x_0)^2) \hspace{.5in} > 0 \text{ for all } x \\
+c &=& \pm \ell \\
+\end{eqnarray*}
+Using the above equation, we get solutions for $\lambda$ as
+\[
+\lambda_\pm = 2c\left(-b \pm \sqrt{b^2 - 4ac}\right)^{-1}
+\]
+For a valid solution for the correction factor, we have to assume that $\lambda$ is positive. This means that for $c = - \ell$, we can only make use of $\lambda_{-}$, which for $c = +\ell$, the only valid solution is given as $\lambda_{+}$:
+\begin{eqnarray*}
+\lambda_- &=& \ell \left(1 + f^\prime(x_0)^2 + \sqrt{ \left(1 + f^\prime(x_0)^2\right)^2 +  f^{\prime\prime}(x_0) f^\prime(x_0)^2\cdot \ell}\right)^{-1} \\
+\lambda_+ &=& \ell \left(-(1 + f^\prime(x_0)^2) + \sqrt{ \left(1 + f^\prime(x_0)^2\right)^2 -  f^{\prime\prime}(x_0) f^\prime(x_0)^2\cdot \ell}\right)^{-1} \\
+\end{eqnarray*}
+
 \end{appendix}
 \clearpage
 \bibliographystyle{asa}
