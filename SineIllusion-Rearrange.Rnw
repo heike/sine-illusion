@@ -75,7 +75,7 @@ createSine <- function(n=200, len=1, f=f, fprime=fprime, f2prime=f2prime, a=0, b
 
   v = 1 + fprime(x)^2
   i2 <- 0.5*(v+sqrt(v^2 + ell*f2p*fp^2))/sqrt(v) # small side - on the outside
-  o2 <- abs(0.5*(-v+sqrt(v^2 - ell*f2p*fp^2))/sqrt(v)) # large side on the inside
+  o2 <- abs(0.5*(-v+sqrt(v^2 - ell*f2p*fp^2)/sqrt(v))) # large side on the inside
   dframe$ellx4.l <- o2
   dframe$ellx4.u <- i2
   idx <- which(f2p < 0)
@@ -1087,37 +1087,6 @@ qplot(data=df.real, x=x, y=y, geom="line") +
 \paragraph{Linear Approximation to $f(x)$}\hfill\newline
 A comparison of the sketches for the linear approach (in Fig. \ref{fig:linear-GeneralCorrection}) and the trigonometric approach (in Fig. \ref{fig:trig}) shows that they are the same. They do, indeed, lead to the same correction factor.
 % 
-% Using a linear approximation of $f(x)$ in value $x_0$, i.e.  
-%  $f(x) \approx f(x_0) + f^\prime(x_0)(x-x_0)$, changes equation \ref{eqn.general.2}  to
-%  \begin{eqnarray*}
-%    f^\prime(x_0)(x-x_0) = -\lambda \pm \ell/2,
-%  \end{eqnarray*}
-% which makes the system linear, and allows a  straightforward solution, and leads to a correction factor of:  
-% 
-% % \begin{align*}
-% % y & = f(x_0) + f^\prime(x_0)(x-x_0) \pm \ell/2\\
-% % y & = \left(-1/f^\prime(x_0)\right) x + f(x_0) + x_0/f^\prime(x_0)
-% % \end{align*}
-% % \newdo{we need the steps in between, too - right now the solution is just a statement, we need an explanation.}
-% 
-% 
-% % Figure \ref{linear-GeneralCorrection} shows the linear approximation to $f(x) \pm \ell/2$ and the secant line. Solving the system of equations provides endpoints $(x_l, y_l)$ and $(x_u, y_u)$ which can then be used to compute the extant width of the line connecting $(x_l, y_l)$ and $(x_u, y_u)$. We then scale the vertical line length so that the extant width is equal to the original value of $\ell/2$. This correction factor is 
-% \begin{equation}\label{LinearApprox}
-% \ell_{new} = \ell \cdot \sqrt{1 + \left(f^\prime(x)\right)^2}
-% \end{equation}
-% 
-% 
-% %= (\atan{f^\prime(x))}^\prime/f^{\prime\prime}(x)
-% 
-% 
-% Note that while this solution looks different from the trigonometric approach, they are actually the same, since
-% \[
-% \cos (\atan{|f^\prime(x)}) = \sqrt{1 + |f^\prime(x)^2|}.
-% \]
-% This follows directly for $y = \atan{|f^\prime(x|}$ in the formula below:
-% \begin{eqnarray*}
-% \cos(y) = 1/sec(y) = 1/\sqrt{1+ \tan^2 y}.\\
-% \end{eqnarray*}
 
 The asymmetric nature of the distortion suggests that we may want to use a second-order taylor polynomial approximation to $f(x)$ to account for the asymmetry in the extant widths on either side of the center trendline.
 
@@ -1136,7 +1105,7 @@ where $v = 1 + f^\prime(x_0)^2$.
 \begin{figure}[h!btp]
 \begin{subfigure}[h]{.495\linewidth}\centering
 \includegraphics[width=\linewidth,keepaspectratio=TRUE]{figure/fig-trigFix1}
-\caption{Uncorrected}
+\caption{Uncorrected\\\phantom{push the caption up}}
 \end{subfigure}
 \begin{subfigure}[h]{.495\linewidth}\centering
 <<CtsAdjustedResults,echo=FALSE, dependson='CtsQuadratic', fig.width=4, fig.height=3>>=
@@ -1147,7 +1116,7 @@ qplot(x=x, xend=x, y=y+ellx4.u, yend=y-ellx4.l, geom="segment", data=dframe, lin
   scale_x_continuous(breaks=seq(0, 2*pi, by=pi/2), minor_breaks=minor.axis.correction,
                      labels=c("0", expression(paste(pi,"/2")), expression(pi), expression(paste("3",pi, "/2")), expression(paste("2",pi))))
 @
-\caption{Quadratic approximation based on eqn (\ref{eqn.quadratic}).}
+\caption{Quadratic approximation based on eqns (\ref{eqn.q1}) and (\ref{eqn.q2}). \todo[inline]{we should either get rid of the scale on the y axis or nromailze the data afterwards. right now our quadratic approaximation is even changing the mean trend. }}
 \end{subfigure}
 \caption[Quadratic Approximation]{
 In the quadratic approximation top and bottom segments of the vertical lines are adjusted separately.
@@ -1203,70 +1172,79 @@ dev.off()
 \caption{Extant Half-segment Length. The secant  line segments are not symmetrical around the center line, so symmetric correction as employed in Figure \ref{fig:linear-GeneralCorrection} leads to simultaneous over- and under-correcting.}\label{fig:HalfSegLength}
 \end{figure}
 
-\subsection{Mathematical Properties of Transformation}
-\todo[inline]{Add pictures comparing the 3 transformations to the untransformed data under both normal and extreme conditions.}
-\todo[inline]{Discussion: Hammock/Trig/linear breaks first,  quadratic breaks after, full optimization breaks eventually}
-As with the trigonometry correction, the linear adjustment is prone to the same overcorrection distortion shown in Figure \ref{fig:linearFixOvercorrect}.
+%\subsection{Mathematical Properties of Transformation}
+The quadratic correction breaks, whenever $(1 + f^\prime(x)^2)^2 \pm \ell\cdot f^{\prime\prime}(x)\cdot f^\prime(x)^2 < 0$
+This is achieved by a combination of large $\ell$ (i.e. large vertical extent) and a large value of curvature $f^{\prime\prime}(x)$, i.e large changes in the slope of the main trend. In the linear approximation of $f$ the same situation leads to a massive overcorrection of the vertical lines, making the `corrected' function almost unrecognizable. 
 
-\begin{figure}[h!tbp]
-\centering
-<<linearFixOvercorrect, dependson='data', echo=FALSE, include=FALSE>>=
-g <- function(x) 5*sin(x)
-gprime <- function(x) 5*cos(x)
-g2prime <- function(x) -5*sin(x)
-dframe <- createSine(100, len=5, f=g, fprime=gprime, f2prime=g2prime)
-ar <- 1
-qplot(x=x, xend=xend, y = g(x) -ell/2, yend=g(x) +ell/2, geom="segment", data=dframe) +
-  theme(panel.grid.major=element_blank(), 
-       panel.grid.minor=element_blank(), panel.background=element_blank(),
-       axis.title = element_blank(), axis.ticks = element_blank(), 
-       axis.text = element_blank()) + coord_equal(ratio=ar)
+% % 
+% % $1 + 2f^\prime(x)^2 + f^\prime(x)^4 \pm \ell\cdot f^{\prime\prime}(x)\cdot f^\prime(x)^2 < 0$
+% % 
+% % $1 + (2  \pm \ell\cdot f^{\prime\prime}(x)) \cdot f^\prime(x)^2 + f^\prime(x)^4 < 0$
+% % 
+% % $\frac{1  + f^\prime(x)^4}{f^\prime(x)^2} < - (2  \pm \ell\cdot f^{\prime\prime}(x)) $
+% 
+% \todo[inline]{Add pictures comparing the 3 transformations to the untransformed data under both normal and extreme conditions.}
+% \todo[inline]{Discussion: Hammock/Trig/linear breaks first,  quadratic breaks after, full optimization breaks eventually}
+% As with the trigonometry correction, the linear adjustment is prone to the same overcorrection distortion shown in Figure \ref{fig:linearFixOvercorrect}.
+% 
+% \begin{figure}[h!tbp]
+% \centering
+% <<linearFixOvercorrect, dependson='data', echo=FALSE, include=FALSE>>=
+% g <- function(x) 5*sin(x)
+% gprime <- function(x) 5*cos(x)
+% g2prime <- function(x) -5*sin(x)
+% dframe <- createSine(75, len=1, f=g, fprime=gprime, f2prime=g2prime)
+% ar <- 1
+% qplot(x=x, xend=xend, y = g(x) -ell/2, yend=g(x) +ell/2, geom="segment", data=dframe) +
+%   theme(panel.grid.major=element_blank(), 
+%        panel.grid.minor=element_blank(), panel.background=element_blank(),
+%        axis.title = element_blank(), axis.ticks = element_blank(), 
+%        axis.text = element_blank()) + coord_equal(ratio=ar)
+% 
+% qplot(x=x, xend=xend, y = g(x) -ellx/2, yend=g(x) +ellx/2, geom="segment", data=dframe) +
+%   theme(panel.grid.major=element_blank(), 
+%        panel.grid.minor=element_blank(), panel.background=element_blank(),
+%        axis.title = element_blank(), axis.ticks = element_blank(), 
+%        axis.text = element_blank()) + coord_equal(ratio=ar)
+% 
+% qplot(x=x, xend=xend, y = g(x) -ellx4.l, yend=g(x) +ellx4.u, geom="segment", data=dframe) +
+%   theme(panel.grid.major=element_blank(), panel.background = element_rect(fill = "white", 
+%                 colour = "black"),
+%        panel.grid.minor=element_blank(), panel.background=element_blank(),
+%        axis.title = element_blank(), axis.ticks = element_blank(), 
+%        axis.text = element_blank()) + coord_equal(ratio=ar)
+% @
+% 
+% \begin{subfigure}[b]{.3\linewidth}\centering
+% \includegraphics[width=\linewidth,keepaspectratio=TRUE]{figure/fig-linearFixOvercorrect1}
+% \caption{$\ell=5$, Uncorrected}
+% \end{subfigure}
+% \begin{subfigure}[b]{.3\linewidth}\centering
+% \includegraphics[width=\linewidth,keepaspectratio=TRUE]{figure/fig-linearFixOvercorrect2}
+% \caption{Corrected by eqn. \ref{trigCorrection}}
+% \end{subfigure}
+% \begin{subfigure}[b]{.3\linewidth}\centering
+% \includegraphics[width=\linewidth,keepaspectratio=TRUE]{figure/fig-linearFixOvercorrect3}
+% \caption{Corrected by eqns (\ref{eqn.q1}) and (\ref{eqn.q2})}
+% \end{subfigure}
+% \caption{The ratio of the length of the line to amplitude of the function needs to be included in the correction. Here, the amplitude is still 1, but the length of the line is 5. The correction factor leads to a massive over correction that makes the function almost unrecognizable. The plot on the left is uncorrected, the plot on the right is `corrected'.\label{fig:linearFixOvercorrect}}
+% \end{figure}
 
-qplot(x=x, xend=xend, y = g(x) -ellx/2, yend=g(x) +ellx/2, geom="segment", data=dframe) +
-  theme(panel.grid.major=element_blank(), 
-       panel.grid.minor=element_blank(), panel.background=element_blank(),
-       axis.title = element_blank(), axis.ticks = element_blank(), 
-       axis.text = element_blank()) + coord_equal(ratio=ar)
-
-qplot(x=x, xend=xend, y = g(x) -ellx2/2, yend=g(x) +ellx2/2, geom="segment", data=dframe) +
-  theme(panel.grid.major=element_blank(), panel.background = element_rect(fill = "white", 
-                colour = "black"),
-       panel.grid.minor=element_blank(), panel.background=element_blank(),
-       axis.title = element_blank(), axis.ticks = element_blank(), 
-       axis.text = element_blank()) + coord_equal(ratio=ar)
-@
-
-\begin{subfigure}[b]{.3\linewidth}\centering
-\includegraphics[width=\linewidth,keepaspectratio=TRUE]{figure/fig-linearFixOvercorrect1}
-\caption{$\ell=5$, Uncorrected}
-\end{subfigure}
-\begin{subfigure}[b]{.3\linewidth}\centering
-\includegraphics[width=\linewidth,keepaspectratio=TRUE]{figure/fig-linearFixOvercorrect2}
-\caption{Corrected by Eqn. \ref{trigCorrection}}
-\end{subfigure}
-\begin{subfigure}[b]{.3\linewidth}\centering
-\includegraphics[width=\linewidth,keepaspectratio=TRUE]{figure/fig-linearFixOvercorrect3}
-\caption{Corrected by Eqn \ref{LinearApprox}}
-\end{subfigure}
-\caption{The ratio of the length of the line to amplitude of the function needs to be included in the correction. Here, the amplitude is still 1, but the length of the line is 5. The correction factor leads to a massive over correction that makes the function almost unrecognizable. The plot on the left is uncorrected, the plot on the right is `corrected'.}\label{fig:linearFixOvercorrect} 
-\end{figure}
-
-\section{Transformation in Practice}
+\section{Transformations in Practice -- a User Study}
 
 Some modifications are necessary to implement the correction factor in a realistic situation in which it might not be practical for the aspect ratio of the graph to be fixed at 1. As in \todo{Cite Marie's paper}, the correction factor necessary to remove the illusion depends on the aspect ratio of the graphs. Figure \ref{fig:trigFix-aspectRatio} demonstrates the relative effectiveness of the correction factor.
 
 
-\subsection{User Study}
-\subsubsection{Applet Description}
+\subsection{Applet Description}
 
 An applet demonstrating the effect of changing parameter values on the strength of the illusion can be found at \url{http://www.michaelbach.de/ot/sze_sineIllusion/index.html}. An applet demonstrating not only the effect of parameters on the illusion but also the various correction factors we propose in this paper can be found at \url{http://vanderplas.dyndns-remote.com/SineIllusion}
 \todo[inline]{When applet is in quasi-final form, will change this to rstudio's server.}
 
 
 M Bach's applet  gives the option to compensate the line length manually for its perceived shortcoming. The amount of compensation chosen turns out to be highly dependent on both the length of the vertical line segments and the amplitude of the sine function. While the applet does not provide details on the compensation function, it does suggest that it may be possible to correct the graphical display so that the brain interprets the stimuli in a manner consistent with the numerical data. 
-\subsubsection{Study Design}
-\subsubsection{Method}
-\subsubsection{Results}
+\subsection{Study Design}
+\subsection{Method}
+\subsection{Results}
 Such a correction is significant not only because of its effect on statistical graphics, but because previously attempts to resolve optical illusions using geometry have not met with success \citep{westheimer2008illusions}.
 
 XXX our evidence: 0 is not in the posterior interval ...
@@ -1348,17 +1326,18 @@ ggplot()  + geom_boxplot(aes(Year+(Month-1)/12, resid/100, group=Year+(Month-1)/
   ylab("Residual temperature (in Celsius)") + theme_bw() + xlab("Time")
 # ggsave(file="figure/monthly-resid-temps.pdf", width=12, height=4.5)
 @
-\caption{Boxplots of the residuals provide more insight into the seasonal variance: Winters show more variation in temperatures, while summers show much less variation in temperatures. Our initial impression from the boxplots of the raw temperature data was only partially correct - while winters certainly  have higher variation, summers show less variation than the fall and spring, albeit with more outliers.}\label{fig:boxplot-resid-temp}
+\caption{Boxplots of the de-seasonalized residuals provide more insight into the seasonal variance: Winters show more variation in temperatures, while summers show much less variation in temperatures. \label{fig:boxplot-resid-temp}}
 \end{figure}
 Figure \ref{fig:raw-temp}  shows temperature data from 422 stations across the US with similar elevation and latitude. Raw monthly temperatures are overlaid by a fit from a `baseline' model. The deviations from the fit in the extremes of the fit suggest that the baseline model is not quite able to capture all of the variability in summer and winter peaks. However, the model used is actually based on averages in each time point. This model is not susceptible to shrinkage, so the question of higher variability in the peaks becomes the question of separating this perceived variability into the part introduced by the illusion and the part actually present in the data.
 
 \paragraph{Trend removal}
 After removing the averages in Figure \ref{fig:boxplot-temp} to yield Figure \ref{fig:boxplot-resid-temp} the impression of higher variability in the peaks is only partially confirmed: there is higher variability in the winter, and lower variability in the summer, though there are more outliers in the summer than in the winter.
 
+
 \paragraph{Transformation in $X$}
-\todo{figure of transformation and discussion}
+\todo[inline]{figure of transformation and discussion}
 \paragraph{Transformation of $Y$}
-\todo{figure of transformation and discussion}
+\todo[inline]{figure of transformation and discussion}
 
 %\clearpage
 \section{Conclusion}
@@ -1437,7 +1416,7 @@ in the example, we have the following equivalencies:
 \begin{eqnarray*}
 a &=& f^"(x_0) f^\prime(x_0)^2 \\
 b &=& 2(1 + f^\prime(x_0)^2) \hspace{.5in} > 0 \text{ for all } x \\
-c &=& \pm \ell \\
+c &=& \pm \ell 
 \end{eqnarray*}
 Using the above equation, we get solutions for $\lambda$ as
 \[
