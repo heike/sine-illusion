@@ -1355,19 +1355,7 @@ ggplot()  + geom_boxplot(aes(Time, value/100, group=interaction(Year, Month)), o
 
 \caption{Monthly boxplot of maximum temperatures (in Celsius) between 1980 and 1995 at 422 stations across the US with similar elevation and latitude. The boxplots suggest that there is more variation in the winter months than in the other seasons. Summer, fall and spring appear to have similar temperature variability, and there are more outliers in the summer.}\label{fig:boxplot-temp}\label{fig:box-temp}
 \end{figure}
-% \begin{figure}[hbtp]
-% \centering
-% <<residtemp, dependson='rawtemp', echo=FALSE, echo=FALSE, fig.width=12, fig.height=4.5, out.width='\\textwidth'>>=
-% ushcn <- merge(ushcn, monthly[,c("time", "avg")], by.x="Time", by.y="time")
-% ushcn$resid <- with(ushcn, value-avg)
-% ggplot()  + geom_jitter(aes(Time, resid/100), data=subset(ushcn, Year>1995), size=1, alpha=.5) + 
-%   geom_hline(yintercept=0, colour="steelblue", size=1) + 
-%   ylab("Residual temperature (in Celsius)") + theme_bw()
-% # ggsave(file="figure/monthly-resid-temps.pdf", width=12, height=4.5)
-% @
-% % \includegraphics[width=\textwidth]{monthly-resid-temps}
-% \caption{Residual monthly temperatures (in Celsius) from the baseline model fit.}\label{fig:resid-temp}
-% \end{figure}
+
 
 \begin{figure}[h!tbp]\centering
 <<residtempboxplot, dependson='residtemp', echo=FALSE, echo=FALSE, fig.width=12, fig.height=4.5, out.width='\\textwidth'>>=
@@ -1378,16 +1366,22 @@ ggplot()  + geom_boxplot(aes(Year+(Month-1)/12, resid/100, group=Year+(Month-1)/
 @
 \caption{Boxplots of the residuals provide more insight into the seasonal variance: Winters show more variation in temperatures, while summers show much less variation in temperatures. Our initial impression from the boxplots of the raw temperature data was only partially correct - while winters certainly  have higher variation, summers show less variation than the fall and spring, albeit with more outliers.}\label{fig:boxplot-resid-temp}
 \end{figure}
-Figure \ref{fig:raw-temp}  shows temperature data from 422 stations across the US with similar elevation and latitude. Raw monthly temperatures are overlaid by a fit from a `baseline' model. The deviations from the fit in the extremes of the fit suggest that the baseline model is not quite able to capture all of the variability in summer and winter peaks. However, the model used is actually based on averages in each time point. This model is not susceptible to shrinkage, so the question of higher variability in the peaks becomes the question of how much of this perceived variability is due to perception or real.
+Figure \ref{fig:raw-temp}  shows temperature data from 422 stations across the US with similar elevation and latitude. Raw monthly temperatures are overlaid by a fit from a `baseline' model. The deviations from the fit in the extremes of the fit suggest that the baseline model is not quite able to capture all of the variability in summer and winter peaks. However, the model used is actually based on averages in each time point. This model is not susceptible to shrinkage, so the question of higher variability in the peaks becomes the question of separating this perceived variability into the part introduced by the illusion and the part actually present in the data.
 
+\paragraph{Trend removal}
 After removing the averages in Figure \ref{fig:boxplot-temp} to yield Figure \ref{fig:boxplot-resid-temp} the impression of higher variability in the peaks is only partially confirmed: there is higher variability in the winter, and lower variability in the summer, though there are more outliers in the summer than in the winter.
+
+\paragraph{Transformation in $X$}
+\todo{figure of transformation and discussion}
+\paragraph{Transformation of $Y$}
+\todo{figure of transformation and discussion}
 
 %\clearpage
 \section{Conclusion}
 \begin{itemize}\item Raise Awareness\item ``Fixing" data is tricky and usually beyond a statistician's comfort zone, but we could see this as part of an applet where the ``fix" is done temporarily as a diagnostic measure
 \item iterative process - we're only doing first step. but then we don't have an explicit functional expression anymore
 \item we're only extending line lengths -- some normalization might help
-\item there's a long tradition in other disciplines of adjusting work for human cognition, e.g. painters correct (what exactly? forgot), rchitecture: columns of Parthenon are curved to appear straight,  floor and top are curved inwardly to appear straight from a distance.
+\item there's a long tradition in other disciplines of adjusting work for human cognition, e.g. painters correct (what exactly? color shades based on context), architecture: columns of Parthenon are curved to appear straight,  floor and top are curved inwardly to appear straight from a distance.
 
 \end{itemize}
 \begin{appendix}
