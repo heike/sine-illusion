@@ -73,25 +73,23 @@ createSine <- function(n=200, len=1, f=f, fprime=fprime, f2prime=f2prime, a=0, b
   fp <- a*fprime(x)
   f2p <- a*f2prime(x)
 
-  lambdam = (fp^2 + 1 + sqrt((fp^2 + 1)^2 + ell*f2p*fp^2))^-1
-  lambdap = (- fp^2 - 1 + sqrt((fp^2 + 1)^2 - ell*f2p*fp^2))^-1
-  inner <- pmin(1/2*(abs(lambdap)*sqrt(fp^2 + 1))^-1, 1/2*(abs(lambdam)*sqrt(fp^2 + 1))^-1)
-  outer <- pmax(1/2*(abs(lambdap)*sqrt(fp^2 + 1))^-1, 1/2*(abs(lambdam)*sqrt(fp^2 + 1))^-1)
-
-  dframe$ellx4.l <- inner
-  dframe$ellx4.u <- outer
+  v = 1 + fprime(x)^2
+  i2 <- 0.5*(v+sqrt(v^2 + ell*f2p*fp^2))/sqrt(v) # small side - on the outside
+  o2 <- abs(0.5*(-v+sqrt(v^2 - ell*f2p*fp^2))/sqrt(v)) # large side on the inside
+  dframe$ellx4.l <- o2
+  dframe$ellx4.u <- i2
   idx <- which(f2p < 0)
-  dframe$ellx4.l[idx] <- outer[idx]
-  dframe$ellx4.u[idx] <- inner[idx]
-  k <- which(diff(f2p < 0) != 0)+1
-  yoff <- max(inner+outer)/2  # not sure whether this works in practice - if 
+  dframe$ellx4.l[idx] <- i2[idx]
+  dframe$ellx4.u[idx] <- o2[idx]
+    
+  k <- which(diff(f2p < 0) != 0)
+  yoff <- max(i2+o2)/2  # not sure whether this works in practice - if 
   # there is a vertical shift that shouldn't be there, this is why
   dframe$ellx4.l[idx] <- dframe$ellx4.l[idx] - yoff
   dframe$ellx4.u[idx] <- dframe$ellx4.u[idx] + yoff
   
   dframe$ellx4.l[-idx] <- dframe$ellx4.l[-idx] + yoff
   dframe$ellx4.u[-idx] <- dframe$ellx4.u[-idx] - yoff
-  
   dframe
 }
 
@@ -104,8 +102,6 @@ getSecantSegment <- function(x0, df, f, fprime, f2prime){
   
   fp <- a*fprime(x0)
   f2p <- a*f2prime(x0)
-  lambdap <- (sqrt((fp^2+1)^2-f2p*fp^2*ell) + fp^2 + 1)^-1    
-  lambdam <- -(sqrt((fp^2+1)^2+f2p*fp^2*ell) + fp^2 + 1)^-1    
   lambdam = (fp^2 + 1 + sqrt((fp^2 + 1)^2 + ell*f2p*fp^2))^-1
   lambdap = (- fp^2 - 1 + sqrt((fp^2 + 1)^2 - ell*f2p*fp^2))^-1
 
@@ -1131,24 +1127,12 @@ Using the approximation $f(x) \approx f(x_0) + f^\prime(x_0)(x-x_0) + 1/2 f^{\pr
 \begin{eqnarray*}
 f^{\prime\prime}(x_0)  f^\prime(x_0)^2 \lambda^2  + 2(f^\prime(x_0)^2 + 1) \lambda  \pm \ell = 0,
 \end{eqnarray*}
-% Note that for values of $x$ with $f^\prime(x) = 0$ or  $f^{\prime\prime}(x)$ the equation simplifies: for local minima or maxima, i.e. $f^\prime(x) = 0$, the extant width coincides with the vertical width, so no correction is needed. In an inflection point, i.e. $f^{\prime\prime}(x) = 0$, the quadratic correction factor simplifies to the solution of the linear approximation and is given as $\sqrt{1 + f^\prime(x_0)^2}$.
-% 
-% For all other cases, we have the following set of solutions:
-% 
-% which leads us to solutions for $\lambda$ as
-% % \[
-% % \lambda_{1/2} = \left(  f^{\prime\prime}(x_0)  f^\prime(x_0)^2 \right)^{-1} \left( -(f^\prime(x_0)^2 + 1) + \sqrt{ (f^\prime(x_0)^2 + 1)^2 -  f^{\prime\prime}(x_0)  f^\prime(x_0)^2 \cdot (\pm \ell)} \right).
-% % \]
-% % We can reduce this further to 
-% \begin{equation}
-% \lambda_{1/2} = \pm 2 \ell \cdot \left( \sqrt{ (f^\prime(x_0)^2 + 1)^2 -  f^{\prime\prime}(x_0)  f^\prime(x_0)^2 \cdot (\pm \ell)} + (f^\prime(x_0)^2 + 1) \right)^{-1}
-% \end{equation}
 which leads us to corrections for the half lengths as (see appendix \ref{app.quadratic} for details):
-\begin{eqnarray*}\label{eqn.quadratic}
-\ell_{\text{new}_1} &=& 1 /2 \cdot  \left(1 + f^\prime(x_0)^2 + \sqrt{ \left(1 + f^\prime(x_0)^2\right)^2 +  f^{\prime\prime}(x_0) f^\prime(x_0)^2\cdot  \ell_{\text{old}}}\right) \cdot \left(\sqrt{1 + f^\prime(x_0)^2}\right)^{-1} \\
-\ell_{\text{new}_2} &=& 1 /2 \cdot  \left(-(1 + f^\prime(x_0)^2) + \sqrt{ \left(1 + f^\prime(x_0)^2\right)^2 -  f^{\prime\prime}(x_0) f^\prime(x_0)^2\cdot  \ell_{\text{old}}}\right) \cdot \left(\sqrt{1 + f^\prime(x_0)^2}\right)^{-1} \\
-\end{eqnarray*}
-
+\begin{eqnarray}\label{eqn.q1}
+\ell_{\text{new}_1} &=& 1 /2 \cdot  \left(v + \sqrt{ v^2 +  f^{\prime\prime}(x_0) f^\prime(x_0)^2\cdot  \ell_{\text{old}}}\right) \cdot v^{-1/2} \\\label{eqn.q2}
+\ell_{\text{new}_2} &=& 1 /2 \cdot  \left(-v + \sqrt{ v^2 -  f^{\prime\prime}(x_0) f^\prime(x_0)^2\cdot  \ell_{\text{old}}}\right) \cdot v^{-1/2} 
+\end{eqnarray}
+where $v = 1 + f^\prime(x_0)^2$.
 \begin{figure}[h!btp]
 \begin{subfigure}[h]{.495\linewidth}\centering
 \includegraphics[width=\linewidth,keepaspectratio=TRUE]{figure/fig-trigFix1}
@@ -1464,7 +1448,7 @@ For a valid solution for the correction factor, we have to assume that $\lambda$
 \lambda_- &=& \ell \left(1 + f^\prime(x_0)^2 + \sqrt{ \left(1 + f^\prime(x_0)^2\right)^2 +  f^{\prime\prime}(x_0) f^\prime(x_0)^2\cdot \ell}\right)^{-1} \\
 \lambda_+ &=& \ell \left(-(1 + f^\prime(x_0)^2) + \sqrt{ \left(1 + f^\prime(x_0)^2\right)^2 -  f^{\prime\prime}(x_0) f^\prime(x_0)^2\cdot \ell}\right)^{-1} \\
 \end{eqnarray*}
-
+This gives the results as shown in equations (\ref{eqn.q1}) and (\ref{eqn.q2})
 \end{appendix}
 \clearpage
 \bibliographystyle{asa}
