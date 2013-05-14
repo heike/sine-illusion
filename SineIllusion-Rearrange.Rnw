@@ -1289,6 +1289,8 @@ XXX our evidence: 0 is not in the posterior interval ...
 
 
 \section{Application: USHCN Data}
+We will demonstrate the occurrence of the sine illusion as well as the suggested transformations at the example of data from the United States Historical Climatology Network \cite[USHCN;][]{ushcn, ushcn2}.
+
 <<readdata, echo=FALSE>>=
 ushcn <- na.omit(read.csv("data/subushcn.csv"))
 #monthly <- read.csv("data/monthly-avgs.csv")
@@ -1323,57 +1325,49 @@ monthly$time <- as.Date(monthly$time)
 <<rawtemp, dependson='readdata', echo=FALSE, echo=FALSE, fig.width=12, fig.height=4.5, out.width='\\textwidth',cache=TRUE>>=
 ggplot()  + geom_jitter(aes(Time, value/100), data=subset(ushcn, Year>1995), size=1) + 
   geom_line(aes(time, avg/100), data=subset(monthly, year(time)>1995), colour="steelblue", size=1.5) + 
-  ylab("Temperature (in Celsius)") + theme_bw() + theme(plot.margin = unit(c(0,6,0,0), "cm"))
+  ylab("Temperature (in Celsius)") + theme_bw() + theme(plot.margin = unit(c(0,6,0,0), "cm")) + xlab("Year")
 # ggsave(file="figure/monthly-temps.pdf", width=12, height=4.5)
 
 suppressWarnings(require(maps))
 states <- map_data("state")
 p <- ggplot() + geom_polygon(aes(long, lat, group=group), fill="grey80", data=states) + theme_bw() + 
   theme(panel.grid.major=element_blank(), panel.background = element_blank(),
-       panel.grid.minor=element_blank(), panel.border = element_blank(),
+       panel.grid.minor=element_blank(), #panel.border = element_blank(),
        axis.title = element_blank(), axis.ticks = element_blank(), 
        axis.text = element_blank(), plot.margin = unit(c(-1,-1,-1,-1), "cm")) +
   geom_point(aes(Long, Lat), colour="black", size=1.25, data=station.sub)
 
-vp1 <- viewport(x = 0.95, y = 0.925, height = unit(2.5, "cm"), width =  unit(4, "cm"), just = c("right","top"))
+vp1 <- viewport(x = 0.955, y = 0.91, height = unit(2.5, "cm"), width =  unit(4, "cm"), just = c("right","top"))
   
 print(p, vp = vp1)
 @
 % \includegraphics[width=\textwidth]{monthly-temps}
 \caption{Raw monthly maximum temperatures (in Celsius) between 1980 and 2012 at 422 stations across the US (as indicated on the map) with similar elevation and latitude. The blue line shows fitted temperatures from a baseline model. The plot suggests that the model fails to capture the more extreme values in summer and winter. \label{fig:raw-temp}}
 \end{figure}
-% \begin{figure}[hbtp]
-% \centering
-% <<rawmap, dependson='readdata', echo=FALSE, echo=FALSE, fig.width=4, fig.height=2.5, out.width='.3\\textwidth',cache=TRUE>>=
-% # ggsave(file="figure/monthly-temps.pdf", width=12, height=4.5)
-% @
-% % \includegraphics[width=\textwidth]{monthly-temps}
-% \caption{Map of stations across the US included.}\label{fig:raw-map}
-% \end{figure}
 
 \begin{figure}[hbtp]\centering
 <<boxtemp, dependson='readdata', echo=FALSE, fig.width=12, fig.height=4.5, out.width='\\textwidth',cache=TRUE>>=
 ggplot()  + geom_boxplot(aes(Time, value/100, group=interaction(Year, Month)), outlier.size=1, fill = "grey65", data=subset(ushcn, Year>1995)) + theme_bw() + 
   #geom_line(aes(time, avg/100), data=subset(monthly, year(time)<1995), colour="steelblue", size=1.5, alpha=.5) + 
-  ylab("Temperature (in Celsius)")+ xlab("Time")
+  ylab("Temperature (in Celsius)")+ xlab("Year")
 # ggsave(file="figure/monthly-temps.pdf", width=12, height=4.5)
 @
 
 \caption{Monthly boxplot of maximum temperatures (in Celsius) between 1980 and 1995 at 422 stations across the US with similar elevation and latitude. The boxplots suggest that there is more variation in the winter months than in the other seasons. Summer, fall and spring appear to have similar temperature variability, and there are more outliers in the summer.}\label{fig:boxplot-temp}\label{fig:box-temp}
 \end{figure}
-\begin{figure}[hbtp]
-\centering
-<<residtemp, dependson='rawtemp', echo=FALSE, echo=FALSE, fig.width=12, fig.height=4.5, out.width='\\textwidth'>>=
-ushcn <- merge(ushcn, monthly[,c("time", "avg")], by.x="Time", by.y="time")
-ushcn$resid <- with(ushcn, value-avg)
-ggplot()  + geom_jitter(aes(Time, resid/100), data=subset(ushcn, Year>1995), size=1, alpha=.5) + 
-  geom_hline(yintercept=0, colour="steelblue", size=1) + 
-  ylab("Residual temperature (in Celsius)") + theme_bw()
-# ggsave(file="figure/monthly-resid-temps.pdf", width=12, height=4.5)
-@
-% \includegraphics[width=\textwidth]{monthly-resid-temps}
-\caption{Residual monthly temperatures (in Celsius) from the baseline model fit.}\label{fig:resid-temp}
-\end{figure}
+% \begin{figure}[hbtp]
+% \centering
+% <<residtemp, dependson='rawtemp', echo=FALSE, echo=FALSE, fig.width=12, fig.height=4.5, out.width='\\textwidth'>>=
+% ushcn <- merge(ushcn, monthly[,c("time", "avg")], by.x="Time", by.y="time")
+% ushcn$resid <- with(ushcn, value-avg)
+% ggplot()  + geom_jitter(aes(Time, resid/100), data=subset(ushcn, Year>1995), size=1, alpha=.5) + 
+%   geom_hline(yintercept=0, colour="steelblue", size=1) + 
+%   ylab("Residual temperature (in Celsius)") + theme_bw()
+% # ggsave(file="figure/monthly-resid-temps.pdf", width=12, height=4.5)
+% @
+% % \includegraphics[width=\textwidth]{monthly-resid-temps}
+% \caption{Residual monthly temperatures (in Celsius) from the baseline model fit.}\label{fig:resid-temp}
+% \end{figure}
 
 \begin{figure}[h!tbp]\centering
 <<residtempboxplot, dependson='residtemp', echo=FALSE, echo=FALSE, fig.width=12, fig.height=4.5, out.width='\\textwidth'>>=
@@ -1384,8 +1378,9 @@ ggplot()  + geom_boxplot(aes(Year+(Month-1)/12, resid/100, group=Year+(Month-1)/
 @
 \caption{Boxplots of the residuals provide more insight into the seasonal variance: Winters show more variation in temperatures, while summers show much less variation in temperatures. Our initial impression from the boxplots of the raw temperature data was only partially correct - while winters certainly  have higher variation, summers show less variation than the fall and spring, albeit with more outliers.}\label{fig:boxplot-resid-temp}
 \end{figure}
-\todo[inline]{Add Citations for USHCN website, data, etc.}
-Figures \ref{fig:raw-temp} and \ref{fig:resid-temp} show temperature data from 422 stations across the US with similar elevation and latitude. The first plot shows raw temperatures, the second residuals from a `baseline' model. The caption for the raw temperature plot suggests that the baseline model is not quite able to capture all of the variability in summer and winter peaks. However, the model used is actually based on averages in each time point. This model is not  susceptible to shrinking values, and it is our perception of the plot rather than the data that makes us see any higher variability in the peaks. After removing the averages in Figure \ref{fig:boxplot-temp} to yield Figure \ref{fig:boxplot-resid-temp} the impression of higher variability in the peaks is only partially confirmed: there is higher variability in the winter, and lower variability in the summer, though there are more outliers in the summer than in the winter.
+Figure \ref{fig:raw-temp}  shows temperature data from 422 stations across the US with similar elevation and latitude. Raw monthly temperatures are overlaid by a fit from a `baseline' model. The deviations from the fit in the extremes of the fit suggest that the baseline model is not quite able to capture all of the variability in summer and winter peaks. However, the model used is actually based on averages in each time point. This model is not susceptible to shrinkage, so the question of higher variability in the peaks becomes the question of how much of this perceived variability is due to perception or real.
+
+After removing the averages in Figure \ref{fig:boxplot-temp} to yield Figure \ref{fig:boxplot-resid-temp} the impression of higher variability in the peaks is only partially confirmed: there is higher variability in the winter, and lower variability in the summer, though there are more outliers in the summer than in the winter.
 
 %\clearpage
 \section{Conclusion}
