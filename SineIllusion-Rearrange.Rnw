@@ -1175,7 +1175,8 @@ dev.off()
 @
 \begin{figure}[h!tbp]\centering
 \includegraphics[keepaspectratio=TRUE, width=.8\linewidth]{figure/fig-wtf}
-\caption{Extant Half-segment Length. The secant  line segments are not symmetrical around the center line, so symmetric correction as employed in Figure \ref{fig:linear-GeneralCorrection} leads to simultaneous over- and under-correcting.}\label{fig:HalfSegLength}
+\caption{Extant Half-segment Length \todo[inline]{Which correction is used?}. The secant  line segments are not symmetrical around the center line, \todo[inline]{describe for the blind.} %so symmetric correction as employed in Figure \ref{fig:linear-GeneralCorrection} leads to simultaneous over- and under-correcting. 
+\todo[inline]{In my pdf the symbol does not show up. We need to make sure that in the final pdf it does.}}\label{fig:HalfSegLength}
 \end{figure}
 
 %\subsection{Mathematical Properties of Transformation}
