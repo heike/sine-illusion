@@ -46,7 +46,8 @@ suppressMessages(library(ggplot2))
 library(plyr)
 suppressMessages(library(gridExtra))
 
-createSine <- function(n=200, len=1, f=f, fprime=fprime, f2prime=f2prime, a=0, b=2*pi) {
+createSine <- function(n=200, len=1, f=f, fprime=fprime, getquadapprox=FALSE, f2prime=getquadapprox, a=0, b=2*pi) {
+#  if(getquadapprox & !is.function(f2prime)) f2prime <- function(x) -1*f(x) # for backwards compatibility
   x <- seq(a, b, length=n+2)[(2:(n+1))]
   ell <- rep(len, length=length(x))
   fx <- f(x)
@@ -69,27 +70,22 @@ createSine <- function(n=200, len=1, f=f, fprime=fprime, f2prime=f2prime, a=0, b
   
   # third adjustment is based on quadratic approximation of f.
   # this needs two parts: correction above and below f(x)  
- 
+#   if(getquadapprox & is.function(f2prime)){
+#     secseg <- do.call("rbind", lapply(dframe$x, function(i) getSecantSegment(i, dframe, f, fprime, f2prime)))
+#     dframe$ellx3.u <- secseg$sec.ell1
+#     dframe$ellx3.l <- secseg$sec.ell2
+#   }
+  
   fp <- a*fprime(x)
   f2p <- a*f2prime(x)
-
-  v = 1 + fprime(x)^2
-  i2 <- 0.5*(v+sqrt(v^2 + ell*f2p*fp^2))/sqrt(v) # small side - on the outside
-  o2 <- abs(0.5*(-v+sqrt(v^2 - ell*f2p*fp^2)/sqrt(v))) # large side on the inside
-  dframe$ellx4.l <- o2
-  dframe$ellx4.u <- i2
-  idx <- which(f2p < 0)
-  dframe$ellx4.l[idx] <- i2[idx]
-  dframe$ellx4.u[idx] <- o2[idx]
-    
-  k <- which(diff(f2p < 0) != 0)
-  yoff <- max(i2+o2)/2  # not sure whether this works in practice - if 
-  # there is a vertical shift that shouldn't be there, this is why
-  dframe$ellx4.l[idx] <- dframe$ellx4.l[idx] - yoff
-  dframe$ellx4.u[idx] <- dframe$ellx4.u[idx] + yoff
+  v <- 1 + fp^2
+  lambdap <- (sqrt(v^2-f2p*fp^2*ell) + v)^-1    
+  lambdam <- -(sqrt(v^2+f2p*fp^2*ell) + v)^-1    
   
-  dframe$ellx4.l[-idx] <- dframe$ellx4.l[-idx] + yoff
-  dframe$ellx4.u[-idx] <- dframe$ellx4.u[-idx] - yoff
+  
+  dframe$ellx4.l <- (4*abs(lambdap)*sqrt(1+fp^2))^-1
+  dframe$ellx4.u <- (4*abs(lambdam)*sqrt(1+fp^2))^-1
+  
   dframe
 }
 
@@ -102,15 +98,16 @@ getSecantSegment <- function(x0, df, f, fprime, f2prime){
   
   fp <- a*fprime(x0)
   f2p <- a*f2prime(x0)
-  lambdam = (fp^2 + 1 + sqrt((fp^2 + 1)^2 + ell*f2p*fp^2))^-1
-  lambdap = (- fp^2 - 1 + sqrt((fp^2 + 1)^2 - ell*f2p*fp^2))^-1
+  v <- fp^2 + 1
+  lambdam = (v + sqrt(v^2 + ell*f2p*fp^2))^-1
+  lambdap = (v + sqrt(v^2 - ell*f2p*fp^2))^-1
 
   #---- Approximation
   
-  x2 <- lambdap*fprime(x0)+x0
-  x1 <- lambdam*fprime(x0)+x0
-  y2 <- f(x0)-lambdap
-  y1 <- f(x0)-lambdam
+  x2 <- lambdap*fp+x0
+  x1 <- lambdam*fp+x0
+  y2 <- a*f(x0)-lambdap
+  y1 <- a*f(x0)-lambdam
   #----
  
   df2 <- data.frame(x=x0, y=f(x0), deriv=fprime(x0),
@@ -138,13 +135,12 @@ getSecantSegment <- function(x0, df, f, fprime, f2prime){
 \begin{document}
 \maketitle
 \begin{abstract}
-The sine illusion, which is part of a set of optical illusions which occur based on a conflict between a stimuli and the real-world situation which can cause similar stimuli, has a notable impact on perception of time-series data with a seasonal component. In this paper, we discuss the reasons for the illusion and various strategies which might be useful to break the illusion or reduce its' strength, demonstrating the presence of the illusion in real-world and theoretical situations. We also present data from user studies which demonstrate the dramatic effect the sine illusion can have on conclusions drawn from displayed data.
+The sine illusion, which is part of a set of optical illusions which occur based on a conflict between a stimuli and the real-world situation which can cause similar stimuli, has a notable impact on perception of time-series data with a seasonal component. In this paper, we discuss the reasons for the illusion and various strategies which might be useful to break the illusion or reduce its strength, demonstrating the presence of the illusion in real-world and theoretical situations. We also present data from user studies which demonstrate the dramatic effect the sine illusion can have on conclusions drawn from displayed data.
 \end{abstract}
 \tableofcontents
 
 \section{Introduction}
-Graphics are powerful tools for summarizing large or complex data. The main premise in our dealings with statistical graphics is that
-graphics have to be true to the data \citep[see e.g.][]{tufte, wainer:2000, robbins:2005}. Generally, we see a lot of discussion on keeping true to the data in the framework of (ab)using three dimensional effects in graphics. \citep{tufte} goes as far as defining a {\it lie-factor} -- the ratio of the size of an effect in the data compared to the size of an effect shown, with the premise that any large deviations from one indicate a misuse of graphical techniques. Computational tools help us ensure technical trueness -- but this brings up the additional question of how we deal with situations that involve innate inability or trigger learned misperceptions. In this paper we want to raise awareness for one of these situations, show that it occurs frequently in our dealings with graphics and provide different attempts at solving or avoiding it.
+Graphics are powerful tools for summarizing large or complex data. The main premise of statistical graphics is that any graphical representation of the data has to be ``true'' to the data \citep[see e.g.][]{tufte, wainer:2000, robbins:2005} i.e. a measurable aspect of a graphical element in the representation has to  reflect  the underlying data. Generally, we see a lot of discussion on keeping true to the data in the framework of (ab)using three dimensional effects in graphics. \citep{tufte} goes as far as defining a {\it lie-factor} -- the ratio of the size of an effect in the data compared to the size of an effect shown, with the premise that any large deviations from one indicate a misuse of graphical techniques. Computational tools help us ensure technical trueness -- but this brings up the additional question of how we deal with situations that involve innate inability or trigger learned misperceptions. In this paper we want to raise awareness for one of these situations, show that it occurs frequently in our dealings with graphics and provide a set of strategies at solving or avoiding it.
 
 
 <<example,echo=FALSE, include=FALSE>>=
@@ -435,7 +431,7 @@ dframe <- rbind.fill(dframe, dframe.1)
 qplot(x=x, y=y, geom="line", data=dframe, colour=I("grey50")) + theme_bw() + 
   geom_line(aes(y=ystartcts), colour="grey50", linetype=4) + 
   geom_line(aes(y=yendcts), colour="grey50", linetype=4) +
-  geom_segment(data=subset(dframe, !is.na(type)), aes(x=xstart, xend = xend, y=ystart, yend=yend, colour=type))  + xlab("") + ylab("") +
+  geom_segment(data=subset(dframe, !is.na(type)), aes(x=xstart, xend = xend, y=ystart, yend=yend, colour=type))  + xlab("") + ylab("")  +
   coord_equal(ratio=1) + scale_colour_manual("", values=c("black", "blue")) + 
 #   geom_text(aes(label=paste(round(vangle/pi*180), "^o", sep=""),
 #                 x=xstart*(x<pi/2 | x>1.5*pi) + xend*(x>pi/2 & x<1.5*pi), y=ystart*(x<pi/2 | x<1.5*pi) + yend*(x>pi/2 & x<1.5*pi)), 
@@ -444,7 +440,7 @@ qplot(x=x, y=y, geom="line", data=dframe, colour=I("grey50")) + theme_bw() +
                 x=pmax(xstart, xend)/2+x/2+.2, y=y-sign(vangle)*.6+.02), 
             data=dframe.1, parse=TRUE, hjust=.9, vjust=.5, size=3) + 
   scale_x_continuous(breaks=seq(0, 2*pi, by=pi/2), 
-                     labels=c("0", expression(paste(pi,"/2")), expression(pi), expression(paste("3",pi, "/2")), expression(paste("2",pi)))) #+ 
+                     labels=c("0", expression(paste(pi,"/2")), expression(pi), expression(paste("3",pi, "/2")), expression(paste("2",pi)))) + xlim(c(0,2*pi)) + ylim(c(-3,3)) #+ 
   # facet_wrap(~type)
   # + ggtitle("Changes in Perceived Orthogonal Width \ndue to Change in Secant Angle")
 @
@@ -1122,7 +1118,7 @@ qplot(x=x, xend=x, y=y+ellx4.u, yend=y-ellx4.l, geom="segment", data=dframe, lin
   scale_x_continuous(breaks=seq(0, 2*pi, by=pi/2), minor_breaks=minor.axis.correction,
                      labels=c("0", expression(paste(pi,"/2")), expression(pi), expression(paste("3",pi, "/2")), expression(paste("2",pi))))
 @
-\caption{Quadratic approximation based on eqns (\ref{eqn.q1}) and (\ref{eqn.q2}). \todo[inline]{we should either get rid of the scale on the y axis or normalize the data afterwards. right now our quadratic approaximation is even changing the mean trend. }}
+\caption{Quadratic approximation based on eqns (\ref{eqn.q1}) and (\ref{eqn.q2}). }
 \end{subfigure}
 \caption[Quadratic Approximation]{
 In the quadratic approximation top and bottom segments of the vertical lines are adjusted separately.
@@ -1297,7 +1293,7 @@ ggplot()  + geom_jitter(aes(Time, value/100), data=subset(ushcn, Year>1995), siz
   ylab("Temperature (in Celsius)") + theme_bw() + theme(plot.margin = unit(c(0,6,0,0), "cm")) + xlab("Year")
 # ggsave(file="figure/monthly-temps.pdf", width=12, height=4.5)
 
-suppressWarnings(require(maps))
+suppressMessages(suppressWarnings(require(maps)))
 states <- map_data("state")
 p <- ggplot() + geom_polygon(aes(long, lat, group=group), fill="grey80", data=states) + theme_bw() + 
   theme(panel.grid.major=element_blank(), panel.background = element_blank(),
@@ -1352,7 +1348,7 @@ After removing the averages in Figure \ref{fig:boxplot-temp} to yield Figure \re
 \item iterative process - we're only doing first step. but then we don't have an explicit functional expression anymore
 \item we're only extending line lengths -- some normalization might help
 \item there's a long tradition in other disciplines of adjusting work for human cognition, e.g. painters correct (what exactly? color shades based on context), architecture: columns of Parthenon are curved to appear straight,  floor and top are curved inwardly to appear straight from a distance.
-
+\item transformations allows us to keep the context, whereas best practice of trend removal does not do that and requires extra cognitive load to process the information.
 \end{itemize}
 \begin{appendix}
 \section{Transformation of the horizontal axis}\label{app.xtrans}
@@ -1412,28 +1408,29 @@ We can write the difference $|f(x_j) - f(x_{j-1})|$ as $\int_{x_{j-1}}^{x_j} |f^
 \section{Reformulation of the quadratic approximation}\label{app.quadratic}
 For a quadratic equation with parameters $a, b, c \in R$ of the form 
 \begin{equation}\label{quadratic.equation}
-ax^2 + bx + c = 0
+a\lambda^2 + b\lambda + c = 0
 \end{equation}
 we know that solutions come in the form of 
 \[
-x_{1/2} = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}  = 2c/\left(-b \pm \sqrt{b^2 - 4ac}\right)
+\lambda_{\pm} = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}  = 2c\left(-b \pm \sqrt{b^2 - 4ac}\right)^{-1}
 \]
 \paragraph{Application to quadratic approximation to $f$:}
 in the example, we have the following equivalencies:
 \begin{eqnarray*}
-a &=& f^"(x_0) f^\prime(x_0)^2 \\
+a &=& f^{\prime\prime}(x_0) f^\prime(x_0)^2 \\
 b &=& 2(1 + f^\prime(x_0)^2) \hspace{.5in} > 0 \text{ for all } x \\
 c &=& \pm \ell 
 \end{eqnarray*}
-Using the above equation, we get solutions for $\lambda$ as
-\[
-\lambda_\pm = 2c\left(-b \pm \sqrt{b^2 - 4ac}\right)^{-1}
-\]
-For a valid solution for the correction factor, we have to assume that $\lambda$ is positive. This means that for $c = - \ell$, we can only make use of $\lambda_{-}$, which for $c = +\ell$, the only valid solution is given as $\lambda_{+}$:
+% Using the above equation, we get solutions for $\lambda$ as
+% \[
+% \lambda_\pm = 2c\left(-b \pm \sqrt{b^2 - 4ac}\right)^{-1}
+% \]
+For a valid solution for the correction factor, we have to assume that $\lambda$ is a factor that extends the original extant width (in absolute value).
+This means that for $c = - \ell$, we can only make use of $\lambda_{-}$, while for $c = +\ell$, the only valid solution is given as $\lambda_{+}$:
 \begin{eqnarray*}
-\lambda_- &=& \ell \left(1 + f^\prime(x_0)^2 + \sqrt{ \left(1 + f^\prime(x_0)^2\right)^2 +  f^{\prime\prime}(x_0) f^\prime(x_0)^2\cdot \ell}\right)^{-1} \\
-\lambda_+ &=& \ell \left(-(1 + f^\prime(x_0)^2) + \sqrt{ \left(1 + f^\prime(x_0)^2\right)^2 -  f^{\prime\prime}(x_0) f^\prime(x_0)^2\cdot \ell}\right)^{-1} \\
+|(\lambda)| &=& \ell \left(v + \sqrt{ v^2 \pm  f^{\prime\prime}(x_0) f^\prime(x_0)^2\cdot \ell}\right)^{-1} 
 \end{eqnarray*}
+for $v = 1 + f^\prime(x_0)$. 
 This gives the results as shown in equations (\ref{eqn.q1}) and (\ref{eqn.q2})
 \end{appendix}
 \clearpage
