@@ -1,3 +1,35 @@
+#' Function to data frame
+#'  
+#' @param n number of values 
+#' @param ell extent of vertical range
+#' @param x range of horizontal values
+#' @return data frame with n function values and derivatives along the x axis for a range given by x
+#' @example
+#' f <- sin
+#' fp <- cos
+#' f2p <- function(x) -sin(x)
+#' dframe <- function.frame(n=50, ell=1, x=c(0,2*pi), f, fp, f2p)
+#' require(ggplot2)
+#' qplot(x, y=ystart, yend=yend, xend=x, geom="segment", data=dframe) +
+#'    geom_point(aes(x,y))
+function.frame <- function(n=200, ell=1, x, f, fprime, f2prime) {
+  x <- seq(x[1], x[2], length=n)
+  if (length(ell) != length(x)) ell <- rep(ell, length(x))
+  y <- f(x)
+  ystart <- y - ell/2
+  yend <- y + ell/2
+  # now correct for line illusion in vertical direction
+  dy <- diff(range(y))
+  dyl <- diff(range(c(ystart, yend)))
+  # fprime works in framework of dx and dy, but we represent it in framework of dy and dy+len
+  # needs to be fixed by factor a:  
+  a <- dy/dyl 
+  
+  fp <- a*fprime(x)
+  f2p <- a*f2prime(x)
+  data.frame(x,y,ystart, yend, fp, f2p, a)
+}
+
 #' This function has to be split in parts and renamed
 #' 
 #' Right now this function is a convoluted mess.  We need to have separate
@@ -5,7 +37,7 @@
 #' (2) a trig transform function
 #' (3) a quadratic approach function - better even, make (2) and (3) one function and use a parameter to decide on the method to use.
 
-createSine <- function(n=200, len=1, f=f, fprime=fprime, getquadapprox=FALSE, f2prime=getquadapprox, a=0, b=2*pi) {
+createSine <- function(n=200, len=1, f=f, fprime=fprime, f2prime=f2prime, a=0, b=2*pi) {
   #  if(getquadapprox & !is.function(f2prime)) f2prime <- function(x) -1*f(x) # for backwards compatibility
   x <- seq(a, b, length=n+2)[(2:(n+1))]
   ell <- rep(len, length=length(x))
@@ -18,7 +50,9 @@ createSine <- function(n=200, len=1, f=f, fprime=fprime, getquadapprox=FALSE, f2
   dx <- diff(range(x))
   # fprime works in framework of dx and dy, but we represent it in framework of dx and dy+len
   # needs to be fixed by factor a:  
-  a <- dy/(dy + len) 
+#  a <- dy/(dy + len) 
+  dyl <- diff(range(c(ystart, yend)))
+  a <- dy/(dyl) 
   # ellx is based on the "trig" correction
   ellx <- ell / cos(atan(abs(a*fprime(x))))
   # ellx2 is based on linear approximation of f  
@@ -43,7 +77,11 @@ createSine <- function(n=200, len=1, f=f, fprime=fprime, getquadapprox=FALSE, f2
   
   
   dframe$ellx4.l <- abs(lambdapinv)*(4*sqrt(v))^-1
-  dframe$ellx4.u <- abs(lambdam)*(4*sqrt(v))^-1
+  dframe$ellx4.u <- abs(lambdaminv)*(4*sqrt(v))^-1
+  dframe$lambdam <- 1/lambdaminv
+  dframe$lambdap <- 1/lambdapinv
+  dframe$fp <- fp
+  dframe$f2p <- f2p
   
   dframe
 }
