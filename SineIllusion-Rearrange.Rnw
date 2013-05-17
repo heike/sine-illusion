@@ -106,8 +106,8 @@ getSecantSegment <- function(x0, df, f, fprime, f2prime){
   
   x2 <- lambdap*fp+x0
   x1 <- lambdam*fp+x0
-  y2 <- a*f(x0)-lambdap
-  y1 <- a*f(x0)-lambdam
+  y2 <- f(x0)-lambdap
+  y1 <- f(x0)-lambdam
   #----
  
   df2 <- data.frame(x=x0, y=f(x0), deriv=fprime(x0),
@@ -115,10 +115,10 @@ getSecantSegment <- function(x0, df, f, fprime, f2prime){
                     sec.ystart=y1, sec.yend = y2,
                     ell = 2*ell)
 
-  df2$sec.ellp <- (4*abs(lambdap)*sqrt(1+fp^2))^-1
-  df2$sec.ellm <- (4*abs(lambdam)*sqrt(1+fp^2))^-1
-#   df2$sec.ellp <- with(df2, sqrt((sec.yend-y)^2+(sec.xend-x)^2))
-#   df2$sec.ellm <- with(df2, sqrt((y-sec.ystart)^2+(x-sec.xstart)^2))
+#  df2$sec.ellp <- (4*abs(lambdap)*sqrt(1+fp^2))^-1
+#  df2$sec.ellm <- (4*abs(lambdam)*sqrt(1+fp^2))^-1
+   df2$sec.ellp <- with(df2, sqrt((sec.yend-y)^2+(sec.xend-x)^2))
+   df2$sec.ellm <- with(df2, sqrt((y-sec.ystart)^2+(x-sec.xstart)^2))
   df2$type <- "Perceived Width"
   df2$a <- a
   return(df2)
@@ -140,7 +140,7 @@ The sine illusion, which is part of a set of optical illusions which occur based
 \tableofcontents
 
 \section{Introduction}
-Graphics are powerful tools for summarizing large or complex data. The main premise of statistical graphics is that any graphical representation of the data has to be ``true'' to the data \citep[see e.g.][]{tufte, wainer:2000, robbins:2005} i.e. a measurable aspect of a graphical element in the representation has to  reflect  the underlying data. Generally, we see a lot of discussion on keeping true to the data in the framework of (ab)using three dimensional effects in graphics. \citep{tufte} goes as far as defining a {\it lie-factor} -- the ratio of the size of an effect in the data compared to the size of an effect shown, with the premise that any large deviations from one indicate a misuse of graphical techniques. Computational tools help us ensure technical trueness -- but this brings up the additional question of how we deal with situations that involve innate inability or trigger learned misperceptions. In this paper we want to raise awareness for one of these situations, show that it occurs frequently in our dealings with graphics and provide a set of strategies at solving or avoiding it.
+Graphics are powerful tools for summarizing large or complex data. The main premise of statistical graphics is that any graphical representation of the data has to be ``true'' to the data \citep[see e.g.][]{tufte, wainer:2000, robbins:2005} i.e. a measurable aspect of a graphical element in the representation has to  reflect  the underlying data. Generally, we see a lot of discussion on keeping true to the data in the framework of (ab)using three dimensional effects in graphics. \citep{tufte} goes as far as defining a {\it lie-factor} of a chart as the ratio of the size of an effect in the data compared to the size of an effect shown, with the premise that any large deviations from one indicate a misuse of graphical techniques. Computational tools help us ensure technical trueness -- but this brings up the additional question of how we deal with situations that involve innate inability or trigger learned misperceptions. In this paper we want to raise awareness for one of these situations, show that it occurs frequently in our dealings with graphics and provide a set of strategies at solving or avoiding it.
 
 
 <<example,echo=FALSE, include=FALSE>>=
@@ -431,22 +431,21 @@ dframe <- rbind.fill(dframe, dframe.1)
 qplot(x=x, y=y, geom="line", data=dframe, colour=I("grey50")) + theme_bw() + 
   geom_line(aes(y=ystartcts), colour="grey50", linetype=4) + 
   geom_line(aes(y=yendcts), colour="grey50", linetype=4) +
-  geom_segment(data=subset(dframe, !is.na(type)), aes(x=xstart, xend = xend, y=ystart, yend=yend, colour=type))  + xlab("") + ylab("")  +
+  geom_segment(data=subset(dframe, !is.na(type)), 
+               aes(x=xstart, xend = xend, y=ystart, yend=yend, colour=type))  + 
+  xlab("") + ylab("")  +
   coord_equal(ratio=1) + scale_colour_manual("", values=c("black", "blue")) + 
-#   geom_text(aes(label=paste(round(vangle/pi*180), "^o", sep=""),
-#                 x=xstart*(x<pi/2 | x>1.5*pi) + xend*(x>pi/2 & x<1.5*pi), y=ystart*(x<pi/2 | x<1.5*pi) + yend*(x>pi/2 & x<1.5*pi)), 
-#             data=dframe.1, parse=TRUE, hjust=1, vjust=.5, size=2.5) + 
   geom_text(aes(label=paste("theta", "%~~%", round(abs(vangle)/pi*180), "^o", sep=""),
-                x=pmax(xstart, xend)/2+x/2+.2, y=y-sign(vangle)*.6+.02), 
+                x=pmax(xstart, xend)/2+x/2+.45 - sign(vangle)*0.1, y=y-sign(vangle)*.6+.02), 
             data=dframe.1, parse=TRUE, hjust=.9, vjust=.5, size=3) + 
   scale_x_continuous(breaks=seq(0, 2*pi, by=pi/2), 
-                     labels=c("0", expression(paste(pi,"/2")), expression(pi), expression(paste("3",pi, "/2")), expression(paste("2",pi)))) + xlim(c(0,2*pi)) + ylim(c(-3,3)) #+ 
-  # facet_wrap(~type)
-  # + ggtitle("Changes in Perceived Orthogonal Width \ndue to Change in Secant Angle")
+                     labels=c("0", expression(paste(pi,"/2")), expression(pi), 
+                              expression(paste("3",pi, "/2")), expression(paste("2",pi)))) 
+#ggsave("images/illusion-transformation.pdf", width=6, height=4)
 @
 \begin{figure}[h!tbp]
 \centering
-\includegraphics[width=.65\linewidth, keepaspectratio=TRUE]{figure/fig-transform-illustration}
+\includegraphics[width=.75\linewidth, keepaspectratio=TRUE]{images/illusion-transformation}
 \caption{\label{fig:OrthogonalWidth} The sine illusion with secant lines (lines orthogonal to the tangent line at $f(x)$). The perception that the vertical length changes with $f(x)$ corresponds to changes in actual orthogonal width due to the change in secant angle. 
 }
 \end{figure}
@@ -476,7 +475,8 @@ qplot(data=ribbon, x=x, ymin=ybottom, ymax=ytop, geom="ribbon", fill=I("grey")) 
 The visual preference for judging the length of the line by the orthogonal extant suggests that the underlying illusion may be a function of geometry rather than some mysterious visual or neural process that occurs automatically between perception of the stimulus and conscious thought. If this is the case, then it may be  possible to correct the graphical display for so that it is not as visually deceptive. 
 From a statistical standpoint, when we judge the variability of data, we must overcome the visual bias due to the sine illusion. As it turns out, this illusion is incredibly difficult to overcome even when we are aware of its presence: our brains simply cannot ``un-see" the illusion. A geometrical correction that would at least temporarily remove the illusion would be a valuable tool in visual analysis.
 
-What follows is a compilation of various methods to correct for or mitigate the effect of the illusion, intended primarily to demonstrate how pervasive the illusion is and the extreme methods necessary to remove its' effect. 
+What follows is a compilation of various methods to correct for or mitigate the effect of the illusion, intended primarily to demonstrate how pervasive the illusion is and the extreme methods necessary to remove its effect. 
+% do not change this to its'
 
 \section{Breaking the Illusion}
 The illusion is caused by a conflict between the vertical length and the orthogonal width, which is itself a function of the slope. As such, we can resolve the illusion by making the orthogonal width constant. We consider several approaches to forcing the orthogonal width to be constant:  (1) separating the trend and the variability, (2) forcing the slope to be constant (by reparameterizing the $x$ axis), or (3) making the lines appear to be of the same height by adjusting their lengths to maintain a constant orthogonal width. Each of these approaches is discussed in the following section.
