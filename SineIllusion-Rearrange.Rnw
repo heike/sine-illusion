@@ -1065,33 +1065,46 @@ fprime <- function(x) 2*cos(x)
 f2prime <- function(x) -2*sin(x)
 
 suppressMessages(library(ggplot2))
-dframe <- createSine(n = 40, len = 1, f=f, fprime=fprime, f2prime=f2prime)
-dframe$type <- "Data"
-dframe.real <- createSine(n = 4000, len = 1, f=f, fprime=fprime, f2prime=f2prime)
-secantlines <- getSecantSegment(dframe.real$x, dframe, f, fprime, f2prime)
-# secantlines2 <- getAdjLength(secantlines)
-
-dframe2 <- secantlines
-names(dframe2) <- c("x", "y", "deriv", "xstart", "xend", "ystart", "yend", "ell", "ellp", "ellm", "type", "a")
-
-library(plyr)
-dframe2 <- rbind.fill(dframe, dframe2)
-names(secantlines)[9:10] <- c("Bottom.Segment", "Top.Segment")
-
+dframe <- createSine(n = 400, len = 1, f=f, fprime=fprime, f2prime=f2prime)
 library(reshape2)
-secantlines.long <- melt(secantlines, measure.vars=c("Bottom.Segment", "Top.Segment"),  variable.name="Line", value.name="len")
-names(secantlines.long)[11:12] <- c("Line", "len")
-secantlines.long <- subset(secantlines.long, abs(x-pi)<pi)
-cairo_pdf("figure/fig-wtf.pdf", width=8, height=4)
-ggplot(aes(x=x, y=len, linetype=Line), data=secantlines.long) + geom_line()+
+dfm <- melt(dframe, id.var="x", measure.vars=c("ellx4.l", "ellx4.u"))
+levels(dfm$variable) <- c("Bottom Segment", "Top Segment")
+ggplot(aes(x=x, y=value, group=variable, linetype=variable), data=dfm) + geom_line() + 
   scale_x_continuous(breaks=seq(0, 2*pi, by=pi/2), 
                      labels=c("0", expression(paste(pi,"/2")), 
                               expression(pi), 
                               expression(paste("3",pi, "/2")), 
                               expression(paste("2",pi)))) + 
-  ylab(expression(frac('\u2113', 2))) +
-  theme_bw() + theme(legend.position="bottom", axis.title.y=element_text(angle=0)) + scale_linetype_discrete("Adjusted \u2113/2")
-dev.off()
+  ylab(expression(frac('\u2113', 2))) + xlab("") + 
+  theme_bw() + theme(legend.position="bottom", axis.title.y=element_text(angle=0)) +
+  scale_linetype_discrete(expression('Adjusted ' * frac('\u2113', 2)*'  '))
+
+# dframe$type <- "Data"
+# dframe.real <- createSine(n = 4000, len = 1, f=f, fprime=fprime, f2prime=f2prime)
+# secantlines <- getSecantSegment(dframe.real$x, dframe, f, fprime, f2prime)
+# # secantlines2 <- getAdjLength(secantlines)
+# 
+# dframe2 <- secantlines
+# names(dframe2) <- c("x", "y", "deriv", "xstart", "xend", "ystart", "yend", "ell", "ellp", "ellm", "type", "a")
+# 
+# library(plyr)
+# dframe2 <- rbind.fill(dframe, dframe2)
+# names(secantlines)[9:10] <- c("Bottom.Segment", "Top.Segment")
+# 
+# library(reshape2)
+# secantlines.long <- melt(secantlines, measure.vars=c("Bottom.Segment", "Top.Segment"),  variable.name="Line", value.name="len")
+# names(secantlines.long)[11:12] <- c("Line", "len")
+# secantlines.long <- subset(secantlines.long, abs(x-pi)<pi)
+# cairo_pdf("figure/fig-wtf.pdf", width=8, height=4)
+# ggplot(aes(x=x, y=len, linetype=Line), data=secantlines.long) + geom_line()+
+#   scale_x_continuous(breaks=seq(0, 2*pi, by=pi/2), 
+#                      labels=c("0", expression(paste(pi,"/2")), 
+#                               expression(pi), 
+#                               expression(paste("3",pi, "/2")), 
+#                               expression(paste("2",pi)))) + 
+#   ylab(expression(frac('\u2113', 2))) +
+#   theme_bw() + theme(legend.position="bottom", axis.title.y=element_text(angle=0)) + scale_linetype_discrete("Adjusted \u2113/2")
+# dev.off()
 @
 \begin{figure}[h!tbp]\centering
 \includegraphics[keepaspectratio=TRUE, width=.8\linewidth]{figure/fig-wtf}
