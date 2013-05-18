@@ -222,7 +222,9 @@ qplot(x,y, geom="jitter", alpha=I(alph))+
 Sections \ref{perceptualexplanations} and \ref{statisticalgraphics} explore the perceptual and statistical literature examining this illusion.
 %\FloatBarrier
 \subsection{Statistical Graphics and the Sine Illusion}\label{statisticalgraphics}
-The sine illusion demonstrated in Figures \ref{fig:exampleFull1} and \ref{fig:original} has been frequently noted in statistical graphics, though usually not as an optical illusion. Rather, the problem is typically identified as the difficulty of visually subtracting two curves, and the resulting erroneous conclusions when this process goes awry. Figure \ref{fig:playfair-debt} shows one of the possibly oldest example of this common phenomenon \citep{playfair, playfair2}: the graph shows the imports to and exports from the East Indies to England between 1700 and 1780; the vertical distance between the two lines is much less visually salient than the orthogonal width of the line, that is, the width of the line segment which is perpendicular to the tangent line at a given point.
+The sine illusion demonstrated in Figures \ref{fig:exampleFull1} and \ref{fig:original} has been frequently noted in statistical graphics, though usually not as an optical illusion. Rather, the problem is typically identified as the difficulty of visually subtracting two curves, and the resulting erroneous conclusions when this process goes awry. Figure \ref{fig:playfair-debt} shows the possibly oldest example of this common phenomenon \citep{playfair, playfair2}: the graph shows time lines for imports  and exports between the East Indies and England in the 18th century. The shaded area on the chart is named `` balance against England", suggesting that the difference between the lines is of main importance. The 
+ vertical distance between the two lines is much less visually salient than the orthogonal width of the line, leading to an underestimation of the difference in trades around 1763, which is of similar magnitude as around 1770, but appears much smaller than that.  
+% that is, the width of the line segment which is perpendicular to the tangent line at a given point.
 
 \begin{figure}[h!tbp]
 \centering
@@ -231,7 +233,7 @@ The sine illusion demonstrated in Figures \ref{fig:exampleFull1} and \ref{fig:or
 \label{fig:playfair-debt}
 \end{figure}
 
-Another example of this phenomenon is shown in Figure \ref{fig:robbins-graph} \citep{robbins:2005}, which contains the lines $e^x$ and $e^x+1$. The lines appear to be separated by a much smaller distance at $x=2.5$ than at $x=0$, even though mathematically it is obvious that the distance between them is constant. The line width illusion seems to be related to increasing slope - as the slope increases, the apparent distance between the two lines decreases, even though the lines represent a constant vertical shift.
+Another example of the illusion is shown in Figure \ref{fig:robbins-graph} \citep{robbins:2005}, which contains two  exponential curves shifted vertically by a constant, i.e. $f_1(x) = e^x$ and $f_2(x) = e^x + 1$.  The lines appear to be separated by a much smaller distance at $x=2.5$ than at $x=0$, even though mathematically it is obvious that the distance between them is constant. The line width illusion is triggered by the change in slope -- as the slope increases, the apparent distance between the two lines decreases. %, even though the lines represent a constant vertical shift.
 <<effectivegraphsfig,echo=FALSE, include=FALSE>>=
 x <- seq(0, 2.5, .01)
 y1 <- exp(x)
@@ -242,14 +244,19 @@ qplot(data=df, x=x, y=y, geom="line") + geom_line(aes(y=y2)) + theme_bw()
 \begin{SCfigure}
 \centering
 \includegraphics[width=.45\linewidth]{figure/fig-effectivegraphsfig}
-\caption{A replication of Figure 2.16 in \cite{robbins:2005}. Due to the line width illusion the graphs of $y=e^x$ and $y=e^x+1$ appear to converge as $x$ increases.\label{fig:robbins-graph}}
+\caption{Graphs of two vertically shifted exponential curves, $y=e^x$ and $y=e^x+1$. Due to the line width illusion the graphs appear to converge as $x$ increases. (This chart is a replication of Figure 2.16 in \cite{robbins:2005})\label{fig:robbins-graph}}
 \end{SCfigure}
 
 %\FloatBarrier
 \subsection{Perceptual Explanations for the Sine Illusion}\label{perceptualexplanations}
 While not thoroughly examined in the sensation and perception literature, the sine illusion has been classified as part of a group of geometrical optical misperceptions  related to the M\"uller-Lyer illusion \citep{day:1991} or the Poggendorf illusion \citep{poggendorf}, which puts the illusion into the framework of context-based illusions.
 \cite{day:1991} suggest that
-the sine illusion occurs due to misapplication of perceptual experience with the three-dimensional world to a two-dimensional ``artificial" display of data. Figure \ref{fig:ribbon-illusion} shows one possible three-dimensional context for the classical sine illusion; two ribbons are shown at varying perspective strengths. The first appears more natural, but the second still appears three-dimensional and is much closer to the sine illusion stimuli with added shading. 
+the sine illusion occurs due to misapplication of perceptual experience with the three-dimensional world to a two-dimensional ``artificial" display of data. Figure \ref{fig:ribbon-illusion} shows a possible three-dimensional context for the classical sine illusion; two ribbons are shown at varying perspective strengths. \todo[inline]{OK, we need to slow down here, but I'm not sure how to say it. That's why I'm asking all these questions.}
+\todo[inline]{How do the perspective plots relate to the illusion - in words. I can see it, but we need to describe it in the text as well. }
+\todo[inline]{Does the 3d perspective resolve the illusion?}
+
+\todo[inline]{What is the difference between the first and the second perspective plot?}
+The first appears more natural \todo[inline]{What do you mean by more 'natural'?}, but the second still appears three-dimensional \todo[inline]{Why?} and is much closer to the sine illusion stimuli \todo[inline]{Why is it closer?}  with added shading. 
 
 \begin{figure}[h!tbp]\centering
 <<ribbon-illusion,echo=FALSE, include=FALSE, fig.width=5, fig.height=5>>=
