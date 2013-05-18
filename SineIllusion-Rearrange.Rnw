@@ -1330,14 +1330,15 @@ c_i = \sum_{j=0}^{i-1} |f(x_j) - f(x_{j-1})| \text{ and } d_i = \sum_{j=0}^{i} |
 \]
 We can write the difference $|f(x_j) - f(x_{j-1})|$ as $\int_{x_{j-1}}^{x_j} |f^\prime(z)|dz$. This shows equation (\ref{eqn.xtrans}).
 \section{Reformulation of the quadratic approximation}\label{app.quadratic}
-For a quadratic equation with parameters $a, b, c \in R$ of the form 
+A quadratic equation in $\lambda$ of the form 
 \begin{equation}\label{quadratic.equation}
-a\lambda^2 + b\lambda + c = 0
+a\lambda^2 + b\lambda + c = 0,
 \end{equation}
-we know that solutions come in the form of 
+where $a, b,$ and $c$ are real-valued parameters the solutions take on the form
 \[
-\lambda_{\pm} = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}  = 2c\left(-b \pm \sqrt{b^2 - 4ac}\right)^{-1}
+\lambda_{\pm} = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}  \stackrel{*}{=} 2c\left(-b \pm \sqrt{b^2 - 4ac}\right)^{-1}.
 \]
+$^*$ if $b \neq \pm \sqrt{b^2 - 4ac}$, i.e. $a, c \neq 0$.
 \paragraph{Application to quadratic approximation to $f$:}
 in the example, we have the following equivalencies:
 \begin{eqnarray*}
@@ -1352,7 +1353,7 @@ c &=& \pm \ell
 For a valid solution for the correction factor, we have to assume that $\lambda$ is a factor that extends the original extant width (in absolute value).
 This means that for $c = - \ell$, we can only make use of $\lambda_{-}$, while for $c = +\ell$, the only valid solution is given as $\lambda_{+}$:
 \begin{eqnarray*}
-|(\lambda)| &=& \ell \left(v + \sqrt{ v^2 \pm  f^{\prime\prime}(x_0) f^\prime(x_0)^2\cdot \ell}\right)^{-1} 
+|\lambda| &=& \ell \left(v + \sqrt{ v^2 \pm  f^{\prime\prime}(x_0) f^\prime(x_0)^2\cdot \ell}\right)^{-1} 
 \end{eqnarray*}
 for $v = 1 + f^\prime(x_0)$. 
 This gives the results as shown in equations (\ref{eqn.q1}) and (\ref{eqn.q2})
