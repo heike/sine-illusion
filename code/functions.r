@@ -97,8 +97,8 @@ createSine <- function(n=200, len=1, f=f, fprime=fprime, f2prime=f2prime, a=0, b
   
   dframe$ellx4.l <- 0.5*abs(lambdapinv)/sqrt(v)
   dframe$ellx4.u <- 0.5*abs(lambdaminv)/sqrt(v)
-  dframe$lambdam <- 1/lambdaminv
-  dframe$lambdap <- 1/lambdapinv
+#  dframe$lambdam <- 1/lambdaminv
+#  dframe$lambdap <- 1/lambdapinv
   fp <- fprime(x)
   f2p <- f2prime(x)
   v <- 1 + fp^2
@@ -110,8 +110,7 @@ createSine <- function(n=200, len=1, f=f, fprime=fprime, f2prime=f2prime, a=0, b
 
   dframe$lambdam <- lambdaa
   dframe$lambdap <- lambdab
-  
-  # 
+   
   # qplot(a*(sqrt(1 + a^2*fprime(x)^2)*abs(lambdab))^-1, ellx4.u, data=dframe)
   # qplot(a*(sqrt(1 + a^2*fprime(x)^2)*abs(lambdaa))^-1, ellx4.l, data=dframe)
   # ggplot(aes(x, y+ell*(a*sqrt(v)*abs(lambdaa))^-1, xend=x, yend=y-ell*(a*sqrt(v)*abs(lambdab))^-1), data=dframe) + geom_segment()  

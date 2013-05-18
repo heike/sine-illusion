@@ -75,18 +75,11 @@ qplot(data=datasub, x=jitter(Tmax), y=Ozone, geom="point", colour=I("grey30"), a
 qplot(data=datasub, x=jitter(Tmax), y=resid, geom="point", colour=I("grey20"), alpha=I(.5), xlab="Temperature (F)", ylab="Residual Ozone Concentration (ppm)") + geom_line(aes(x=Tmax, y=0*resid), size=1.25, colour="steelblue") + theme_bw()
 @
 
-
-Figure \ref{fig:example1} shows daily measurements of 8-hour average ozone concentration and temperature at several sites in Houston, for days in 2011 with temperatures above $45^\circ$F  and dew points of less than $60^\circ$F. %(as ozone concentration is related to temperature and humidity)
-A loess smooth line is added for reference. 
-Ozone concentrations were gathered from \Sexpr{nsite} locations in the Houston area \citep{epa}, and weather data is aggregated from the NCDC \citep{noaa} site at Hobby International Airport, which is located near the center of Houston. 
-Figure~\ref{fig:example2} shows a residual plot of the same data, created by subtracting the loess fit line from the observed data, leaving only the variability behind. 
-%\done{I like this example! But we still need to suggest that the trumpet shape in the residuals comes as a surprise to lots of people.}
-
 \begin{figure}[h!tbp]\centering
 \begin{subfigure}[b]{.45\linewidth}
   \centering
   \includegraphics[width=\textwidth]{figure/fig-example1}
-  \caption{\small All data}
+  \caption{\small All data \todo[inline]{that's an unfortunate caption. 'All data' suggests that  sometimes you do not show all data.}}
   \label{fig:example1}
 \end{subfigure}
 \begin{subfigure}[b]{.45\linewidth}
@@ -95,13 +88,31 @@ Figure~\ref{fig:example2} shows a residual plot of the same data, created by sub
   \caption{\small Residuals}
   \label{fig:example2}
 \end{subfigure}
-\caption{\label{fig:exampleFull1} Ozone and Temperature in Houston, 2011. Loess fit is shown in (a); (b) shows the residuals from the line fit. What seems to be the trend in overall variance? Is the variance trend in (a) consistent with the residual plot in (b)?}
+\caption{\label{fig:exampleFull1} Scatterplots of Ozone and Temperature in Houston, 2011. A loess fit is overlaid in (a); (b) shows residuals from the loess fit along the vertical axis. The increase in variability over the temperature range is more pronounced in the de-trended plot on the right.}
 \end{figure}
 
-The increasing variance with temperature is camouflaged in the Figure \ref{fig:example1} due to the changes in slope, but is very obvious in the residual plot in Figure \ref{fig:example2}. The sine illusion is responsible for the appearance of constant variance in Figure \ref{fig:example1}, but once the trend has been removed, and thus the corresponding changes in slope are no longer a factor, the increasing variance is visible.
+As a first example let us consider the relationship between ozone concentration and temperature. Ozone concentrations were measured from \Sexpr{nsite} locations in the Houston area \citep{epa}, and temperature data is provided by the NCDC \citep{noaa} site at Hobby International Airport, located near the center of Houston. 
 
-The sine illusion (also known in graphical literature as the line width illusion) is a frequent occurrence in statistical analysis, and graphical displays should be thoughtfully considered to minimize its effect visually and acknowledge its influence. Figure \ref{fig:original} shows the classical sine illusion. The parameters that influence the sine illusion are the amplitude of the function and the line length. 
-With an increase in the length of lines,  the apparent difference in the length decreases. Any modification that increases the apparent slope of the curves, such as an increase in the amplitude or a change towards a more extreme aspect ratio makes the apparent difference in line lengths more pronounced. 
+Figure~\ref{fig:example1} shows daily measurements of 8-hour average ozone concentration and temperature at several sites in Houston, for days in 2011 with temperatures above $45^\circ$F  and dew points of less than $60^\circ$F. %(as ozone concentration is related to temperature and humidity)
+A loess smooth line is added for reference. Does the variability of ozone concentrations stay the same across the range of temperature? We might agree that there is an increase in variability of ozoone concentrations for temperatures above $80^\circ$F, but not reject a  homogeneity assumption elsewhere. 
+
+% Is the variance trend in (a) consistent with the residual plot in (b)?
+% 
+% Figure~\ref{fig:example2} shows a residual plot of the same data, created by subtracting the loess fit line from the observed data, leaving only the variability behind. 
+%\done{I like this example! But we still need to suggest that the trumpet shape in the residuals comes as a surprise to lots of people.}
+
+
+This evaluation changes, when considering Figure~\ref{fig:example2}: the scatterplot shows the  data, detrended based on the loess fit. 
+The steady increase in variance over the temperature range is much more pronounced than in the  plot on the left.
+
+The change in slope of the trend is causing this phenomenon, which is  known as {\it sine illusion} in the literature on cognition and human perception  or {\it line width illusion} in the statistical graphics literature. 
+
+% in the Figure \ref{fig:example1} due to the changes in slope, but is very obvious in the residual plot in Figure \ref{fig:example2}. The sine illusion is responsible for the appearance of constant variance in Figure \ref{fig:example1}, but once the trend has been removed, and thus the corresponding changes in slope are no longer a factor, the increase variance becomes more visible.
+
+The illusion is a frequent occurrence in statistical graphics, and  displays should be thoughtfully considered to minimize its effect visually and acknowledge its influence. 
+In the cognitive literature, \cite{day:1991} first documented the illusion in the context of vertical lines along a sinusoidal curve. Figure \ref{fig:original} shows a sketch of this: line segments are centered evenly spaced along the curve. Line segments are of equal length but appear longer in the peaks and troughs due to the illusion. 
+The parameters that influence the strength of the illusion are the amplitude of the curve and the length of the line segments.
+As the length of the line segments increases,  the apparent difference in the length of the line segments decreases. Any modification that increases the change in slope under which the curve appears, such as an increase in the amplitude of the curve or a more extreme aspect ratio, reinforces the apparent difference in line lengths. 
 
 
 <<functions, echo=FALSE, eval=TRUE>>=
@@ -146,11 +157,13 @@ dev.off()
 \centering
 \includegraphics[keepaspectratio=true, width=.5\linewidth]{figure/fig-original}
 % \includegraphics[keepaspectratio=true, width=\linewidth]{fig-original-redo.pdf}
-\caption{The original Sine Illusion consists of evenly spaced vertical lines centered around the graph of $y=\sin(x)$. The lines in the peak and trough of the curve appear to be longer than in the other regions.}\label{fig:original}
+\caption{The original Sine Illusion was demonstrated on evenly spaced vertical lines centered around a sinusoidal curve of $f(x) = \sin(x)$. The lines in the peak and trough of the curve appear to be longer than in the other regions.\label{fig:original}}
 %The right graph illustrates the parameters determining the appearance of the illusion: $s$ denotes the amplitude of the function, $\ell$ the length of the line segments.
 \end{figure}
 %The first documentation we could find of this illusion,
-In the cognitive literature, \cite{day:1991} first documented the illusion in the context of sinusoidal vertical lines. More recently the illusion has been documented on non-sinusoidal curves \citep{schonlau:2003, marie}, but the underlying effect seems to be the same,  that is, the illusion does not rely on the periodic nature of the underlying trendline but only on its slope and  changes to it. Figure \ref{fig:twoillusions-simulation} shows an example of the sine illusion with an underlying periodic function, with both a nonlinear trend and a periodic component, and additionally with only a nonlinear trend. All three graphs seem to show nonconstant variance; in reality, the variance is constant in all of them. Clearly, the illusion does not rely on the periodicity of the function for which it was named,, instead the ``line width illusion" and the ``sine illusion" are symptoms of the same phenomenon, even though the cognitive literature and the graphics literature refer to the illusion differently. 
+More recently the illusion has been shown in non-sinusoidal curves \citep{cleveland:1984, schonlau:2003, robbins:2005, marie}, but the underlying effect seems to be the same, in the sense the illusion is not triggered by the periodic nature of the underlying trendline but only by  changes to its slope. Figure \ref{fig:twoillusions-simulation} shows three panels, which all exhibit the illusion. From left to right, the trend comes from (a) a periodic function, (b) a periodic component added to an exponential function, and (c) an exponential function on its own.
+While all three graphs seem to show nonconstant variance along the main trend; in reality, the variance is constant in all of them. Clearly, the illusion does not rely on the periodicity of the function for which it was named, but is a symptom of the change in curvature that comes with it.
+%, instead the ``line width illusion" and the ``sine illusion" are symptoms of the same phenomenon, even though the cognitive literature and the graphics literature refer to the illusion differently. 
 
 
 <<simulation1Sine, echo=FALSE, fig.width=4, fig.height=4, include=FALSE>>=
@@ -1025,7 +1038,7 @@ f^{\prime\prime}(x_0)  f^\prime(x_0)^2 \lambda^2  + 2(f^\prime(x_0)^2 + 1) \lamb
 which leads us to corrections for the half lengths as (see appendix \ref{app.quadratic} for details):
 \begin{eqnarray}\label{eqn.q1}
 \ell_{\text{new}_1} &=& 1 /2 \cdot  \left(v + \sqrt{ v^2 +  f^{\prime\prime}(x_0) f^\prime(x_0)^2\cdot  \ell_{\text{old}}}\right) \cdot v^{-1/2} \\\label{eqn.q2}
-\ell_{\text{new}_2} &=& 1 /2 \cdot  \left(-v + \sqrt{ v^2 -  f^{\prime\prime}(x_0) f^\prime(x_0)^2\cdot  \ell_{\text{old}}}\right) \cdot v^{-1/2} 
+\ell_{\text{new}_2} &=& 1 /2 \cdot  \left(v + \sqrt{ v^2 -  f^{\prime\prime}(x_0) f^\prime(x_0)^2\cdot  \ell_{\text{old}}}\right) \cdot v^{-1/2} 
 \end{eqnarray}
 where $v = 1 + f^\prime(x_0)^2$.
 \begin{figure}[h!btp]
@@ -1059,7 +1072,7 @@ Figure \ref{fig:GeneralQuadraticCorrection} shows the correction factor based on
 
 Unlike the linear solution, the half-segments here are not necessarily of the same length, and thus there are separate correction factors for each half-segment. 
 %The correction factors are $(\ell/2)/(m_u)$ and $(\ell/2)/(m_l)$ respectively. 
-<<CtsQuadratic, echo=FALSE, include=FALSE>>=
+<<CtsQuadratic, echo=FALSE, include=FALSE, fig.width=6, fig.height=4>>=
 f <- function(x) 2*sin(x)
 fprime <- function(x) 2*cos(x)
 f2prime <- function(x) -2*sin(x)
@@ -1107,14 +1120,14 @@ ggplot(aes(x=x, y=value, group=variable, linetype=variable), data=dfm) + geom_li
 # dev.off()
 @
 \begin{figure}[h!tbp]\centering
-\includegraphics[keepaspectratio=TRUE, width=.8\linewidth]{figure/fig-wtf}
+\includegraphics[keepaspectratio=TRUE, width=.8\linewidth]{figure/fig-CtsQuadratic}
 \caption{Extant Half-segment Length \todo[inline]{Which correction is used?}. The secant  line segments are not symmetrical around the center line, \todo[inline]{describe for the blind.} %so symmetric correction as employed in Figure \ref{fig:linear-GeneralCorrection} leads to simultaneous over- and under-correcting. 
 \todo[inline]{In my pdf the symbol does not show up. We need to make sure that in the final pdf it does.}}\label{fig:HalfSegLength}
 \end{figure}
 
 %\subsection{Mathematical Properties of Transformation}
-The quadratic correction breaks, whenever $(1 + f^\prime(x)^2)^2 \pm \ell\cdot f^{\prime\prime}(x)\cdot f^\prime(x)^2 < 0$
-This is achieved by a combination of large values of $\ell$, which signify a large vertical extent, or large conditional variability $E[Y|X]$, and a large changes in the slop of the main trend, i.e large values of the curvature $f^{\prime\prime}(x)$. In the linear approximation of $f$ the same situation leads to a massive overcorrection of the vertical lines, making the `corrected' function almost unrecognizable. 
+The quadratic correction breaks, whenever $v^2 \pm \ell\cdot f^{\prime\prime}(x)\cdot f^\prime(x)^2 < 0$
+This is achieved by a combination of large values of $\ell$, which signify a large vertical extent, or large conditional variability $E[Y|X]$, and a large changes in the slope of the main trend, i.e large values of the curvature $f^{\prime\prime}(x)$. In the linear approximation of $f$ the same situation leads to a massive overcorrection of the vertical lines, making the `corrected' function almost unrecognizable. 
 
 % % 
 % % $1 + 2f^\prime(x)^2 + f^\prime(x)^4 \pm \ell\cdot f^{\prime\prime}(x)\cdot f^\prime(x)^2 < 0$
@@ -1351,7 +1364,7 @@ where $a, b,$ and $c$ are real-valued parameters the solutions take on the form
 \[
 \lambda_{\pm} = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}  \stackrel{*}{=} 2c\left(-b \pm \sqrt{b^2 - 4ac}\right)^{-1}.
 \]
-$^*$ if $b \neq \pm \sqrt{b^2 - 4ac}$, i.e. $a, c \neq 0$.
+$^*$ if $b \neq \pm \sqrt{b^2 - 4ac}$, i.~e. $a, c \neq 0$.
 \paragraph{Application to quadratic approximation to $f$:}
 in the example, we have the following equivalencies:
 \begin{eqnarray*}
@@ -1359,14 +1372,10 @@ a &=& f^{\prime\prime}(x_0) f^\prime(x_0)^2 \\
 b &=& 2(1 + f^\prime(x_0)^2) \hspace{.5in} > 0 \text{ for all } x \\
 c &=& \pm \ell 
 \end{eqnarray*}
-% Using the above equation, we get solutions for $\lambda$ as
-% \[
-% \lambda_\pm = 2c\left(-b \pm \sqrt{b^2 - 4ac}\right)^{-1}
-% \]
-For a valid solution for the correction factor, we have to assume that $\lambda$ is a factor that extends the original extant width (in absolute value).
-This means that for $c = - \ell$, we can only make use of $\lambda_{-}$, while for $c = +\ell$, the only valid solution is given as $\lambda_{+}$:
+For a valid solution for the correction factor, we have to assume that $\lambda$ is a factor that extends the original extant width (in absolute value). \todo[inline]{Im not quite sure why the other values are not solutions, but they lead to solutions that don't work.}
+%This means that for $c = - \ell$, we can only make use of $\lambda_{-}$, while for $c = +\ell$, the only valid solution is given as $\lambda_{+}$:
 \begin{eqnarray*}
-|\lambda| &=& \ell \left(v + \sqrt{ v^2 \pm  f^{\prime\prime}(x_0) f^\prime(x_0)^2\cdot \ell}\right)^{-1} 
+\lambda_{1/2} &=& \ell \left(v + \sqrt{ v^2 \pm  f^{\prime\prime}(x_0) f^\prime(x_0)^2\cdot \ell}\right)^{-1} 
 \end{eqnarray*}
 for $v = 1 + f^\prime(x_0)$. 
 This gives the results as shown in equations (\ref{eqn.q1}) and (\ref{eqn.q2})
