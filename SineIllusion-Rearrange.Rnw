@@ -79,16 +79,16 @@ qplot(data=datasub, x=jitter(Tmax), y=resid, geom="point", colour=I("grey20"), a
 \begin{subfigure}[b]{.45\linewidth}
   \centering
   \includegraphics[width=\textwidth]{figure/fig-example1}
-  \caption{\small All data \todo[inline]{that's an unfortunate caption. 'All data' suggests that  sometimes you do not show all data.}}
+  \caption{\small Scatterplot of Ozone and Temperature in Houston, 2011. A loess fit is overlaid to show the overall trend.}
   \label{fig:example1}
-\end{subfigure}
+\end{subfigure}\hfill
 \begin{subfigure}[b]{.45\linewidth}
   \centering
   \includegraphics[width=\textwidth]{figure/fig-example2}
-  \caption{\small Residuals}
+  \caption{\small Scatterplots of Ozone and Temperature detrended according to the loess fit in (a). \\ \phantom{text to get to the next line}}
   \label{fig:example2}
 \end{subfigure}
-\caption{\label{fig:exampleFull1} Scatterplots of Ozone and Temperature in Houston, 2011. A loess fit is overlaid in (a); (b) shows residuals from the loess fit along the vertical axis. The increase in variability over the temperature range is more pronounced in the de-trended plot on the right.}
+\caption{\label{fig:exampleFull1} Scatterplots of Ozone and Temperature in Houston, 2011. The increase in variability over the temperature range is more pronounced in the detrended plot on the right.}
 \end{figure}
 
 As a first example let us consider the relationship between ozone concentration and temperature. Ozone concentrations were measured from \Sexpr{nsite} locations in the Houston area \citep{epa}, and temperature data is provided by the NCDC \citep{noaa} site at Hobby International Airport, located near the center of Houston. 
@@ -123,7 +123,7 @@ f2prime <- function(x) -2*sin(x)
 <<original, dependson='functions', echo=FALSE, fig.width=5, fig.height=5, include=FALSE>>=
 qplot(x=x, xend=xend, y = ystart, yend=yend, geom="segment", data=createSine(40, 1, f=f, fprime=fprime, f2prime)) +
   theme(panel.grid.major=element_blank(), panel.background = element_rect(fill = "white", 
-                colour = "black"),
+                colour = "black"), plot.margin = unit(c(-1,0,-3,0), "cm"), 
        panel.grid.minor=element_blank(), panel.background=element_blank(),
        axis.title = element_blank(), axis.ticks = element_blank(), 
        axis.text = element_blank()) + coord_equal(ratio=1)
@@ -162,7 +162,7 @@ dev.off()
 \end{figure}
 %The first documentation we could find of this illusion,
 More recently the illusion has been shown in non-sinusoidal curves \citep{cleveland:1984, schonlau:2003, robbins:2005, marie}, but the underlying effect seems to be the same, in the sense the illusion is not triggered by the periodic nature of the underlying trendline but only by  changes to its slope. Figure \ref{fig:twoillusions-simulation} shows three panels, which all exhibit the illusion. From left to right, the trend comes from (a) a periodic function, (b) a periodic component added to an exponential function, and (c) an exponential function on its own.
-While all three graphs seem to show nonconstant variance along the main trend; in reality, the variance is constant in all of them. Clearly, the illusion does not rely on the periodicity of the function for which it was named, but is a symptom of the change in curvature that comes with it.
+While all three graphs seem to show nonconstant variance along the main trend; in reality, the variance is constant in all of them. Clearly, the illusion does not rely on the periodicity of the function for which it was named, but is a symptom of the change in curvature that comes with the periodicity.
 %, instead the ``line width illusion" and the ``sine illusion" are symptoms of the same phenomenon, even though the cognitive literature and the graphics literature refer to the illusion differently. 
 
 
@@ -242,7 +242,7 @@ qplot(data=df, x=x, y=y, geom="line") + geom_line(aes(y=y2)) + theme_bw()
 \begin{SCfigure}
 \centering
 \includegraphics[width=.45\linewidth]{figure/fig-effectivegraphsfig}
-\caption{A replication of Figure 2.16 in \cite{robbins:2005}. Lines $y=e^x$ and $y=e^x+1$ appear  to converge as $x$ increases due to the line width illusion.\label{fig:robbins-graph}}
+\caption{A replication of Figure 2.16 in \cite{robbins:2005}. Due to the line width illusion the graphs of $y=e^x$ and $y=e^x+1$ appear to converge as $x$ increases.\label{fig:robbins-graph}}
 \end{SCfigure}
 
 %\FloatBarrier
