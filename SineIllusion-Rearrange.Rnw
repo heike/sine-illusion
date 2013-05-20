@@ -420,7 +420,7 @@ qplot(data=ribbon, x=x, ymin=ybottom, ymax=ytop, geom="ribbon", fill=I("grey")) 
         axis.text = element_blank()) +  
   geom_segment(data=widths, aes(x=xbottom, xend = xtop, y=ybottom, yend=ytop, linetype=label)) +
   geom_text(data=widths, aes(x=mean(c(xbottom[1], xbottom[2], 0)), y=mean(c(ybottom[1], ybottom[2], ybottom[2])), label="theta"), parse=TRUE) +
-  coord_equal(ratio=1) + scale_linetype_manual("") + theme(plot.margin = unit(c(-1,-1,-2,-2), "lines"))
+  coord_equal(ratio=1) + scale_linetype("") + theme(plot.margin = unit(c(-1,-1,-2,-2), "lines"))
 @
 At the same time, our preference for assessing figure width based on the secant width suggests that the underlying illusion may be a function of geometry rather than some mysterious visual or neural process that occurs subconsciously, i.e. in the time between perception of the stimulus and conscious thought. If this is the case, then it may be  possible to correct the graphical display for  that so it is not as visually deceptive. 
 From a statistical standpoint, when we judge the (conditional) variability of data along a trend line, we must overcome the visual bias due to the sine illusion. As it turns out, this illusion is incredibly difficult to overcome even when we are aware of its presence: our brains simply cannot ``un-see" the illusion. A geometrical correction that would at least temporarily remove the illusion would be a valuable tool in visual analysis.
@@ -429,7 +429,16 @@ What follows is a compilation of several approaches to correct for or mitigate t
 % do not change this to its'
 
 \section{Breaking the Illusion}
-The illusion is caused by a conflict between the vertical length and the orthogonal width, which is itself a function of the slope. As such, we can resolve the illusion by making the orthogonal width constant. We consider several approaches to forcing the orthogonal width to be constant:  (1) separating the trend and the variability, (2) forcing the slope to be constant (by reparameterizing the $x$ axis), or (3) making the lines appear to be of the same height by adjusting their lengths to maintain a constant orthogonal width. Each of these approaches is discussed in the following section.
+The illusion is caused by a conflict between vertical width, which is the width that we want to assess visually, and orthogonal width, which is the width that the onlooker perceives. 
+The difference between vertical and orthogonal widths is itself a function of the slope. 
+As such, we can resolve the illusion by adjusting the orthogonal width such that it represents the value that we want the onlooker to perceive. 
+We consider several approaches for this adjustment:  
+\begin{enumerate}
+\item separating the trend and the variability, 
+\item forcing the slope to be constant (by reparameterizing the $x$ axis), or 
+\item making the lines appear to be of the same height by adjusting their lengths to maintain a constant orthogonal width. 
+\end{enumerate}
+Each of these ideas is discussed in the following section.
 
 \subsection{Trend Removal}
 \cite{cleveland:1984, cleveland:1985} discuss the perceptual difficulty of judging the difference between two curves plotted on the same axis. They recommend the difference between the two curves as an alternate display, as shown in the second part of Figure \ref{fig:cleveland-figure}. A loess smooth was used to estimate the trendline, and this estimate was subtracted from the line center to produce separate graphs of the trend and the variance. This is in line with  recommendations  for good graphics to `show the data' rather than make the reader derive some aspect of it \citep[e.g.][]{wainer:2000}. In particular, this is the generally accepted procedure for assessing model fit. 
