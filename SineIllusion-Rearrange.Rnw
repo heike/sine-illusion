@@ -157,7 +157,7 @@ dev.off()
 \centering
 \includegraphics[keepaspectratio=true, width=.5\linewidth]{figure/fig-original}
 % \includegraphics[keepaspectratio=true, width=\linewidth]{fig-original-redo.pdf}
-\caption{The original Sine Illusion was demonstrated on evenly spaced vertical lines centered around a sinusoidal curve of $f(x) = \sin(x)$. The lines in the peak and trough of the curve appear to be longer than in the other regions.\label{fig:original}}
+\caption{The original sine illusion was demonstrated on evenly spaced vertical lines centered around a sinusoidal curve of $f(x) = \sin(x)$. The lines in the peak and trough of the curve appear to be longer than in the other regions.\label{fig:original}}
 %The right graph illustrates the parameters determining the appearance of the illusion: $s$ denotes the amplitude of the function, $\ell$ the length of the line segments.
 \end{figure}
 %The first documentation we could find of this illusion,
@@ -244,19 +244,25 @@ qplot(data=df, x=x, y=y, geom="line") + geom_line(aes(y=y2)) + theme_bw()
 \begin{SCfigure}
 \centering
 \includegraphics[width=.45\linewidth]{figure/fig-effectivegraphsfig}
-\caption{Graphs of two vertically shifted exponential curves, $y=e^x$ and $y=e^x+1$. Due to the line width illusion the graphs appear to converge as $x$ increases. (This chart is a replication of Figure 2.16 in \cite{robbins:2005})\label{fig:robbins-graph}}
+\caption{Graphs of two vertically shifted exponential curves, $y=e^x$ and $y=e^x+1$. Due to the line width illusion the graphs appear to converge as $x$ increases.  \citep[This chart is a replication of Figure 2.16 in][]{robbins:2005}\label{fig:robbins-graph}}
 \end{SCfigure}
 
 %\FloatBarrier
 \subsection{Perceptual Explanations for the Sine Illusion}\label{perceptualexplanations}
 While not thoroughly examined in the sensation and perception literature, the sine illusion has been classified as part of a group of geometrical optical misperceptions  related to the M\"uller-Lyer illusion \citep{day:1991} or the Poggendorf illusion \citep{poggendorf}, which puts the illusion into the framework of context-based illusions.
 \cite{day:1991} suggest that
-the sine illusion occurs due to misapplication of perceptual experience with the three-dimensional world to a two-dimensional ``artificial" display of data. Figure \ref{fig:ribbon-illusion} shows a possible three-dimensional context for the classical sine illusion; two ribbons are shown at varying perspective strengths. \todo[inline]{OK, we need to slow down here, but I'm not sure how to say it. That's why I'm asking all these questions.}
-\todo[inline]{How do the perspective plots relate to the illusion - in words. I can see it, but we need to describe it in the text as well. }
-\todo[inline]{Does the 3d perspective resolve the illusion?}
+the sine illusion occurs due to misapplication of perceptual experience with the three-dimensional world to a two-dimensional ``artificial" display of data. 
 
-\todo[inline]{What is the difference between the first and the second perspective plot?}
-The first appears more natural \todo[inline]{What do you mean by more 'natural'?}, but the second still appears three-dimensional \todo[inline]{Why?} and is much closer to the sine illusion stimuli \todo[inline]{Why is it closer?}  with added shading. 
+Experience with real-world objects suggests that the stimulus of figure~\ref{fig:original} is very similar to a slightly angled top view of the 3-dimensional figure of a strip or ribbon describing waves in a third dimension, such as e.g. a road does on rolling hills. This is sketched out in figure~\ref{fig:ribbon-illusion}(a). Our experience suggests immediately that there changes in the width of the road are unlikely and resolves the illusion. While figure~\ref{fig:ribbon-illusion}(a) shows the line segments slightly angled towards each other,  the figure \ref{fig:ribbon-illusion}(b) shows a variation of the same plot with a  vanishing point further away from the viewer. This makes the line segments almost parallel to each other and therefore more closely resembles the sketch of figure~\ref{fig:original}, in which the sine illusion was originally presented.
+%By treating the graph as a two-dimensional projection of a three-dimensional figure, the illusion disappears and the line widths seem once more to be constant.
+
+
+% Figure \ref{fig:ribbon-illusion} shows a possible three-dimensional context for the classical sine illusion; two ribbons are shown at varying perspective strengths. \todo[inline]{OK, we need to slow down here, but I'm not sure how to say it. That's why I'm asking all these questions.}
+% \todo[inline]{How do the perspective plots relate to the illusion - in words. I can see it, but we need to describe it in the text as well. }
+% \todo[inline]{Does the 3d perspective resolve the illusion?}
+% 
+% \todo[inline]{What is the difference between the first and the second perspective plot?}
+% The first appears more natural \todo[inline]{What do you mean by more 'natural'?}, but the second still appears three-dimensional \todo[inline]{Why?} and is much closer to the sine illusion stimuli \todo[inline]{Why is it closer?}  with added shading. 
 
 \begin{figure}[h!tbp]\centering
 <<ribbon-illusion,echo=FALSE, include=FALSE, fig.width=5, fig.height=5>>=
@@ -297,12 +303,10 @@ persp(x, z, data.persp,  xlab="", ylab="", zlab="", theta=0, phi=45, border="bla
 \includegraphics[width=\linewidth, keepaspectratio=TRUE, trim=0in 1.5in 0in 1.5in]{figure/fig-ribbon-illusion2}
 \caption{Perspective plot, vanishing point near infinity.}
 \end{subfigure}
-\caption{Two different perspective projections of the same data responsible for the sine illusion. The first projection angles the lines and appears much more natural, but the second projection suggests that the lines do not need to be angled to create the same three-dimensional impression.}
-\label{fig:ribbon-illusion}
+\caption{Two different perspective projections of the same data responsible for the sine illusion. The first projection angles the lines and appears much more natural, but the second projection suggests that the lines do not need to be angled to create the same three-dimensional impression.\label{fig:ribbon-illusion}}
 \end{figure}
 
-Experience with real-world objects suggests that the data are most similar to a slightly angled top view of a 3-dimensional strip such as a ribbon, as shown in figure \ref{fig: ribbon-ilusion}(a).  % goldstein S&P 8th edition pg 249
-As the vanishing point moves further away from the viewer, as in figure \ref{fig: ribbon-ilusion}(b), the ribbon plot more closely resembles the sine illusion. By treating the graph as a two-dimensional projection of a three-dimensional figure, the illusion disappears and the line widths seem once more to be constant.
+
 
 <<originalgrid, dependson='data', echo=FALSE, include=FALSE, fig.width=5, fig.height=4>>=
 f <- function(x) 2*sin(x)
@@ -329,14 +333,19 @@ qplot(x=x, xend=xend, y = ystart*ell, yend=yend*ell, geom="segment", data=dframe
 \includegraphics[width=.5\linewidth]{figure/fig-originalgrid}
 \end{SCfigure}
 
-Though it is typically a bad idea to use three-dimensional representations when two dimensions are adequate to display the data \citep{tufte}, counteracting a visual heuristic might make that approach more viable. However, a three-dimensional projection of two-dimensional data is not easy to create and would likely lead to distortions and instability in the visual display. In particular, there does not seem to be an simple guideline for determining the projection angle or color gradient  to create the illusory depth to remove the optical illusion. 
+Though it is typically a bad idea to use three-dimensional representations when two dimensions are adequate to display the data \citep{tufte},this approach might be more viable, if it is used to counteract a visual illusion. However, creating a three-dimensional projection of two-dimensional data is not simple. The projection that best resolves the illusion  likely is highly subjective and influenced by choices of angle and color gradient for depth cues. 
+%and would also lead to distortions and instability in the visual display. In particular, there does not seem to be an simple guideline for determining the projection angle or color gradient  to create the illusory depth to remove the optical illusion. 
 
 %That is, the illusion breaks down if the visual heuristic is pre-empted by an attempt to view the graph as if it were three dimensional or if each piece is considered without the surrounding context. 
 
-Further, the illusion  only  holds when a significant portion of the graph is considered simultaneously without regard to the perceptual mechanisms at play, The contextual cues of the overall trend are critical to the sine illusion's effect; without those cues (either by subtraction of the trend or by considering only one or two lines at a time) the illusion does not occur. In particular, our judgment in comparing the lengths of two lines is relatively accurate, as e.g. discussed in \citet{cleveland:1984}. See \cite{day:1991} for a more thorough discussion of how much surrounding context is required for the illusion to persist. The bold lines in figure \ref{fig:original-grid} are clearly the same length, as comparing individual lines is a fairly simple task. The illusion arises when sufficient context is available to induce an ambiguously three-dimensional figure.
+Further, the illusion  only  holds when a substantial portion of the graph is considered simultaneously, which triggers our innate ability of perceiving one whole rather than the individual parts it consists of \citep[principle of grouping][]{wolfe2012sensation}.
+%without regard to the perceptual mechanisms at play. 
+
+The contextual cues of the overall trend are critical to the sine illusion's effect; removing those cues by either subtracting the trend or by considering only one or two line segments at a time, resolves the illusion. The bold lines in figure \ref{fig:original-grid} are clearly the same length, as comparing individual lines is a fairly simple task, in which our judgment  is relatively accurate, as e.g. discussed in \citet{cleveland:1984}. 
+See \cite{day:1991} for a more thorough discussion of how much surrounding context is required for the illusion to persist. 
+%The illusion arises when sufficient context is available to induce an ambiguously three-dimensional figure.
 
 
-What follows are several methods to ``break" the illusion's effect and allow for more accurate graphical conclusions.
 
 %\FloatBarrier
 \subsection{Geometry of the Illusion}
