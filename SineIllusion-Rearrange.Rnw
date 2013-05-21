@@ -435,15 +435,18 @@ As such, we can resolve the illusion by adjusting the orthogonal width such that
 We consider several approaches for this adjustment:  
 \begin{enumerate}
 \item separating the trend and the variability, 
-\item forcing the slope to be constant (by reparameterizing the $x$ axis), or 
-\item making the lines appear to be of the same height by adjusting their lengths to maintain a constant orthogonal width. 
+\item adjusting the slope to be constant (by reparameterizing the $x$ axis), or 
+\item making the line segments appear to be of the correct height by adjusting their lengths proportional to orthogonal width (by transforming the $y$ values). 
 \end{enumerate}
-Each of these ideas is discussed in the following section.
+Each of these ideas is discussed in more detail in this section.
 
 \subsection{Trend Removal}
-\cite{cleveland:1984, cleveland:1985} discuss the perceptual difficulty of judging the difference between two curves plotted on the same axis. They recommend the difference between the two curves as an alternate display, as shown in the second part of Figure \ref{fig:cleveland-figure}. A loess smooth was used to estimate the trendline, and this estimate was subtracted from the line center to produce separate graphs of the trend and the variance. This is in line with  recommendations  for good graphics to `show the data' rather than make the reader derive some aspect of it \citep[e.g.][]{wainer:2000}. In particular, this is the generally accepted procedure for assessing model fit. 
-
-While removing the trend and showing variability separately does largely remove the sine illusion, it also makes it  more difficult to parse the overall data, as judgments must be made by combining two graphs or by mentally re-composing the original graph (at which point, the sine-illusion becomes a factor). We ideally want to tell the whole story with a single graph, to minimize cognitive demands. While this example is relatively simple, it would be much harder to create a de-trended version of Figure \ref{fig:playfair-debt} that could be easily assessed to determine both trend and change in the size of the trade imbalance over time. 
+\cite{cleveland:1984, cleveland:1985} discuss the perceptual difficulty of judging the difference between two curves plotted in the same chart, and alternatively, recommend to display the difference between the two curves directly. This is in line with  recommendations  for good graphics to `show the data' rather than make the reader derive some aspect of it \citep[e.g.][]{wainer:2000}. In particular, this is the generally accepted procedure for assessing model fit. 
+ Figure \ref{fig:cleveland-figure} shows a scatterplot of data with a trend on the left. A loess smooth is used to estimate the trendline. A visual assessment of variability along this trendline
+might result in a description along the lines of `homogeneous variance or slightly increasing variance for  negative $x$, followed by a dramatic decrease in vertical variability for positive $x$'.  
+Once the residuals are separated from the trendline as shown on the right hand side of the figure, it bceomes apparent that this first assessment of conditional variability was not correct, and the steadily decrease along the horizontal axis shows up.
+ 
+Removing the trend and showing variability separately does largely remove the sine illusion, but it also makes it  more difficult to evaluate the overall  pattern in the data, as we  must any judgment on two charts; either  by combining two graphs or by mentally re-composing the original graph (at which point, the sine-illusion becomes a factor). To minimize cognitive demands  we ideally want to tell the whole story with a single graph. This example is also relatively simple, it is much harder to create a de-trended  version of Figure \ref{fig:playfair-debt} that allows for an easy and accurate assessment of  both the trend and a change in the size of the trade imbalance over time. 
 
 
 <<cleveland, echo=FALSE, fig.width=6, fig.height=6, include=FALSE>>=
