@@ -161,7 +161,7 @@ dev.off()
 %The right graph illustrates the parameters determining the appearance of the illusion: $s$ denotes the amplitude of the function, $\ell$ the length of the line segments.
 \end{figure}
 %The first documentation we could find of this illusion,
-More recently the illusion has been shown in non-sinusoidal curves \citep{cleveland:1984, schonlau:2003, robbins:2005, marie}, but the underlying effect seems to be the same, in the sense the illusion is not triggered by the periodic nature of the underlying trendline but only by  changes to its slope. Figure \ref{fig:twoillusions-simulation} shows three panels, which all exhibit the illusion. From left to right, the trend comes from (a) a periodic function, (b) a periodic component added to an exponential function, and (c) an exponential function on its own.
+More recently the illusion has been shown in non-sinusoidal curves \citep{cleveland:1984, schonlau:2003, robbins:2005, marie:2013}, but the underlying effect seems to be the same, in the sense the illusion is not triggered by the periodic nature of the underlying trendline but only by  changes to its slope. Figure \ref{fig:twoillusions-simulation} shows three panels, which all exhibit the illusion. From left to right, the trend comes from (a) a periodic function, (b) a periodic component added to an exponential function, and (c) an exponential function on its own.
 While all three graphs seem to show nonconstant variance along the main trend; in reality, the variance is constant in all of them. Clearly, the illusion does not rely on the periodicity of the function for which it was named, but is a symptom of the change in curvature that comes with the periodicity.
 %, instead the ``line width illusion" and the ``sine illusion" are symptoms of the same phenomenon, even though the cognitive literature and the graphics literature refer to the illusion differently. 
 
@@ -604,7 +604,7 @@ ggplot(aes(x=xtrans4, xend=xtrans4, y = ystart, yend=yend), data=dframe) +
 \caption[X axis transformations]{Examples of $X$ axis transformations in the sine curve.  Dots at the bottom of the graph show the transformation's effect on equally spaced points along the $x$-axis. Different amounts of weighting $w$ correspond to differently strong corrections. In (a),   $x$-spacing of the lines changes the extant width such that the absolute value of the slope is uniform across the whole range of the $x$ axis resulting in the largest amount of correction.  (b) - (d) reduce the correction in (a) towards successively more uniform spacings in $x$ while still breaking the effects of the illusion.}
 \label{fig:xtrans}
 \end{figure}
-While the transformation in equation \ref{eqn.xtrans} effectively removes the appearance of changing line length resulting from the sine illusion, in practice we can see that the illusion can be broken by a much less severe transformation of the $x$ values. 
+While the transformation in equation (\ref{eqn.xtrans}) effectively removes the appearance of changing line length resulting from the sine illusion, in practice we can see that the illusion can be broken by a much less severe transformation of the $x$ values. 
 Shrinking the transformation in Figure \ref{fig:xtrans1} towards the original $x$ values by a factor of $w \in (0,1)$ allows the effect of the illusion to be disrupted with a weaker transformation. Under the weaker transformation, the data more closely reflect the original function $f(x)$. We use the following equation for this: 
 %
 \begin{equation}\label{eqn.xtrans.weighted}
@@ -676,7 +676,7 @@ Figure \ref{fig:xtrans-example} shows the original data side-by-side with the tr
 \includegraphics[keepaspectratio=TRUE,width=\linewidth]{figure/fig-xtrans-example2}
 \caption{Transformed $X$ Axis}\label{fig:xtrans-example-trans}
 \end{subfigure}
-\caption{Original data and data after x-transformation. The increasing variance is easier to see when $x$ has been transformed, because the slope is now uniform.\label{fig:xtrans-example}}
+\caption{Original data and data after $x$-transformation. The increasing variance is easier to see when $x$ has been transformed, because the slope is now uniform.\label{fig:xtrans-example}}
 \end{figure}
 Figure \ref{fig:xtrans-example} demonstrates not only the effect of transformation of the $x$-axis, but also that the transformation is not particularly misleading in this example.The granularity of the data in this example provides an implicit measure of the strength of the transformation along the $x$-axis and the transformation is also clearly evident in the labels along the $x$-axis. 
 % While we typically prefer that our axis transformations are monotone, this transformation provides additional utility that a monotone transformation does not. \newdo{ the transformation is monotone - it only goes up and doesn't reverse the temperatures. it's even continuous, but it is not differentiable. }
@@ -686,7 +686,7 @@ Figure \ref{fig:xtrans-example} demonstrates not only the effect of transformati
 Understanding the geometry of the sine illusion leads to another approach to disrupting the conflict between the orthogonal width and the vertical length of the segment. 
 
 All of our approaches in this section are based on a comparison of the orthogonal width to the vertical length of lines. 
-Studies have shown \cite{XXX, YYY} that onlookers generally evaluate orthogonal width rather than vertical or horizontal widths of lines.
+%Studies have shown \cite{XXX, YYY} that onlookers generally evaluate orthogonal width rather than vertical or horizontal widths of lines.
 By adjusting the vertical width in such a way that the (perceived) orthogonal width displays the quantity of interest, we can match an onlooker's intuitive evaluation of a situation  with the data values we want to present.
 
 % 
@@ -1114,7 +1114,7 @@ ggplot(aes(x=x, y=value, group=variable, linetype=variable), data=dfm) + geom_li
 \end{figure}
 
 %\subsection{Mathematical Properties of Transformation}
-The quadratic correction breaks, whenever $v^2 \pm \ell\cdot f^{\prime\prime}(x)\cdot f^\prime(x)^2 < 0$
+The quadratic correction breaks, whenever $v^2 \pm \ell\cdot f^{\prime\prime}(x)\cdot f^\prime(x)^2 < 0$.
 This is achieved by a combination of large values of $\ell$, which signify a large vertical extent, or large conditional variability $E[Y|X]$, and a large changes in the slope of the main trend, i.e large values of the curvature $f^{\prime\prime}(x)$. In the linear approximation of $f$ the same situation leads to a massive overcorrection of the vertical lines, making the `corrected' function almost unrecognizable. 
 
 % % 
@@ -1173,7 +1173,7 @@ This is achieved by a combination of large values of $\ell$, which signify a lar
 
 \section{Transformations in Practice -- a User Study}
 
-Some modifications are necessary to implement the correction factor in a realistic situation in which it might not be practical for the aspect ratio of the graph to be fixed at 1. As in \todo{Cite Marie's paper}, the correction factor necessary to remove the illusion depends on the aspect ratio of the graphs. Figure \ref{fig:trigFix-aspectRatio} demonstrates the relative effectiveness of the correction factor.
+Some modifications are necessary to implement the correction factor in a realistic situation in which it might not be practical for the aspect ratio of the graph to be fixed at 1. As in \citet{marie:2013}, the correction factor necessary to remove the illusion depends on the aspect ratio of the graphs. Figure \ref{fig:trigFix-aspectRatio} demonstrates the relative effectiveness of the correction factor.
 
 
 \subsection{Applet Description}
