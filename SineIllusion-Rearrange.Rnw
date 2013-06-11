@@ -434,7 +434,7 @@ What follows is a compilation of several approaches to correct for or mitigate t
 % do not change this to its'
 
 \section{Breaking the Illusion}
-The linewidth  illusion is caused by a conflict between vertical width, which is the width that we want to assess visually, and orthogonal width, which is the width that the onlooker perceives. 
+The linewidth  illusion is caused by a conflict between vertical width, which is the width that we want onlookers to assess visually, and orthogonal width, which is the width that the onlooker perceives. 
 The difference between vertical and orthogonal widths is itself a function of the slope. 
 As such, we can resolve the illusion by adjusting the orthogonal width such that it represents the value that we want the onlooker to perceive. 
 We consider several approaches for this adjustment:  
