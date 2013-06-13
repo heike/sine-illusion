@@ -306,7 +306,7 @@ persp(x, z, data.persp,  xlab="", ylab="", zlab="", theta=0, phi=45, border="bla
 \includegraphics[width=\linewidth, keepaspectratio=TRUE, trim=0in 1.5in 0in 1.5in]{figure/fig-ribbon-illusion2}
 \caption{Perspective plot, vanishing point near infinity.}
 \end{subfigure}
-\caption{Two different perspective projections of the same data responsible for the sine illusion. The first projection angles the lines and appears much more natural, but the second projection suggests that the lines do not need to be angled to create the same three-dimensional impression.\label{fig:ribbon-illusion}}
+\caption{Two different perspective projections of the same data responsible for the sine illusion. The first projection angles the lines and appears much more natural, but the second projection suggests that the lines do not need to be angled to create the same three-dimensional impression.\label{fig-ribbon-illusion}}
 \end{figure}
 
 
@@ -834,8 +834,8 @@ qplot(x=x, xend=xend, y = f(x) -ellx2/2, yend=f(x) +ellx2/2, geom="segment", dat
 \includegraphics[width=\linewidth,keepaspectratio=TRUE]{figure/fig-trigFix2}
 \caption{Trigonometric correction}
 \end{subfigure}
-\caption[Demonstration of Trig Correction Fix]{Fix of the sine illusion by using the factor of $1/\cos\left(\atan{|\cos(x)|}\right)$ to adjust the vertical extent of the lines.}
-\label{fig:trigFix} 
+\caption[Demonstration of Trig Correction Fix]{\label{fig:trigFix} 
+Fix of the sine illusion by using the factor of $1/\cos\left(\atan{|\cos(x)|}\right)$ to adjust the vertical extent of the lines.}
 \end{figure}
 
 The correction is shown in Figure \ref{fig:trigFix}. 
@@ -1178,20 +1178,27 @@ This is achieved by a combination of large values of $\ell$, which signify a lar
 
 \section{Transformations in Practice -- a User Study}
 
-Some modifications are necessary to implement the correction factor in a realistic situation in which it might not be practical for the aspect ratio of the graph to be fixed at 1. As in \citet{marie:2013}, the correction factor necessary to remove the illusion depends on the aspect ratio of the graphs. Figure \ref{fig:trigFix-aspectRatio} demonstrates the relative effectiveness of the correction factor.
+Some modifications are necessary to implement the correction factor in a realistic situation in which it might not be practical for the aspect ratio of the graph to be fixed at 1. As in \citet{marie:2013}, the correction factor necessary to remove the illusion depends on the aspect ratio of the graphs. Figure \ref{fig:trigFix} demonstrates the relative effectiveness of the correction factor.
 
 
 \subsection{Applet Description}
 
-An applet demonstrating the effect of changing parameter values on the strength of the illusion can be found at \url{http://www.michaelbach.de/ot/sze_sineIllusion/index.html}. An applet demonstrating not only the effect of parameters on the illusion but also the various correction factors we propose in this paper can be found at \url{http://vanderplas.dyndns-remote.com/SineIllusion}
-\todo[inline]{When applet is in quasi-final form, will change this to rstudio's server.}
+An applet demonstrating the effect of changing parameter values on the strength of the illusion can be found at \url{http://www.michaelbach.de/ot/sze_sineIllusion/index.html}. An applet demonstrating not only the effect of parameters on the illusion but also the various correction factors we propose in this paper can be found at \newtext{\url{http://glimmer.rstudio.com/srvanderplas/SineIllusionShiny/}. Figure~\ref{fig:shiny.app} shows a screen shot of it. The applet is implemented in {\tt shiny} \citep{shiny}. Users can adjust the amount of adjustment using the plus and minus button (with plus indicating a higher level of correction). Underlying this adjustment is the value of the weight $w$, as defined in eqns.~\ref{eqn.xtrans.weighted} and~\newdo{XXX reference to weighted y transformation}. Participants were recruited from Amazon Mechanical Turk and the reddit community. }
 
-
-M Bach's applet  gives the option to compensate the line length manually for its perceived shortcoming. The amount of compensation chosen turns out to be highly dependent on both the length of the vertical line segments and the amplitude of the sine function. While the applet does not provide details on the compensation function, it does suggest that it may be possible to correct the graphical display so that the brain interprets the stimuli in a manner consistent with the numerical data. 
+% 
+% 
+% M Bach's applet  gives the option to compensate the line length manually for its perceived shortcoming. The amount of compensation chosen turns out to be highly dependent on both the length of the vertical line segments and the amplitude of the sine function. While the applet does not provide details on the compensation function, it does suggest that it may be possible to correct the graphical display so that the brain interprets the stimuli in a manner consistent with the numerical data. 
 \subsection{Study Design}
+\newtext{The goal of the study is to determine an overall `optimal' setting for each of the correction factors. It is of additional interest, whether this setting is  subject-specific or population-based, and how much within-subject variability we find compared to between-subject variability. 
+Once a participants arrives at the site, he/she is presented with a specific setting of the weight $w$, where for the first six evaluations $w$ is randomly chosen from the set of numbers $\{0, 1, ...\}$. After that, $w$ is randomly sampled from a normal distribution with mean 0.5 and standard deviation of 0.5. 
+}
 \subsection{Method}
+\begin{figure}
+\includegraphics[width=\textwidth]{images/shiny.pdf}
+\caption{\label{fig:shiny.app} Screenshot of the shiny application used to collect information of observers' preference with respect to an optimal correction for the illusion  under each of the  transformations discussed in the previous section. }
+\end{figure}
 \subsection{Results}
-Such a correction is significant not only because of its effect on statistical graphics, but because previously attempts to resolve optical illusions using geometry have not met with success \citep{westheimer2008illusions}.
+\newtext{XXX participants in total took part in the study with XXX total evaluations. }
 
 XXX our evidence: 0 is not in the posterior interval ...
 
@@ -1288,6 +1295,9 @@ After removing the averages in Figure \ref{fig:boxplot-temp} to yield Figure \re
 %\clearpage
 \section{Conclusion}
 \begin{itemize}\item Raise Awareness\item ``Fixing" data is tricky and usually beyond a statistician's comfort zone, but we could see this as part of an applet where the ``fix" is done temporarily as a diagnostic measure
+
+Such a correction is significant not only because of its effect on statistical graphics, but because previously attempts to resolve optical illusions using geometry have not met with success \citep{westheimer2008illusions}.
+
 \item iterative process - we're only doing first step. but then we don't have an explicit functional expression anymore
 \item we're only extending line lengths -- some normalization might help
 \item there's a long tradition in other disciplines of adjusting work for human cognition, e.g. painters correct (what exactly? color shades based on context), architecture: columns of Parthenon are curved to appear straight,  floor and top are curved inwardly to appear straight from a distance.
