@@ -1183,7 +1183,7 @@ Some modifications are necessary to implement the correction factor in a realist
 
 \subsection{Applet Description}
 
-An applet demonstrating the effect of changing parameter values on the strength of the illusion can be found at \url{http://www.michaelbach.de/ot/sze_sineIllusion/index.html}. An applet demonstrating not only the effect of parameters on the illusion but also the various correction factors we propose in this paper can be found at \newtext{\url{http://glimmer.rstudio.com/srvanderplas/SineIllusionShiny/}. Figure~\ref{fig:shiny.app} shows a screen shot of it. The applet is implemented in {\tt shiny} \citep{shiny}. Users can adjust the amount of adjustment using the plus and minus button (with plus indicating a higher level of correction). Underlying this adjustment is the value of the weight $w$, as defined in eqns.~\ref{eqn.xtrans.weighted} and~\newdo{XXX reference to weighted y transformation}. Participants were recruited from Amazon Mechanical Turk and the reddit community. }
+An applet demonstrating the effect of changing parameter values on the strength of the illusion can be found at \url{http://www.michaelbach.de/ot/sze_sineIllusion/index.html}. An applet demonstrating not only the effect of parameters on the illusion but also the various correction factors we propose in this paper can be found at \newtext{\url{http://glimmer.rstudio.com/srvanderplas/SineIllusion/}, and the applet used in the user study can be found at \url{http://glimmer.rstudio.com/srvanderplas/SineIllusionShiny/}. Figure~\ref{fig:shiny.app} shows a screen shot of it. The applet is implemented in {\tt shiny} \citep{shiny}. Users can adjust the amount of adjustment using the plus and minus button (with plus indicating a higher level of correction). Underlying this adjustment is the value of the weight $w$, as defined in eqns.~\ref{eqn.xtrans.weighted} and~\newdo{XXX reference to weighted y transformation}. Participants were recruited from Amazon Mechanical Turk and the \href{reddit}{http://reddit.com} community.}
 
 % 
 % 
@@ -1194,7 +1194,7 @@ Once a participants arrives at the site, he/she is presented with a specific set
 }
 \subsection{Method}
 \begin{figure}
-\includegraphics[width=\textwidth]{images/shiny.pdf}
+\includegraphics[width=.9\linewidth]{images/shiny.pdf}
 \caption{\label{fig:shiny.app} Screenshot of the shiny application used to collect information of observers' preference with respect to an optimal correction for the illusion  under each of the  transformations discussed in the previous section. }
 \end{figure}
 \subsection{Results}
