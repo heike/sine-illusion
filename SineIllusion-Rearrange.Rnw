@@ -54,7 +54,7 @@ source("code/functions.r")
 
 
 \title{Signs of the Sine Illusion -- why we need to care}
-\author{Susan Vanderplas, Heike Hofmann, Dianne Cook, Xiaoyue Cheng}
+\author{Susan Vanderplas, Heike Hofmann, Dianne Cook}%, Xiaoyue Cheng}
 
 \begin{document}
 \maketitle
