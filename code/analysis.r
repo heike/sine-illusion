@@ -230,56 +230,29 @@ qplot(data=test.post.indiv,  x=lb, xend=ub, y=factor(fingerid), yend=factor(fing
 
 #' Posterior estimates, including CI information for the individual observations 
 #' (i.e. not for any individual observation)
-# indiv.value.bounds <- ddply(test.mean, .(fingerprint, type), function(x){
-#   lb=x$mean[which.min(abs(cumsum(x$f)-.025))]
-#   med=x$mean[which.min(abs(cumsum(x$f)-.5))]
-#   ub=x$mean[which.min(abs(cumsum(x$f)-.975))]
-#   data.frame(lb=lb, median=med, ub=ub)
-# })
-# 
-# overall.value.bounds <- ddply(overall.mean.f, .(type), function(x){
-#   xnew <- sample(x$mean, length(x$mean), prob=x$f, replace=TRUE)
-#   z <- as.numeric(quantile(xnew, c(.025, .5, .975)))
-#   data.frame(lb=z[1], median=z[2], ub=z[3])
-# })
+indiv.value.bounds <- ddply(test.mean, .(fingerprint, type), function(x){
+  lb=x$mean[which.min(abs(cumsum(x$f)-.025))]
+  med=x$mean[which.min(abs(cumsum(x$f)-.5))]
+  ub=x$mean[which.min(abs(cumsum(x$f)-.975))]
+  data.frame(lb=lb, median=med, ub=ub)
+})
+
+overall.value.bounds <- ddply(overall.mean.f, .(type), function(x){
+  xnew <- sample(x$mean, length(x$mean), prob=x$f, replace=TRUE)
+  z <- as.numeric(quantile(xnew, c(.025, .5, .975)))
+  data.frame(lb=z[1], median=z[2], ub=z[3])
+})
 # Posterior Distribution for theta without averaging over individuals
-# qplot(data=overall.mean.f, x=mean, y=f, geom="line", colour=type) + 
-#   xlab("Psychological Lie Factor\nEstimated Distribution for All Individuals") + 
-#   theme_bw() + theme(legend.position="bottom") + scale_color_discrete("Function Type") + 
-#   ylab("Density")
-# 
-# qplot(data=indiv.value.bounds,  x=lb, xend=ub, y=fingerprint, yend=fingerprint, geom="segment", colour=type) + 
-#   facet_wrap(~type) + geom_point(aes(x=median), colour="black") + 
-#   geom_vline(data=overall.value.bounds, aes(xintercept=lb), linetype=3) + 
-#   geom_vline(data=overall.value.bounds, aes(xintercept=median)) + 
-#   geom_vline(data=overall.value.bounds, aes(xintercept=ub), linetype=3) + 
-#   ylab("Participant ID") + xlab("Lie Factor") + theme_bw() + theme(legend.position="bottom") + 
-#   scale_colour_discrete("Function Type")
-# 
+qplot(data=overall.mean.f, x=mean, y=f, geom="line", colour=type) + 
+  xlab("Psychological Lie Factor\nEstimated Distribution for All Individuals") + 
+  theme_bw() + theme(legend.position="bottom") + scale_color_discrete("Function Type") + 
+  ylab("Density")
 
+qplot(data=indiv.value.bounds,  x=lb, xend=ub, y=fingerprint, yend=fingerprint, geom="segment", colour=type) + 
+  facet_wrap(~type) + geom_point(aes(x=median), colour="black") + 
+  geom_vline(data=overall.value.bounds, aes(xintercept=lb), linetype=3) + 
+  geom_vline(data=overall.value.bounds, aes(xintercept=median)) + 
+  geom_vline(data=overall.value.bounds, aes(xintercept=ub), linetype=3) + 
+  ylab("Participant ID") + xlab("Lie Factor") + theme_bw() + theme(legend.position="bottom") + 
+  scale_colour_discrete("Function Type")
 
-#' Plot both individual user and group posterior estimates of preferred weightings. 
-#' We may need more power/trials for each user in phase 2 if we want to do inference on w directly.
-# test.mean.marginal <- ddply(test, .(fingerprint, type, mean), summarise, f=sum(f))
-# test.mean.marginal$f <- unlist(dlply(test.mean.marginal, .(fingerprint, type), summarise, f=f/sum(f)))
-# test.mean.marginal$functions <- c("Exponential", "Inverse", "Sine")[as.numeric(as.factor(test.mean.marginal$type))]
-# test.mean.marginal$functions <- factor(test.mean.marginal$functions, levels=c("Sine", "Exponential", "Inverse"))
-# overall.mean$functions <- c("Exponential", "Inverse", "Sine")[as.numeric(as.factor(overall.mean$type))]
-
-ggplot(data=test.mean.marginal, aes(x=mean, y=f, group=fingerprint, colour=type)) + geom_line(alpha=I(.175)) + 
-  facet_wrap(~functions) + ylab("Density") + xlab("Lie Factor") + theme_bw() + scale_colour_discrete("Function Type") +
-  theme(legend.position="none") + geom_line(data=overall.mean, aes(x=mean, y=f, group=functions), colour="black") + 
-  guides(colour = guide_legend(override.aes = list(alpha = 1)))
-# ggsave("figure/fig-spaghettiIndivDistsW.pdf", width=6, height=6, units="in")
-# 
-# posterior.modes <- ddply(test, .(fingerprint, type), summarise, theta=mean[which.max(f)])
-# qplot(data=posterior.modes, x=theta, geom="density",colour=type, fill=type, alpha=I(.25)) + ylab("Density") + xlab("Individual Posterior Lie Factor Mode")
-
-
-#' User's estimates for Sine vs other experiment.
-byuser <- dcast(test.post.indiv[, c(1, 2, 4)], fingerprint~type)
-byuser <- melt(byuser, id.vars=c("fingerprint", "Sin"), variable.name="Experiment2", value.name="w")
-qplot(data=byuser, x=Sin, y=w, colour=Experiment2, geom="point")  + 
-  scale_colour_manual(values=c("red", "blue")) + 
-  geom_smooth(method="lm") + theme_bw() + 
-  ylab("Weight in Exp 2") + xlab("Weight for Sine")
