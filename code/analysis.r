@@ -44,7 +44,8 @@ getDoParWorkers()
 #               end.time = rep(min(time2)-max(time2),length(time2)),
 #               len = rep(length(time2),length(time2)),
 #               trial.time = as.numeric(time2-max(time2)),
-#               seq = 1:length(time2))
+#               seq = 1:length(time2),
+#               post.training = time2>ymd("2013-7-21") & (q+skip)>=2)
 # 
 # # dataset of individual questions, but without each individual change
 # # Includes only trials where the participant interacted with the graph at least twice. 
@@ -57,7 +58,8 @@ getDoParWorkers()
 #                                 len = length(weight), 
 #                                 unique.weights = length(unique(weight)),
 #                                 time.trial = max(time2)-min(time2),
-#                                 training = training[1]))
+#                                 training = training[1]),
+#                                 post.training = time2>ymd("2013-7-21") & (q+skip)>=2)
 #               })
 # 
 # data$fingerid <- as.numeric(factor(data$fingerprint))
@@ -77,7 +79,7 @@ tab2$time2 <- ymd_hms(tab2$time2)
 # #----------- Plots and Exploration - raw data --------------
 
 # plot of directional arrows indicating start and end point by user and trial type.
-qplot(data=subset(data, len>1), 
+qplot(data=subset(data, len>1, post.training=TRUE), 
       x=startweight, xend=endweight, 
       y=fingerprint, yend=fingerprint, geom="segment", 
       arrow=arrow(length = unit(0.1,"cm")), group=q+skip, alpha=I(.2)) + 
@@ -86,7 +88,11 @@ qplot(data=subset(data, len>1),
   facet_wrap(~type)
 
 # plot of trial trajectories for each user and trial type (not so useful now that there are a bunch of users)
-qplot(data=subset(tab2, len>2 & seq>1 & ntrials>3 & trial.time>-500 & !training), x=trial.time, y=weight, group=q+skip, geom="line", colour=factor((q+skip)%%6)) + geom_point(aes(x=0, y=end.weight)) + facet_grid(type~fingerprint, scales="free_x") + xlab("Time until Trial End") + ylab("Weight") + geom_hline(yintercept=1) + geom_hline(yintercept=0)
+qplot(data=subset(tab2, len>2 & seq>1 & ntrials>6 & trial.time>-500 & !training), x=trial.time, y=weight, group=q+skip, geom="line", colour=factor((q+skip)%%6)) + geom_point(aes(x=0, y=end.weight)) + facet_grid(type~fingerprint, scales="free_x") + xlab("Time until Trial End") + ylab("Weight") + geom_hline(yintercept=1) + geom_hline(yintercept=0)
+
+
+# plot of trial trajectories for each user
+qplot(data=subset(tab2, len>2 & seq>1 & ntrials>15 & trial.time>-500 & !training), x=trial.time, y=weight, group=q+skip, geom="line", colour=type, alpha=I(.5)) + geom_point(aes(x=0, y=end.weight), alpha=.5) + facet_wrap(~fingerprint, scales="free_x") + xlab("Time until Trial End") + ylab("Weight") + geom_hline(yintercept=1) + geom_hline(yintercept=0)
 
 # plot of trial trajectories, for each trial type across all users. 
 ggplot() + 
