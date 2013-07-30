@@ -58,8 +58,8 @@ getDoParWorkers()
 #                                 len = length(weight), 
 #                                 unique.weights = length(unique(weight)),
 #                                 time.trial = max(time2)-min(time2),
-#                                 training = training[1]),
-#                                 post.training = time2>ymd("2013-7-21") & (q+skip)>=2)
+#                                 training = training[1],
+#                                 post.training = min(time2)>ymd("2013-7-21") & (q+skip)[1]>=2))
 #               })
 # 
 # data$fingerid <- as.numeric(factor(data$fingerprint))
@@ -79,13 +79,13 @@ tab2$time2 <- ymd_hms(tab2$time2)
 # #----------- Plots and Exploration - raw data --------------
 
 # plot of directional arrows indicating start and end point by user and trial type.
-qplot(data=subset(data, len>1, post.training=TRUE), 
+qplot(data=subset(data, len>1), 
       x=startweight, xend=endweight, 
       y=fingerprint, yend=fingerprint, geom="segment", 
       arrow=arrow(length = unit(0.1,"cm")), group=q+skip, alpha=I(.2)) + 
   geom_vline(aes(xintercept=0), linetype=2) +
   geom_vline(aes(xintercept=1), linetype=2) +
-  facet_wrap(~type)
+  facet_grid(post.training~type)
 
 # plot of trial trajectories for each user and trial type (not so useful now that there are a bunch of users)
 qplot(data=subset(tab2, len>2 & seq>1 & ntrials>6 & trial.time>-500 & !training), x=trial.time, y=weight, group=q+skip, geom="line", colour=factor((q+skip)%%6)) + geom_point(aes(x=0, y=end.weight)) + facet_grid(type~fingerprint, scales="free_x") + xlab("Time until Trial End") + ylab("Weight") + geom_hline(yintercept=1) + geom_hline(yintercept=0)
