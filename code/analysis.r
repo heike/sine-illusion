@@ -88,7 +88,7 @@ qplot(data=subset(data, len>1),
   facet_grid(post.training~type)
 
 # plot of trial trajectories for each user and trial type (not so useful now that there are a bunch of users)
-qplot(data=subset(tab2, len>2 & seq>1 & ntrials>6 & trial.time>-500 & !training), x=trial.time, y=weight, group=q+skip, geom="line", colour=factor((q+skip)%%6)) + geom_point(aes(x=0, y=end.weight)) + facet_grid(type~fingerprint, scales="free_x") + xlab("Time until Trial End") + ylab("Weight") + geom_hline(yintercept=1) + geom_hline(yintercept=0)
+qplot(data=subset(tab2, len>2 & seq>1 & ntrials>6 & trial.time>-500 & !training & post.training), x=trial.time, y=weight, group=q+skip, geom="line", colour=factor((q+skip)%%6)) + geom_point(aes(x=0, y=end.weight)) + facet_grid(type~fingerprint, scales="free_x") + xlab("Time until Trial End") + ylab("Weight") + geom_hline(yintercept=1) + geom_hline(yintercept=0)
 
 
 # plot of trial trajectories for each user
@@ -121,6 +121,25 @@ ggplot() + geom_density(data=data, aes(x=endweight, group=startweight.cat,
   xlab("Final Weight") + ylab("Density") + ggtitle("Density of Final Weight") + xlim(c(-.5, 1.5))
 
 qplot(data=subset(data, ntrials>10 & q>1), geom="boxplot", x=factor(fingerid), y=endweight) + facet_wrap(~type) + ylim(c(-1, 2)) + ggtitle("Individual boxplots")
+
+#----------------------Mixed Model Approach-----------------
+
+fixed.model <- lm(data=data, endweight~startweight+type+post.training+training)
+# start weight is significant (p<2e-16), type is not. 
+# Whether or not the trial is post-training is also not significant 
+#   (though it comes close when training is also included).
+
+lm.data <- subset(data, startweight<=1 & startweight>=0 & !training & ntrials>3)
+
+library(lme4)
+library(multcomp)
+model <- lmer(data=lm.data, endweight~startweight*I(type=="x")+(1|fingerprint))
+summary(model)
+model.mcmc <- mcmcsamp(model, 5000)
+ints <- HPDinterval(model.mcmc)
+
+individual.effects <- ranef(model, postVar=TRUE)
+dotplot(individual.effects)
 
 
 #-----------------------Distribution of W-------------------
