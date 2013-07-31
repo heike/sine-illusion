@@ -122,6 +122,8 @@ ggplot() + geom_density(data=data, aes(x=endweight, group=startweight.cat,
 
 qplot(data=subset(data, ntrials>10 & q>1), geom="boxplot", x=factor(fingerid), y=endweight) + facet_wrap(~type) + ylim(c(-1, 2)) + ggtitle("Individual boxplots")
 
+ggplot(data=data, aes(x=startweight, y=endweight)) + geom_polygon(aes(fill=..level.., group=..piece..), stat="density2d", alpha=.5) + xlab("Starting Weight") + ylab("Submitted \"Correct\" Weight") + facet_wrap(~type)
+
 #----------------------Mixed Model Approach-----------------
 
 fixed.model <- lm(data=data, endweight~startweight+type+post.training+training)
