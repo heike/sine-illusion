@@ -1202,7 +1202,7 @@ qplot(x=wopts, geom="density") + geom_rug()
 Once a participants arrives at the site, he/she is presented with a specific setting of the weight $w$, where for the first six evaluations $w$ is randomly chosen from the set of numbers $\{0, 1, c\}, c\in(.25, .75)$. The first six stimuli consist of the sine illusion, corrected in $x$ or $y$ with weight $w$, so that each participant is exposed to a factorial combination of three weights and the two correction types. Participants are free to adjust up to thirty graphs, so after the initial six, $w$ is randomly sampled from distribution centered at 0.6 with mass on $(-4, 5)$. %wopts and graph are in study-weight-dist above
 This allows us to fully explore the space of plausible $w$ while focusing on the $w \in (0,1)$.
 
-The range of weight values the shiny app allows follows the full distribution of $w$ described above, so possible weight values are between $(-4, 5)$. Participants adjust the graph using increment and decrement buttons, and click "submit" to proceed to the next stimuli when they are satisfied with the adjustment. This provides a clear starting value and ending value, allowing us to assess the range of optimal values for each participant. 
+The range of weight values the shiny app allows follows the full distribution of $w$ described above, so possible weight values are between $(-4, 5)$. Participants adjust the graph using increment and decrement buttons, and click "submit" to proceed to the next stimuli when they are satisfied with the adjustment. This provides a clear starting value and ending value, allowing us to assess the range of optimal values for each participant. Two "training" trials were provided that additionally superimposed a graph of the underlying mean function to give participants some idea of the ideal mean function. This approach was taken to reduce the incidence of extremely high "x" correction values, because when $w>>1$, the lines still look to be of equal length but the underlying function bears little resemblance to $\sin(x)$. 
 }
 \subsection{Method}
 \begin{figure}\centering
@@ -1210,7 +1210,7 @@ The range of weight values the shiny app allows follows the full distribution of
 \caption{\label{fig:shiny.app} Screenshot of the shiny application used to collect information of observers' preference with respect to an optimal correction for the illusion  under each of the  transformations discussed in the previous section. }
 \end{figure}
 \subsection{Results}
-\newtext{XXX participants in total took part in the study with XXX total evaluations. }
+\newtext{123 participants in total took part in the study with XXX total evaluations. }
 
 XXX our evidence: 0 is not in the posterior interval ...
 
