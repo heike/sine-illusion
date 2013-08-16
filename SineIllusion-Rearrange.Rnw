@@ -1084,33 +1084,6 @@ ggplot(aes(x=x, y=value, group=variable, linetype=variable), data=dfm) + geom_li
   ylab(expression(frac('\u2113', 2))) + xlab("") + 
   theme_bw() + theme(legend.position="bottom", axis.title.y=element_text(angle=0)) +
   scale_linetype_discrete(expression('Adjusted ' * frac('\u2113', 2)*'  '))
-
-# dframe$type <- "Data"
-# dframe.real <- createSine(n = 4000, len = 1, f=f, fprime=fprime, f2prime=f2prime)
-# secantlines <- getSecantSegment(dframe.real$x, dframe, f, fprime, f2prime)
-# # secantlines2 <- getAdjLength(secantlines)
-# 
-# dframe2 <- secantlines
-# names(dframe2) <- c("x", "y", "deriv", "xstart", "xend", "ystart", "yend", "ell", "ellp", "ellm", "type", "a")
-# 
-# library(plyr)
-# dframe2 <- rbind.fill(dframe, dframe2)
-# names(secantlines)[9:10] <- c("Bottom.Segment", "Top.Segment")
-# 
-# library(reshape2)
-# secantlines.long <- melt(secantlines, measure.vars=c("Bottom.Segment", "Top.Segment"),  variable.name="Line", value.name="len")
-# names(secantlines.long)[11:12] <- c("Line", "len")
-# secantlines.long <- subset(secantlines.long, abs(x-pi)<pi)
-# cairo_pdf("figure/fig-wtf.pdf", width=8, height=4)
-# ggplot(aes(x=x, y=len, linetype=Line), data=secantlines.long) + geom_line()+
-#   scale_x_continuous(breaks=seq(0, 2*pi, by=pi/2), 
-#                      labels=c("0", expression(paste(pi,"/2")), 
-#                               expression(pi), 
-#                               expression(paste("3",pi, "/2")), 
-#                               expression(paste("2",pi)))) + 
-#   ylab(expression(frac('\u2113', 2))) +
-#   theme_bw() + theme(legend.position="bottom", axis.title.y=element_text(angle=0)) + scale_linetype_discrete("Adjusted \u2113/2")
-# dev.off()
 @
 \begin{figure}[h!tbp]\centering
 \includegraphics[keepaspectratio=TRUE, width=.8\linewidth]{figure/fig-CtsQuadratic}
@@ -1122,6 +1095,12 @@ ggplot(aes(x=x, y=value, group=variable, linetype=variable), data=dfm) + geom_li
 The quadratic correction breaks, whenever $v^2 \pm \ell\cdot f^{\prime\prime}(x)\cdot f^\prime(x)^2 < 0$.
 This is achieved by a combination of large values of $\ell$, which signify a large vertical extent, or large conditional variability $E[Y|X]$, and a large changes in the slope of the main trend, i.e large values of the curvature $f^{\prime\prime}(x)$. In the linear approximation of $f$ the same situation leads to a massive overcorrection of the vertical lines, making the `corrected' function almost unrecognizable. 
 
+\newdo{Add a paragraph on using a weighted approach to this correction.}
+\newtext{Similar to the proposed $X$ transformation, we can use a weighted approach to find a balance between counteracting the illusion and representating the form of the original data. }
+\newdo{state the formula with $w$ here}
+\begin{equation}\label{eqn.ytrans.weighted}
+\text{which function are you using in the app?}
+\end{equation}
 % % 
 % % $1 + 2f^\prime(x)^2 + f^\prime(x)^4 \pm \ell\cdot f^{\prime\prime}(x)\cdot f^\prime(x)^2 < 0$
 % % 
@@ -1182,8 +1161,13 @@ Some modifications are necessary to implement the correction factor in a realist
 
 
 \subsection{Applet Description}
-
-An applet demonstrating the effect of changing parameter values on the strength of the illusion can be found at \url{http://www.michaelbach.de/ot/sze_sineIllusion/index.html}. An applet demonstrating not only the effect of parameters on the illusion but also the various correction factors we propose in this paper can be found at \newtext{\url{http://glimmer.rstudio.com/srvanderplas/SineIllusion/}, and the applet used in the user study can be found at \url{http://glimmer.rstudio.com/srvanderplas/SineIllusionShiny/}. Figure~\ref{fig:shiny.app} shows a screen shot of it. The applet is implemented in {\tt shiny} \citep{shiny}. Users can adjust the amount of adjustment using the plus and minus button (with plus indicating a higher level of correction). Underlying this adjustment is the value of the weight $w$, as defined in eqns.~\ref{eqn.xtrans.weighted} and~\newdo{XXX reference to weighted y transformation}. Participants were recruited from Amazon Mechanical Turk and the \href{reddit}{http://reddit.com} community.}
+\begin{figure}\centering
+\includegraphics[width=.9\linewidth]{images/shiny.pdf}
+\caption{\label{fig:shiny.app} Screenshot of the shiny application used to collect information of observers' preference with respect to an optimal correction for the illusion  under each of the  transformations discussed in the previous section. }
+\end{figure}
+%
+%An applet demonstrating the effect of changing parameter values on the strength of the illusion can be found at \url{http://www.michaelbach.de/ot/sze_sineIllusion/index.html}. 
+An applet demonstrating the effect of changing parameter values on the strength of the illusion as well as all of the correction factors we propose in this paper can be found at \url{http://glimmer.rstudio.com/srvanderplas/SineIllusion/}. This applet was used in collecting data from users and can be found at \url{http://glimmer.rstudio.com/srvanderplas/SineIllusionShiny/}. Figure~\ref{fig:shiny.app} shows a screen shot of it. The applet is implemented in {\tt shiny} \citep{shiny}. Users can adjust the amount of adjustment using the plus and minus button (with plus indicating a higher level of correction). Underlying this adjustment is the value of the weight $w$, as defined in eqns.~\ref{eqn.xtrans.weighted} and~\ref{eqn.ytrans.weighted}. Participants were recruited from Amazon Mechanical Turk and the \href{reddit}{http://reddit.com} community.
 
 % 
 % 
@@ -1205,10 +1189,6 @@ This allows us to fully explore the space of plausible $w$ while focusing on the
 The range of weight values the shiny app allows follows the full distribution of $w$ described above, so possible weight values are between $(-4, 5)$. Participants adjust the graph using increment and decrement buttons, and click "submit" to proceed to the next stimuli when they are satisfied with the adjustment. This provides a clear starting value and ending value, allowing us to assess the range of optimal values for each participant. Two "training" trials were provided that additionally superimposed a graph of the underlying mean function to give participants some idea of the ideal mean function. This approach was taken to reduce the incidence of extremely high "x" correction values, because when $w>>1$, the lines still look to be of equal length but the underlying function bears little resemblance to $\sin(x)$. 
 }
 \subsection{Method}
-\begin{figure}\centering
-\includegraphics[width=.9\linewidth]{images/shiny.pdf}
-\caption{\label{fig:shiny.app} Screenshot of the shiny application used to collect information of observers' preference with respect to an optimal correction for the illusion  under each of the  transformations discussed in the previous section. }
-\end{figure}
 \subsection{Results}
 \newtext{123 participants in total took part in the study with XXX total evaluations. }
 
@@ -1315,6 +1295,14 @@ Such a correction is significant not only because of its effect on statistical g
 \item there's a long tradition in other disciplines of adjusting work for human cognition, e.g. painters correct (what exactly? color shades based on context), architecture: columns of Parthenon are curved to appear straight,  floor and top are curved inwardly to appear straight from a distance.
 \item transformations allows us to keep the context, whereas best practice of trend removal does not do that and requires extra cognitive load to process the information.
 \end{itemize}
+%
+%
+\bibliographystyle{asa}
+% argument is your BibTeX string definitions and bibliography database(s)
+\bibliography{references}
+\clearpage
+%
+%
 \begin{appendix}
 \section{Transformation of the horizontal axis}\label{app.xtrans}
 As the slope is determined by the aspect ratio, we are free to choose it and w.l.o.g. we get for each piece $T_i$: 
@@ -1395,10 +1383,6 @@ For a valid solution for the correction factor, we have to assume that $\lambda$
 for $v = 1 + f^\prime(x_0)$. 
 This gives the results as shown in equations (\ref{eqn.q1}) and (\ref{eqn.q2})
 \end{appendix}
-\clearpage
-\bibliographystyle{asa}
-% argument is your BibTeX string definitions and bibliography database(s)
-\bibliography{references}
 \end{document}
 
 
