@@ -28,7 +28,7 @@ getDoParWorkers()
 # tab <- ddply(tab, .(iphash, fingerprint, ipid), transform, ntrials=length(unique(q+skip))) # add number of trials
 # tab <- tab[which(tab$weight>0),] # remove "initial" observation that no longer corresponds to weight in this iteration of the program. 
 # tab <- subset(tab, !grepl("test", userid)) # remove "test" runs
-# tab <- subset(tab, !grepl("76.84", ipid)) # remove data from Auburn/Nebraska City, NE, because it's full of "tests" that weren't marked as such. Whoops.
+# tab <- subset(tab, !grepl("76.84", ipid)) # remove sum.data from Auburn/Nebraska City, NE, because it's full of "tests" that weren't marked as such. Whoops.
 # tab$weight <- wopts[tab$weight] # convert javascript vector weight into actual meaningful weight measurement
 # 
 # 
@@ -47,9 +47,9 @@ getDoParWorkers()
 #               seq = 1:length(time2),
 #               post.training = time2>ymd("2013-7-21") & (q+skip)>=2)
 # 
-# # dataset of individual questions, but without each individual change
+# # sum.dataset of individual questions, but without each individual change
 # # Includes only trials where the participant interacted with the graph at least twice. 
-# data <- ddply(subset(tab2, len>2 & seq>1), .(iphash, fingerprint, ipid, q, skip, type, ntrials), 
+# sum.data <- ddply(subset(tab2, len>2 & seq>1), .(iphash, fingerprint, ipid, q, skip, type, ntrials), 
 #               function(df){
 #                 with(df, 
 #                      data.frame(startweight = weight[which.min(time2)], 
@@ -62,24 +62,24 @@ getDoParWorkers()
 #                                 post.training = min(time2)>ymd("2013-7-21") & (q+skip)[1]>=2))
 #               })
 # 
-# data$fingerid <- as.numeric(factor(data$fingerprint))
+# sum.data$fingerid <- as.numeric(factor(sum.data$fingerprint))
 # tab2$fingerid <- as.numeric(factor(tab2$fingerprint))
 # 
-# write.csv(tab2[,-which(names(tab2)=="userid")], "./data/IndivTrajectory.csv")
-# write.csv(data, "./data/SummaryTable.csv")
+# write.csv(tab2[,-which(names(tab2)=="userid")], "./sum.data/IndivTrajectory.csv")
+# write.csv(sum.data, "./sum.data/SummaryTable.csv")
 
 
 # #-----------------------Read in Data------------------------
 
-# use if no access to the SQL database.
-data <- read.csv("./data/SummaryTable.csv", row.names=1, stringsAsFactors=FALSE)
+# use if no access to the SQL sum.database.
+sum.data <- read.csv("./data/SummaryTable.csv", row.names=1, stringsAsFactors=FALSE)
 tab2 <- read.csv("./data/IndivTrajectory.csv", row.names=1, stringsAsFactors=FALSE)
 tab2$time2 <- ymd_hms(tab2$time2)
 
-# #----------- Plots and Exploration - raw data --------------
+# #----------- Plots and Exploration - raw sum.data --------------
 
 # plot of directional arrows indicating start and end point by user and trial type.
-qplot(data=subset(data, len>1), 
+qplot(data=subset(sum.data, len>1), 
       x=startweight, xend=endweight, 
       y=fingerprint, yend=fingerprint, geom="segment", 
       arrow=arrow(length = unit(0.1,"cm")), group=q+skip, alpha=I(.2)) + 
@@ -96,8 +96,8 @@ qplot(data=subset(tab2, len>2 & seq>1 & ntrials>15 & trial.time>-500 & !training
 
 # plot of trial trajectories, for each trial type across all users. 
 ggplot() + 
-  geom_point(data=data, aes(x=0, y=endweight), alpha=.05) + 
-  geom_rug(data=data, aes(y=endweight), alpha=.05, sides="r") +
+  geom_point(data=sum.data, aes(x=0, y=endweight), alpha=.05) + 
+  geom_rug(data=sum.data, aes(y=endweight), alpha=.05, sides="r") +
   geom_line(data=subset(tab2, len>2 & seq>1 & ntrials>4 & trial.time>-100),
             aes(x=trial.time, y=weight, group=interaction(q+skip, fingerprint)), alpha=.1) + 
   facet_grid(type~., scales="free_x") + 
@@ -109,34 +109,40 @@ ggplot() +
   ylim(c(-1, 2))
 
 # Where (approximately) did weight start?
-data$startweight.cat <- factor(
-  sapply(data$startweight, function(i) sum(i<=quantile(data$startweight, seq(.2, 1, .2)))),
-  labels=paste(quantile(data$startweight, seq(0, .8, .2)), quantile(data$startweight, seq(.2, 1, .2)), sep=" - "))
+sum.data$startweight.cat <- factor(
+  sapply(sum.data$startweight, function(i) sum(i<=quantile(sum.data$startweight, seq(.2, 1, .2)))),
+  labels=paste(quantile(sum.data$startweight, seq(0, .8, .2)), quantile(sum.data$startweight, seq(.2, 1, .2)), sep=" - "))
 
-ggplot() + geom_density(data=data, aes(x=endweight, group=startweight.cat,
+ggplot() + geom_density(data=sum.data, aes(x=endweight, group=startweight.cat,
                                        colour=startweight.cat, fill=startweight.cat), alpha=I(.2)) + 
-  geom_rug(data=data, aes(x=endweight), alpha=I(.1)) + 
+  geom_rug(data=sum.data, aes(x=endweight), alpha=I(.1)) + 
   facet_grid(startweight.cat~type) + scale_fill_discrete("Starting Weight") + 
   scale_colour_discrete("Starting Weight") + 
   xlab("Final Weight") + ylab("Density") + ggtitle("Density of Final Weight") + xlim(c(-.5, 1.5))
 
-qplot(data=subset(data, ntrials>10 & q>1), geom="boxplot", x=factor(fingerid), y=endweight) + facet_wrap(~type) + ylim(c(-1, 2)) + ggtitle("Individual boxplots")
+qplot(data=subset(sum.data, ntrials>10 & q>1), geom="boxplot", 
+      x=factor(fingerid), y=endweight) + 
+  facet_wrap(~type) + ylim(c(-1, 2)) + ggtitle("Individual boxplots")
 
-ggplot(data=data, aes(x=startweight, y=endweight)) + geom_polygon(aes(fill=..level.., group=..piece..), stat="density2d", alpha=.5) + xlab("Starting Weight") + ylab("Submitted \"Correct\" Weight") + facet_wrap(~type)
+ggplot(data=sum.data, aes(x=startweight, y=endweight)) + 
+  geom_polygon(aes(fill=..level.., group=..piece..), stat="density2d", alpha=.5) + 
+  xlab("Starting Weight") + 
+  ylab("Submitted \"Correct\" Weight") + 
+  facet_wrap(~type)
 
 #----------------------Mixed Model Approach-----------------
 
-fixed.model <- lm(data=data, endweight~startweight+type+post.training+training)
+fixed.model <- lm(data=sum.data, endweight~startweight+type+post.training+training)
 # start weight is significant (p<2e-16), type is not. 
 # Whether or not the trial is post-training is also not significant 
 #   (though it comes close when training is also included).
 
-lm.data <- subset(data, startweight<=1 & startweight>=0 & !training & ntrials>3)
+lm.sum.data <- subset(sum.data, startweight<=1 & startweight>=0 & !training & ntrials>3)
 
 library(lme4)
 library(multcomp)
-model <- lmer(data=lm.data, endweight~startweight*I(type=="x")+(1|fingerprint))
-model <- lmer(data=lm.data, endweight~startweight + type +(1|fingerprint))
+model <- lmer(data=lm.sum.data, endweight~startweight*I(type=="x")+(1|fingerprint))
+model <- lmer(data=lm.sum.data, endweight~startweight + type +(1|fingerprint))
 summary(model)
 model.mcmc <- mcmcsamp(model, 5000)
 ints <- HPDinterval(model.mcmc)
@@ -145,153 +151,155 @@ individual.effects <- ranef(model, postVar=TRUE)
 dotplot(individual.effects)
 
 
-modelx <- lmer(data=subset(lm.data, type=="x"), endweight~startweight + (1|fingerprint))
+modelx <- lmer(data=subset(lm.sum.data, type=="x"), endweight~startweight + (1|fingerprint))
 summary(modelx)
 modelx.mcmc <- mcmcsamp(modelx, 5000)
 ints.x <- HPDinterval(modelx.mcmc)
 
-modely <- lmer(data=subset(lm.data, type=="y"), endweight~startweight + (1|fingerprint))
+modely <- lmer(data=subset(lm.sum.data, type=="y"), endweight~startweight + (1|fingerprint))
 summary(modely)
 modely.mcmc <- mcmcsamp(modely, 5000)
 ints.y <- HPDinterval(modely.mcmc)
 
-
-#-----------------------Distribution of W-------------------
-logpost <- function(data, par){
-  temp <- sum(dnorm(data$endweight, mean=par[1], sd=par[2], log=TRUE))
-  temp <- temp-max(temp)*.9 # adjust by a constant so small values don't wash out.
-}
-
-get_posterior_density <- function(data, pars){
-  temp <- sapply(1:nrow(pars), function(i) logpost(data, pars[i,]))
-  temp <- exp(temp)/sum(exp(temp))
-  data.frame(mean=pars[,1], sd=pars[,2], f=temp)
-}
-
-#------------------------- Overall Marginals ---------------
-
-pars <- as.matrix(expand.grid(seq(-.5, 1.2, .005), seq(.4, 1, .005)))
-
-overall <- ddply(subset(data, ntrials>6), .(type), get_posterior_density, pars=pars)
-overall.mean <- ddply(overall[,-3], .(type, mean), summarise, f=sum(f))
-overall.mean <- ddply(overall.mean, .(type), transform, f=f/sum(f))
-#' Posterior marginal distribution over individual and std. deviation
-qplot(data=overall.mean, x=mean, y=f, geom="line", colour=type, group=type) + 
-  scale_colour_discrete("Function Type") + 
-  xlab("Mean Preferred Weighting") + ylab("Density") + theme_bw()  + theme(legend.position="bottom") 
-# ggsave("figure/fig-OverallMeansW.pdf", width=4, height=4, units="in")
-
-
-overall.sd <- ddply(overall[,-2], .(type, sd), summarise, f=sum(f))
-overall.sd <- ddply(overall.sd, .(type), transform, f=f/sum(f))
-
-#' Posterior marginal distribution over individual and mean
-qplot(data=overall.sd, x=sd, y=f, geom="line", colour=factor(type), group=type) + theme_bw() + xlab("Posterior SD") + ylab("Density")
-
-#' Posterior joint dist of mean, sd over individuals
-#' since stat_density2d won't use weights, ... improvise!
-overall.joint.sample <- sample(1:nrow(overall), size=50000, replace=TRUE, prob=overall$f)
-ggplot(data=overall[overall.joint.sample,], aes(x=mean, y=sd)) + 
-  stat_density2d(n=c(75, 40), geom="density2d", aes(colour=type)) + 
-#   facet_wrap(~type) + scale_colour_discrete(guide="none") + 
-  theme_bw() + 
-  xlab("Mean Preferred Weighting") + ylab("Std. Deviation")
-# ggsave("figure/fig-Joint2dDensityW.pdf", width=4, height=4, units="in")
-
-#--------------------Individual Distribution of Theta ------
-
-# get posterior density for each individual
-test <- ddply(subset(data, ntrials>12), .(fingerprint, fingerid, type), get_posterior_density, pars=pars, .parallel=TRUE)
-
-test.mean <- ddply(test, .(fingerprint, fingerid, type, mean), summarise, f=sum(f))
-test.mean <- ddply(test.mean, .(fingerprint, fingerid, type), transform, f=f/sum(f))
-
-participants <- dcast(ddply(data, .(fingerprint, type), summarise, 
-                            fingerid=unique(fingerid), n=length(type)), 
-                      fingerprint+fingerid~type, value.var="n")
-participants.max <- ddply(test.mean, .(fingerprint, fingerid, type), summarise, x = mean[which.max(f)], y=max(f))
-
-ipsubset <- subset(participants, rowSums(is.na(participants))==0 & 
-                     rowSums(participants[,3:4]>12, na.rm=TRUE)==2)$fingerprint
-
-par_labeller <- function(var, value){
-  n <- sapply(value, function(i) sum(subset(participants, fingerid%in%i)[,3:4]))
-#   value <- subset(participants, fingerprint==value)$fingerid
-  value <- paste("Participant ", as.character(value), "\n(n = ", n, ")", sep="")
-  return(value)
-}
-
-
-#' Plot 4 individuals who did at least 12 trials of each type 
-qplot(data=subset(test.mean, fingerprint%in%ipsubset), x=mean, y=f, group=type, colour=type, geom="line") + 
-  facet_grid(.~fingerid, labeller=par_labeller) + scale_colour_discrete("Function Type") + theme_bw() + 
-  theme(legend.position="bottom") + xlab("Preferred Weight") + ylab("Density") + 
-  geom_segment(data=subset(participants.max, fingerprint%in%ipsubset), aes(x=x, xend=x, y=0, yend=y, colour=type))
-# ggsave("figure/fig-IndivMeanAllFcnsW.pdf", width=7, height=3.5)      
-
-
-
-#' Posterior mean estimates, including CI information for the individual MEAN 
-#' (i.e. not for any individual observation)
-test.post.indiv<- ddply(test.mean, .(fingerprint, fingerid, type), 
-                        function(x){
-                          ex=sum(x$mean*x$f)
-                          n=sum(data$fingerprint==x$fingerprint[1] & data$type==x$type[1])
-                          samp <- matrix(sample(x$mean, n*20, prob=x$f, replace=TRUE), ncol=20)
-                          z <- as.numeric(quantile(rowMeans(samp), c(.025, .5, .975)))
-                          data.frame(fingerprint=unique(x$fingerprint), type=unique(x$type), lb=z[1], mean = ex, median=z[2], ub=z[3], n=n)
-                        })
-
-overall.mean.f <- ddply(test.mean, .(type, mean), summarise, f=sum(f))
-overall.mean.f <- ddply(overall.mean.f, .(type), transform, f=f/sum(f))
-
-overall.mean.bounds <- ddply(overall.mean.f, .(type), function(x){
-  ex=sum(x$mean*x$f)
-  n=length(unique(subset(data, data$type==type)$fingerprint))
-  samp <- matrix(sample(x$mean, n*11, prob=x$f, replace=TRUE), ncol=11)
-  sample.mean = mean(samp)                          
-  sdev = sd(rowMeans(samp))
-  lb = as.numeric(quantile(rowMeans(samp), .025))
-  med = as.numeric(quantile(rowMeans(samp), .5))
-  ub = as.numeric(quantile(rowMeans(samp), .975))
-  data.frame(lb=lb, mean=sample.mean, median=med, ub=ub)
-})
-
-
-qplot(data=test.post.indiv,  x=lb, xend=ub, y=factor(fingerid), yend=factor(fingerid), geom="segment", colour=type) + 
-  facet_wrap(~type) + geom_point(aes(x=median), colour="black") + 
-  geom_vline(data=overall.mean.bounds, aes(xintercept=lb), linetype=3) + 
-  geom_vline(data=overall.mean.bounds, aes(xintercept=median)) + 
-  geom_vline(data=overall.mean.bounds, aes(xintercept=ub), linetype=3) + 
-  ylab("Participant ID") + xlab("Mean Preferred Weighting") + theme_bw() + theme(legend.position="none") + 
-  scale_colour_discrete("Function Type")
-# ggsave("figure/fig-CIindivMeanW.pdf", width=6, height=6, units="in")
-
-#' Posterior estimates, including CI information for the individual observations 
-#' (i.e. not for any individual observation)
-indiv.value.bounds <- ddply(test.mean, .(fingerprint, type), function(x){
-  lb=x$mean[which.min(abs(cumsum(x$f)-.025))]
-  med=x$mean[which.min(abs(cumsum(x$f)-.5))]
-  ub=x$mean[which.min(abs(cumsum(x$f)-.975))]
-  data.frame(lb=lb, median=med, ub=ub)
-})
-
-overall.value.bounds <- ddply(overall.mean.f, .(type), function(x){
-  xnew <- sample(x$mean, length(x$mean), prob=x$f, replace=TRUE)
-  z <- as.numeric(quantile(xnew, c(.025, .5, .975)))
-  data.frame(lb=z[1], median=z[2], ub=z[3])
-})
-# Posterior Distribution for theta without averaging over individuals
-qplot(data=overall.mean.f, x=mean, y=f, geom="line", colour=type) + 
-  xlab("Psychological Lie Factor\nEstimated Distribution for All Individuals") + 
-  theme_bw() + theme(legend.position="bottom") + scale_color_discrete("Function Type") + 
-  ylab("Density")
-
-qplot(data=indiv.value.bounds,  x=lb, xend=ub, y=fingerprint, yend=fingerprint, geom="segment", colour=type) + 
-  facet_wrap(~type) + geom_point(aes(x=median), colour="black") + 
-  geom_vline(data=overall.value.bounds, aes(xintercept=lb), linetype=3) + 
-  geom_vline(data=overall.value.bounds, aes(xintercept=median)) + 
-  geom_vline(data=overall.value.bounds, aes(xintercept=ub), linetype=3) + 
-  ylab("Participant ID") + xlab("Lie Factor") + theme_bw() + theme(legend.position="bottom") + 
-  scale_colour_discrete("Function Type")
-
+# 
+# #-----------------------Distribution of W-------------------
+# logpost <- function(data, par){
+#   temp <- sum(dnorm(data$endweight, mean=par[1], sd=par[2], log=TRUE))
+#   temp <- temp-max(temp)*.9 # adjust by a constant so small values don't wash out.
+# }
+# 
+# get_posterior_density <- function(data, pars){
+#   temp <- sapply(1:nrow(pars), function(i) logpost(data, pars[i,]))
+#   temp <- exp(temp)/sum(exp(temp))
+#   sum.data.frame(mean=pars[,1], sd=pars[,2], f=temp)
+# }
+# 
+# #------------------------- Overall Marginals ---------------
+# 
+# pars <- as.matrix(expand.grid(seq(-.5, 1.2, .005), seq(.4, 1, .005)))
+# 
+# overall <- ddply(subset(data, ntrials>6), .(type), get_posterior_density, pars=pars)
+# overall.mean <- ddply(overall[,-3], .(type, mean), summarise, f=sum(f))
+# overall.mean <- ddply(overall.mean, .(type), transform, f=f/sum(f))
+# #' Posterior marginal distribution over individual and std. deviation
+# qplot(data=overall.mean, x=mean, y=f, geom="line", colour=type, group=type) + 
+#   scale_colour_discrete("Function Type") + 
+#   xlab("Mean Preferred Weighting") + ylab("Density") + theme_bw()  + theme(legend.position="bottom") 
+# # ggsave("figure/fig-OverallMeansW.pdf", width=4, height=4, units="in")
+# 
+# 
+# overall.sd <- ddply(overall[,-2], .(type, sd), summarise, f=sum(f))
+# overall.sd <- ddply(overall.sd, .(type), transform, f=f/sum(f))
+# 
+# #' Posterior marginal distribution over individual and mean
+# qplot(data=overall.sd, x=sd, y=f, geom="line", 
+#       colour=factor(type), group=type) + 
+#   theme_bw() + xlab("Posterior SD") + ylab("Density")
+# 
+# #' Posterior joint dist of mean, sd over individuals
+# #' since stat_density2d won't use weights, ... improvise!
+# overall.joint.sample <- sample(1:nrow(overall), size=50000, replace=TRUE, prob=overall$f)
+# ggplot(data=overall[overall.joint.sample,], aes(x=mean, y=sd)) + 
+#   stat_density2d(n=c(75, 40), geom="density2d", aes(colour=type)) + 
+# #   facet_wrap(~type) + scale_colour_discrete(guide="none") + 
+#   theme_bw() + 
+#   xlab("Mean Preferred Weighting") + ylab("Std. Deviation")
+# # ggsave("figure/fig-Joint2dDensityW.pdf", width=4, height=4, units="in")
+# 
+# #--------------------Individual Distribution of Theta ------
+# 
+# # get posterior density for each individual
+# test <- ddply(subset(sum.data, ntrials>12), .(fingerprint, fingerid, type), get_posterior_density, pars=pars, .parallel=TRUE)
+# 
+# test.mean <- ddply(test, .(fingerprint, fingerid, type, mean), summarise, f=sum(f))
+# test.mean <- ddply(test.mean, .(fingerprint, fingerid, type), transform, f=f/sum(f))
+# 
+# participants <- dcast(ddply(sum.data, .(fingerprint, type), summarise, 
+#                             fingerid=unique(fingerid), n=length(type)), 
+#                       fingerprint+fingerid~type, value.var="n")
+# participants.max <- ddply(test.mean, .(fingerprint, fingerid, type), summarise, x = mean[which.max(f)], y=max(f))
+# 
+# ipsubset <- subset(participants, rowSums(is.na(participants))==0 & 
+#                      rowSums(participants[,3:4]>12, na.rm=TRUE)==2)$fingerprint
+# 
+# par_labeller <- function(var, value){
+#   n <- sapply(value, function(i) sum(subset(participants, fingerid%in%i)[,3:4]))
+# #   value <- subset(participants, fingerprint==value)$fingerid
+#   value <- paste("Participant ", as.character(value), "\n(n = ", n, ")", sep="")
+#   return(value)
+# }
+# 
+# 
+# #' Plot 4 individuals who did at least 12 trials of each type 
+# qplot(data=subset(test.mean, fingerprint%in%ipsubset), x=mean, y=f, group=type, colour=type, geom="line") + 
+#   facet_grid(.~fingerid, labeller=par_labeller) + scale_colour_discrete("Function Type") + theme_bw() + 
+#   theme(legend.position="bottom") + xlab("Preferred Weight") + ylab("Density") + 
+#   geom_segment(data=subset(participants.max, fingerprint%in%ipsubset), aes(x=x, xend=x, y=0, yend=y, colour=type))
+# # ggsave("figure/fig-IndivMeanAllFcnsW.pdf", width=7, height=3.5)      
+# 
+# 
+# 
+# #' Posterior mean estimates, including CI information for the individual MEAN 
+# #' (i.e. not for any individual observation)
+# test.post.indiv<- ddply(test.mean, .(fingerprint, fingerid, type), 
+#                         function(x){
+#                           ex=sum(x$mean*x$f)
+#                           n=sum(sum.data$fingerprint==x$fingerprint[1] & sum.data$type==x$type[1])
+#                           samp <- matrix(sample(x$mean, n*20, prob=x$f, replace=TRUE), ncol=20)
+#                           z <- as.numeric(quantile(rowMeans(samp), c(.025, .5, .975)))
+#                           sum.data.frame(fingerprint=unique(x$fingerprint), type=unique(x$type), lb=z[1], mean = ex, median=z[2], ub=z[3], n=n)
+#                         })
+# 
+# overall.mean.f <- ddply(test.mean, .(type, mean), summarise, f=sum(f))
+# overall.mean.f <- ddply(overall.mean.f, .(type), transform, f=f/sum(f))
+# 
+# overall.mean.bounds <- ddply(overall.mean.f, .(type), function(x){
+#   ex=sum(x$mean*x$f)
+#   n=length(unique(subset(sum.data, sum.data$type==type)$fingerprint))
+#   samp <- matrix(sample(x$mean, n*11, prob=x$f, replace=TRUE), ncol=11)
+#   sample.mean = mean(samp)                          
+#   sdev = sd(rowMeans(samp))
+#   lb = as.numeric(quantile(rowMeans(samp), .025))
+#   med = as.numeric(quantile(rowMeans(samp), .5))
+#   ub = as.numeric(quantile(rowMeans(samp), .975))
+#   data.frame(lb=lb, mean=sample.mean, median=med, ub=ub)
+# })
+# 
+# 
+# qplot(data=test.post.indiv,  x=lb, xend=ub, y=factor(fingerid), yend=factor(fingerid), geom="segment", colour=type) + 
+#   facet_wrap(~type) + geom_point(aes(x=median), colour="black") + 
+#   geom_vline(data=overall.mean.bounds, aes(xintercept=lb), linetype=3) + 
+#   geom_vline(data=overall.mean.bounds, aes(xintercept=median)) + 
+#   geom_vline(data=overall.mean.bounds, aes(xintercept=ub), linetype=3) + 
+#   ylab("Participant ID") + xlab("Mean Preferred Weighting") + theme_bw() + theme(legend.position="none") + 
+#   scale_colour_discrete("Function Type")
+# # ggsave("figure/fig-CIindivMeanW.pdf", width=6, height=6, units="in")
+# 
+# #' Posterior estimates, including CI information for the individual observations 
+# #' (i.e. not for any individual observation)
+# indiv.value.bounds <- ddply(test.mean, .(fingerprint, type), function(x){
+#   lb=x$mean[which.min(abs(cumsum(x$f)-.025))]
+#   med=x$mean[which.min(abs(cumsum(x$f)-.5))]
+#   ub=x$mean[which.min(abs(cumsum(x$f)-.975))]
+#   data.frame(lb=lb, median=med, ub=ub)
+# })
+# 
+# overall.value.bounds <- ddply(overall.mean.f, .(type), function(x){
+#   xnew <- sample(x$mean, length(x$mean), prob=x$f, replace=TRUE)
+#   z <- as.numeric(quantile(xnew, c(.025, .5, .975)))
+#   data.frame(lb=z[1], median=z[2], ub=z[3])
+# })
+# # Posterior Distribution for theta without averaging over individuals
+# qplot(data=overall.mean.f, x=mean, y=f, geom="line", colour=type) + 
+#   xlab("Psychological Lie Factor\nEstimated Distribution for All Individuals") + 
+#   theme_bw() + theme(legend.position="bottom") + scale_color_discrete("Function Type") + 
+#   ylab("Density")
+# 
+# qplot(data=indiv.value.bounds,  x=lb, xend=ub, y=fingerprint, yend=fingerprint, geom="segment", colour=type) + 
+#   facet_wrap(~type) + geom_point(aes(x=median), colour="black") + 
+#   geom_vline(data=overall.value.bounds, aes(xintercept=lb), linetype=3) + 
+#   geom_vline(data=overall.value.bounds, aes(xintercept=median)) + 
+#   geom_vline(data=overall.value.bounds, aes(xintercept=ub), linetype=3) + 
+#   ylab("Participant ID") + xlab("Lie Factor") + theme_bw() + theme(legend.position="bottom") + 
+#   scale_colour_discrete("Function Type")
+# 
