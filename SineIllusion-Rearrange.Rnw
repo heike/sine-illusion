@@ -256,7 +256,7 @@ While not thoroughly examined in the sensation and perception literature, the si
 \cite{day:1991} suggest that
 the sine illusion occurs due to misapplication of perceptual experience with the three-dimensional world to a two-dimensional ``artificial" display of data. 
 
-Experience with real-world objects suggests that the stimulus of figure~\ref{fig:original} is very similar to a slightly angled top view of the 3-dimensional figure of a strip or ribbon describing waves in a third dimension, such as e.g.~a road does on rolling hills. This is sketched out in figure~\ref{fig:ribbon-illusion}(a). Our experience suggests immediately that  changes in the width of the road are unlikely and resolves the illusion. While figure~\ref{fig:ribbon-illusion}(a) shows the line segments slightly angled towards each other,  the figure \ref{fig:ribbon-illusion}(b) shows a variation of the same plot with a  vanishing point set further away from the viewer. This makes the line segments almost parallel to each other and therefore more closely resembles the sketch of figure~\ref{fig:original}, in which the sine illusion was originally presented.
+Experience with real-world objects suggests that the stimulus of figure~\ref{fig:original} is very similar to a slightly angled top view of the 3-dimensional figure of a strip or ribbon describing waves in a third dimension, such as e.g.~a road does on rolling hills. This is sketched out in figure~\ref{fig-ribbon-illusion}(a). Our experience suggests immediately that  changes in the width of the road are unlikely and resolves the illusion. While figure~\ref{fig-ribbon-illusion}(a) shows the line segments slightly angled towards each other,  the figure \ref{fig-ribbon-illusion}(b) shows a variation of the same plot with a  vanishing point set further away from the viewer. This makes the line segments almost parallel to each other and therefore more closely resembles the sketch of figure~\ref{fig:original}, in which the sine illusion was originally presented.
 %By treating the graph as a two-dimensional projection of a three-dimensional figure, the illusion disappears and the line widths seem once more to be constant.
 
 
@@ -1063,7 +1063,10 @@ Figure \ref{fig:GeneralQuadraticCorrection} shows the correction factor based on
 
 %As shown in Figure \ref{quadratic-GeneralCorrection}, the solution of this equation provides endpoints $(x_l, y_l)$ and $(x_u, y_u)$ which can then be used to compute the extant width of each half-segment $m$. 
 
-Unlike the linear solution, the half-segments here are not necessarily of the same length, and thus there are separate correction factors for each half-segment. 
+Unlike the linear solution, the half-segments here are not necessarily of the same length, and thus there are separate correction factors for each half-segment. As with the $x$ correction, we can weight this transformation 
+\begin{equation}\label{eqn.ytrans.weighted}
+(\ell_{new_w})(x) = (1-w) \cdot \ell_{old} + w \cdot (\ell_{new})(x)
+\end{equation}
 %The correction factors are $(\ell/2)/(m_u)$ and $(\ell/2)/(m_l)$ respectively. 
 <<CtsQuadratic, echo=FALSE, include=FALSE, fig.width=6, fig.height=4>>=
 f <- function(x) 2*sin(x)
@@ -1075,6 +1078,7 @@ dframe <- createSine(n = 400, len = 1, f=f, fprime=fprime, f2prime=f2prime)
 library(reshape2)
 dfm <- melt(dframe, id.var="x", measure.vars=c("ellx4.l", "ellx4.u"))
 levels(dfm$variable) <- c("Bottom Segment", "Top Segment")
+cairo_pdf("figure/fig-CtsQuadratic.pdf", width=6, height=4)
 ggplot(aes(x=x, y=value, group=variable, linetype=variable), data=dfm) + geom_line() + 
   scale_x_continuous(breaks=seq(0, 2*pi, by=pi/2), 
                      labels=c("0", expression(paste(pi,"/2")), 
@@ -1084,7 +1088,7 @@ ggplot(aes(x=x, y=value, group=variable, linetype=variable), data=dfm) + geom_li
   ylab(expression(frac('\u2113', 2))) + xlab("") + 
   theme_bw() + theme(legend.position="bottom", axis.title.y=element_text(angle=0)) +
   scale_linetype_discrete(expression('Adjusted ' * frac('\u2113', 2)*'  '))
-
+dev.off()
 # dframe$type <- "Data"
 # dframe.real <- createSine(n = 4000, len = 1, f=f, fprime=fprime, f2prime=f2prime)
 # secantlines <- getSecantSegment(dframe.real$x, dframe, f, fprime, f2prime)
@@ -1114,8 +1118,8 @@ ggplot(aes(x=x, y=value, group=variable, linetype=variable), data=dfm) + geom_li
 @
 \begin{figure}[h!tbp]\centering
 \includegraphics[keepaspectratio=TRUE, width=.8\linewidth]{figure/fig-CtsQuadratic}
-\caption{Extant Half-segment Length \todo[inline]{Which correction is used?}. The orthogonal  line segments are not symmetrical around the center line, \todo[inline]{describe for the blind.} %so symmetric correction as employed in Figure \ref{fig:linear-GeneralCorrection} leads to simultaneous over- and under-correcting. 
-\todo[inline]{In my pdf the symbol does not show up. We need to make sure that in the final pdf it does.}}\label{fig:HalfSegLength}
+\caption{Extant half-segment length using the quadratic correction in $y$. The orthogonal  line segments are not symmetrical around the center line; when the top segment is long, the bottom segment is short and vice versa. At $\pi/2$ and $3\pi/2$ the segments have equal length.} %so symmetric correction as employed in Figure \ref{fig:linear-GeneralCorrection} leads to simultaneous over- and under-correcting. 
+\label{fig:HalfSegLength}
 \end{figure}
 
 %\subsection{Mathematical Properties of Transformation}
@@ -1183,7 +1187,7 @@ Some modifications are necessary to implement the correction factor in a realist
 
 \subsection{Applet Description}
 
-An applet demonstrating the effect of changing parameter values on the strength of the illusion can be found at \url{http://www.michaelbach.de/ot/sze_sineIllusion/index.html}. An applet demonstrating not only the effect of parameters on the illusion but also the various correction factors we propose in this paper can be found at \newtext{\url{http://glimmer.rstudio.com/srvanderplas/SineIllusion/}, and the applet used in the user study can be found at \url{http://glimmer.rstudio.com/srvanderplas/SineIllusionShiny/}. Figure~\ref{fig:shiny.app} shows a screen shot of it. The applet is implemented in {\tt shiny} \citep{shiny}. Users can adjust the amount of adjustment using the plus and minus button (with plus indicating a higher level of correction). Underlying this adjustment is the value of the weight $w$, as defined in eqns.~\ref{eqn.xtrans.weighted} and~\newdo{XXX reference to weighted y transformation}. Participants were recruited from Amazon Mechanical Turk and the \href{reddit}{http://reddit.com} community.}
+An applet demonstrating the effect of changing parameter values on the strength of the illusion can be found at \url{http://www.michaelbach.de/ot/sze_sineIllusion/index.html}. An applet demonstrating not only the effect of parameters on the illusion but also the various correction factors we propose in this paper can be found at \url{http://glimmer.rstudio.com/srvanderplas/SineIllusion/}, and the applet used in the user study can be found at \url{http://glimmer.rstudio.com/srvanderplas/SineIllusionShiny/}. Figure~\ref{fig:shiny.app} shows a screen shot of the user study applet, which was implemented in {\tt shiny} \citep{shiny}. Users can adjust the amount of adjustment using the plus and minus button (with plus indicating a higher level of correction). Underlying this adjustment is the value of the weight $w$, as defined in eqns.~\ref{eqn.xtrans.weighted} and~\ref{eqn.ytrans.weighted}. Participants were recruited from Amazon Mechanical Turk and the \href{reddit}{http://reddit.com} community.
 
 % 
 % 
@@ -1197,12 +1201,12 @@ qplot(x=wopts, geom="density") + geom_rug()
 @
 
 \subsection{Study Design}
-\newtext{The goal of the study is to determine an overall `optimal' setting for each of the correction factors. It is of additional interest, whether this setting is subject-specific or population-based, if the optimal setting depends on the starting value, and how much within-subject variability we find compared to between-subject variability. 
+\newtext{The goal of the study is to determine an overall `optimal' setting for each of the correction factors. It is of additional interest to determine whether this setting is subject-specific or population-based, if the optimal setting depends on the starting value, and how much within-subject variability we find compared to between-subject variability. 
 
 Once a participants arrives at the site, he/she is presented with a specific setting of the weight $w$, where for the first six evaluations $w$ is randomly chosen from the set of numbers $\{0, 1, c\}, c\in(.25, .75)$. The first six stimuli consist of the sine illusion, corrected in $x$ or $y$ with weight $w$, so that each participant is exposed to a factorial combination of three weights and the two correction types. Participants are free to adjust up to thirty graphs, so after the initial six, $w$ is randomly sampled from distribution centered at 0.6 with mass on $(-4, 5)$. %wopts and graph are in study-weight-dist above
 This allows us to fully explore the space of plausible $w$ while focusing on the $w \in (0,1)$.
 
-The range of weight values the shiny app allows follows the full distribution of $w$ described above, so possible weight values are between $(-4, 5)$. Participants adjust the graph using increment and decrement buttons, and click "submit" to proceed to the next stimuli when they are satisfied with the adjustment. This provides a clear starting value and ending value, allowing us to assess the range of optimal values for each participant. Two "training" trials were provided that additionally superimposed a graph of the underlying mean function to give participants some idea of the ideal mean function. This approach was taken to reduce the incidence of extremely high "x" correction values, because when $w>>1$, the lines still look to be of equal length but the underlying function bears little resemblance to $\sin(x)$. 
+The range of weight values the shiny app allows follows the full distribution of $w$ described above, so possible weight values are between $(-4, 5)$. Participants adjust the graph using increment and decrement buttons, and click ``submit'' to proceed to the next stimuli when they are satisfied with the adjustment. This provides a clear starting value and ending value, allowing us to assess the range of optimal values for each participant. Two ``training'' trials were provided that additionally superimposed a graph of the underlying mean function to give participants some idea of the underlying function the lines represent. This approach was taken to reduce the incidence of extremely high ``x'' correction values, because when $w>>1$, the lines still look to be of equal length but the underlying function bears little resemblance to $\sin(x)$. 
 }
 \subsection{Method}
 \begin{figure}\centering
@@ -1210,7 +1214,68 @@ The range of weight values the shiny app allows follows the full distribution of
 \caption{\label{fig:shiny.app} Screenshot of the shiny application used to collect information of observers' preference with respect to an optimal correction for the illusion  under each of the  transformations discussed in the previous section. }
 \end{figure}
 \subsection{Results}
-\newtext{123 participants in total took part in the study with XXX total evaluations. }
+<<results-analysis,echo=FALSE, cache=TRUE, include=FALSE, fig.width=6, fig.height=3>>=
+data <- read.csv("./data/SummaryTable.csv", row.names=1, stringsAsFactors=FALSE)
+tab2 <- read.csv("./data/IndivTrajectory.csv", row.names=1, stringsAsFactors=FALSE)
+tab2$time2 <- ymd_hms(tab2$time2)
+
+
+#--- Mixed Model ---#
+lm.data <- subset(data, startweight<=1 & startweight>=0 & !training & ntrials>3)
+
+
+# polygon contour plot of submitted vs starting weight for x and y
+ggplot(data=data, aes(x=startweight, y=endweight)) + geom_polygon(aes(fill=..level.., group=..piece..), stat="density2d", alpha=.5) + xlab("Starting Weight") + ylab("Submitted \"Correct\" Weight") + facet_wrap(~type) + ggtitle("The Effect of Starting Weight on Submitted Weight")
+
+# stats
+nparticipants <- length(unique(lm.data$fingerprint))
+ntrials <- nrow(lm.data)
+trials.per.participant <- mean(ddply(lm.data, .(fingerprint), summarise, ntrials=mean(ntrials))$ntrials)
+
+set.seed(82187)
+library(lme4)
+library(multcomp)
+library(memisc) # latex output for lmer 
+# Much more complicated to examine...
+lm.data$type <- relevel(factor(lm.data$type), ref="y")
+model <- lmer(data=lm.data, endweight~startweight+type+(1|fingerprint))
+summary(model)
+model.mcmc <- mcmcsamp(model, 1000)
+ints <- HPDinterval(model.mcmc)
+# 
+# modelx <- lmer(data=subset(lm.data, type=="x"), endweight~startweight + (1|fingerprint))
+# summary(modelx)
+# modelx.mcmc <- mcmcsamp(modelx, 1000)
+# ints.x <- HPDinterval(modelx.mcmc)
+# 
+# modely <- lmer(data=subset(lm.data, type=="y"), endweight~startweight + (1|fingerprint))
+# summary(modely)
+# modely.mcmc <- mcmcsamp(modely, 1000)
+# ints.y <- HPDinterval(modely.mcmc)
+
+@
+\newtext{\Sexpr{nparticipants} participants in total took part in the study with \Sexpr{ntrials} total evaluations. The mean number of trials per participant was \Sexpr{round(trials.per.participant, 2)}. As there were only 30 trials with starting weight outside of [0,1], those trials were eliminated from the analysis. Additionally, participants who completed fewer than 4 trials were not included in this analysis. Training trials were also excluded. }
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[keepaspectratio=TRUE, width=.9\linewidth]{figure/fig-results-analysis}
+\caption{\label{fig:polygondensityresults}Density plot of corrected $w$ value compared with starting $w$ value for both correction types. Corrected weight is positively correlated with starting weight, but there is considerable variability.}
+\end{figure}
+
+\newtext{Figure \ref{fig:polygondensityresults} shows density plots which demonstrate the relationship between the starting weight value and the user-submitted ``optimal'' weight value. The $x$ and $y$ corrections show similar trends - as the starting weight increases, so does the correct weight, but in general the correct weight value seems to be between 0 and 1 for both correction types, with the $y$ weight slightly higher than the $x$ weight.
+
+In order to account for user-level variability, we fit a random effects model for the corrected weight value as a function of the starting weight and trial type, with a random effect for participant. The interaction between starting weight and trial type was not significant and was thus removed from the model. }
+
+<<modelres, echo=FALSE, include=TRUE>>=
+summary(model)
+@
+\newtext{Posterior confidence intervals for each of the coefficients suggest that the preferred correction for an initially uncorrected plot has optimal $w$ between \Sexpr{round(ints$fixef[1,1], 3)} and \Sexpr{round(ints$fixef[1,2], 3)}.}
+
+
+<<fixefIntervals,echo=FALSE,include=TRUE>>=
+ints$fixef
+@
+
 
 XXX our evidence: 0 is not in the posterior interval ...
 

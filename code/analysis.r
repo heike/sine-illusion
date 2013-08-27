@@ -136,12 +136,24 @@ lm.data <- subset(data, startweight<=1 & startweight>=0 & !training & ntrials>3)
 library(lme4)
 library(multcomp)
 model <- lmer(data=lm.data, endweight~startweight*I(type=="x")+(1|fingerprint))
+model <- lmer(data=lm.data, endweight~startweight + type +(1|fingerprint))
 summary(model)
 model.mcmc <- mcmcsamp(model, 5000)
 ints <- HPDinterval(model.mcmc)
 
 individual.effects <- ranef(model, postVar=TRUE)
 dotplot(individual.effects)
+
+
+modelx <- lmer(data=subset(lm.data, type=="x"), endweight~startweight + (1|fingerprint))
+summary(modelx)
+modelx.mcmc <- mcmcsamp(modelx, 5000)
+ints.x <- HPDinterval(modelx.mcmc)
+
+modely <- lmer(data=subset(lm.data, type=="y"), endweight~startweight + (1|fingerprint))
+summary(modely)
+modely.mcmc <- mcmcsamp(modely, 5000)
+ints.y <- HPDinterval(modely.mcmc)
 
 
 #-----------------------Distribution of W-------------------
