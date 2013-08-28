@@ -1241,6 +1241,7 @@ The range of weight values the shiny app allows follows the full distribution of
 <<results-analysis,echo=FALSE, cache=TRUE, include=FALSE, fig.width=6, fig.height=3>>=
 data <- read.csv("./data/SummaryTable.csv", row.names=1, stringsAsFactors=FALSE)
 tab2 <- read.csv("./data/IndivTrajectory.csv", row.names=1, stringsAsFactors=FALSE)
+library(lubridate)
 tab2$time2 <- ymd_hms(tab2$time2)
 
 
