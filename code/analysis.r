@@ -195,10 +195,56 @@ library(lme4)
 library(multcomp)
 model <- lmer(data=lm.data, endweight~ (type-1) + startweight + (1|fingerprint))
 summary(model)
-model.mcmc <- mcmcsamp(model, 1000)
-ints <- HPDinterval(model.mcmc)
-individual.effects <- ranef(model, postVar=TRUE)
-dotplot(individual.effects)
+N <- 100
+model.mcmc <- mcmcsamp(model, N, saveb=TRUE)
+
+fixef.model <- as.data.frame(t(attr(model.mcmc, "fixef")))
+names(fixef.model) <- c("x", "y", "weight")
+fixef.model <- melt(fixef.model, id.vars=3)
+names(fixef.model) <- c("weight", "type", "intercept")
+ranef.model <- as.data.frame(t(attr(model.mcmc, "ranef")))
+ranef.model <- cbind(trial = 1:N, ranef.model)
+names(ranef.model) <- c("trial", paste("X", 1:125, sep=""))
+
+sim.data <- cbind(fixef.model, rbind(ranef.model, ranef.model))
+
+sim.data <- melt(sim.data, id.vars = 1:4)
+sim.data$ub <- sim.data$weight + sim.data$intercept
+sim.data$lb <- sim.data$intercept
+names(sim.data)[5:6] <- c("user", "ranef")
+sim.data <- melt(sim.data, id.vars = 1:6)
+names(sim.data)[7:8] <- c("limit", "fixef")
+sim.data$eu.level <- sim.data$ranef + sim.data$fixef
+
+sim.data$limit <- relevel(sim.data$limit, ref="lb")
+sim.data$limit <- mapvalues(sim.data$limit, from=c("lb", "ub"), to=c("from below", "from above"))
+ints <- ddply(sim.data, .(type, limit), function(x){
+  temp <- HPDinterval(t(x$fixef))
+  data.frame(lb = temp[1], med = median(x$fixef), ub = temp[2])
+})
+names(ints) <- c("type", "limit", "xmin", "x",  "xmax")
+
+ints.users <- ddply(sim.data, .(user, type, limit), function(x){
+  temp <- HPDinterval(t(x$eu.level))
+  data.frame(lb = temp[1], med = median(x$eu.level), ub = temp[2])
+})
+names(ints.users) <- c("user", "type", "limit", "xmin", "x", "xmax")
+
+
+ggplot() + 
+  geom_histogram(data=subset(sim.data, user=="X1"), aes(x=fixef, y=..density.., group=limit, fill=limit), binwidth=.01) +
+  geom_line(data=subset(sim.data), 
+               aes(x=eu.level, y=..density.., color = limit, group=interaction(user, limit)), alpha=.1, stat='density', trim=TRUE) + 
+  facet_grid(type~., scales="free") + 
+  ylab("Density") + xlab("Weight") + 
+  scale_colour_discrete("Approach") +
+  scale_fill_discrete("Approach") + 
+  ggtitle("Individual and Group Level Simulations for Optimal Weight Values") + 
+  geom_errorbarh(aes(xmin=xmin, x=x, xmax=xmax, y=30, color=limit), data=ints)
+
+
+
+
 
 # 
 
