@@ -1288,7 +1288,7 @@ lm.data <- subset(trial.sum, incl.startwt & incl.trials & !endwt.outlier, string
 # rm("temp")
 
 # polygon contour plot of submitted vs starting weight for x and y
-ggplot(data=lm.data, aes(x=startweight, y=endweight)) + geom_polygon(aes(fill=..level.., group=..piece..), stat="density2d", alpha=.5) + xlab("Starting Weight") + ylab("Submitted \"Correct\" Weight") + facet_wrap(~type) + ggtitle("The Effect of Starting Weight on Submitted Weight")
+ggplot(data=lm.data, aes(x=startweight, y=endweight)) + geom_polygon(aes(fill=..level.., group=..piece..), stat="density2d", alpha=.5) + xlab("Starting Weight") + ylab("Submitted \"Correct\" Weight") + facet_wrap(~type) + ggtitle("The Effect of Starting Weight on Submitted Weight") + xlim(c(-.2, 1.15))
 
 # stats
 nparticipants <- length(unique(subset(trial.sum, incl.startwt&incl.trials)$fingerprint))
