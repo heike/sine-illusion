@@ -1244,14 +1244,14 @@ qplot(x=wopts, geom="density") + geom_rug()
 Once a participants arrives at the site, he/she is presented with a specific setting of the weight $w$, where for the first six evaluations $w$ is randomly chosen from the set of numbers $\{0, 1, c\}, c\in(.25, .75)$. The first six stimuli consist of the sine illusion, corrected in $x$ or $y$ with weight $w$, so that each participant is exposed to a factorial combination of three weights and the two correction types. Participants are free to adjust up to thirty graphs, so after the initial six, $w$ is randomly sampled from distribution centered at 0.6 with mass on $(-4, 5)$. %wopts and graph are in study-weight-dist above
 This allows us to fully explore the space of plausible $w$ while focusing on the $w \in (0,1)$.
 
-The range of weight values the shiny app allows follows the full distribution of $w$ described above, so possible weight values are between $(-4, 5)$. Participants adjust the graph using increment and decrement buttons, and click ``submit'' to proceed to the next stimuli when they are satisfied with the adjustment. This provides a clear starting value and ending value, allowing us to assess the range of optimal values for each participant. Two ``training'' trials were provided that additionally superimposed a graph of the underlying mean function to give participants some idea of the underlying function the lines represent. This approach was taken to reduce the incidence of extremely high ``x'' correction values, because when $w>>1$, the lines still look to be of equal length but the underlying function bears little resemblance to $\sin(x)$. 
+The range of weight values the shiny app allows follows the full distribution of $w$ described above, so possible weight values are between $(-4, 5)$. Participants adjust the graph using increment and decrement buttons, and click ``submit'' to proceed to the next stimuli when they are satisfied with the adjustment. This provides a clear starting value and ending value, allowing us to assess the range of optimal values for each participant. Two ``training'' trials were provided that additionally superimposed a graph of the underlying mean function to give participants some idea of the underlying function the lines represent. This approach was taken to reduce the incidence of extremely high ``x'' correction values, because when $w>>1$, the lines still look to be of equal length but the underlying function bears little resemblance to $\sin(x)$. }
+
 
 \newtext{A single `trial' begins with the presentation of a graph at the chosen starting weight, and ends when the participant submits the trial. Trials with less than two total interactions (i.e. at least one adjustment plus a submission at the end of the trial) were removed because of the likelihood that the participant did not complete the required task for that trial. Trials that participants skipped were also removed from the data before analysis. Participants were asked to complete at least 10 trials after the training trials; any participants who completed fewer than 4 post-training trials were removed before data analysis.}
-}
 
 \subsection{Method}
 \subsection{Results}
-<<results-analysis,echo=FALSE, cache=TRUE, include=FALSE, fig.width=6, fig.height=3>>=
+<<results-analysis,echo=FALSE, cache=TRUE, include=FALSE, fig.width=8, fig.height=6>>=
 trial.sum <- read.csv("./data/SummaryTable.csv", row.names=1, stringsAsFactors=FALSE)
 trial.sequence <- read.csv("./data/IndivTrajectory.csv", row.names=1, stringsAsFactors=FALSE)
 library(lubridate)
@@ -1288,7 +1288,7 @@ lm.data <- subset(trial.sum, incl.startwt & incl.trials & !endwt.outlier, string
 # rm("temp")
 
 # polygon contour plot of submitted vs starting weight for x and y
-ggplot(data=lm.data, aes(x=startweight, y=endweight)) + geom_polygon(aes(fill=..level.., group=..piece..), stat="density2d", alpha=.5) + xlab("Starting Weight") + ylab("Submitted \"Correct\" Weight") + facet_wrap(~type) + ggtitle("The Effect of Starting Weight on Submitted Weight") + xlim(c(-.2, 1.15))
+# ggplot(data=lm.data, aes(x=startweight, y=endweight)) + geom_polygon(aes(fill=..level.., group=..piece..), stat="density2d", alpha=.5) + xlab("Starting Weight") + ylab("Submitted \"Correct\" Weight") + facet_wrap(~type) + ggtitle("The Effect of Starting Weight on Submitted Weight") + xlim(c(-.2, 1.15))
 
 # stats
 nparticipants <- length(unique(subset(trial.sum, incl.startwt&incl.trials)$fingerprint))
@@ -1309,21 +1309,53 @@ summary(modeltest)
 
 model <- lmer(data=lm.data, endweight~ (type-1) + startweight + (1|fingerprint))
 summary(model)
-model.mcmc <- mcmcsamp(model, 1000)
-ints <- HPDinterval(model.mcmc)
-individual.effects <- ranef(model, postVar=TRUE)
-# dotplot(individual.effects)
+N <- 100
+model.mcmc <- mcmcsamp(model, N, saveb=TRUE)
 
-# 
-# modelx <- lmer(data=subset(lm.data, type=="x"), endweight~startweight + (1|fingerprint))
-# summary(modelx)
-# modelx.mcmc <- mcmcsamp(modelx, 1000)
-# ints.x <- HPDinterval(modelx.mcmc)
-# 
-# modely <- lmer(data=subset(lm.data, type=="y"), endweight~startweight + (1|fingerprint))
-# summary(modely)
-# modely.mcmc <- mcmcsamp(modely, 1000)
-# ints.y <- HPDinterval(modely.mcmc)
+fixef.model <- as.data.frame(t(attr(model.mcmc, "fixef")))
+names(fixef.model) <- c("x", "y", "weight")
+fixef.model <- melt(fixef.model, id.vars=3)
+names(fixef.model) <- c("weight", "type", "intercept")
+ranef.model <- as.data.frame(t(attr(model.mcmc, "ranef")))
+ranef.model <- cbind(trial = 1:N, ranef.model)
+names(ranef.model) <- c("trial", paste("X", 1:125, sep=""))
+
+sim.data <- cbind(fixef.model, rbind(ranef.model, ranef.model))
+
+sim.data <- melt(sim.data, id.vars = 1:4)
+sim.data$ub <- sim.data$weight + sim.data$intercept
+sim.data$lb <- sim.data$intercept
+names(sim.data)[5:6] <- c("user", "ranef")
+sim.data <- melt(sim.data, id.vars = 1:6)
+names(sim.data)[7:8] <- c("limit", "fixef")
+sim.data$eu.level <- sim.data$ranef + sim.data$fixef
+
+sim.data$limit <- relevel(sim.data$limit, ref="lb")
+sim.data$limit <- mapvalues(sim.data$limit, from=c("lb", "ub"), to=c("from below", "from above"))
+ints <- ddply(sim.data, .(type, limit), function(x){
+  temp <- HPDinterval(t(x$fixef))
+  data.frame(lb = temp[1], med = median(x$fixef), ub = temp[2])
+})
+names(ints) <- c("type", "limit", "xmin", "x",  "xmax")
+
+ints.users <- ddply(sim.data, .(user, type, limit), function(x){
+  temp <- HPDinterval(t(x$eu.level))
+  data.frame(lb = temp[1], med = median(x$eu.level), ub = temp[2])
+})
+names(ints.users) <- c("user", "type", "limit", "xmin", "x", "xmax")
+
+
+ggplot() + 
+  geom_histogram(data=subset(sim.data, user=="X1"), aes(x=fixef, y=..density.., group=limit, fill=limit), binwidth=.01) +
+  geom_line(data=subset(sim.data), 
+               aes(x=eu.level, y=..density.., color = limit, group=interaction(user, limit)), alpha=.075, stat='density', trim=TRUE) + 
+  facet_grid(type~., scales="free") + 
+  ylab("Density") + xlab("Weight") + 
+  scale_colour_discrete("Approach") +
+  scale_fill_discrete("Approach") + 
+  ggtitle("Individual and Group Level Simulations for Optimal Weight Values") + 
+  geom_errorbarh(aes(xmin=xmin, x=x, xmax=xmax, y=30, color=limit), data=ints) + 
+  theme(legend.position="bottom")
 
 @
 \newtext{\Sexpr{nparticipants} participants in total took part in the study with \Sexpr{ntrials} total evaluations. 
@@ -1332,17 +1364,18 @@ For each starting weight, responses more than 1.5*IQR from the upper and lower q
 \begin{figure}[htbp]
 \centering
 \includegraphics[keepaspectratio=TRUE, width=.9\linewidth]{figure/fig-results-analysis}
-\caption{\label{fig:polygondensityresults}Density plot of corrected $w$ value compared with starting $w$ value for both correction types. Corrected weight is positively correlated with starting weight, but there is considerable variability.}
+\caption{\label{fig:MixedModelResults} Simulation results from the fitted model, facetted by correction type. Fixed effects results are shown as histograms; the red values display the results when starting from an uncorrected plot and are concentrated around $w=.15$; the blue values represent user-chosen weights when starting from a fully corrected plot and are concentrated around $w=.64$. Additionally, 95\% HPD intervals are shown above the histograms; these intervals are for the lower and upper bounds of the ``preferred weight interval'' tested in the experiment. User-level density curves show the individual variability around each fixed effect.}
 \end{figure}
 
-\newtext{Figure \ref{fig:polygondensityresults} shows density plots which demonstrate the relationship between the starting weight value and the user-submitted ``optimal'' weight value. The $x$ and $y$ corrections show similar trends - as the starting weight increases, so does the correct weight, but in general the correct weight value seems to be between 0 and 1 for both correction types, with the $y$ weight slightly higher than the $x$ weight.
+\newdo{Describe the reason for the approach taken - connect to sensory experiments that try to bound perceptual effects by approaching from both above and below.}
+\newtext{Figure \ref{fig:MixedModelResults} shows density plots which demonstrate the relationship between the starting weight value and the user-submitted ``optimal'' weight value. 
 
 In order to account for user-level variability, we fit a random effects model for the corrected weight value as a function of the starting weight and trial type, with a random effect for participant. The random effects for each trial type were similar, so it is appropriate to fit a single model in order to better estimate the random effects. Additionally, the interaction between starting weight and trial type was not significant, and was thus removed from the model.}
 
 <<modelres, echo=FALSE, include=TRUE>>=
 summary(model)
 @
-\newtext{Posterior confidence intervals for each of the coefficients suggest that the preferred correction for an initially uncorrected plot has optimal $w$ between \Sexpr{round(ints$fixef[1,1], 3)} and \Sexpr{round(ints$fixef[1,2], 3)}.}
+\newtext{MCMC simulations from the posterior distrubution for each of the coefficients suggest that the optimal $w$ lies between \Sexpr{round(ints$x[1], 3)} and \Sexpr{round(ints$x[2], 3)} for $x$ and \Sexpr{round(ints$x[3], 3)} and \Sexpr{round(ints$x[4], 3)} for $y$. This suggests that either correction is preferrable to an uncorrected graph, and that a weighted correction is preferrable to the fully corrected graph, as neither 0 nor 1 is contained in any overall interval. }
 
 
 <<fixefIntervals,echo=FALSE,include=TRUE>>=
