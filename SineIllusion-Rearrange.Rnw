@@ -1308,6 +1308,7 @@ summary(modeltest)
 # conclusion - within-user variance is very similar for different trial types
 
 model <- lmer(data=lm.data, endweight~ (type-1) + startweight + (1|fingerprint))
+
 summary(model)
 N <- 100
 model.mcmc <- mcmcsamp(model, N, saveb=TRUE)
@@ -1360,6 +1361,15 @@ ggplot() +
 @
 \newtext{\Sexpr{nparticipants} participants in total took part in the study with \Sexpr{ntrials} total evaluations. 
 For each starting weight, responses more than 1.5*IQR from the upper and lower quartiles were removed (a total of \Sexpr{noutliers} trials). Additionally, observations from participants who completed fewer than 4 non-outlier trials were removed from the data to allow estimation of individual random effects with some accuracy. The mean number of trials per participant once outliers were removed was \Sexpr{round(trials.per.participant, 2)}. As there were only \Sexpr{sum(!trial.sum$incl.startwt & trial.sum$incl.trials & !trial.sum$endwt.outlier)} trials with starting weight outside of [0,1] which met the other inclusion criteria, those trials were eliminated from the analysis. }
+
+\begin{figure}[H]
+<<notes, echo=FALSE, results='asis'>>=
+qplot(startweight, endweight, data=lm.data)
+
+
+@
+\caption{\hh{How are you dealing with those very high and very low endweights? For a linear model they are going to have an incredibly high influence.}}
+\end{figure}
 
 \begin{figure}[htbp]
 \centering
