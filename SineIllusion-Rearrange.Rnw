@@ -796,31 +796,29 @@ Understanding the geometry of the sine illusion leads to another approach to cou
 % \cos(y) = 1/\text{sec}(y) = 1/\sqrt{1+ \tan^2 y}.\\
 % \end{eqnarray*}
 % 
- <<trigFix, dependson='data', echo=FALSE, include=FALSE, fig.width=4, fig.height=3>>=
+ <<trigFix, echo=FALSE, include=FALSE, fig.width=4, fig.height=3>>=
 dframe <- createSine(40,1, f=f, fprime=fprime, f2prime=f2prime)
  qplot(x=x, xend=xend, y = f(x) -ell/2, yend=f(x) +ell/2, geom="segment", data=dframe) +
-  theme_bw() + coord_fixed(ratio=1) + 
+   theme(panel.background=element_blank(), axis.title = element_blank()) + 
+   coord_equal(ratio=1)+ 
    xlab("x") + ylab("y") +
    scale_x_continuous(breaks=seq(0, 2*pi, by=pi/2), minor_breaks=minor.axis.correction,
                       labels=c("0", expression(paste(pi,"/2")), expression(pi), expression(paste("3",pi, "/2")), expression(paste("2",pi))))
- 
+  
  qplot(x=x, xend=xend, y = f(x) -ellx/2, yend=f(x) +ellx/2, geom="segment", data=dframe) +
-  theme_bw() + coord_fixed(ratio=1) + 
+   theme(panel.background=element_blank(), axis.title = element_blank()) + 
+   coord_equal(ratio=1)+ 
    xlab("x") + ylab("y") +
    scale_x_continuous(breaks=seq(0, 2*pi, by=pi/2), minor_breaks=minor.axis.correction,
                       labels=c("0", expression(paste(pi,"/2")), expression(pi), expression(paste("3",pi, "/2")), expression(paste("2",pi))))
- 
- 
- qplot(x=x, xend=xend, y = f(x) -ellx2/2, yend=f(x) +ellx2/2, geom="segment", data=dframe) +
-   theme(#panel.grid.major=element_blank(), 
- #       panel.grid.minor=element_blank(), 
-     panel.background=element_blank(),
-        axis.title = element_blank()
- #    , axis.ticks = element_blank(), 
- #       axis.text = element_blank()
-     ) + 
-   coord_equal(ratio=1)
- 
+  
+#  
+#  qplot(x=x, xend=xend, y = f(x) -ellx2/2, yend=f(x) +ellx2/2, geom="segment", data=dframe) +
+#    theme(panel.background=element_blank(), axis.title = element_blank()) + 
+#    coord_equal(ratio=1)+ 
+#    xlab("x") + ylab("y") +
+#    scale_x_continuous(breaks=seq(0, 2*pi, by=pi/2), minor_breaks=minor.axis.correction,
+#                       labels=c("0", expression(paste(pi,"/2")), expression(pi), expression(paste("3",pi, "/2")), expression(paste("2",pi)))) 
  @
 % \begin{figure}[h!btp]
 % \begin{subfigure}[b]{.48\linewidth}\centering
@@ -1043,11 +1041,28 @@ which leads us to corrections for the half lengths as (see appendix \ref{app.qua
 where $v = 1 + f^\prime(x_0)^2$.
 \begin{figure}[h!btp]
 \begin{subfigure}[b]{.3\linewidth}\centering
-\includegraphics[width=\linewidth,keepaspectratio=TRUE]{figure/fig-trigFix1}
+<<UncorRresults, echo=FALSE, fig.width=4, fig.height=3, out.width='\\linewidth'>>=
+dframe <- createSine(40,1, f=f, fprime=fprime, f2prime=f2prime)
+ qplot(x=x, xend=xend, y = f(x) -ell/2, yend=f(x) +ell/2, geom="segment", data=dframe) +
+   theme(panel.background=element_blank(), axis.title = element_blank()) + 
+   coord_equal(ratio=1)+ 
+   xlab("x") + ylab("y") +
+   scale_x_continuous(breaks=seq(0, 2*pi, by=pi/2), minor_breaks=minor.axis.correction,
+                      labels=c("0", expression(paste(pi,"/2")), expression(pi), expression(paste("3",pi, "/2")), expression(paste("2",pi))))
+@
 \caption{Uncorrected}
 \end{subfigure}
 \begin{subfigure}[b]{.3\linewidth}\centering
-\includegraphics[width=\linewidth,keepaspectratio=TRUE]{figure/fig-trigFix2}
+% \includegraphics[width=\linewidth,keepaspectratio=TRUE]{figure/fig-trigFix2}
+<<LinearResults,echo=FALSE, fig.width=4, fig.height=3, out.width='\\linewidth'>>=
+dframe <- createSine(40,1, f=f, fprime=fprime, f2prime=f2prime)
+ qplot(x=x, xend=xend, y = f(x) -ellx/2, yend=f(x) +ellx/2, geom="segment", data=dframe) +
+   theme(panel.background=element_blank(), axis.title = element_blank()) + 
+   coord_equal(ratio=1)+ 
+   xlab("x") + ylab("y") +
+   scale_x_continuous(breaks=seq(0, 2*pi, by=pi/2), minor_breaks=minor.axis.correction,
+                      labels=c("0", expression(paste(pi,"/2")), expression(pi), expression(paste("3",pi, "/2")), expression(paste("2",pi))))
+@
 \caption{Linear correction}
 \end{subfigure}
 %
@@ -1055,10 +1070,11 @@ where $v = 1 + f^\prime(x_0)^2$.
 <<CtsAdjustedResults,echo=FALSE, dependson='CtsQuadratic', fig.width=4, fig.height=3, out.width='\\linewidth'>>=
 dframe <- createSine(n = 40, len = 1, f=f, fprime=fprime, f2prime=f2prime) 
 qplot(x=x, xend=x, y=y+ellx4.u, yend=y-ellx4.l, geom="segment", data=dframe, linetype=I(1)) +   
- theme_bw() + coord_fixed(ratio=1) + 
-  xlab("x") + ylab("y") +
-  scale_x_continuous(breaks=seq(0, 2*pi, by=pi/2), minor_breaks=minor.axis.correction,
-                     labels=c("0", expression(paste(pi,"/2")), expression(pi), expression(paste("3",pi, "/2")), expression(paste("2",pi))))
+   theme(panel.background=element_blank(), axis.title = element_blank()) + 
+   coord_equal(ratio=1)+ 
+   xlab("x") + ylab("y") +
+   scale_x_continuous(breaks=seq(0, 2*pi, by=pi/2), minor_breaks=minor.axis.correction,
+                      labels=c("0", expression(paste(pi,"/2")), expression(pi), expression(paste("3",pi, "/2")), expression(paste("2",pi))))
 @
 \caption{Quadratic approximation based on eqns (\ref{eqn.q1}) and (\ref{eqn.q2}). }
 \end{subfigure}
