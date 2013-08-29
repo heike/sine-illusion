@@ -8,10 +8,10 @@ library(grid)
 library(reshape2)
 library(doMC) 
 
-registerDoMC() 
-mcoptions <- list(preschedule=FALSE, set.seed=FALSE)
-getDoParWorkers() 
-
+# registerDoMC() 
+# mcoptions <- list(preschedule=FALSE, set.seed=FALSE)
+# getDoParWorkers() 
+# 
 # # ----------------- Database Access -------------------------
 # con <- dbConnect(MySQL(), group="stat")
 # tab <- dbReadTable(con, name="SineIllusionShiny")[-1,]
@@ -25,18 +25,26 @@ getDoParWorkers()
 # wopts <- -4 +cumsum(diffs)
 # 
 # tab$time2 <- ymd_hms(tab$time) # convert to lubridate time
-# tab <- ddply(tab, .(iphash, fingerprint, ipid), transform, ntrials=length(unique(q+skip))) # add number of trials
-# tab <- tab[which(tab$weight>0),] # remove "initial" observation that no longer corresponds to weight in this iteration of the program. 
-# tab <- subset(tab, !grepl("test", userid)) # remove "test" runs
-# tab <- subset(tab, !grepl("76.84", ipid)) # remove sum.data from Auburn/Nebraska City, NE, because it's full of "tests" that weren't marked as such. Whoops.
-# tab$weight <- wopts[tab$weight] # convert javascript vector weight into actual meaningful weight measurement
+# tab$trialnum <- with(tab, q+skip)
+# tab <- ddply(tab, .(iphash, fingerprint, ipid, q), transform, skipdata=max(trialnum)!=trialnum)
+#   # binary variable that will only keep the data from the non-skipped question
+# tab <- tab[!tab$skipdata,]
+# tab <- ddply(tab, .(iphash, fingerprint, ipid), transform, ntrials=length(unique(trialnum)), ntrials.old = length(unique(q+skip))) # add number of trials
+# tab <- tab[which(tab$weight>0),] 
+#   # remove "initial" observation that no longer corresponds to weight in this iteration of the program. 
+# tab <- subset(tab, !grepl("test", userid))
+#   # remove "test" runs
+# tab <- subset(tab, !grepl("76.84", ipid)) 
+#   # remove trial.sum from Auburn/Nebraska City, NE, because it's full of "tests" that weren't marked as such. Whoops.
+# tab$weight <- wopts[tab$weight] 
+#   # convert javascript vector weight into actual meaningful weight measurement
 # 
+# tab$training <- (tab$time2>ymd("2013-7-21") & (tab$q+tab$skip)<2) 
+#   # two "training" questions added on 7.21.13 that may be biased... test?
 # 
-# tab$training <- (tab$time2>ymd("2013-7-21") & (tab$q+tab$skip)<2) # two "training" questions added on 7.21.13 that may be biased... test?
-
 # #------------------ Data Reshaping -------------------------
 # # dataset of individual questions with each individual observation and time. 
-# tab2 <- ddply(tab, .(iphash, fingerprint, ipid, q, skip, type, ntrials), transform,
+# trial.sequence <- ddply(tab, .(iphash, fingerprint, ipid, q, skip, type, ntrials), transform,
 #               weight = weight,
 #               start.weight = rep(weight[which.min(time2)],length(time2)), 
 #               end.weight = rep(weight[which.max(time2)],length(time2)),
@@ -47,9 +55,9 @@ getDoParWorkers()
 #               seq = 1:length(time2),
 #               post.training = time2>ymd("2013-7-21") & (q+skip)>=2)
 # 
-# # sum.dataset of individual questions, but without each individual change
+# # dataset of individual questions, but without each individual change
 # # Includes only trials where the participant interacted with the graph at least twice. 
-# sum.data <- ddply(subset(tab2, len>2 & seq>1), .(iphash, fingerprint, ipid, q, skip, type, ntrials), 
+# trial.sum <- ddply(subset(trial.sequence, len>2 & seq>1), .(iphash, fingerprint, ipid, q, skip, type, ntrials), 
 #               function(df){
 #                 with(df, 
 #                      data.frame(startweight = weight[which.min(time2)], 
@@ -60,26 +68,26 @@ getDoParWorkers()
 #                                 time.trial = max(time2)-min(time2),
 #                                 training = training[1],
 #                                 post.training = min(time2)>ymd("2013-7-21") & (q+skip)[1]>=2))
-#               })
+#               }, .parallel=TRUE)
 # 
-# sum.data$fingerid <- as.numeric(factor(sum.data$fingerprint))
-# tab2$fingerid <- as.numeric(factor(tab2$fingerprint))
+# trial.sum$fingerid <- as.numeric(factor(trial.sum$fingerprint))
+# trial.sequence$fingerid <- as.numeric(factor(trial.sequence$fingerprint))
 # 
-# write.csv(tab2[,-which(names(tab2)=="userid")], "./sum.data/IndivTrajectory.csv")
-# write.csv(sum.data, "./sum.data/SummaryTable.csv")
+# write.csv(trial.sequence[,-which(names(trial.sequence)=="userid")], "./data/IndivTrajectory.csv")
+# write.csv(trial.sum, "./data/SummaryTable.csv")
 
 
 # #-----------------------Read in Data------------------------
 
-# use if no access to the SQL sum.database.
-sum.data <- read.csv("./data/SummaryTable.csv", row.names=1, stringsAsFactors=FALSE)
-tab2 <- read.csv("./data/IndivTrajectory.csv", row.names=1, stringsAsFactors=FALSE)
-tab2$time2 <- ymd_hms(tab2$time2)
+# use if no access to the SQL database.
+trial.sum <- read.csv("./data/SummaryTable.csv", row.names=1, stringsAsFactors=FALSE)
+trial.sequence <- read.csv("./data/IndivTrajectory.csv", row.names=1, stringsAsFactors=FALSE)
+trial.sequence$time2 <- ymd_hms(trial.sequence$time2)
 
-# #----------- Plots and Exploration - raw sum.data --------------
+# #----------- Plots and Exploration - raw trial.sum --------------
 
 # plot of directional arrows indicating start and end point by user and trial type.
-qplot(data=subset(sum.data, len>1), 
+qplot(data=subset(trial.sum, len>1), 
       x=startweight, xend=endweight, 
       y=fingerprint, yend=fingerprint, geom="segment", 
       arrow=arrow(length = unit(0.1,"cm")), group=q+skip, alpha=I(.2)) + 
@@ -88,17 +96,31 @@ qplot(data=subset(sum.data, len>1),
   facet_grid(post.training~type)
 
 # plot of trial trajectories for each user and trial type (not so useful now that there are a bunch of users)
-qplot(data=subset(tab2, len>2 & seq>1 & ntrials>6 & trial.time>-500 & !training & post.training), x=trial.time, y=weight, group=q+skip, geom="line", colour=factor((q+skip)%%6)) + geom_point(aes(x=0, y=end.weight)) + facet_grid(type~fingerprint, scales="free_x") + xlab("Time until Trial End") + ylab("Weight") + geom_hline(yintercept=1) + geom_hline(yintercept=0)
+qplot(data=subset(trial.sequence, len>2 & seq>1 & ntrials>6 & trial.time>-500 & 
+                    !training & post.training), 
+      x=trial.time, y=weight, group=q+skip, geom="line", 
+      colour=factor((q+skip)%%6)) + 
+  geom_point(aes(x=0, y=end.weight)) + 
+  facet_grid(type~fingerprint, scales="free_x") + 
+  xlab("Time until Trial End") + ylab("Weight") + 
+  geom_hline(yintercept=1) + geom_hline(yintercept=0)
 
 
 # plot of trial trajectories for each user
-qplot(data=subset(tab2, len>2 & seq>1 & ntrials>15 & trial.time>-500 & !training), x=trial.time, y=weight, group=q+skip, geom="line", colour=type, alpha=I(.5)) + geom_point(aes(x=0, y=end.weight), alpha=.5) + facet_wrap(~fingerprint, scales="free_x") + xlab("Time until Trial End") + ylab("Weight") + geom_hline(yintercept=1) + geom_hline(yintercept=0)
+qplot(data=subset(trial.sequence, len>2 & seq>1 & ntrials>25 & 
+                    trial.time>-500 & !training), 
+      x=trial.time, y=weight, group=q+skip, geom="line", 
+      colour=type, alpha=I(.5)) + 
+  geom_point(aes(x=0, y=end.weight), alpha=.5) + 
+  facet_grid(type~fingerprint, scales="free_x") + 
+  xlab("Time until Trial End") + ylab("Weight") + 
+  geom_hline(yintercept=1) + geom_hline(yintercept=0)
 
 # plot of trial trajectories, for each trial type across all users. 
 ggplot() + 
-  geom_point(data=sum.data, aes(x=0, y=endweight), alpha=.05) + 
-  geom_rug(data=sum.data, aes(y=endweight), alpha=.05, sides="r") +
-  geom_line(data=subset(tab2, len>2 & seq>1 & ntrials>4 & trial.time>-100),
+  geom_point(data=trial.sum, aes(x=0, y=endweight), alpha=.05) + 
+  geom_rug(data=trial.sum, aes(y=endweight), alpha=.05, sides="r") +
+  geom_line(data=subset(trial.sequence, len>2 & seq>1 & ntrials>4 & trial.time>-100),
             aes(x=trial.time, y=weight, group=interaction(q+skip, fingerprint)), alpha=.1) + 
   facet_grid(type~., scales="free_x") + 
   xlab("Time until Trial End") + 
@@ -109,22 +131,23 @@ ggplot() +
   ylim(c(-1, 2))
 
 # Where (approximately) did weight start?
-sum.data$startweight.cat <- factor(
-  sapply(sum.data$startweight, function(i) sum(i<=quantile(sum.data$startweight, seq(.2, 1, .2)))),
-  labels=paste(quantile(sum.data$startweight, seq(0, .8, .2)), quantile(sum.data$startweight, seq(.2, 1, .2)), sep=" - "))
+trial.sum$startweight.cat <- factor(
+  sapply(trial.sum$startweight, function(i) sum(i<=quantile(trial.sum$startweight, seq(.2, 1, .2)))),
+  labels=paste(round(quantile(trial.sum$startweight, seq(0, .8, .2)), 2), 
+               round(quantile(trial.sum$startweight, seq(.2, 1, .2)), 2), sep=" - "))
 
-ggplot() + geom_density(data=sum.data, aes(x=endweight, group=startweight.cat,
+ggplot() + geom_density(data=trial.sum, aes(x=endweight, group=startweight.cat,
                                        colour=startweight.cat, fill=startweight.cat), alpha=I(.2)) + 
-  geom_rug(data=sum.data, aes(x=endweight), alpha=I(.1)) + 
+  geom_rug(data=trial.sum, aes(x=endweight), alpha=I(.1)) + 
   facet_grid(startweight.cat~type) + scale_fill_discrete("Starting Weight") + 
   scale_colour_discrete("Starting Weight") + 
   xlab("Final Weight") + ylab("Density") + ggtitle("Density of Final Weight") + xlim(c(-.5, 1.5))
 
-qplot(data=subset(sum.data, ntrials>10 & q>1), geom="boxplot", 
+qplot(data=subset(trial.sum, ntrials>10 & q>1), geom="boxplot", 
       x=factor(fingerid), y=endweight) + 
   facet_wrap(~type) + ylim(c(-1, 2)) + ggtitle("Individual boxplots")
 
-ggplot(data=sum.data, aes(x=startweight, y=endweight)) + 
+ggplot(data=trial.sum, aes(x=startweight, y=endweight)) + 
   geom_polygon(aes(fill=..level.., group=..piece..), stat="density2d", alpha=.5) + 
   xlab("Starting Weight") + 
   ylab("Submitted \"Correct\" Weight") + 
@@ -132,36 +155,66 @@ ggplot(data=sum.data, aes(x=startweight, y=endweight)) +
 
 #----------------------Mixed Model Approach-----------------
 
-fixed.model <- lm(data=sum.data, endweight~startweight+type+post.training+training)
+fixed.model <- lm(data=trial.sum, endweight~startweight+type+post.training+training)
+summary(fixed.model)
 # start weight is significant (p<2e-16), type is not. 
 # Whether or not the trial is post-training is also not significant 
 #   (though it comes close when training is also included).
 
-lm.sum.data <- subset(sum.data, startweight<=1 & startweight>=0 & !training & ntrials>3)
+qplot(x=startweight, geom="histogram", data=subset(trial.sum, !training & ntrials>3), binwidth=.1)
+
+qplot(data=subset(trial.sum, !training & ntrials>3), x=factor(startweight), y=endweight, geom="boxplot") + 
+  geom_text(aes(x=factor(startweight), y=4, label=..count..), stat="bin")
+
+is.outlier <- function(x){
+  qs <- as.numeric(quantile(x, c(.25, .75)))
+  iqr <- diff(qs)
+  lims <- qs + c(-1, 1)*1.5*iqr
+  !(x>=lims[1] & x <= lims[2])
+}
+trial.sum <- ddply(trial.sum, .(startweight), transform, 
+                      incl.startwt = startweight<=1 & startweight>=0,
+                      incl.trials = ntrials>3,
+                      endwt.outlier = is.outlier(endweight)) 
+# compute outliers for each possible start weight
+
+noutliers <- sum(trial.sum$endwt.outlier)
+
+lm.data <- subset(trial.sum, incl.startwt & incl.trials & !endwt.outlier)
+
+temp <- rbind.fill(cbind(trial.sum, dataset="full"), cbind(lm.data, dataset="trimmed"))
+# not much has changed density wise...
+ggplot(data=temp, aes(x=startweight, y=endweight)) + 
+  geom_contour(aes(group=dataset, colour=dataset), stat="density2d") + 
+  scale_colour_manual("Data", values=c("red", "blue"))+
+  xlab("Starting Weight") + ylab("Submitted \"Correct\" Weight") + 
+  facet_wrap(~type) + ggtitle("The Effect of Starting Weight on Submitted Weight")
+rm("temp")
 
 library(lme4)
 library(multcomp)
-model <- lmer(data=lm.sum.data, endweight~startweight*I(type=="x")+(1|fingerprint))
-model <- lmer(data=lm.sum.data, endweight~startweight + type +(1|fingerprint))
+model <- lmer(data=lm.data, endweight~ (type-1) + startweight + (1|fingerprint))
 summary(model)
-model.mcmc <- mcmcsamp(model, 5000)
+model.mcmc <- mcmcsamp(model, 1000)
 ints <- HPDinterval(model.mcmc)
-
 individual.effects <- ranef(model, postVar=TRUE)
 dotplot(individual.effects)
 
-
-modelx <- lmer(data=subset(lm.sum.data, type=="x"), endweight~startweight + (1|fingerprint))
-summary(modelx)
-modelx.mcmc <- mcmcsamp(modelx, 5000)
-ints.x <- HPDinterval(modelx.mcmc)
-
-modely <- lmer(data=subset(lm.sum.data, type=="y"), endweight~startweight + (1|fingerprint))
-summary(modely)
-modely.mcmc <- mcmcsamp(modely, 5000)
-ints.y <- HPDinterval(modely.mcmc)
-
 # 
+
+# #-----------------------  Change+Direction  --------------------
+qplot(data=lm.data, x=jitter(startweight), y=jitter(endweight), 
+      xlab="Starting Weight", ylab="Final Weight", geom="point", alpha=I(.25)) + 
+  geom_smooth() + ylim(c(-1,2)) + facet_wrap(~type) + theme_bw()
+## Much easier to see the *amount* of change here - where amount of change is close to 0,
+## correction is (approx) acceptable?
+
+
+ggplot(data=lm.data, xlab="Starting Weight", ylab="Final Weight") +
+  geom_point(aes(x=jitter(startweight), y=jitter(endweight)), alpha=I(.25)) + 
+  geom_smooth(aes(x=startweight, y=endweight)) +
+  ylim(c(-1,2)) + facet_wrap(~type) + theme_bw()
+
 # #-----------------------Distribution of W-------------------
 # logpost <- function(data, par){
 #   temp <- sum(dnorm(data$endweight, mean=par[1], sd=par[2], log=TRUE))
@@ -171,7 +224,7 @@ ints.y <- HPDinterval(modely.mcmc)
 # get_posterior_density <- function(data, pars){
 #   temp <- sapply(1:nrow(pars), function(i) logpost(data, pars[i,]))
 #   temp <- exp(temp)/sum(exp(temp))
-#   sum.data.frame(mean=pars[,1], sd=pars[,2], f=temp)
+#   trial.sum.frame(mean=pars[,1], sd=pars[,2], f=temp)
 # }
 # 
 # #------------------------- Overall Marginals ---------------
@@ -209,12 +262,12 @@ ints.y <- HPDinterval(modely.mcmc)
 # #--------------------Individual Distribution of Theta ------
 # 
 # # get posterior density for each individual
-# test <- ddply(subset(sum.data, ntrials>12), .(fingerprint, fingerid, type), get_posterior_density, pars=pars, .parallel=TRUE)
+# test <- ddply(subset(trial.sum, ntrials>12), .(fingerprint, fingerid, type), get_posterior_density, pars=pars, .parallel=TRUE)
 # 
 # test.mean <- ddply(test, .(fingerprint, fingerid, type, mean), summarise, f=sum(f))
 # test.mean <- ddply(test.mean, .(fingerprint, fingerid, type), transform, f=f/sum(f))
 # 
-# participants <- dcast(ddply(sum.data, .(fingerprint, type), summarise, 
+# participants <- dcast(ddply(trial.sum, .(fingerprint, type), summarise, 
 #                             fingerid=unique(fingerid), n=length(type)), 
 #                       fingerprint+fingerid~type, value.var="n")
 # participants.max <- ddply(test.mean, .(fingerprint, fingerid, type), summarise, x = mean[which.max(f)], y=max(f))
@@ -244,10 +297,10 @@ ints.y <- HPDinterval(modely.mcmc)
 # test.post.indiv<- ddply(test.mean, .(fingerprint, fingerid, type), 
 #                         function(x){
 #                           ex=sum(x$mean*x$f)
-#                           n=sum(sum.data$fingerprint==x$fingerprint[1] & sum.data$type==x$type[1])
+#                           n=sum(trial.sum$fingerprint==x$fingerprint[1] & trial.sum$type==x$type[1])
 #                           samp <- matrix(sample(x$mean, n*20, prob=x$f, replace=TRUE), ncol=20)
 #                           z <- as.numeric(quantile(rowMeans(samp), c(.025, .5, .975)))
-#                           sum.data.frame(fingerprint=unique(x$fingerprint), type=unique(x$type), lb=z[1], mean = ex, median=z[2], ub=z[3], n=n)
+#                           trial.sum.frame(fingerprint=unique(x$fingerprint), type=unique(x$type), lb=z[1], mean = ex, median=z[2], ub=z[3], n=n)
 #                         })
 # 
 # overall.mean.f <- ddply(test.mean, .(type, mean), summarise, f=sum(f))
@@ -255,7 +308,7 @@ ints.y <- HPDinterval(modely.mcmc)
 # 
 # overall.mean.bounds <- ddply(overall.mean.f, .(type), function(x){
 #   ex=sum(x$mean*x$f)
-#   n=length(unique(subset(sum.data, sum.data$type==type)$fingerprint))
+#   n=length(unique(subset(trial.sum, trial.sum$type==type)$fingerprint))
 #   samp <- matrix(sample(x$mean, n*11, prob=x$f, replace=TRUE), ncol=11)
 #   sample.mean = mean(samp)                          
 #   sdev = sd(rowMeans(samp))
