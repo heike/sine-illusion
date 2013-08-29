@@ -162,6 +162,16 @@ modely.mcmc <- mcmcsamp(modely, 5000)
 ints.y <- HPDinterval(modely.mcmc)
 
 # 
+
+# #-----------------------  Change+Direction  --------------------
+qplot(data=lm.sum.data, x=jitter(startweight), y=jitter(endweight), 
+      xlab="Starting Weight", ylab="Final Weight", geom="point", alpha=I(.25)) + 
+  geom_smooth() + ylim(c(-1,1)) + facet_wrap(~type) + theme_bw()
+## Much easier to see the *amount* of change here - where amount of change is close to 0,
+## correction is (approx) acceptable?
+
+
+
 # #-----------------------Distribution of W-------------------
 # logpost <- function(data, par){
 #   temp <- sum(dnorm(data$endweight, mean=par[1], sd=par[2], log=TRUE))
