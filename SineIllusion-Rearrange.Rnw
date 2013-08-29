@@ -1075,10 +1075,7 @@ Figure \ref{fig:GeneralQuadraticCorrection} shows the correction factor based on
 
 %As shown in Figure \ref{quadratic-GeneralCorrection}, the solution of this equation provides endpoints $(x_l, y_l)$ and $(x_2, y_2)$ which can then be used to compute the extant width of each half-segment $m$. 
 
-Unlike the linear solution, the half-segments here are not necessarily of the same length, and thus there are separate correction factors for each half-segment. As with the $x$ correction, we can weight this transformation 
-\begin{equation}\label{eqn.ytrans.weighted}
-(\ell_{new_w})(x) = (1-w) \cdot \ell_{old} + w \cdot (\ell_{new})(x)
-\end{equation}
+Unlike the linear solution, the half-segments here are not necessarily of the same length, and thus there are separate correction factors for each half-segment. 
 %The correction factors are $(\ell/2)/(m_u)$ and $(\ell/2)/(m_l)$ respectively. 
 <<CtsQuadratic, echo=FALSE, include=FALSE, fig.width=6, fig.height=4>>=
 f <- function(x) 2*sin(x)
@@ -1136,14 +1133,12 @@ dev.off()
 % \end{figure}
 
 %\subsection{Mathematical Properties of Transformation}
-The quadratic correction breaks, whenever the expression in the square root of eqn~\ref{} becomes negative, i.e.~wehenever $v^2 \pm \ell\cdot f^{\prime\prime}(x)\cdot f^\prime(x)^2 < 0$.
+The quadratic correction breaks whenever the expression in the square root of eqn~\ref{eqn.q1} becomes negative, i.e.~whenever $v^2 \pm \ell\cdot f^{\prime\prime}(x)\cdot f^\prime(x)^2 < 0$.
 This happens for  combinations of large values of $\ell$, which signify a large vertical extent, or large conditional variability $E[Y|X]$, and simultaneous large changes in the slope of the main trend, i.e.~large values of the curvature $f^{\prime\prime}(x)$. In the linear approximation of $f$ the same situation leads to a massive overcorrection of the vertical lines, making the `corrected' function look almost unrecognizable. 
 
-\newdo{Add a paragraph on using a weighted approach to this correction.}
-\newtext{Similar to the proposed $X$ transformation, we can use a weighted approach to find a balance between counteracting the illusion and representating the form of the original data. }
-\newdo{state the formula with $w$ here}
+As with the $x$ correction, we can use a weighted approach to find a balance between counteracting the illusion and representating the form of the original data. In order to balance these goals for  the quadratic correction in $y$, half-segment lengths must be weighted separately; a single segment weighting will suffice for the linear correction in $y$. 
 \begin{equation}\label{eqn.ytrans.weighted}
-\text{which function are you using in the app?}
+(\ell_{new_w})(x) = (1-w) \cdot \ell_{old} + w \cdot (\ell_{new})(x)
 \end{equation}
 % % 
 % % $1 + 2f^\prime(x)^2 + f^\prime(x)^4 \pm \ell\cdot f^{\prime\prime}(x)\cdot f^\prime(x)^2 < 0$
@@ -1213,7 +1208,7 @@ Some modifications are necessary to implement the correction factor in a realist
 \end{figure}
 %
 %An applet demonstrating the effect of changing parameter values on the strength of the illusion can be found at \url{http://www.michaelbach.de/ot/sze_sineIllusion/index.html}. 
-An applet demonstrating the effect of changing parameter values on the strength of the illusion as well as all of the correction factors we propose in this paper can be found at \url{http://glimmer.rstudio.com/srvanderplas/SineIllusion/}. This applet was used in collecting data from users and can be found at \url{http://glimmer.rstudio.com/srvanderplas/SineIllusionShiny/}. Figure~\ref{fig:shiny.app} shows a screen shot of it. The applet is implemented in {\tt shiny} \citep{shiny}. Users can adjust the amount of adjustment using the plus and minus button (with plus indicating a higher level of correction). Underlying this adjustment is the value of the weight $w$, as defined in eqns.~\ref{eqn.xtrans.weighted} and~\ref{eqn.ytrans.weighted}. Participants were recruited from Amazon Mechanical Turk and the \href{reddit}{http://reddit.com} community.
+An applet demonstrating the effect of changing parameter values on the strength of the illusion as well as all of the correction factors we propose in this paper can be found at \url{http://glimmer.rstudio.com/srvanderplas/SineIllusion/}. This applet was used in collecting data from users and can be found at \url{http://glimmer.rstudio.com/srvanderplas/SineIllusionShiny/}. Figure~\ref{fig:shiny.app} shows a screen shot of it. The applet is implemented in {\tt shiny} \citep{shiny}. Users can adjust the amount of adjustment using the plus and minus button (with plus indicating a higher level of correction). Underlying this adjustment is the value of the weight $w$, as defined in eqns.~\ref{eqn.xtrans.weighted} and~\ref{eqn.ytrans.weighted}. \newtext{As the aspect ratio and function are controlled in this app, we used the linear transformation in $y$; the transformation does not break under any combination of parameters tested in this experiment.} Participants were recruited from Amazon Mechanical Turk and the \href{reddit}{http://reddit.com} community.
 
 % 
 % 
@@ -1326,7 +1321,7 @@ For each starting weight, responses more than 1.5*IQR from the upper and lower q
 
 \newtext{Figure \ref{fig:polygondensityresults} shows density plots which demonstrate the relationship between the starting weight value and the user-submitted ``optimal'' weight value. The $x$ and $y$ corrections show similar trends - as the starting weight increases, so does the correct weight, but in general the correct weight value seems to be between 0 and 1 for both correction types, with the $y$ weight slightly higher than the $x$ weight.
 
-In order to account for user-level variability, we fit a random effects model for the corrected weight value as a function of the starting weight and trial type, with a random effect for participant. The interaction between starting weight and trial type was not significant and was thus removed from the model. }
+In order to account for user-level variability, we fit a random effects model for the corrected weight value as a function of the starting weight and trial type, with a random effect for participant. The random effects for each trial type were similar, so it is appropriate to fit a single model in order to better estimate the random effects. Additionally, the interaction between starting weight and trial type was not significant, and was thus removed from the model.}
 
 <<modelres, echo=FALSE, include=TRUE>>=
 summary(model)
