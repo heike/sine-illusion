@@ -193,19 +193,12 @@ rm("temp")
 
 library(lme4)
 library(multcomp)
-modelx <- lmer(data=subset(lm.data, type=="x"), endweight~ 1+ (1+startweight|fingerprint))
-summary(modelx)
-modelx.mcmc <- mcmcsamp(modelx, 5000)
-ints.x <- HPDinterval(modelx.mcmc)
-individual.effects <- ranef(modelx, postVar=TRUE)
+model <- lmer(data=lm.data, endweight~ (type-1) + startweight + (1|fingerprint))
+summary(model)
+model.mcmc <- mcmcsamp(model, 1000)
+ints <- HPDinterval(model.mcmc)
+individual.effects <- ranef(model, postVar=TRUE)
 dotplot(individual.effects)
-
-
-
-modely <- lmer(data=subset(lm.data, type=="y"), endweight~startweight + (1|fingerprint))
-summary(modely)
-modely.mcmc <- mcmcsamp(modely, 5000)
-ints.y <- HPDinterval(modely.mcmc)
 
 # 
 

@@ -1296,10 +1296,13 @@ modeltest <- lmer(endweight ~ type -1 + startweight + (type-1|fingerprint), data
 summary(modeltest)
 # conclusion - within-user variance is very similar for different trial types
 
-model <- lmer(data=lm.data, endweight~(type-1)+startweight+(1|fingerprint))
+model <- lmer(data=lm.data, endweight~ (type-1) + startweight + (1|fingerprint))
 summary(model)
-model.mcmc <- mcmcsamp(model, 1000, saveb=TRUE)
+model.mcmc <- mcmcsamp(model, 1000)
 ints <- HPDinterval(model.mcmc)
+individual.effects <- ranef(model, postVar=TRUE)
+# dotplot(individual.effects)
+
 # 
 # modelx <- lmer(data=subset(lm.data, type=="x"), endweight~startweight + (1|fingerprint))
 # summary(modelx)
