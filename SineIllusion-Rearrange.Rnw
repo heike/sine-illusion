@@ -1263,7 +1263,7 @@ library(multcomp)
 library(memisc) # latex output for lmer 
 # Much more complicated to examine...
 lm.data$type <- relevel(factor(lm.data$type), ref="y")
-model <- lmer(data=lm.data, endweight~startweight+type+(1|fingerprint))
+model <- lmer(data=lm.data, endweight~startweight*type+(1|fingerprint))
 summary(model)
 model.mcmc <- mcmcsamp(model, 1000)
 ints <- HPDinterval(model.mcmc)
@@ -1280,6 +1280,15 @@ ints <- HPDinterval(model.mcmc)
 
 @
 \newtext{\Sexpr{nparticipants} participants in total took part in the study with \Sexpr{ntrials} total evaluations. The mean number of trials per participant was \Sexpr{round(trials.per.participant, 2)}. As there were only 30 trials with starting weight outside of [0,1], those trials were eliminated from the analysis. Additionally, participants who completed fewer than 4 trials were not included in this analysis. Training trials were also excluded. }
+
+\begin{figure}[H]
+<<notes, echo=FALSE, results='asis'>>=
+qplot(startweight, endweight, data=lm.data)
+
+
+@
+\caption{\hh{How are you dealing with those very high and very low endweights? For a linear model they are going to have an incredibly high influence.}}
+\end{figure}
 
 \begin{figure}[htbp]
 \centering
