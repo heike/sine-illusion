@@ -111,7 +111,8 @@ ggplot() +
 # Where (approximately) did weight start?
 sum.data$startweight.cat <- factor(
   sapply(sum.data$startweight, function(i) sum(i<=quantile(sum.data$startweight, seq(.2, 1, .2)))),
-  labels=paste(quantile(sum.data$startweight, seq(0, .8, .2)), quantile(sum.data$startweight, seq(.2, 1, .2)), sep=" - "))
+  labels=paste(round(quantile(sum.data$startweight, seq(0, .8, .2)), 2), 
+               round(quantile(sum.data$startweight, seq(.2, 1, .2)), 2), sep=" - "))
 
 ggplot() + geom_density(data=sum.data, aes(x=endweight, group=startweight.cat,
                                        colour=startweight.cat, fill=startweight.cat), alpha=I(.2)) + 
@@ -133,30 +134,53 @@ ggplot(data=sum.data, aes(x=startweight, y=endweight)) +
 #----------------------Mixed Model Approach-----------------
 
 fixed.model <- lm(data=sum.data, endweight~startweight+type+post.training+training)
+summary(fixed.model)
 # start weight is significant (p<2e-16), type is not. 
 # Whether or not the trial is post-training is also not significant 
 #   (though it comes close when training is also included).
 
-lm.sum.data <- subset(sum.data, startweight<=1 & startweight>=0 & !training & ntrials>3)
+qplot(x=startweight, geom="histogram", data=subset(sum.data, !training & ntrials>3), binwidth=.1)
+
+qplot(data=subset(sum.data, !training & ntrials>3), x=factor(startweight), y=endweight, geom="boxplot") + 
+  geom_text(aes(x=factor(startweight), y=4, label=..count..), stat="bin")
+
+is.outlier <- function(x){
+  qs <- as.numeric(quantile(x, c(.25, .75)))
+  iqr <- diff(qs)
+  lims <- qs + c(-1, 1)*1.5*iqr
+  !(x>=lims[1] & x <= lims[2])
+}
+sum.data <- ddply(sum.data, .(startweight), transform, 
+                      incl.startwt = startweight<=1 & startweight>=0,
+                      incl.trials = ntrials>3,
+                      endwt.outlier = is.outlier(endweight)) 
+# compute outliers for each possible start weight
+
+noutliers <- sum(sum.data$endwt.outlier)
+
+lm.data <- subset(sum.data, incl.startwt & incl.trials & !endwt.outlier)
+
+temp <- rbind.fill(cbind(sum.data, dataset="full"), cbind(lm.data, dataset="trimmed"))
+# not much has changed density wise...
+ggplot(data=temp, aes(x=startweight, y=endweight)) + 
+  geom_contour(aes(group=dataset, colour=dataset), stat="density2d") + 
+  scale_colour_manual("Data", values=c("red", "blue"))+
+  xlab("Starting Weight") + ylab("Submitted \"Correct\" Weight") + 
+  facet_wrap(~type) + ggtitle("The Effect of Starting Weight on Submitted Weight")
+rm("temp")
 
 library(lme4)
 library(multcomp)
-model <- lmer(data=lm.sum.data, endweight~startweight*I(type=="x")+(1|fingerprint))
-model <- lmer(data=lm.sum.data, endweight~startweight + type +(1|fingerprint))
-summary(model)
-model.mcmc <- mcmcsamp(model, 5000)
-ints <- HPDinterval(model.mcmc)
-
-individual.effects <- ranef(model, postVar=TRUE)
-dotplot(individual.effects)
-
-
-modelx <- lmer(data=subset(lm.sum.data, type=="x"), endweight~startweight + (1|fingerprint))
+modelx <- lmer(data=subset(lm.data, type=="x"), endweight~ 1+ (1+startweight|fingerprint))
 summary(modelx)
 modelx.mcmc <- mcmcsamp(modelx, 5000)
 ints.x <- HPDinterval(modelx.mcmc)
+individual.effects <- ranef(modelx, postVar=TRUE)
+dotplot(individual.effects)
 
-modely <- lmer(data=subset(lm.sum.data, type=="y"), endweight~startweight + (1|fingerprint))
+
+
+modely <- lmer(data=subset(lm.data, type=="y"), endweight~startweight + (1|fingerprint))
 summary(modely)
 modely.mcmc <- mcmcsamp(modely, 5000)
 ints.y <- HPDinterval(modely.mcmc)
@@ -164,13 +188,17 @@ ints.y <- HPDinterval(modely.mcmc)
 # 
 
 # #-----------------------  Change+Direction  --------------------
-qplot(data=lm.sum.data, x=jitter(startweight), y=jitter(endweight), 
+qplot(data=lm.data, x=jitter(startweight), y=jitter(endweight), 
       xlab="Starting Weight", ylab="Final Weight", geom="point", alpha=I(.25)) + 
   geom_smooth() + ylim(c(-1,2)) + facet_wrap(~type) + theme_bw()
 ## Much easier to see the *amount* of change here - where amount of change is close to 0,
 ## correction is (approx) acceptable?
 
 
+ggplot(data=lm.data, xlab="Starting Weight", ylab="Final Weight") +
+  geom_point(aes(x=jitter(startweight), y=jitter(endweight)), alpha=I(.25)) + 
+  geom_smooth(aes(x=startweight, y=endweight)) +
+  ylim(c(-1,2)) + facet_wrap(~type) + theme_bw()
 
 # #-----------------------Distribution of W-------------------
 # logpost <- function(data, par){
