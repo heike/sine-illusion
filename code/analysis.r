@@ -166,7 +166,7 @@ ints.y <- HPDinterval(modely.mcmc)
 # #-----------------------  Change+Direction  --------------------
 qplot(data=lm.sum.data, x=jitter(startweight), y=jitter(endweight), 
       xlab="Starting Weight", ylab="Final Weight", geom="point", alpha=I(.25)) + 
-  geom_smooth() + ylim(c(-1,1)) + facet_wrap(~type) + theme_bw()
+  geom_smooth() + ylim(c(-1,2)) + facet_wrap(~type) + theme_bw()
 ## Much easier to see the *amount* of change here - where amount of change is close to 0,
 ## correction is (approx) acceptable?
 
