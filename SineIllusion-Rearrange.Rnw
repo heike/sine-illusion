@@ -1333,6 +1333,8 @@ sim.data$eu.level <- sim.data$ranef + sim.data$fixef
 
 sim.data$limit <- relevel(sim.data$limit, ref="lb")
 sim.data$limit <- mapvalues(sim.data$limit, from=c("lb", "ub"), to=c("from below", "from above"))
+levels(sim.data$type) <- c("Transformation of X axis", "Transformation in Y")
+
 ints <- ddply(sim.data, .(type, limit), function(x){
   temp <- HPDinterval(t(x$fixef))
   data.frame(lb = temp[1], med = median(x$fixef), ub = temp[2])
@@ -1345,18 +1347,20 @@ ints.users <- ddply(sim.data, .(user, type, limit), function(x){
 })
 names(ints.users) <- c("user", "type", "limit", "xmin", "x", "xmax")
 
+ests <- data.frame(ests = c(fixef(model)[1:2], fixef(model)[1:2]+fixef(model)[3]), type=rep(c("Transformation in Y", "Transformation of X axis"), 2))
 
 ggplot() + 
-  geom_histogram(data=subset(sim.data, user=="X1"), aes(x=fixef, y=..density.., group=limit, fill=limit), binwidth=.01) + 
+  geom_histogram(data=subset(sim.data, user=="X1"), aes(x=fixef, y=..density.., group=limit, fill=limit), alpha=0.8, binwidth=.01) + 
+  geom_vline(xintercept=c(0,1)) +
   geom_line(data=subset(sim.data), 
                aes(x=eu.level, y=..density.., color = limit, group=interaction(user, limit)), alpha=.075, stat='density', trim=TRUE) + 
   facet_grid(type~., scales="free") + 
-  ylab("Density") + xlab("Weight") + 
+  ylab("Density") + xlab("Weight w") + 
   scale_colour_discrete("Approach") +
   scale_fill_discrete("Approach") + 
   ggtitle("Individual and Group Level Simulations for Optimal Weight Values") + 
   geom_errorbarh(aes(xmin=xmin, x=x, xmax=xmax, y=30, color=limit), data=ints) + 
-  theme(legend.position="bottom")
+  theme(legend.position="bottom") + geom_point(aes(x=ests, y=30), data=ests) #+ geom_point(aes(x=eu.level, y=0, colour=limit), alpha=0.3, data=subset(sim.data, user=="X1"))
 
 @
 \newtext{\Sexpr{nparticipants} participants in total took part in the study with \Sexpr{ntrials} total evaluations. 
