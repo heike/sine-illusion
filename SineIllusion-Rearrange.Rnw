@@ -1066,7 +1066,7 @@ dframe <- createSine(40,1, f=f, fprime=fprime, f2prime=f2prime)
 \caption{Linear correction}
 \end{subfigure}
 %
-\begin{subfigure}[h]{.3\linewidth}\centering
+\begin{subfigure}[b]{.3\linewidth}\centering
 <<CtsAdjustedResults,echo=FALSE, dependson='CtsQuadratic', fig.width=4, fig.height=3, out.width='\\linewidth'>>=
 dframe <- createSine(n = 40, len = 1, f=f, fprime=fprime, f2prime=f2prime) 
 qplot(x=x, xend=x, y=y+ellx4.u, yend=y-ellx4.l, geom="segment", data=dframe, linetype=I(1)) +   
@@ -1076,7 +1076,7 @@ qplot(x=x, xend=x, y=y+ellx4.u, yend=y-ellx4.l, geom="segment", data=dframe, lin
    scale_x_continuous(breaks=seq(0, 2*pi, by=pi/2), minor_breaks=minor.axis.correction,
                       labels=c("0", expression(paste(pi,"/2")), expression(pi), expression(paste("3",pi, "/2")), expression(paste("2",pi))))
 @
-\caption{Quadratic approximation based on eqns (\ref{eqn.q1}) and (\ref{eqn.q2}). }
+\caption{Quadratic correction }
 \end{subfigure}
 \caption[Quadratic Approximation]{
 In the quadratic approximation top and bottom segments of the vertical lines are adjusted separately.
@@ -1362,14 +1362,6 @@ ggplot() +
 \newtext{\Sexpr{nparticipants} participants in total took part in the study with \Sexpr{ntrials} total evaluations. 
 For each starting weight, responses more than 1.5*IQR from the upper and lower quartiles were removed (a total of \Sexpr{noutliers} trials). Additionally, observations from participants who completed fewer than 4 non-outlier trials were removed from the data to allow estimation of individual random effects with some accuracy. The mean number of trials per participant once outliers were removed was \Sexpr{round(trials.per.participant, 2)}. As there were only \Sexpr{sum(!trial.sum$incl.startwt & trial.sum$incl.trials & !trial.sum$endwt.outlier)} trials with starting weight outside of [0,1] which met the other inclusion criteria, those trials were eliminated from the analysis. }
 
-\begin{figure}[H]
-<<notes, echo=FALSE, results='asis'>>=
-qplot(startweight, endweight, data=lm.data)
-
-
-@
-\caption{\hh{How are you dealing with those very high and very low endweights? For a linear model they are going to have an incredibly high influence.}}
-\end{figure}
 
 \begin{figure}[htbp]
 \centering
