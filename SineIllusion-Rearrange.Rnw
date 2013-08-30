@@ -959,9 +959,9 @@ qplot(data=df.real, x=x, y=y, geom="line")+
   geom_point(data=df.real[which.min(df.real$sec),], aes(x=x, y=sec), size=2) + 
   geom_point(data=df.real[which.max(df.real$sec),], aes(x=x, y=sec), size=2) +
   geom_segment(data=dfslope, aes(x=xstart, y=ystart, xend=xend, yend=yend), linetype=2) + 
-  geom_text(data=df.real[which.min(df.real$sec),], aes(x=x, y=sec-0.08, label="paste(group('(',list(x[2],y[2]),')'))"), 
+  geom_text(data=df.real[which.min(df.real$sec),], aes(x=x, y=sec-0.08, label="paste(group('(',list(x[1],y[1]),')'))"), 
             parse=TRUE, hjust=1, vjust=.25) + 
-  geom_text(data=df.real[which.max(df.real$sec),], aes(x=x-.05, y=sec+.05, label="paste(group('(',list(x[1],y[1]),')'))"), 
+  geom_text(data=df.real[which.max(df.real$sec),], aes(x=x-.05, y=sec+.05, label="paste(group('(',list(x[2],y[2]),')'))"), 
             parse=TRUE, hjust=0, vjust=.25)  + 
   theme(axis.title=element_blank(), axis.text=element_blank(), axis.ticks=element_blank(), axis.line=element_blank(), panel.grid=element_blank())
 
@@ -1347,7 +1347,7 @@ names(ints.users) <- c("user", "type", "limit", "xmin", "x", "xmax")
 
 
 ggplot() + 
-  geom_histogram(data=subset(sim.data, user=="X1"), aes(x=fixef, y=..density.., group=limit, fill=limit), binwidth=.01) +
+  geom_histogram(data=subset(sim.data, user=="X1"), aes(x=fixef, y=..density.., group=limit, fill=limit), binwidth=.01) + 
   geom_line(data=subset(sim.data), 
                aes(x=eu.level, y=..density.., color = limit, group=interaction(user, limit)), alpha=.075, stat='density', trim=TRUE) + 
   facet_grid(type~., scales="free") + 
