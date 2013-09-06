@@ -845,14 +845,13 @@ Let again the function $f$ describe the general relationship between variables $
 
 As sketched out in figure~\ref{fig:GeneralCorrection} we want to first find the orthogonal (extant) width in a point $(x_0, f(x_o))$ on the graph, which corresponds to the  perceived width, and then correct the vertical width accordingly to match with the audience's expectation.
 
-\comment{The use of $\ell$ in both $f_\ell$ and $\ell/2$ was a bit unfortunate. I've renamed $f_\ell$ to $f_1$ and $f_u$ to $f_2$. i've tried to do that in all of the sketches as well, but we need to still check all occurrences carefully. }
 \begin{SCfigure}
 \centering
 \includegraphics[keepaspectratio=TRUE,width=.4\linewidth]{figure/fig-generalcorrectioncartoon3}
-\caption[General correction approach]{ General correction approach. This approach may require numerical optimization to obtain exact solutions for $(x_2, y_2)$ and $(x_l, y_l)$.}\label{fig:GeneralCorrection}
+\caption[General correction approach]{ General correction approach. This approach may require numerical optimization to obtain exact solutions for $(x_1, y_1)$ and $(x_2, y_2)$.}\label{fig:GeneralCorrection}
 \end{SCfigure}
 
-The orthogonal width is given as the line segment between endpoints $(x_2, f_2(x_2))$ and $(x_1, f_1(x_1))$, where $f_1$ and $f_2$ denote the vertical shifts of function $f$ by $-\ell/2$ and $\ell/2$, respectively.
+The orthogonal width is given as the line segment between endpoints $(x_1, f_1(x_1))$ and $(x_2, f_2(x_2))$, where $f_1$ and $f_2$ denote the vertical shifts of function $f$ by $-\ell/2$ and $\ell/2$, respectively.
 These endpoints are determined as the intersection of the line  orthogonal to the tangent line in $(x, f(x))$ and the graphs resulting from vertical shifts of $f$ by $\pm \ell/2$.
 
 The function describing the orthogonal line through $(x_o, f(x_o))$ is given in point-vector form as 
@@ -1012,7 +1011,7 @@ qplot(data=df.real, x=x, y=y, geom="line") +
 \includegraphics[keepaspectratio=TRUE,width=0.9\textwidth]{figure/fig-generalcorrectioncartoon3}
 \caption{Quadratic Approximation}\label{fig:quadratic-GeneralCorrection}
 \end{subfigure}
-\caption[Methods based on Approximations to f(x)]{(a) uses a first-order taylor series approximation to $f(x)$ and (b) uses a second-order taylor series approximation to $f(x)$. The intersection of the function $f(x) \pm \ell/2$ and the orthogonal line,  $(x_2, y_2), (x_l, y_l)$ must be obtained to determine the necessary correction factor.}\label{fig:linear.quadratic} 
+\caption[Methods based on Approximations to f(x)]{(a) uses a first-order Taylor series approximation to $f(x)$ and (b) uses a second-order Taylor series approximation to $f(x)$. The intersection of the function $f(x) \pm \ell/2$ and the orthogonal line,  $(x_1, y_1), (x_2, y_2)$ must be obtained to determine the necessary correction factor.}\label{fig:linear.quadratic} 
 \end{figure}
 
 \paragraph{Linear Approximation to $f(x)$}\hfill\newline
@@ -1025,7 +1024,7 @@ For the linear approximation we make use of $f(x) \approx f(x_0) + (x - x_0) f^\
 Note that the linear method yields the same result as a varying slope extension from a trigonometric approach as suggested by \citet{schonlau:2003} and used in \citet{marie:2013}
 %Previous work in \citet{schonlau:2003, marie:2013} used the adjustment in eqn.~(\ref{eqn.adjust}) for a line with constant slope. We have to extend this approach to a functional form with varying slope. This is the approach taken in the next sections.
 
-The asymmetric nature of the distortion suggests that we may want to use a second-order taylor polynomial approximation to $f(x)$ to account for the asymmetry in the extant widths on either side of the center trendline.
+The asymmetric nature of the distortion suggests that we may want to use a second-order Taylor polynomial approximation to $f(x)$ to account for the asymmetry in the extant widths on either side of the center trendline.
 
 \paragraph{Quadratic Approximation to $f(x)$}\hfill\newline
 %
@@ -1212,7 +1211,7 @@ As with the $x$ correction, we can use a weighted approach to find a balance bet
 
 \section{Transformations in Practice -- a User Study}
 
-Some modifications are necessary to implement the correction factor in a realistic situation in which it might not be practical for the aspect ratio of the graph to be fixed at 1. As in \citet{marie:2013}, the correction factor necessary to remove the illusion depends on the aspect ratio of the graphs. Figure \ref{fig:trigFix} demonstrates the relative effectiveness of the correction factor.
+Some modifications are necessary to implement the correction factor in a realistic situation in which it might not be practical for the aspect ratio of the graph to be fixed as 1. As in \citet{marie:2013}, the correction factor necessary to remove the illusion depends on the aspect ratio of the graphs. %Figure~\ref{fig:trigFix} demonstrates the relative effectiveness of the correction factor.
 
 
 \subsection{Applet Description}
@@ -1224,7 +1223,8 @@ Some modifications are necessary to implement the correction factor in a realist
 \end{figure}
 %
 %An applet demonstrating the effect of changing parameter values on the strength of the illusion can be found at \url{http://www.michaelbach.de/ot/sze_sineIllusion/index.html}. 
-An applet demonstrating the effect of changing parameter values on the strength of the illusion as well as all of the correction factors we propose in this paper can be found at \url{http://glimmer.rstudio.com/srvanderplas/SineIllusion/}. This applet was used in collecting data from users and can be found at \url{http://glimmer.rstudio.com/srvanderplas/SineIllusionShiny/}. Figure~\ref{fig:shiny.app} shows a screen shot of it. The applet is implemented in {\tt shiny} \citep{shiny}. Users can adjust the amount of adjustment using the plus and minus button (with plus indicating a higher level of correction). Underlying this adjustment is the value of the weight $w$, as defined in eqns.~\ref{eqn.xtrans.weighted} and~\ref{eqn.ytrans.weighted}. \newtext{As the aspect ratio and function are controlled in this app, we used the linear transformation in $y$; the transformation does not break under any combination of parameters tested in this experiment.} Participants were recruited from Amazon Mechanical Turk and the \href{reddit}{http://reddit.com} community.
+An applet demonstrating the effect of changing parameter values on the strength of the illusion as well as all of the correction factors we propose in this paper can be found at \url{http://glimmer.rstudio.com/srvanderplas/SineIllusion/}. This applet was used in collecting data from users and can be found at \url{http://glimmer.rstudio.com/srvanderplas/SineIllusionShiny/}. Figure~\ref{fig:shiny.app} shows a screen shot of it. The applet is implemented in {\tt shiny} \citep{shiny}. Users can adjust the amount of adjustment using the plus and minus button (with plus indicating a higher level of correction). Underlying this adjustment is the value of the weight $w$, as defined in eqns.~\ref{eqn.xtrans.weighted} and~\ref{eqn.ytrans.weighted}. 
+\newdo{why does controlling for aspect ratio and the function imply a use of the linear approximation? I don't see the causal relationship.} As the aspect ratio and function are controlled in this app, we used the linear transformation in $y$; the transformation does not break under any combination of parameters tested in this experiment. Participants were recruited from Amazon Mechanical Turk and the \href{reddit}{http://reddit.com} community.
 
 % 
 % 
@@ -1239,12 +1239,15 @@ qplot(x=wopts, geom="density") + geom_rug()
 
 \subsection{Study Design}
 
-\newtext{The goal of the study is to determine an overall `optimal' setting for each of the correction factors. It is of additional interest to determine whether this setting is subject-specific or population-based, if the optimal setting depends on the starting value, and how much within-subject variability we find compared to between-subject variability. 
+The goal of the study is to determine an overall `optimal' setting for the weights in each of the correction factors. It is of additional interest to determine whether and how much this setting is subject-specific or population-based, whether the optimal setting depends on the starting value, and how much within-subject variability we find compared to between-subject variability. 
 
-Once a participants arrives at the site, he/she is presented with a specific setting of the weight $w$, where for the first six evaluations $w$ is randomly chosen from the set of numbers $\{0, 1, c\}, c\in(.25, .75)$. The first six stimuli consist of the sine illusion, corrected in $x$ or $y$ with weight $w$, so that each participant is exposed to a factorial combination of three weights and the two correction types. Participants are free to adjust up to thirty graphs, so after the initial six, $w$ is randomly sampled from distribution centered at 0.6 with mass on $(-4, 5)$. %wopts and graph are in study-weight-dist above
-This allows us to fully explore the space of plausible $w$ while focusing on the $w \in (0,1)$.
+% setup of the study
+\newdo{Could you put the factors of the study into a table for a better overview?}
+Once a participant arrives at the site, he/she is presented with a specific setting of the weight $w$, where for the first six evaluations $w$ is randomly chosen from the set of numbers $\{0, 1, c\}, c\in(.25, .75)$. The first six stimuli consist of the sine illusion, corrected in $x$ or $y$ with weight $w$, so that each participant is exposed to a factorial combination of three weights and the two correction types. Participants are free to adjust up to thirty graphs, so after the initial six, $w$ is randomly sampled from distribution centered at 0.6 with mass on $(-4, 5)$. %wopts and graph are in study-weight-dist above
+This allows us to fully explore the space of plausible $w$ while focusing on weights in the $(0,1)$ interval.
 
-The range of weight values the shiny app allows follows the full distribution of $w$ described above, so possible weight values are between $(-4, 5)$. Participants adjust the graph using increment and decrement buttons, and click ``submit'' to proceed to the next stimuli when they are satisfied with the adjustment. This provides a clear starting value and ending value, allowing us to assess the range of optimal values for each participant. Two ``training'' trials were provided that additionally superimposed a graph of the underlying mean function to give participants some idea of the underlying function the lines represent. This approach was taken to reduce the incidence of extremely high ``x'' correction values, because when $w>>1$, the lines still look to be of equal length but the underlying function bears little resemblance to $\sin(x)$. }
+%The range of weight values the shiny app allows follows the full distribution of $w$ described above, so possible weight values are between $(-4, 5)$. 
+Participants adjust the graph using increment and decrement buttons, and click ``submit'' to proceed to the next stimuli when they are satisfied with the adjustment. This provides a clear starting value and ending value, allowing us to assess the range of optimal values for each participant. Two ``training'' trials were provided that additionally superimposed a graph of the underlying mean function to give participants some idea of the underlying function the lines represent. This approach was taken to reduce the incidence of extremely high ``x'' correction values, because when $w>\!\!>1$, the lines still look to be of equal length but the underlying function bears little resemblance to $\sin(x)$. 
 
 
 \newtext{A single `trial' begins with the presentation of a graph at the chosen starting weight, and ends when the participant submits the trial. Trials with less than two total interactions (i.e. at least one adjustment plus a submission at the end of the trial) were removed because of the likelihood that the participant did not complete the required task for that trial. Trials that participants skipped were also removed from the data before analysis. Participants were asked to complete at least 10 trials after the training trials; any participants who completed fewer than 4 post-training trials were removed before data analysis.}
