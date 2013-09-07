@@ -1151,10 +1151,14 @@ dev.off()
 The quadratic correction breaks whenever the expression in the square root of eqn~\ref{eqn.q1} becomes negative, i.e.~whenever $v^2 \pm \ell\cdot f^{\prime\prime}(x)\cdot f^\prime(x)^2 < 0$.
 This happens for  combinations of large values of $\ell$, which signify a large vertical extent, or large conditional variability $E[Y|X]$, and simultaneous large changes in the slope of the main trend, i.e.~large values of the curvature $f^{\prime\prime}(x)$. In the linear approximation of $f$ the same situation leads to a massive overcorrection of the vertical lines, making the `corrected' function look almost unrecognizable. 
 
-As with the $x$ correction, we can use a weighted approach to find a balance between counteracting the illusion and representating the form of the original data. In order to balance these goals for  the quadratic correction in $y$, half-segment lengths must be weighted separately; a single segment weighting will suffice for the linear correction in $y$. 
+Similar to the correction of the $x$-axis,  we can use a weighted approach to find a balance between counteracting the illusion and representating the  original data:
+%In order to balance these goals for  the quadratic correction in $y$, half-segment lengths must be weighted separately; a single segment weighting will suffice for the linear correction in $y$. 
 \begin{equation}\label{eqn.ytrans.weighted}
 (\ell_{new_w})(x) = (1-w) \cdot \ell_{old} + w \cdot (\ell_{new})(x)
 \end{equation}
+
+Note that for the quadratic correction in $y$, half-segment lengths must be weighted separatel.%y; a single segment weighting will suffice for the linear correction in $y$. 
+
 % % 
 % % $1 + 2f^\prime(x)^2 + f^\prime(x)^4 \pm \ell\cdot f^{\prime\prime}(x)\cdot f^\prime(x)^2 < 0$
 % % 
