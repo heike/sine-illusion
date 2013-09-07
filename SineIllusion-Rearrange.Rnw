@@ -1215,20 +1215,30 @@ Note that for the quadratic correction in $y$, half-segment lengths must be weig
 
 \section{Transformations in Practice -- a User Study}
 
+\newdo{Add an intro to this section: overview of what is addressed in this section: applet, study, results - one sentence each}
+
+The goal of the study is to determine an overall `optimal' setting for the weights in each of the correction factors. It is of additional interest to determine whether and how much this setting is subject-specific or population-based, whether the optimal setting depends on the starting value, and how much within-subject variability we find compared to between-subject variability. 
+
+\newdo{The discussion on realistic situations has to go further back - this is not the place for it}
 Some modifications are necessary to implement the correction factor in a realistic situation in which it might not be practical for the aspect ratio of the graph to be fixed as 1. As in \citet{marie:2013}, the correction factor necessary to remove the illusion depends on the aspect ratio of the graphs. %Figure~\ref{fig:trigFix} demonstrates the relative effectiveness of the correction factor.
 
 
 \subsection{Applet Description}
 
-
+\newdo{`can be found' - that sounds like you picked it up from the street - emphasize that this is part of the work you did for this paper. An applet ... is  made avalailable at ...}
 \begin{figure}\centering
 \includegraphics[width=.9\linewidth]{images/shiny.pdf}
 \caption{\label{fig:shiny.app} Screenshot of the shiny application used to collect information of observers' preference with respect to an optimal correction for the illusion  under each of the  transformations discussed in the previous section. }
 \end{figure}
 %
 %An applet demonstrating the effect of changing parameter values on the strength of the illusion can be found at \url{http://www.michaelbach.de/ot/sze_sineIllusion/index.html}. 
-An applet demonstrating the effect of changing parameter values on the strength of the illusion as well as all of the correction factors we propose in this paper can be found at \url{http://glimmer.rstudio.com/srvanderplas/SineIllusion/}. This applet was used in collecting data from users and can be found at \url{http://glimmer.rstudio.com/srvanderplas/SineIllusionShiny/}. Figure~\ref{fig:shiny.app} shows a screen shot of it. The applet is implemented in {\tt shiny} \citep{shiny}. Users can adjust the amount of adjustment using the plus and minus button (with plus indicating a higher level of correction). Underlying this adjustment is the value of the weight $w$, as defined in eqns.~\ref{eqn.xtrans.weighted} and~\ref{eqn.ytrans.weighted}. 
+An applet demonstrating the effect of changing parameter values on the strength of the illusion as well as all of the correction factors we propose in this paper {\it can be found at} \url{http://glimmer.rstudio.com/srvanderplas/SineIllusion/}. This applet was used in collecting data from users and {\it can be found at} \url{http://glimmer.rstudio.com/srvanderplas/SineIllusionShiny/}. Figure~\ref{fig:shiny.app} shows a screen shot of it. 
+\newdo{you cite two different websites. describe the difference, too.}
+The applet is implemented in {\tt shiny} \citep{shiny}. Users can adjust the amount of adjustment using the plus and minus button (with plus indicating a higher level of correction).
+\newdo{adjust, adjustment, adjust ... } Underlying this adjustment is the value of the weight $w$, as defined in eqns.~\ref{eqn.xtrans.weighted} and~\ref{eqn.ytrans.weighted}. 
+\newdo{numerical feedback of weight is removed for the study, because results from a pilot study showed that users had `favorite' numbers for the weights and adjusted based on the number, not based on the plot. Not showing the number removed that bias (expectation error, meilgaard)}
 \newdo{why does controlling for aspect ratio and the function imply a use of the linear approximation? I don't see the causal relationship.} As the aspect ratio and function are controlled in this app, we used the linear transformation in $y$; the transformation does not break under any combination of parameters tested in this experiment. Participants were recruited from Amazon Mechanical Turk and the \href{reddit}{http://reddit.com} community.
+
 
 % 
 % 
@@ -1242,22 +1252,29 @@ qplot(x=wopts, geom="density") + geom_rug()
 @
 
 \subsection{Study Design}
-
-The goal of the study is to determine an overall `optimal' setting for the weights in each of the correction factors. It is of additional interest to determine whether and how much this setting is subject-specific or population-based, whether the optimal setting depends on the starting value, and how much within-subject variability we find compared to between-subject variability. 
+\newdo{why do we look at starting weight in the first place? that needs a sentence}
+\newtext{The study is set up as a fractional factorial design of correction type ($x$ or $y$ correction) and starting weight $w_0$. Each participant is asked to evaluate a total of twelve situations, six of each correction type. For the first six starting weights $w_0$ values were chosen  with equal probability from the set of numbers $\{0, 1, c\}$, where $c \sim U(.25, .75)$, while the second set of starting weights is randomly sampled from a distribution centered at 0.6 with mass on $(-4, 5)$. 
+}
+\newdo{a distribution centered at 0.6 - can you be more specific? is it a normal distribution? }
+\newdo{center of 0.6 because of a results from a pilot study, which showed a  preference of 0.6 }
+This allows us to fully explore the space of plausible $w$ while focusing on weights in the $(0,1)$ interval.
 
 % setup of the study
 \newdo{Could you put the factors of the study into a table for a better overview?}
-Once a participant arrives at the site, he/she is presented with a specific setting of the weight $w$, where for the first six evaluations $w$ is randomly chosen from the set of numbers $\{0, 1, c\}, c\in(.25, .75)$. The first six stimuli consist of the sine illusion, corrected in $x$ or $y$ with weight $w$, so that each participant is exposed to a factorial combination of three weights and the two correction types. Participants are free to adjust up to thirty graphs, so after the initial six, $w$ is randomly sampled from distribution centered at 0.6 with mass on $(-4, 5)$. %wopts and graph are in study-weight-dist above
-This allows us to fully explore the space of plausible $w$ while focusing on weights in the $(0,1)$ interval.
+%Once a participant arrives at the site, he/she 
+% Each participant is presented with a specific setting of the weight $w$, where for the first six evaluations $w$ is randomly chosen from the set of numbers $\{0, 1, c\}, c\in(.25, .75)$. The first six stimuli consist of the sine illusion, corrected in $x$ or $y$ with weight $w$, so that each participant is exposed to a factorial combination of three weights and the two correction types. Participants are free to adjust up to thirty graphs, so after the initial six, $w$ is randomly sampled from distribution centered at 0.6 with mass on $(-4, 5)$. %wopts and graph are in study-weight-dist above
+% This allows us to fully explore the space of plausible $w$ while focusing on weights in the $(0,1)$ interval.
 
 %The range of weight values the shiny app allows follows the full distribution of $w$ described above, so possible weight values are between $(-4, 5)$. 
 Participants adjust the graph using increment and decrement buttons, and click ``submit'' to proceed to the next stimuli when they are satisfied with the adjustment. This provides a clear starting value and ending value, allowing us to assess the range of optimal values for each participant. Two ``training'' trials were provided that additionally superimposed a graph of the underlying mean function to give participants some idea of the underlying function the lines represent. This approach was taken to reduce the incidence of extremely high ``x'' correction values, because when $w>\!\!>1$, the lines still look to be of equal length but the underlying function bears little resemblance to $\sin(x)$. 
 
 
-\newtext{A single `trial' begins with the presentation of a graph at the chosen starting weight, and ends when the participant submits the trial. Trials with less than two total interactions (i.e. at least one adjustment plus a submission at the end of the trial) were removed because of the likelihood that the participant did not complete the required task for that trial. Trials that participants skipped were also removed from the data before analysis. Participants were asked to complete at least 10 trials after the training trials; any participants who completed fewer than 4 post-training trials were removed before data analysis.}
+A single `trial' begins with the presentation of a graph at the chosen starting weight, and ends when the participant submits the trial. 
+\newdo{What other records did you keep track of?}
 
-\subsection{Method}
 \subsection{Results}
+% Data preparation
+
 <<results-analysis,echo=FALSE, cache=TRUE, include=FALSE, fig.width=8, fig.height=6>>=
 trial.sum <- read.csv("./data/SummaryTable.csv", row.names=1, stringsAsFactors=FALSE)
 trial.sequence <- read.csv("./data/IndivTrajectory.csv", row.names=1, stringsAsFactors=FALSE)
@@ -1370,8 +1387,13 @@ ggplot() +
   theme(legend.position="bottom") + geom_point(aes(x=ests, y=30), data=ests) #+ geom_point(aes(x=eu.level, y=0, colour=limit), alpha=0.3, data=subset(sim.data, user=="X1"))
 
 @
+
+\newdo{From the writeup I'm not completely sure, which data you removed and why - simply removing outliers looks like you want to make your results prettier. You need a better reason for removing data. This is something that the reviewers will tear into, if you don't make a solid case.
+What happened to the training data?}
 \newtext{\Sexpr{nparticipants} participants in total took part in the study with \Sexpr{ntrials} total evaluations. 
-For each starting weight, responses more than 1.5*IQR from the upper and lower quartiles were removed (a total of \Sexpr{noutliers} trials). Additionally, observations from participants who completed fewer than 4 non-outlier trials were removed from the data to allow estimation of individual random effects with some accuracy. The mean number of trials per participant once outliers were removed was \Sexpr{round(trials.per.participant, 2)}. As there were only \Sexpr{sum(!trial.sum$incl.startwt & trial.sum$incl.trials & !trial.sum$endwt.outlier)} trials with starting weight outside of [0,1] which met the other inclusion criteria, those trials were eliminated from the analysis. }
+For each starting weight, responses more than 1.5*IQR from the upper and lower quartiles were removed (a total of \Sexpr{noutliers} trials). 
+Trials with less than two total interactions (i.e. at least one adjustment plus a submission at the end of the trial) were removed because of the likelihood that the participant did not complete the required task for that trial. Trials that participants skipped were also removed from the data before analysis. Participants were asked to complete at least 10 trials after the training trials.
+Observations from participants who completed fewer than 4 non-outlier trials were removed from the data to allow estimation of individual random effects with some accuracy. The mean number of trials per participant once outliers were removed was \Sexpr{round(trials.per.participant, 2)}. As there were only \Sexpr{sum(!trial.sum$incl.startwt & trial.sum$incl.trials & !trial.sum$endwt.outlier)} trials with starting weight outside of [0,1] which met the other inclusion criteria, those trials were eliminated from the analysis. }
 
 
 \begin{figure}[htbp]
