@@ -170,7 +170,7 @@ is.outlier <- function(x){
   qs <- as.numeric(quantile(x, c(.25, .75)))
   iqr <- diff(qs)
   lims <- qs + c(-1, 1)*1.5*iqr
-  !(x>=lims[1] & x <= lims[2]) #& !(x>=0 & x<=1)
+  !(x>=lims[1] & x <= lims[2]) & !(x>=0 & x<=1)
 }
 trial.sum <- ddply(trial.sum, .(startweight), transform, 
                       incl.startwt = startweight<=1 & startweight>=0,
@@ -190,15 +190,17 @@ ggplot() +
   ylab("Weight") + 
   geom_hline(yintercept=1) + 
   geom_hline(yintercept=0)
+# note that x values outside of [0,1] do not preserve the underlying function shape to any degree (i.e. concavity changes, etc.) and y values outside of [0,1] are not at all perceptually reasonable. 
+
 
 # compute outliers for each possible start weight
 
 noutliers <- sum(trial.sum$endwt.outlier)
 
-qplot(data=subset(trial.sum, !training & ntrials>3), x=factor(startweight), y=endweight, geom="jitter", colour=endwt.outlier, alpha=I(.5)) + facet_grid(post.training~type)
+qplot(data=subset(trial.sum, !training & ntrials>3), x=startweight, y=endweight, geom="jitter", colour=endwt.outlier, alpha=I(.5)) + facet_grid(.~type)
 
 # lm.data <- subset(trial.sum, incl.startwt & incl.trials & !endwt.outlier)
-lm.data <- subset(trial.sum, incl.startwt & incl.trials)
+lm.data <- subset(trial.sum, incl.trials)
 
 temp <- rbind.fill(cbind(trial.sum, dataset="full"), cbind(lm.data, dataset="trimmed"))
 # not much has changed density wise...
@@ -211,6 +213,33 @@ rm("temp")
 
 library(lme4)
 library(multcomp)
+model.full <- lmer(data=subset(trial.sum, incl.trials), 
+                   endweight ~ (type-1) + post.training + training + startweight + ((type-1)|fingerprint))
+summary(model.full)
+# training trials are not significantly different from non-training trials, having training doesn't really matter
+
+model.full2 <- lmer(data=subset(trial.sum, incl.trials), 
+                    endweight ~ (type-1) + startweight + ((type-1)|fingerprint))
+summary(model.full2)
+# removing those extra terms makes things much prettier, std error wise.
+
+model.full3 <- lmer(data=subset(trial.sum, incl.trials & !endwt.outlier), 
+                    endweight ~ (type-1) + startweight + ((type-1)|fingerprint))
+summary(model.full3)
+# without outliers, debug model - for the first time, random effects for type have similar variances
+
+model.full4 <- lmer(data=subset(lm.data, incl.startwt & incl.trials & !endwt.outlier), 
+                    endweight ~ (type-1) + startweight + ((type-1)|fingerprint))
+summary(model.full4)
+# without outliers or starting values outside of (0,1) - high influence values without sufficient data points... should remove those as well.
+
+model.x <- lmer(data=subset(trial.sum, type=="x" & incl.trials), 
+                endweight ~ startweight + (1|fingerprint))
+summary(model.x)
+
+
+
+
 model <- lmer(data=lm.data, endweight~ (type-1) + startweight + (1|fingerprint))
 summary(model)
 N <- 100
