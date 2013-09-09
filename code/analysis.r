@@ -170,17 +170,35 @@ is.outlier <- function(x){
   qs <- as.numeric(quantile(x, c(.25, .75)))
   iqr <- diff(qs)
   lims <- qs + c(-1, 1)*1.5*iqr
-  !(x>=lims[1] & x <= lims[2])
+  !(x>=lims[1] & x <= lims[2]) #& !(x>=0 & x<=1)
 }
 trial.sum <- ddply(trial.sum, .(startweight), transform, 
                       incl.startwt = startweight<=1 & startweight>=0,
                       incl.trials = ntrials>3,
                       endwt.outlier = is.outlier(endweight)) 
+
+trial.sequence <- ddply(trial.sequence, .(start.weight), transform, endwt.outlier = is.outlier(end.weight))
+
+# picture of outlier trial time sequences. Note that in most cases, the value declined monotonically; this potentially indicates applet issues or user issues, i.e. "I'm going to click this button forever" syndrome.
+ggplot() + 
+  geom_point(data=subset(trial.sum, endwt.outlier), aes(x=0, y=endweight), alpha=.1) + 
+  geom_rug(data=subset(trial.sum, endwt.outlier), aes(y=endweight), alpha=.1, sides="r") +
+  geom_line(data=subset(trial.sequence, len>2 & seq>1 & ntrials>4 & trial.time>-100 & endwt.outlier),
+            aes(x=trial.time, y=weight, group=interaction(q+skip, fingerprint)), alpha=.5) + 
+  facet_grid(type~., scales="free_x") + 
+  xlab("Time until Trial End") + 
+  ylab("Weight") + 
+  geom_hline(yintercept=1) + 
+  geom_hline(yintercept=0)
+
 # compute outliers for each possible start weight
 
 noutliers <- sum(trial.sum$endwt.outlier)
 
-lm.data <- subset(trial.sum, incl.startwt & incl.trials & !endwt.outlier)
+qplot(data=subset(trial.sum, !training & ntrials>3), x=factor(startweight), y=endweight, geom="jitter", colour=endwt.outlier, alpha=I(.5)) + facet_grid(post.training~type)
+
+# lm.data <- subset(trial.sum, incl.startwt & incl.trials & !endwt.outlier)
+lm.data <- subset(trial.sum, incl.startwt & incl.trials)
 
 temp <- rbind.fill(cbind(trial.sum, dataset="full"), cbind(lm.data, dataset="trimmed"))
 # not much has changed density wise...
