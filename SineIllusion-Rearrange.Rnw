@@ -1418,7 +1418,7 @@ sim.data$eu.level <- sim.data$ranef + sim.data$fixef
 
 sim.data$limit <- relevel(sim.data$limit, ref="lb")
 sim.data$limit <- mapvalues(sim.data$limit, from=c("lb", "ub"), to=c("from below", "from above"))
-levels(sim.data$type) <- paste("Transformation of ", toupper(levels(sim.data$type)), " axis", sep="")
+levels(sim.data$type) <- paste(toupper(levels(sim.data$type)), " Transformation", sep="")
 
 ints <- ddply(sim.data, .(type, limit), function(x){
   temp <- HPDinterval(t(x$fixef))
@@ -1434,7 +1434,7 @@ ints.users <- ddply(sim.data, .(user, type, limit), function(x){
 })
 names(ints.users) <- c("user", "type", "limit", "xmin", "x", "xmax")
 
-ests <- data.frame(ests = c(fixef(model)[1:2], fixef(model)[1:2]+fixef(model)[3]), type=rep(c("Transformation of X axis", "Transformation of Y values"), 2))
+ests <- data.frame(ests = c(fixef(model)[1:2], fixef(model)[1:2]+fixef(model)[3]), type=rep(c("Y Transformation", "X Transformation"), 2))
 
 ggplot() + theme_bw() + facet_grid(type~., scales="free") + 
   geom_rect(data=ints.all, aes(xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax), 
