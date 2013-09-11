@@ -1387,19 +1387,19 @@ library(memisc) # latex output for lmer
 lm.data$type <- relevel(factor(lm.data$type), ref="y")
 
 modeltest <- lmer(endweight ~ type -1 + startweight + (type-1|fingerprint), data=lm.data)
-summary(modeltest)
+# summary(modeltest)
 # conclusion - within-user variance is reasonably similar for different trial types
 
 fixedmodel <- lm(endweight~(type-1) +startweight + training, data=lm.data)
 
 model <- lmer(data=lm.data, endweight~ (type-1) + startweight + (1|fingerprint))
 
-summary(model)
+# summary(model)
 N <- 1000
 model.mcmc <- mcmcsamp(model, N, saveb=TRUE)
 
 fixef.model <- as.data.frame(t(attr(model.mcmc, "fixef")))
-names(fixef.model) <- c("x", "y", "weight")
+names(fixef.model) <- gsub("start", "", gsub("type", "", names(fixef.model)))
 fixef.model <- melt(fixef.model, id.vars=3)
 names(fixef.model) <- c("weight", "type", "intercept")
 ranef.model <- as.data.frame(t(attr(model.mcmc, "ranef")))
@@ -1418,7 +1418,7 @@ sim.data$eu.level <- sim.data$ranef + sim.data$fixef
 
 sim.data$limit <- relevel(sim.data$limit, ref="lb")
 sim.data$limit <- mapvalues(sim.data$limit, from=c("lb", "ub"), to=c("from below", "from above"))
-levels(sim.data$type) <- c("Transformation of X axis", "Transformation of Y values")
+levels(sim.data$type) <- paste("Transformation of ", toupper(levels(sim.data$type)), " axis", sep="")
 
 ints <- ddply(sim.data, .(type, limit), function(x){
   temp <- HPDinterval(t(x$fixef))
