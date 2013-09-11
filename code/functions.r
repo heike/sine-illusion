@@ -189,3 +189,12 @@ getSecantSegment <- function(x0, df, f, fprime, f2prime){
   df2$a <- a
   return(df2)
 }
+
+correctx <- function(z, fprime, a=0, b=2*pi, w=1) {
+  # w = 1/(shrink+1)
+  const <- integrate(function(x) abs(fprime(x)), a, b)$value
+  trans <- sapply(z, function(i) integrate(function(x) abs(fprime(x)), a, i)$value*(b-a)/const + a)
+  # alternatively to the rowMeans, you could report back  
+  # trans*(1-w) + z*w
+  trans*w + z*(1-w)
+}

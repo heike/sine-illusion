@@ -15,6 +15,8 @@
 \usepackage{ulem}
 \usepackage[section]{placeins}
 \usepackage{sidecap}
+\usepackage{multirow}
+\usepackage{bbm}
 
 % test change
 % help with editing and coauthoring
@@ -1228,16 +1230,20 @@ Some modifications are necessary to implement the correction factor in a realist
 \newdo{`can be found' - that sounds like you picked it up from the street - emphasize that this is part of the work you did for this paper. An applet ... is  made avalailable at ...}
 \begin{figure}\centering
 \includegraphics[width=.9\linewidth]{images/shiny.pdf}
-\caption{\label{fig:shiny.app} Screenshot of the shiny application used to collect information of observers' preference with respect to an optimal correction for the illusion  under each of the  transformations discussed in the previous section. }
+\caption{\label{fig:shiny.app} Screenshot of the shiny application used to collect information of observers' preference with respect to an optimal correction for the illusion under each of the  transformations discussed in the previous section. }
 \end{figure}
 %
 %An applet demonstrating the effect of changing parameter values on the strength of the illusion can be found at \url{http://www.michaelbach.de/ot/sze_sineIllusion/index.html}. 
-An applet demonstrating the effect of changing parameter values on the strength of the illusion as well as all of the correction factors we propose in this paper {\it can be found at} \url{http://glimmer.rstudio.com/srvanderplas/SineIllusion/}. This applet was used in collecting data from users and {\it can be found at} \url{http://glimmer.rstudio.com/srvanderplas/SineIllusionShiny/}. Figure~\ref{fig:shiny.app} shows a screen shot of it. 
-\newdo{you cite two different websites. describe the difference, too.}
-The applet is implemented in {\tt shiny} \citep{shiny}. Users can adjust the amount of adjustment using the plus and minus button (with plus indicating a higher level of correction).
-\newdo{adjust, adjustment, adjust ... } Underlying this adjustment is the value of the weight $w$, as defined in eqns.~\ref{eqn.xtrans.weighted} and~\ref{eqn.ytrans.weighted}. 
-\newdo{numerical feedback of weight is removed for the study, because results from a pilot study showed that users had `favorite' numbers for the weights and adjusted based on the number, not based on the plot. Not showing the number removed that bias (expectation error, meilgaard)}
-\newdo{why does controlling for aspect ratio and the function imply a use of the linear approximation? I don't see the causal relationship.} As the aspect ratio and function are controlled in this app, we used the linear transformation in $y$; the transformation does not break under any combination of parameters tested in this experiment. Participants were recruited from Amazon Mechanical Turk and the \href{reddit}{http://reddit.com} community.
+An applet demonstrating the effect of changing parameter values on the strength of the illusion as well as all of the correction factors we propose in this paper is available at \url{http://glimmer.rstudio.com/srvanderplas/SineIllusion/}. In addition, figure~\ref{fig:shiny.app} shows a screenshot of the applet used to collect user data. This applet is also available online at \url{http://glimmer.rstudio.com/srvanderplas/SineIllusionShiny/}. The applet used for data collection is scaled down to provide experimental control; users are assigned specific transformations and starting values and can only increment or decrement the weight of the transformation.
+\done{you cite two different websites. describe the difference, too.}
+The applet is implemented in {\tt shiny} \citep{shiny}. Users can modify the transformation weight using the plus and minus button (with plus indicating a higher level of correction).
+Underlying this adjustment is the value of the weight $w$ as defined in eqns.~\ref{eqn.xtrans.weighted} and~\ref{eqn.ytrans.weighted}, though the numerical value of $w$ was hidden from the user to prevent anchoring to a specific numerical value. 
+
+\done{why does controlling for aspect ratio and the function imply a use of the linear approximation? I don't see the causal relationship.}
+\done{(should have been line length, not aspect ratio... sorry!)\\
+The linear approximation doesn't break until you reach certain conditions, i.e. line length vs. function amplitude: ``The quadratic correction breaks whenever ... combinations of large values of $\ell$, which signify a large vertical extent, or large conditional variability $E[Y|X]$, and simultaneous large changes in the slope of the main trend, i.e.~large values of the curvature $f^{\prime\prime}(x)$. In the linear approximation of $f$ the same situation leads to a massive overcorrection of the vertical lines, making the `corrected' function look almost unrecognizable."} 
+
+As the line length and function are controlled in this app, we used the linear transformation in $y$; the transformation does not break under any combination of parameters tested in this experiment. Participants were recruited from Amazon Mechanical Turk and the \href{reddit}{http://reddit.com/r/SampleSize} community.
 
 
 % 
@@ -1248,31 +1254,37 @@ The applet is implemented in {\tt shiny} \citep{shiny}. Users can adjust the amo
 # Weight values possible in the Shiny App.
 diffs <- c(0, .5, .5, .5, .5, .25, .25, .25, .25, .25, .25, .25, .25, .1, .1, .05, .05, .05, .05, .05, .05, .025, .025, .025, .025, .025, .025, .025, .025, .025, .025, .025, .025, .05, .05, .05, .05, .1, .1, .1, .1, .1, .25, .25, .25, .25, .25, .25, .5, .5, .5, .5)
 wopts <- -4 +cumsum(diffs)
-qplot(x=wopts, geom="density") + geom_rug()
+qplot(x=wopts, geom="density") + geom_rug() + theme_bw() + ylab("Kernel Density") + xlab("w") + ggtitle("Distribution of w")
 @
 
 \subsection{Study Design}
 \newtext{The study aims to determine the ``optimal'' transformation weight for each transformation type. Psychophysics methodology typically approaches threshold estimation by using the method of adjustment, where a stimulus is provided at a starting point above or below the hypothesized optimal value and the participant adjusts the stimulus until the stated goal is met (in this case, until the lines appear to have equal length). It is expected that there will be a difference in user-reported values from below and from above, and these values are typically averaged to produce a single threshold value. Rather than averaging these values, we use a mixed model to compare user responses for different starting points in a more continuous fashion, incorporating some of the advantages of the method of constant stimuli to more robustly estimate the optimal transformation weight. For a review of general psychophysics methodology, the method of adjustment, and the method of constant stimuli, see \citet{goldstein}.
 
-The study is set up as a fractional factorial design of correction type ($x$ or $y$ correction) and starting weight $w_0$. Each participant is asked to evaluate a total of twelve situations, six of each correction type. For the first six starting weights $w_0$ values were chosen with equal probability from the set of numbers $\{0, 1, c\}$, where $c \sim U(.25, .75)$, while the second set of starting weights is randomly sampled from a distribution centered at 0.6 with mass on $(-4, 5)$, shown in figure \ref{fig:weightdist}. Participants were allowed to complete as many trials as they wished, with any trials after the first six sampled as in the second set of trials.
+The study is set up as a fractional factorial design of correction type ($x$ or $y$ correction) and starting weight $w_0$. Each participant is asked to evaluate a total of twelve situations, six of each correction type, though they are allowed to complete up to 30 trials if they wish. For the first six starting weights $w_0$ values were chosen with equal probability from the set of numbers $\{0, 1, c\}$, where $c \sim U(.25, .75)$, while the second set of starting weights is randomly sampled from a distribution centered at 0.6 with mass on discrete values in the interval $(-4, 5)$, shown in figure \ref{fig:weightdist}. The distribution was chosen to have a higher coverage density around 0.6 after a pilot study indicated a preference for that value. Using a distribution with a wide range of coverage allows us to fully explore the space of plausible $w$ while focusing on weights in the $(0,1)$ interval. Table \ref{factortable} summarizes the factors under investigation in the experiment.
 }
-\newdo{a distribution centered at 0.6 - can you be more specific? is it a normal distribution? \\
-Not exactly.}
 \begin{figure}[h]\centering
 \includegraphics[keepaspectratio=TRUE,width=.5\linewidth]{figure/fig-study-weight-dist}
-\caption{Distribution of starting weights}\label{fig:weightdist}
+\caption{Distribution of starting weights. Weight values are discrete, but staggered so as to provide fine-grained adjustments around 0.6 and more coarse discriminatory information outside of $(0,1)$.}\label{fig:weightdist}
 \end{figure}
-\newdo{center of 0.6 because of a results from a pilot study, which showed a  preference of 0.6 }
-This allows us to fully explore the space of plausible $w$ while focusing on weights in the $(0,1)$ interval.
 
 % setup of the study
 \newdo{Could you put the factors of the study into a table for a better overview?}
+\begin{table}[htbp]\centering
+\begin{tabular}{ccc}
+Factor & Stage & Values \\\hline
+Transformation & Trials 1-30 & $X$, $Y$\\
+\multirow{2}{*}{Weight} & Trials 1-6 & $0, 1, c \in (.25, .75)$\\
+& Trials 7-30 & $c \in [-4, 5]$\\
+\end{tabular}
+\caption{Summary of factors in the experiment.}\label{factortable}
+\end{table}
+
 %Once a participant arrives at the site, he/she 
 % Each participant is presented with a specific setting of the weight $w$, where for the first six evaluations $w$ is randomly chosen from the set of numbers $\{0, 1, c\}, c\in(.25, .75)$. The first six stimuli consist of the sine illusion, corrected in $x$ or $y$ with weight $w$, so that each participant is exposed to a factorial combination of three weights and the two correction types. Participants are free to adjust up to thirty graphs, so after the initial six, $w$ is randomly sampled from distribution centered at 0.6 with mass on $(-4, 5)$. %wopts and graph are in study-weight-dist above
 % This allows us to fully explore the space of plausible $w$ while focusing on weights in the $(0,1)$ interval.
 
 %The range of weight values the shiny app allows follows the full distribution of $w$ described above, so possible weight values are between $(-4, 5)$. 
-Participants adjust the graph using increment and decrement buttons, and click ``submit'' to proceed to the next stimuli when they are satisfied with the adjustment. This provides a clear starting value and ending value, allowing us to assess the range of optimal values for each participant. Two ``training'' trials were provided that additionally superimposed a graph of the underlying mean function to give participants some idea of the underlying function the lines represent. This approach was taken to reduce the incidence of extremely high ``x'' correction values, because when $w>\!\!>1$, the lines still look to be of equal length but the underlying function bears little resemblance to $\sin(x)$, as shown in figures \ref{fig:xtransover1} and \ref{fig:xtransover2}. 
+Participants adjust the graph using increment and decrement buttons, and click ``submit'' to proceed to the next stimuli when they are satisfied with the adjustment. This provides a clear starting value and ending value, allowing us to assess the range of optimal values for each participant. Two ``training'' trials were provided that additionally superimposed a graph of the underlying mean function to give participants some idea of the underlying function the lines represent. This approach was taken to reduce the incidence of extremely high ``x'' correction values, because when $w>\!\!>1$, the lines still look to be of equal length but the underlying function bears little resemblance to $\sin(x)$, as shown in figure \ref{fig:overtransform}. 
 
 
 \newtext{A single `trial' begins with the presentation of a graph at the chosen starting weight, and ends when the participant submits the trial. In addition to transformation weight, type, and user submission, time-series data for each user interaction was recorded, as well as anonymized user data (partial IP address, hashed IP address, and hashed browser characteristics sufficient to provide a user 'fingerprint' to distinguish different users). }
@@ -1281,7 +1293,44 @@ Participants adjust the graph using increment and decrement buttons, and click `
 \subsection{Results}
 % Data preparation
 
-<<results-analysis,echo=FALSE, cache=TRUE, include=FALSE, fig.width=8, fig.height=6>>=
+<<overcorrectlimits, out.width='.45\\linewidth', fig.width=6, fig.height=4, dependson='xtransform', echo=FALSE, include=FALSE>>=
+# what do the different corrections look like outside of the boundary region for outliers?
+f <- sin
+fprime <- cos
+f2prime <- function(x) -sin(x)
+dframe <- createSine(40 , len=1, f=f, fprime=fprime, f2prime=f2prime)
+wlow <- -2.5
+whigh <- 3.5
+ycorrlow <- with(dframe, data.frame(x=x, xstart=xstart, xend=xend, 
+                                    y=y, ystart = y - ((1-wlow)*ell/2 + (wlow)*ellx4.l), 
+                                    yend = y + ((1-wlow)*ell/2 + (wlow)*ellx4.u),
+                                    corr = "Y", level = "low"))
+ycorrhigh <- with(dframe, data.frame(x=x, xstart=xstart, xend=xend, 
+                                     y=y, ystart = y - ((1-whigh)*ell/2+(whigh)*ellx4.l), 
+                                     yend = y + ((1-whigh)*ell/2 + (whigh)*ellx4.u),
+                                     corr = "Y", level = "high"))
+
+xcorrlow <- with(dframe, data.frame(x=correctx(x, fprime, w=wlow), 
+                                    xstart=correctx(x, fprime, w=wlow),
+                                    xend=correctx(x, fprime, w=wlow), 
+                                    y=y, ystart=ystart, yend=yend,
+                                    corr = "X", level = "low"))
+xcorrhigh <- with(dframe, data.frame(x=correctx(x, fprime, w=whigh), 
+                                    xstart=correctx(x, fprime, w=whigh),
+                                    xend=correctx(x, fprime, w=whigh), 
+                                    y=y, ystart=ystart, yend=yend,
+                                    corr = "X", level = "high"))
+correction.extremes <- rbind(ycorrlow,ycorrhigh,xcorrlow,xcorrhigh)
+qplot(data=correction.extremes, geom="segment", x=xstart, xend=xend, y=ystart, yend=yend) +
+  facet_grid(corr~level) + ylab("") + xlab("")  +
+  theme(panel.grid.major=element_blank(), panel.background = element_rect(fill = "white", 
+                colour = "black"), plot.margin = unit(c(-1,0,-3,0), "cm"), 
+       panel.grid.minor=element_blank(), panel.background=element_blank(),
+       axis.title = element_blank(), axis.ticks = element_blank(), 
+       axis.text = element_blank()) + coord_equal(ratio=1)
+@
+
+<<results-analysis,echo=FALSE, cache=TRUE, include=FALSE, fig.width=8, fig.height=6, dependson='overcorrectlimits'>>=
 trial.sum <- read.csv("./data/SummaryTable.csv", row.names=1, stringsAsFactors=FALSE)
 trial.sequence <- read.csv("./data/IndivTrajectory.csv", row.names=1, stringsAsFactors=FALSE)
 library(lubridate)
@@ -1291,10 +1340,11 @@ trial.sequence$time2 <- ymd_hms(trial.sequence$time2)
 #--- Mixed Model ---#
 
 is.outlier <- function(x){
-  qs <- as.numeric(quantile(x, c(.25, .75)))
-  iqr <- diff(qs)
-  lims <- qs + c(-1, 1)*1.5*iqr
-  !(x>=lims[1] & x <= lims[2]) & !(x>=0 & x<=1)
+#   qs <- as.numeric(quantile(x, c(.25, .75)))
+#   iqr <- diff(qs)
+#   lims <- qs + c(-1, 1)*1.5*iqr
+#   !(x>=lims[1] & x <= lims[2]) & !(x>=-1 & x<=2)
+  !(x>=wlow & x<=whigh)
 }
 
 trial.sum <- ddply(trial.sum, .(startweight), transform, 
@@ -1338,14 +1388,14 @@ lm.data$type <- relevel(factor(lm.data$type), ref="y")
 
 modeltest <- lmer(endweight ~ type -1 + startweight + (type-1|fingerprint), data=subset(lm.data, !training))
 summary(modeltest)
-# conclusion - within-user variance is very similar for different trial types
+# conclusion - within-user variance is reasonably similar for different trial types
 
-fixedmodel <- lm(endweight~(type-1)*training+startweight, data=lm.data)
+fixedmodel <- lm(endweight~(type-1) +startweight + training, data=lm.data)
 
 model <- lmer(data=lm.data, endweight~ (type-1) + startweight + (1|fingerprint))
 
 summary(model)
-N <- 100
+N <- 1000
 model.mcmc <- mcmcsamp(model, N, saveb=TRUE)
 
 fixef.model <- as.data.frame(t(attr(model.mcmc, "fixef")))
@@ -1397,107 +1447,89 @@ ggplot() + theme_bw() + facet_grid(type~., scales="free") +
             alpha=.1, stat='density', trim=TRUE) + 
   ylab("Density") + xlab("Weight w") + 
   scale_colour_manual("Approach", values=c("#B2182B", "#2166AC"),
-                    breaks=c("from below", "from above"))  +
+                      breaks=c("from below", "from above"))  +
   scale_fill_manual("Approach", values=c("#d6604d", "#4393c3"),
                     breaks=c("from below", "from above")) + 
   geom_errorbarh(aes(xmin=xmin, x=x, xmax=xmax, y=32, color=limit), data=ints) + 
   theme(legend.position="bottom") + geom_point(aes(x=ests, y=32), data=ests) +
-  xlim(c(-.4, 1.4)) +
-  geom_point(data=ints.all, aes(x=xmax, y=0, size=factor("Acceptable Weights")), shape=NA, colour="grey75") +
-  guides(size=guide_legend("", override.aes=list(shape=15, size = 10), order=2)) +
-  theme(legend.box="horizontal")
-
+  xlim(c(-.2, 1.2)) +
+  geom_point(data=ints.all, aes(x=xmax, y=0, size=factor("Range")), shape=NA, colour="grey75") +
+  guides(colour=guide_legend(order=1), fill=guide_legend(order=1), size=guide_legend("Overall Acceptable Weights", override.aes=list(shape=15, size = 10), order=3))
 @
 
-\newdo{From the writeup I'm not completely sure, which data you removed and why - simply removing outliers looks like you want to make your results prettier. You need a better reason for removing data. This is something that the reviewers will tear into, if you don't make a solid case.
+\done{From the writeup I'm not completely sure, which data you removed and why - simply removing outliers looks like you want to make your results prettier. You need a better reason for removing data. This is something that the reviewers will tear into, if you don't make a solid case.
 What happened to the training data?}
 \Sexpr{nparticipants} participants in total took part in the study with \Sexpr{ntrials} total evaluations. Trials with less than two total interactions (i.e. at least one adjustment plus a submission at the end of the trial) were removed because of the likelihood that the participant did not complete the required task for that trial. Trials that participants skipped were also removed from the data before analysis. Participants were asked to complete at least 10 trials after the training trials, so observations from participants who completed fewer than 4 non-outlier trials were removed from the data to allow estimation of individual random effects with some accuracy. 
 
-\newtext{After removing data according to these criteria, we noticed that there were many responses for the $x$ correction that tended towards the endpoints of the weight value. These responses indicated that the participant did not attempt to maintain the underlying function, and the trials should thus be excluded from calculation of the optimal weight. This occurs as a result of an artifact of the x correction which enables participants to more easily perceive a three-dimensional image at corrections outside of [0,1] at the expense of the underlying mean function, as shown in figures \ref{fig:xtransover1} and \ref{fig:xtransover2}. }
+\newtext{After removing data according to these criteria, we noticed that there were many responses for the $x$ correction that tended towards the endpoints of the weight value. These responses indicated that the participant did not attempt to maintain the underlying function, and the trials should thus be excluded from calculation of the optimal weight. This occurs as a result of an artifact of the x correction which enables participants to more easily perceive a three-dimensional image at corrections outside of [0,1] at the expense of the underlying mean function, as shown in figure \ref{fig:overtransform}.}
 
-<<xcorr-over, out.width='.45\\linewidth', fig.width=4, fig.height=2, dependson='xtransform', echo=FALSE, include=FALSE>>=
-f <- sin
-fprime <- cos
-f2prime <- function(x) -sin(x)
-dframe <- createSine(40 , len=1, f=f, fprime=fprime, f2prime=f2prime)
-minor.axis.correction <- correctx(seq(0, 2*pi, pi/8), fprime, w=-3)
-
-dframe$xtrans <- correctx(dframe$x, fprime=fprime, w=-3)
-
-dots <- data.frame(x = rep(minor.axis.correction, times=1), y=rep(c(-2), each=length(minor.axis.correction)))
-
-ggplot(aes(x=xtrans, xend=xtrans, y = ystart, yend=yend), data=dframe) +
-  geom_abline(aes(slope = 0, intercept=0), colour="grey70") +
-  geom_segment(colour="grey20") +
-  theme_bw() + coord_fixed(ratio=1) + xlab("x") + ylab("y")+ 
-  scale_x_continuous(breaks=seq(0, 2*pi, by=pi/2), minor_breaks=minor.axis.correction,
-                     labels=c("0", expression(paste(pi,"/2")), expression(pi), expression(paste("3",pi, "/2")), expression(paste("2",pi)))) + 
-  geom_point(data=dots, aes(x=x, y=y), inherit.aes=FALSE) + 
-  theme(plot.margin = unit(c(.1,.1,-.5,.1), "cm")) + 
-  ggtitle("Correction with w = -3.0")
-
-minor.axis.correction <- correctx(seq(0, 2*pi, pi/8), fprime, w=3)
-dframe$xtrans <- correctx(dframe$x, fprime=fprime, w=3)
-
-dots <- data.frame(x = rep(minor.axis.correction, times=1), y=rep(c(-2), each=length(minor.axis.correction)))
-
-ggplot(aes(x=xtrans, xend=xtrans, y = ystart, yend=yend), data=dframe) +
-  geom_abline(aes(slope = 0, intercept=0), colour="grey70") +
-  geom_segment(colour="grey20") +
-  theme_bw() + coord_fixed(ratio=1) + xlab("x") + ylab("y")+ 
-  scale_x_continuous(breaks=seq(0, 2*pi, by=pi/2), minor_breaks=minor.axis.correction,
-                     labels=c("0", expression(paste(pi,"/2")), expression(pi), expression(paste("3",pi, "/2")), expression(paste("2",pi)))) + 
-  geom_point(data=dots, aes(x=x, y=y), inherit.aes=FALSE) + 
-  theme(plot.margin = unit(c(.1,.1,-.5,.1), "cm")) + 
-  ggtitle("Correction with w = 3.0")
-
-@
 
 \begin{figure}[htbp]\centering
-\begin{subfigure}[b]{.45\linewidth}\centering 
-\includegraphics[keepaspectratio=TRUE,width=\linewidth]{figure/fig-xcorr-over1}
-\caption[Negative weight $X$ transformation]{$X$ transformation with negative weight.}
-\label{fig:xtransover1}
-\end{subfigure} \hfill\hfill
-\begin{subfigure}[b]{.45\linewidth}\centering 
-\includegraphics[keepaspectratio=TRUE,width=\linewidth]{figure/fig-xcorr-over2}
-\caption[Large positive weight $X$ transformation]{$X$ transformation with weight$>>$1}
-\label{fig:xtransover2}
-\end{subfigure}
-\caption[X transformations outside of the 0-1 interval]{The $X$ transformation outside of the interval [0,1] produces figures with even-looking lines that also appear to be three-dimensional.}
+\includegraphics[keepaspectratio=TRUE,width=.9\linewidth]{figure/fig-overcorrectlimits}
+\caption[Overcorrected transformations excluded from the analysis]{Transformation weights outside of the interval [\Sexpr{wlow}, \Sexpr{whigh}] produce figures which do not maintain the underlying function shape (in $x$) or which are composed of extremely uneven length lines (in $y$). Trials with final results that were more extreme than these examples were excluded from the analysis.}
+\label{fig:overtransform}
 \end{figure}
 
-\newtext{In addition to the $x$ transformation artifact, there were a few user reports of applet lag, so that the only option to continue was to ``submit'' the trial (or ``skip'' it), even though the final graph had not rendered correctly; this resulted in a recorded value more extreme than the participant intended. To account for these technological difficulties, the exclusion criteria were applied to trials from both transformations. Importantly, in both types of trials, values outside of [0,1] demonstrate remarkable deviations from the criteria described to the participants; $x$ transformations outside of that range do not preserve the underlying function concavity and $y$ transformations outside of that range (particularly those below 0 or above 1.2) have dramatically unequal line lengths. Hence, user values outside of these ranges likely indicate noncompliance or equipment malfunction.}
+\newtext{In addition to the $x$ transformation artifact, there were a few user reports of applet lag, so that the only option to continue was to ``submit'' the trial (or ``skip'' it), even though the final graph had not rendered correctly; this resulted in a recorded value more extreme than the participant intended. To account for these technological difficulties, the exclusion criteria were applied to trials from both transformations. Importantly, in both types of trials, values outside of [\Sexpr{wlow}, \Sexpr{whigh}] demonstrate remarkable deviations from the criteria described to the participants; $x$ transformations outside of that range do not preserve the underlying function shape and concavity and $y$ transformations outside of that range have dramatically unequal line lengths. Hence, user values outside of these ranges likely indicate noncompliance or equipment malfunction. Responses were removed if they fell outside the [\Sexpr{wlow}, \Sexpr{whigh}] interval (\Sexpr{noutliers.x} $x$ and \Sexpr{noutliers.y} $y$ trials, for a total of \Sexpr{noutliers} trials).}
 
-In order to have a consistent rule for trial removal based on these artifacts, for each starting weight, responses more than 1.5*IQR from the upper and lower quartiles were removed if they fell outside the [0,1] interval (\Sexpr{noutliers.x} $x$ and \Sexpr{noutliers.y} $y$ trials, for a total of \Sexpr{noutliers} trials). Values outside the [0,1] interval were not removed unless they were also more than 1.5*IQR from the upper and lower quartiles. The higher number of $x$ trials excluded suggest that the unique feature of the $x$ transformation demonstrated above influenced some participant responses. Once outliers were removed, each participant completed an average of  \Sexpr{round(trials.per.participant, 2)} trials. As there were only \Sexpr{sum(!trial.sum$incl.startwt & trial.sum$incl.trials & !trial.sum$endwt.outlier)} trials with starting weight outside of [0,1] which met the other inclusion criteria, those trials were eliminated from the analysis to prevent high-influence points from adversely influencing the model. 
+% In order to have a consistent rule for trial removal based on these artifacts, for each starting weight, responses more than 1.5*IQR from the upper and lower quartiles were removed if they fell outside the [0,1] interval (\Sexpr{noutliers.x} $x$ and \Sexpr{noutliers.y} $y$ trials, for a total of \Sexpr{noutliers} trials). Values outside the [0,1] interval were not removed unless they were also more than 1.5*IQR from the upper and lower quartiles. The higher number of $x$ trials excluded suggest that the unique feature of the $x$ transformation demonstrated above influenced some participant responses. 
 
-Training trials were included in the analysis after a fixed effects model incorporating type, starting weight, and training showed that there was no evidence of a significant difference between trials with and without the original mean function on the graph ($p(>|t|) = $\Sexpr{summary(fixedmodel)$coefficients[4,4]}). 
+Once outliers were removed, each participant completed an average of  \Sexpr{round(trials.per.participant, 2)} trials. As there were only \Sexpr{sum(!trial.sum$incl.startwt & trial.sum$incl.trials & !trial.sum$endwt.outlier)} trials with starting weight outside of [0,1] which met the other inclusion criteria, those trials were eliminated from the analysis to prevent high-influence points from adversely influencing the model. 
 
+Training trials were included in the analysis after a fixed effects model incorporating type, starting weight, and training showed that there was no evidence of a significant difference between trials with and without the original mean function on the graph ($p(>|t|) = $\Sexpr{round(summary(fixedmodel)$coefficients['trainingTRUE',4], 4)}). 
+
+\newtext{In order to account for user-level variability, we fit a random effects model for the corrected weight value as a function of the starting weight and trial type, with a random effect for participant. The variability of the random effects for each trial type are similar, so it is appropriate to fit a single model in order to better estimate the participant-level effects. Additionally, the interaction between starting weight and trial type was not significant, and was thus removed from the model.}
+
+Participant $i$'s response for trial $j$, $W_{ij}$, was modeled as a function of the correction type $T_{ij}$, and starting weight $X_{ij}$, with a random effect for participant. 
+\begin{align}\label{model}
+W_{ij} &= \alpha_X \mathbbm{1}_{[T_{ij}=X]} + \alpha_Y \mathbbm{1}_{[T_{ij}=Y]} + \beta X_{ij} + \gamma_i + \epsilon_{ij}\\
+\gamma_i &\sim N(0, \eta^2)\notag\\
+\epsilon_{ij} &\sim N(0, \sigma^2)\notag
+\end{align}
+
+The fitted model parameters are shown in tables \ref{fixedeffectsresults} and \ref{randomeffectsresults}, but for interpretation purposes, we can use MCMC simulation to simulate responses for each correction type and each participant from the model. These simulated responses can then be used to create user-level densities as well as overall densities for the quantities shown in Equation \ref{modelfcns}. 
+\begin{align}\label{modelfcns}
+\underbrace{\alpha + \beta(0)}_{\text{Approach from Below}} \quad & \quad \underbrace{\alpha + \beta(1)}_{\text{Approach from Above}}
+\end{align}
+
+\newtext{Figure \ref{fig:MixedModelResults} shows density plots which demonstrate the relationship between the starting weight value and the user-submitted ``optimal'' weight value. }
 
 \begin{figure}[htbp]
 \centering
 \includegraphics[keepaspectratio=TRUE, width=.9\linewidth]{figure/fig-results-analysis}
-\caption{\label{fig:MixedModelResults} Simulation results from the fitted model, facetted by correction type. Fixed effects results are shown as histograms; the red values display the results when starting from an uncorrected plot and are concentrated around $w=.15$; the blue values represent user-chosen weights when starting from a fully corrected plot and are concentrated around $w=.64$. Additionally, 95\% HPD intervals are shown above the histograms; these intervals are for the lower and upper bounds of the ``preferred weight interval'' tested in the experiment. User-level density curves show the individual variability around each fixed effect.}
+\caption{\label{fig:MixedModelResults} Simulation results from the fitted model, facetted by correction type. Fixed effects results are shown as histograms; the red values display the results when starting from an uncorrected plot and are concentrated around $w=\Sexpr{round(mean(ints$x[c(1,3)]), 2)}$; the blue values represent user-chosen weights when starting from a fully corrected plot and are concentrated around $w=\Sexpr{round(mean(ints$x[c(2,4)]), 2)}$. Additionally, 95\% HPD intervals are shown above the histograms; these intervals are for the lower and upper bounds of the ``preferred weight interval'' tested in the experiment. User-level density curves show the individual variability around each fixed effect.}
 \end{figure}
 
-\newdo{Describe the reason for the approach taken - connect to sensory experiments that try to bound perceptual effects by approaching from both above and below.}
-\newtext{Figure \ref{fig:MixedModelResults} shows density plots which demonstrate the relationship between the starting weight value and the user-submitted ``optimal'' weight value. 
 
-In order to account for user-level variability, we fit a random effects model for the corrected weight value as a function of the starting weight and trial type, with a random effect for participant. The random effects for each trial type were similar, so it is appropriate to fit a single model in order to better estimate the random effects. Additionally, the interaction between starting weight and trial type was not significant, and was thus removed from the model.}
-
-<<modelres, echo=FALSE, include=TRUE>>=
-summary(model)
+\done{Describe the reason for the approach taken - connect to sensory experiments that try to bound perceptual effects by approaching from both above and below.\\ Done above in the experiment description section, just before the applet was described.}
+<<modelres, echo=FALSE, include=FALSE, dependson='results-analysis'>>=
+library(languageR) # gets p-values for lmer models
+library(xtable)
+res <- pvals.fnc(model, nsim=5000, ndigits=4)
+fixed.effects.table <- res$fixed[,c(3, 1, 4, 5)]
+names(fixed.effects.table) <- c("95% HPD Lower", "Estimate", "95% HPD Upper", "MCMC p-value")
+rownames(fixed.effects.table) <- c("X Trans.", "Y Trans.", "Starting Weight")
+temp<- xtable(fixed.effects.table)
+align(temp) <- c("r", rep("c", 4))
+print(temp, file="./figure/fixef.txt", floating=FALSE)
+rdm.effects.table <- res$random[,c(1, 2, 3, 5, 6, 7)]
+names(rdm.effects.table) <- c("Groups", "Name", "Std. Dev.", "MCMC mean", "95% HPD Lower", "95% HPD Upper")
+rdm.effects.table[1,1] <- "Participant"
+temp <- xtable(rdm.effects.table)
+align(temp) <- c("r", "l", "l", rep("c", 4))
+print(temp, file="./figure/ranef.txt", floating=FALSE, include.rownames=FALSE)
 @
-\newtext{MCMC simulations from the posterior distrubution for each of the coefficients suggest that the optimal $w$ lies between \Sexpr{round(ints$x[1], 3)} and \Sexpr{round(ints$x[2], 3)} for $x$ and \Sexpr{round(ints$x[3], 3)} and \Sexpr{round(ints$x[4], 3)} for $y$. This suggests that either correction is preferrable to an uncorrected graph, and that a weighted correction is preferrable to the fully corrected graph, as neither 0 nor 1 is contained in any overall interval. }
+\begin{table}[htbp]\centering
+\input{figure/fixef.txt}
 
+\caption{Model fixed effects, with HPD intervals computed using MCMC simulation.}\label{fixedeffectsresults}
+\end{table}
+\begin{table}[htbp]\centering
+\input{figure/ranef.txt}
+\caption{Model random effects, with HPD intervals computed using MCMC simulation.}\label{randomeffectsresults}
+\end{table}
 
-<<fixefIntervals,echo=FALSE,include=TRUE>>=
-ints$fixef
-@
-
-
-XXX our evidence: 0 is not in the posterior interval ...
-
+\newtext{MCMC simulations from the posterior distrubution for each of the coefficients suggest that the optimal $w$ lies between \Sexpr{round(ints$x[1], 3)} and \Sexpr{round(ints$x[2], 3)} for $x$ and \Sexpr{round(ints$x[3], 3)} and \Sexpr{round(ints$x[4], 3)} for $y$, where the lower value is the estimate starting at $w=0$ and moving up, and the upper value is the estimate starting at $w=1$ and moving down. This suggests that either correction is preferrable to an uncorrected graph, and that a weighted correction is preferrable to the fully corrected graph, as neither 0 nor 1 is contained in any overall interval. }
 
 \section{Application: USHCN Data}
 We will demonstrate the occurrence of the sine illusion as well as the suggested transformations at the example of data from the United States Historical Climatology Network \cite[USHCN;][]{ushcn, ushcn2}.
