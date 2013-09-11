@@ -1386,7 +1386,7 @@ library(memisc) # latex output for lmer
 # Much more complicated to examine...
 lm.data$type <- relevel(factor(lm.data$type), ref="y")
 
-modeltest <- lmer(endweight ~ type -1 + startweight + (type-1|fingerprint), data=subset(lm.data, !training))
+modeltest <- lmer(endweight ~ type -1 + startweight + (type-1|fingerprint), data=lm.data)
 summary(modeltest)
 # conclusion - within-user variance is reasonably similar for different trial types
 
