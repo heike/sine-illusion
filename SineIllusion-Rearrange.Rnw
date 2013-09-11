@@ -1434,6 +1434,7 @@ ints.users <- ddply(sim.data, .(user, type, limit), function(x){
 })
 names(ints.users) <- c("user", "type", "limit", "xmin", "x", "xmax")
 
+
 ests <- data.frame(ests = c(fixef(model)[1:2], fixef(model)[1:2]+fixef(model)[3]), type=rep(c("Y Transformation", "X Transformation"), 2))
 
 ggplot() + theme_bw() + facet_grid(type~., scales="free") + 
