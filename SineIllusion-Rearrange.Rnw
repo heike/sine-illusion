@@ -1227,23 +1227,24 @@ Some modifications are necessary to implement the correction factor in a realist
 
 \subsection{Applet Description}
 
-\newdo{`can be found' - that sounds like you picked it up from the street - emphasize that this is part of the work you did for this paper. An applet ... is  made avalailable at ...}
 \begin{figure}\centering
 \includegraphics[width=.9\linewidth]{images/shiny.pdf}
 \caption{\label{fig:shiny.app} Screenshot of the shiny application used to collect information of observers' preference with respect to an optimal correction for the illusion under each of the  transformations discussed in the previous section. }
 \end{figure}
 %
 %An applet demonstrating the effect of changing parameter values on the strength of the illusion can be found at \url{http://www.michaelbach.de/ot/sze_sineIllusion/index.html}. 
-An applet demonstrating the effect of changing parameter values on the strength of the illusion as well as all of the correction factors we propose in this paper is available at \url{http://glimmer.rstudio.com/srvanderplas/SineIllusion/}. In addition, figure~\ref{fig:shiny.app} shows a screenshot of the applet used to collect user data. This applet is also available online at \url{http://glimmer.rstudio.com/srvanderplas/SineIllusionShiny/}. The applet used for data collection is scaled down to provide experimental control; users are assigned specific transformations and starting values and can only increment or decrement the weight of the transformation.
-\done{you cite two different websites. describe the difference, too.}
-The applet is implemented in {\tt shiny} \citep{shiny}. Users can modify the transformation weight using the plus and minus button (with plus indicating a higher level of correction).
+An applet demonstrating the effect of changing parameter values on the strength of the illusion as well as all of the correction factors we propose in this paper is made available at \url{http://glimmer.rstudio.com/srvanderplas/SineIllusion/}.
+\newdo{Describe the functionality of the applet - half a  sentence for each item on the site. I know that people could just follow the link, but they usually won't.}
+The applet used for data collection is scaled down to provide experimental control \newdo{what do you mean by experimental control?}; users are assigned specific transformations and starting values and can only increment or decrement the weight of the transformation.
+
+Figure~\ref{fig:shiny.app} shows a screenshot of the applet used to collect user data. This applet is  available online at \url{http://glimmer.rstudio.com/srvanderplas/SineIllusionShiny/}. Both applets are implemented in {\tt shiny} \citep{shiny}. Users can modify the transformation weight using the plus and minus button (with plus indicating a higher level of correction).
 Underlying this adjustment is the value of the weight $w$ as defined in eqns.~\ref{eqn.xtrans.weighted} and~\ref{eqn.ytrans.weighted}, though the numerical value of $w$ was hidden from the user to prevent anchoring to a specific numerical value. 
 
 \done{why does controlling for aspect ratio and the function imply a use of the linear approximation? I don't see the causal relationship.}
 \done{(should have been line length, not aspect ratio... sorry!)\\
 The linear approximation doesn't break until you reach certain conditions, i.e. line length vs. function amplitude: ``The quadratic correction breaks whenever ... combinations of large values of $\ell$, which signify a large vertical extent, or large conditional variability $E[Y|X]$, and simultaneous large changes in the slope of the main trend, i.e.~large values of the curvature $f^{\prime\prime}(x)$. In the linear approximation of $f$ the same situation leads to a massive overcorrection of the vertical lines, making the `corrected' function look almost unrecognizable."} 
 
-As the line length and function are controlled in this app, we used the linear transformation in $y$; the transformation does not break under any combination of parameters tested in this experiment. Participants were recruited from Amazon Mechanical Turk and the \href{reddit}{http://reddit.com/r/SampleSize} community.
+As the line length and function are controlled in this app, we used the linear transformation in $y$; the transformation does not break under any combination of parameters tested in this experiment. Participants were recruited from Amazon Mechanical Turk and the \href{http://reddit.com/r/SampleSize}{reddit} community.
 
 
 % 
