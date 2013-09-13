@@ -1459,11 +1459,17 @@ ggplot() + theme_bw() + facet_grid(type~., scales="free") +
   guides(colour=guide_legend(order=1), fill=guide_legend(order=1), size=guide_legend("Overall Acceptable Weights", override.aes=list(shape=15, size = 10), order=3))
 @
 
-\done{From the writeup I'm not completely sure, which data you removed and why - simply removing outliers looks like you want to make your results prettier. You need a better reason for removing data. This is something that the reviewers will tear into, if you don't make a solid case.
-What happened to the training data?}
-\Sexpr{nparticipants} participants in total took part in the study with \Sexpr{ntrials} total evaluations. Trials with less than two total interactions (i.e. at least one adjustment plus a submission at the end of the trial) were removed because of the likelihood that the participant did not complete the required task for that trial. Trials that participants skipped were also removed from the data before analysis. Participants were asked to complete at least 10 trials after the training trials, so observations from participants who completed fewer than 4 non-outlier trials were removed from the data to allow estimation of individual random effects with some accuracy. 
 
-\newtext{After removing data according to these criteria, we noticed that there were many responses for the $x$ correction that tended towards the endpoints of the weight value. These responses indicated that the participant did not attempt to maintain the underlying function, and the trials should thus be excluded from calculation of the optimal weight. This occurs as a result of an artifact of the x correction which enables participants to more easily perceive a three-dimensional image at corrections outside of [0,1] at the expense of the underlying mean function, as shown in figure \ref{fig:overtransform}.}
+\Sexpr{nparticipants} participants in total took part in the study with \Sexpr{ntrials} total evaluations. Trials with less than two total interactions (i.e. at least one adjustment plus a submission at the end of the trial) were removed because of the likelihood that the participant did not complete the required task for that trial. Trials that participants skipped were also removed from the data before analysis. Participants were asked to complete at least 10 trials after the training trials, so observations from participants who completed fewer than 4 non-outlier trials were removed from the data to allow estimation of individual random effects with some accuracy. 
+ \newdo{Let's make this a list:}
+As this study was done outside a laboratory setting, we can not tell a participant's willingness to follow the guidelines and put in their best effort. This, besides potential technical issues (server outage, speed of response) make a careful selection of data going into the analysis unavoidable. The following exclusion criteria were used:
+\begin{itemize}
+\item Participant did not interact with the applet: we required a participant to use the adjustment at least once in order to include data for this trial. 
+\item Participants finished fewer than four trials: while participants were asked to complete twelve trials, some did not finish all of those. In order to stabilize predictions of random effects, participants' data was excluded, if there were fewer than four trials (XXX out of a total of \Sexpr{nparticipants} participants).
+\item Out-of-bounds results: weights leading to severely over- or undercorrected results were excluded from the analysis. Figure~\ref{fig:overtransform} shows results at the threshold of acceptability. Only more severely distorted results were excluded from the analysis (XXX out of \Sexpr{ntrials} trials).
+\end{itemize}
+
+% \newtext{After removing data according to these criteria, we noticed that there were many responses for the $x$ correction that tended towards the endpoints of the weight value. These responses indicated that the participant did not attempt to maintain the underlying function, and the trials should thus be excluded from calculation of the optimal weight. This occurs as a result of an artifact of the x correction which enables participants to more easily perceive a three-dimensional image at corrections outside of [0,1] at the expense of the underlying mean function, as shown in figure \ref{fig:overtransform}.}
 
 
 \begin{figure}[htbp]\centering
@@ -1488,12 +1494,12 @@ W_{ij} &= \alpha_X \mathbbm{1}_{[T_{ij}=X]} + \alpha_Y \mathbbm{1}_{[T_{ij}=Y]} 
 \gamma_i &\sim N(0, \eta^2)\notag\\
 \epsilon_{ij} &\sim N(0, \sigma^2)\notag
 \end{align}
-
+\newdo{Points of discussion for the model: one random effect for both types of correction, because there is no significant difference between the two obvious. One $\beta$ rather than one for each correction, because the interaction between type and starting weight is not significant (effect size and $p$-value XXX).}
 The fitted model parameters are shown in tables \ref{fixedeffectsresults} and \ref{randomeffectsresults}, but for interpretation purposes, we can use MCMC simulation to simulate responses for each correction type and each participant from the model. These simulated responses can then be used to create user-level densities as well as overall densities for the quantities shown in Equation \ref{modelfcns}. 
 \begin{align}\label{modelfcns}
 \underbrace{\alpha + \beta(0)}_{\text{Approach from Below}} \quad & \quad \underbrace{\alpha + \beta(1)}_{\text{Approach from Above}}
 \end{align}
-
+\newdo{Make the interpretation of $\alpha_X$ and $\alpha_Y$ as the lower threshold of plausible weights and  $\beta$ as the interval length of plausible weights  even more obvious, i.e. add a sentence to that effect :)}
 \newtext{Figure \ref{fig:MixedModelResults} shows density plots which demonstrate the relationship between the starting weight value and the user-submitted ``optimal'' weight value. }
 
 \begin{figure}[htbp]
@@ -1508,12 +1514,31 @@ The fitted model parameters are shown in tables \ref{fixedeffectsresults} and \r
 library(languageR) # gets p-values for lmer models
 library(xtable)
 res <- pvals.fnc(model, nsim=5000, ndigits=4)
-fixed.effects.table <- res$fixed[,c(3, 1, 4, 5)]
-names(fixed.effects.table) <- c("95% HPD Lower", "Estimate", "95% HPD Upper", "MCMC p-value")
-rownames(fixed.effects.table) <- c("X Trans.", "Y Trans.", "Starting Weight")
-temp<- xtable(fixed.effects.table)
+# fixed.effects.table <- res$fixed[,c(3, 1, 4, 5)]
+# fixed.effects.table$interval <- sprintf("(%s, %s)", res$fixed[,3],res$fixed[,4])
+# names(fixed.effects.table) <- c("95% HPD Lower", "Estimate", "95% HPD Upper", "MCMC p-value", "95% HPD CI")
+# rownames(fixed.effects.table) <- c("X Transformation","", "Y Transformation", "")
+# 
+# temp<- xtable(fixed.effects.table[,c(2,5,4)])
+# #align(temp) <- c("r", rep("c", 4))
+# print(temp, file="./figure/fixef.txt", floating=FALSE)
+
+# fixed effects table:
+fet <- res$fixed[,c( 1, 3, 4)]
+for (i in 1:3) fet[,i] <- as.numeric(fet[,i])
+fet <- rbind(fet, fet[1,]+fet[3,])
+fet <- rbind(fet, fet[2,]+fet[3,])
+fet <- fet[-3,]
+
+fet$interval <- sprintf("(%s, %s)", fet[,2],fet[,3])
+fet <- fet[c(1,3,2,4),]
+names(fet) <- c( "Estimate", "95% HPD Lower", "95% HPD Upper", "95% HPD CI")
+fet$Transformation <- c("Y","", "X", "")
+fet$Threshold <- rep(c("Lower", "Upper"), 2)
+
+temp<- xtable(fet[,c(5,6,1,4)])
 align(temp) <- c("r", rep("c", 4))
-print(temp, file="./figure/fixef.txt", floating=FALSE)
+print(temp, file="./figure/fixef.txt", floating=FALSE, include.rownames=FALSE)
 rdm.effects.table <- res$random[,c(1, 2, 3, 5, 6, 7)]
 names(rdm.effects.table) <- c("Groups", "Name", "Std. Dev.", "MCMC mean", "95% HPD Lower", "95% HPD Upper")
 rdm.effects.table[1,1] <- "Participant"
