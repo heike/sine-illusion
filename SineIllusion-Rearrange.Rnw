@@ -1251,11 +1251,13 @@ As the line length and function are controlled in this app, we used the linear t
 % 
 % M Bach's applet  gives the option to compensate the line length manually for its perceived shortcoming. The amount of compensation chosen turns out to be highly dependent on both the length of the vertical line segments and the amplitude of the sine function. While the applet does not provide details on the compensation function, it does suggest that it may be possible to correct the graphical display so that the brain interprets the stimuli in a manner consistent with the numerical data. 
 
-<<study-weight-dist,include=FALSE,eval=TRUE, fig.width=6, fig.height=3>>=
+<<study-weight-dist,include=FALSE,eval=TRUE, fig.width=8.5, fig.height=1.5>>=
 # Weight values possible in the Shiny App.
 diffs <- c(0, .5, .5, .5, .5, .25, .25, .25, .25, .25, .25, .25, .25, .1, .1, .05, .05, .05, .05, .05, .05, .025, .025, .025, .025, .025, .025, .025, .025, .025, .025, .025, .025, .05, .05, .05, .05, .1, .1, .1, .1, .1, .25, .25, .25, .25, .25, .25, .5, .5, .5, .5)
 wopts <- -4 +cumsum(diffs)
-qplot(x=wopts, geom="density") + geom_rug() + theme_bw() + ylab("Kernel Density") + xlab("w") + ggtitle("Distribution of w")
+#qplot(x=wopts, geom="density") + geom_rug() + theme_bw() + ylab("Kernel Density") + xlab("w") + ggtitle("Distribution of w")
+w01 <- wopts[(wopts < 1) & (wopts > 0)]
+qplot(wopts, rep(1, length=length(wopts)), geom="point") + geom_vline(xintercept =c(0,1), colour="grey80") + theme_bw() + ylab("") + ylim(c(0.8, 1.2)) + xlab("Starting weight") + geom_point(aes(x=w01, y=rep(1, length(w01))), pch=1, size=4) + theme(axis.ticks.y=element_blank(), axis.text.y=element_blank())  + geom_point(aes(x=c(0,1), y=rep(1, 2)), pch=1, size=6) + theme(axis.ticks.y=element_blank(), axis.text.y=element_blank()) + xlim(c(-2,3))
 @
 
 \subsection{Study Design}
@@ -1264,8 +1266,8 @@ qplot(x=wopts, geom="density") + geom_rug() + theme_bw() + ylab("Kernel Density"
 The study is set up as a fractional factorial design of correction type ($x$ or $y$ correction) and starting weight $w_0$. Each participant is asked to evaluate a total of twelve situations, six of each correction type, though they are allowed to complete up to 30 trials if they wish. For the first six starting weights $w_0$ values were chosen with equal probability from the set of numbers $\{0, 1, c\}$, where $c \sim U(.25, .75)$, while the second set of starting weights is randomly sampled from a distribution centered at 0.6 with mass on discrete values in the interval $(-4, 5)$, shown in figure \ref{fig:weightdist}. The distribution was chosen to have a higher coverage density around 0.6 after a pilot study indicated a preference for that value. Using a distribution with a wide range of coverage allows us to fully explore the space of plausible $w$ while focusing on weights in the $(0,1)$ interval. Table \ref{factortable} summarizes the factors under investigation in the experiment.
 }
 \begin{figure}[h]\centering
-\includegraphics[keepaspectratio=TRUE,width=.5\linewidth]{figure/fig-study-weight-dist}
-\caption{Distribution of starting weights. Weight values are discrete, but staggered so as to provide fine-grained adjustments around 0.6 and more coarse discriminatory information outside of $(0,1)$.}\label{fig:weightdist}
+\includegraphics[keepaspectratio=TRUE,width=\linewidth]{figure/fig-study-weight-dist}
+\caption{Overview of possible starting weights. Weight values are discrete, but staggered so as to provide fine-grained adjustments around 0.6 and more coarse discriminatory information outside of $(0,1)$. Hollow circles indicate choices of starting weights for the first six values, filled circles represent starting weights for trials beyond the first six. All weights (with the exception of 0 and 1) are selected with equal probability.}\label{fig:weightdist}
 \end{figure}
 
 % setup of the study
@@ -1273,11 +1275,11 @@ The study is set up as a fractional factorial design of correction type ($x$ or 
 \begin{table}[htbp]\centering
 \begin{tabular}{ccc}
 Factor & Stage & Values \\\hline
-Transformation & Trials 1-30 & $X$, $Y$\\
-\multirow{2}{*}{Weight} & Trials 1-6 & $0, 1, c \in (.25, .75)$\\
-& Trials 7-30 & $c \in [-4, 5]$\\
+Transformation & Trial no  & $X$, $Y$\\
+\multirow{2}{*}{Weight} & $ \le 6$ & $0, 1, c \in (.25, .75)$\\
+& $> 6$ & $c \in [-4, 5]$ \\
 \end{tabular}
-\caption{Summary of factors in the experiment.}\label{factortable}
+\caption{Summary of factors in the experiment. \newdo{you wanted to check on the  limits.}}\label{factortable}
 \end{table}
 
 %Once a participant arrives at the site, he/she 
@@ -1394,6 +1396,9 @@ modeltest <- lmer(endweight ~ type -1 + startweight + (type-1|fingerprint), data
 fixedmodel <- lm(endweight~(type-1) +startweight + training, data=lm.data)
 
 model <- lmer(data=lm.data, endweight~ (type-1) + startweight + (1|fingerprint))
+model2 <- lmer(data=lm.data, endweight~ (type-1) + startweight + (type-1|fingerprint))
+model3 <- lmer(data=lm.data, endweight~ (type-1) + type:startweight + (1|fingerprint))
+
 
 # summary(model)
 N <- 1000
@@ -1466,7 +1471,7 @@ As this study was done outside a laboratory setting, we can not tell a participa
 \begin{itemize}
 \item Participant did not interact with the applet: we required a participant to use the adjustment at least once in order to include data for this trial. 
 \item Participants finished fewer than four trials: while participants were asked to complete twelve trials, some did not finish all of those. In order to stabilize predictions of random effects, participants' data was excluded, if there were fewer than four trials (XXX out of a total of \Sexpr{nparticipants} participants).
-\item Out-of-bounds results: weights leading to severely over- or undercorrected results were excluded from the analysis. Figure~\ref{fig:overtransform} shows results at the threshold of acceptability. Only more severely distorted results were excluded from the analysis (XXX out of \Sexpr{ntrials} trials).
+\item Out-of-bounds results: weights leading to severely over- or undercorrected results were excluded from the analysis. Figure~\ref{fig:overtransform} shows results at the threshold of acceptability. Only more severely distorted results were excluded from the analysis (\Sexpr{noutliers.x} $x$ and \Sexpr{noutliers.y} $y$ trials out of \Sexpr{ntrials} total trials).
 \end{itemize}
 
 % \newtext{After removing data according to these criteria, we noticed that there were many responses for the $x$ correction that tended towards the endpoints of the weight value. These responses indicated that the participant did not attempt to maintain the underlying function, and the trials should thus be excluded from calculation of the optimal weight. This occurs as a result of an artifact of the x correction which enables participants to more easily perceive a three-dimensional image at corrections outside of [0,1] at the expense of the underlying mean function, as shown in figure \ref{fig:overtransform}.}
@@ -1486,13 +1491,15 @@ Once outliers were removed, each participant completed an average of  \Sexpr{rou
 
 Training trials were included in the analysis after a fixed effects model incorporating type, starting weight, and training showed that there was no evidence of a significant difference between trials with and without the original mean function on the graph ($p(>|t|) = $\Sexpr{round(summary(fixedmodel)$coefficients['trainingTRUE',4], 4)}). 
 
-\newtext{In order to account for user-level variability, we fit a random effects model for the corrected weight value as a function of the starting weight and trial type, with a random effect for participant. The variability of the random effects for each trial type are similar, so it is appropriate to fit a single model in order to better estimate the participant-level effects. Additionally, the interaction between starting weight and trial type was not significant, and was thus removed from the model.}
+In order to account for user-level variability, we fit a random effects model for the corrected weight value as a function of the starting weight and trial type, with a random intercept for each participant. 
+The variability of the random effects for each trial type are similar (\Sexpr{library(lme4); summary(model)@REmat[1,3]} for the overall variability as opposed to \Sexpr{summary(model2)@REmat[1,3]} and \Sexpr{summary(model2)@REmat[2,3]} for $y$ and $x$ transformations, respectively), so it is appropriate to fit a single model in order to better estimate the participant-level effects. Additionally, the interaction between starting weight and trial type was not significant, and was thus removed from the model ($p$-value = \Sexpr{anova(model, model3)$`Pr(>Chisq)`[2]}).
 
-Participant $i$'s response for trial $j$, $W_{ij}$, was modeled as a function of the correction type $T_{ij}$, and starting weight $X_{ij}$, with a random effect for participant. 
+
+Participant $i$'s response for trial $j$, $W_{ij}$, was modeled as a function of the correction type $T_{ij}$, and starting weight $X_{ij}$, with a random intercept for participant. 
 \begin{align}\label{model}
 W_{ij} &= \alpha_X \mathbbm{1}_{[T_{ij}=X]} + \alpha_Y \mathbbm{1}_{[T_{ij}=Y]} + \beta X_{ij} + \gamma_i + \epsilon_{ij}\\
-\gamma_i &\sim N(0, \eta^2)\notag\\
-\epsilon_{ij} &\sim N(0, \sigma^2)\notag
+\gamma_i &\sim N(0, \eta^2), 
+\epsilon_{ij} \sim N(0, \sigma^2), \text{ and } \text{Cov}(\gamma, \epsilon) = 0\notag 
 \end{align}
 \newdo{Points of discussion for the model: one random effect for both types of correction, because there is no significant difference between the two obvious. One $\beta$ rather than one for each correction, because the interaction between type and starting weight is not significant (effect size and $p$-value XXX).}
 The fitted model parameters are shown in tables \ref{fixedeffectsresults} and \ref{randomeffectsresults}, but for interpretation purposes, we can use MCMC simulation to simulate responses for each correction type and each participant from the model. These simulated responses can then be used to create user-level densities as well as overall densities for the quantities shown in Equation \ref{modelfcns}. 
