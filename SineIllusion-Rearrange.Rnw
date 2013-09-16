@@ -1217,30 +1217,24 @@ Note that for the quadratic correction in $y$, half-segment lengths must be weig
 
 \section{Transformations in Practice -- a User Study}
 
-\newdo{Add an intro to this section: overview of what is addressed in this section: applet, study, results - one sentence each}
+\done{Add an intro to this section: overview of what is addressed in this section: applet, study, results - one sentence each}
+In order to more fully understand the sine illusion and test the proposed corrections, we created an applet to both serve as a testing environment and allow users to interact with the illusion and corrections. We deployed the applet to participants recruited online, collecting their responses and other metadata. The results of the analysis suggest that the correction factors in $X$ and $Y$ are both preferrable to uncorrected data, but that full correction is not necessary to break the illusion.
 
-The goal of the study is to determine an overall `optimal' setting for the weights in each of the correction factors. It is of additional interest to determine whether and how much this setting is subject-specific or population-based, whether the optimal setting depends on the starting value, and how much within-subject variability we find compared to between-subject variability. 
-
-\newdo{The discussion on realistic situations has to go further back - this is not the place for it}
-Some modifications are necessary to implement the correction factor in a realistic situation in which it might not be practical for the aspect ratio of the graph to be fixed as 1. As in \citet{marie:2013}, the correction factor necessary to remove the illusion depends on the aspect ratio of the graphs. %Figure~\ref{fig:trigFix} demonstrates the relative effectiveness of the correction factor.
-
+The goal of the study is to determine an overall `optimal' setting for the weights in each of the correction factors. That is, if the optimal weight is 0, the corrections are not effective at reducing the effect of the illusion; if the optimal weight is 1, the full correction is necessary to reduce the illusion. It is of additional interest to determine whether and how much this setting is subject-specific or population-based, whether the optimal setting depends on the starting value, and how much within-subject variability we find compared to between-subject variability. 
 
 \subsection{Applet Description}
-
-\newdo{`can be found' - that sounds like you picked it up from the street - emphasize that this is part of the work you did for this paper. An applet ... is  made avalailable at ...}
 \begin{figure}\centering
 \includegraphics[width=.9\linewidth]{images/shiny.pdf}
 \caption{\label{fig:shiny.app} Screenshot of the shiny application used to collect information of observers' preference with respect to an optimal correction for the illusion under each of the  transformations discussed in the previous section. }
 \end{figure}
 %
-%An applet demonstrating the effect of changing parameter values on the strength of the illusion can be found at \url{http://www.michaelbach.de/ot/sze_sineIllusion/index.html}. 
 An applet demonstrating the effect of changing parameter values on the strength of the illusion as well as all of the correction factors we propose in this paper is available at \url{http://glimmer.rstudio.com/srvanderplas/SineIllusion/}. In addition, figure~\ref{fig:shiny.app} shows a screenshot of the applet used to collect user data. This applet is also available online at \url{http://glimmer.rstudio.com/srvanderplas/SineIllusionShiny/}. The applet used for data collection is scaled down to provide experimental control; users are assigned specific transformations and starting values and can only increment or decrement the weight of the transformation.
 \done{you cite two different websites. describe the difference, too.}
-The applet is implemented in {\tt shiny} \citep{shiny}. Users can modify the transformation weight using the plus and minus button (with plus indicating a higher level of correction).
+Both applets are implemented in {\tt shiny} \citep{shiny}. Users can modify the transformation weight using the plus and minus button (with plus indicating a higher level of correction).
 Underlying this adjustment is the value of the weight $w$ as defined in eqns.~\ref{eqn.xtrans.weighted} and~\ref{eqn.ytrans.weighted}, though the numerical value of $w$ was hidden from the user to prevent anchoring to a specific numerical value. 
 
-\done{why does controlling for aspect ratio and the function imply a use of the linear approximation? I don't see the causal relationship.}
-\done{(should have been line length, not aspect ratio... sorry!)\\
+\done{why does controlling for aspect ratio and the function imply a use of the linear approximation? I don't see the causal relationship.\\
+(should have been line length, not aspect ratio... sorry!)\\
 The linear approximation doesn't break until you reach certain conditions, i.e. line length vs. function amplitude: ``The quadratic correction breaks whenever ... combinations of large values of $\ell$, which signify a large vertical extent, or large conditional variability $E[Y|X]$, and simultaneous large changes in the slope of the main trend, i.e.~large values of the curvature $f^{\prime\prime}(x)$. In the linear approximation of $f$ the same situation leads to a massive overcorrection of the vertical lines, making the `corrected' function look almost unrecognizable."} 
 
 As the line length and function are controlled in this app, we used the linear transformation in $y$; the transformation does not break under any combination of parameters tested in this experiment. Participants were recruited from Amazon Mechanical Turk and the \href{reddit}{http://reddit.com/r/SampleSize} community.
