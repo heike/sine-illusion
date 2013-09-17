@@ -153,29 +153,26 @@ ggplot(data=trial.sum, aes(x=startweight, y=endweight)) +
   ylab("Submitted \"Correct\" Weight") + 
   facet_wrap(~type)
 
-#----------------------Mixed Model Approach-----------------
+#----------------------Data Cleaning-----------------
 
-fixed.model <- lm(data=trial.sum, endweight~startweight+type+post.training+training)
-summary(fixed.model)
-# start weight is significant (p<2e-16), type is not. 
-# Whether or not the trial is post-training is also not significant 
-#   (though it comes close when training is also included).
-
-qplot(x=startweight, geom="histogram", data=subset(trial.sum, !training & ntrials>3), binwidth=.1)
-
-qplot(data=subset(trial.sum, !training & ntrials>3), x=factor(startweight), y=endweight, geom="boxplot") + 
-  geom_text(aes(x=factor(startweight), y=4, label=..count..), stat="bin")
+# qplot(x=startweight, geom="histogram", data=subset(trial.sum, !training & ntrials>3), binwidth=.1)
+# 
+# qplot(data=subset(trial.sum, !training & ntrials>3), x=factor(round(startweight, 3)), y=endweight, geom="violin") + 
+#   geom_text(aes(x=factor(round(startweight, 3)), y=4, label=..count..), stat="bin")
 
 is.outlier <- function(x){
-  qs <- as.numeric(quantile(x, c(.25, .75)))
-  iqr <- diff(qs)
-  lims <- qs + c(-1, 1)*1.5*iqr
-  !(x>=lims[1] & x <= lims[2]) & !(x>=0 & x<=1)
+  #   qs <- as.numeric(quantile(x, c(.25, .75)))
+  #   iqr <- diff(qs)
+  #   lims <- qs + c(-1, 1)*1.5*iqr
+  #   !(x>=lims[1] & x <= lims[2]) & !(x>=-1 & x<=2)
+  !(x>=wlow & x<=whigh)
 }
+
 trial.sum <- ddply(trial.sum, .(startweight), transform, 
-                      incl.startwt = startweight<=1 & startweight>=0,
-                      incl.trials = ntrials>3,
-                      endwt.outlier = is.outlier(endweight)) 
+                   incl.startwt = startweight<=1 & startweight>=0,
+                   incl.trials = ntrials>3,
+                   endwt.outlier = is.outlier(endweight)) 
+# compute outliers for each possible start weight
 
 trial.sequence <- ddply(trial.sequence, .(start.weight), transform, endwt.outlier = is.outlier(end.weight))
 
@@ -192,57 +189,124 @@ ggplot() +
   geom_hline(yintercept=0)
 # note that x values outside of [0,1] do not preserve the underlying function shape to any degree (i.e. concavity changes, etc.) and y values outside of [0,1] are not at all perceptually reasonable. 
 
+# #--- Plot to compare bivar. density before/after trimming
+# temp <- rbind.fill(cbind(trial.sum, dataset="full"), cbind(lm.data, dataset="trimmed"))
+# # not much has changed density wise...
+# ggplot(data=temp, aes(x=startweight, y=endweight)) + 
+#   geom_contour(aes(group=dataset, colour=dataset), stat="density2d") + 
+#   scale_colour_manual("Data", values=c("red", "blue"))+
+#   xlab("Starting Weight") + ylab("Submitted \"Correct\" Weight") + 
+#   facet_wrap(~type) + ggtitle("The Effect of Starting Weight on Submitted Weight")
+# rm("temp")
 
-# compute outliers for each possible start weight
+# polygon contour plot of submitted vs starting weight for x and y
+# ggplot(data=lm.data, aes(x=startweight, y=endweight)) + geom_polygon(aes(fill=..level.., group=..piece..), stat="density2d", alpha=.5) + xlab("Starting Weight") + ylab("Submitted \"Correct\" Weight") + facet_wrap(~type) + ggtitle("The Effect of Starting Weight on Submitted Weight") + xlim(c(-.2, 1.15))
+
+# stats
+nparticipants <- length(unique(trial.sum$fingerprint))
+ntrials <- nrow(trial.sum)
+
+nparttrials <- ddply(trial.sum, .(fingerprint), summarise, exclude=ntrials[1]>3)
+nparttrials <- sum(nparttrials$exclude)
 
 noutliers <- sum(trial.sum$endwt.outlier)
+noutliers.x <- sum(trial.sum$endwt.outlier & trial.sum$type=="x")
+noutliers.y <- sum(trial.sum$endwt.outlier & trial.sum$type=="y")
 
-qplot(data=subset(trial.sum, !training & ntrials>3), x=startweight, y=endweight, geom="jitter", colour=endwt.outlier, alpha=I(.5)) + facet_grid(.~type)
 
-# lm.data <- subset(trial.sum, incl.startwt & incl.trials & !endwt.outlier)
-lm.data <- subset(trial.sum, incl.trials)
+ntrials2 <- nrow(subset(trial.sum, incl.startwt & incl.trials))
 
-temp <- rbind.fill(cbind(trial.sum, dataset="full"), cbind(lm.data, dataset="trimmed"))
-# not much has changed density wise...
-ggplot(data=temp, aes(x=startweight, y=endweight)) + 
-  geom_contour(aes(group=dataset, colour=dataset), stat="density2d") + 
-  scale_colour_manual("Data", values=c("red", "blue"))+
-  xlab("Starting Weight") + ylab("Submitted \"Correct\" Weight") + 
-  facet_wrap(~type) + ggtitle("The Effect of Starting Weight on Submitted Weight")
-rm("temp")
+
+lm.data <- subset(trial.sum, incl.startwt & incl.trials & !endwt.outlier, stringsAsFactors=FALSE)
+lm.data$type <- relevel(factor(lm.data$type), ref="y")
+
+trials.per.participant <- mean(ddply(lm.data, .(fingerprint), summarise, ntrials=mean(ntrials))$ntrials)
+
+
+# ------------------- Participant Averages ------------------- 
+
+end.trials <- (lm.data$startweight == 0 | lm.data$startweight == 1)
+
+user.avg <- ddply(subset(lm.data, end.trials), # include trials starting at 0, 1
+                  .(fingerprint, type), function(df){
+                    avg.0 <- with(subset(df, startweight==0), mean(endweight, na.rm=TRUE))
+                    avg.1 <- with(subset(df, startweight==1), mean(endweight, na.rm=TRUE))
+                    return(data.frame(fingerprint=df$fingerprint[1], type=df$type[1], 
+                                      avg.0=avg.0, avg.1=avg.1, ntrials=df$ntrials[1], 
+                                      ntrials.sub = nrow(df)))
+                  })
+
+user.avg.all <- subset(user.avg, !is.nan(rowSums(user.avg[,3:4])))
+user.avg.all$avg <- rowMeans(user.avg.all[,3:4])
+user.avg.all <- ddply(user.avg.all, .(type), transform, overall.avg = mean(avg))
+
+qplot(data=user.avg.all, x=type, y=avg, geom="violin")
+
+ggplot(data=user.avg.all) + 
+  geom_segment(aes(x=avg.0, xend=avg.1, y=fingerprint, yend=fingerprint, alpha=ntrials.sub)) + 
+  scale_alpha_continuous(range=c(.5, 1)) + 
+  geom_point(aes(x=avg, y=fingerprint, alpha=ntrials.sub)) +
+  geom_vline(aes(xintercept=overall.avg)) +
+  facet_wrap(~type)
+               
+ggplot(data=user.avg.all) + 
+  geom_density(aes(x=avg.0), colour="blue") + 
+  geom_density(aes(x=avg.1), colour="red") + 
+  geom_vline(aes(xintercept=overall.avg)) + 
+  facet_wrap(~type)
+
+ggplot(data=user.avg.all) + 
+  geom_density(aes(x=avg, fill=type)) + 
+  geom_vline(aes(xintercept=overall.avg)) +
+  geom_rug(aes(x=avg, colour=type), alpha=.9) +
+  facet_grid(type~.) +
+  scale_fill_manual("Transformation", values=c("#d6604d", "#4393c3")) +
+  scale_colour_manual("Transformation", values=c("#d6604d", "#4393c3")) + 
+  theme_bw() +
+  xlim(c(-.2, 1.2))
+
+
+# ---------------------- Mixed Models ---------------------------
+fixed.model <- lm(data=trial.sum, endweight~startweight+type+post.training+training)
+summary(fixed.model)
+# start weight is significant (p<2e-16), type is not. 
+# Whether or not the trial is post-training is also not significant 
+#   (though it comes close when training is also included).
 
 library(lme4)
 library(multcomp)
 model.full <- lmer(data=subset(trial.sum, incl.trials), 
-                   endweight ~ (type-1) + post.training + training + startweight + ((type-1)|fingerprint))
+                   endweight ~ (type-1) + post.training + training + startweight + 
+                     ((type-1)|fingerprint))
 summary(model.full)
 # training trials are not significantly different from non-training trials, having training doesn't really matter
 
-model.full2 <- lmer(data=subset(trial.sum, incl.trials), 
+model.RdmOutliers <- lmer(data=subset(trial.sum, incl.trials), 
                     endweight ~ (type-1) + startweight + ((type-1)|fingerprint))
-summary(model.full2)
-# removing those extra terms makes things much prettier, std error wise.
+summary(model.RdmOutliers)
+# removing those extra terms makes things a bit prettier, std error wise.
 
-model.full3 <- lmer(data=subset(trial.sum, incl.trials & !endwt.outlier), 
-                    endweight ~ (type-1) + startweight + ((type-1)|fingerprint))
-summary(model.full3)
+model.RdmNoOutliers <- lmer(data=subset(trial.sum, incl.trials & !endwt.outlier), 
+                            endweight ~ (type-1) + startweight + ((type-1)|fingerprint))
+summary(model.RdmNoOutliers)
 # without outliers, debug model - for the first time, random effects for type have similar variances
 
-model.full4 <- lmer(data=subset(lm.data, incl.startwt & incl.trials & !endwt.outlier), 
-                    endweight ~ (type-1) + startweight + ((type-1)|fingerprint))
-summary(model.full4)
+model.Rdm <- lmer(data=lm.data, 
+                  endweight ~ (type-1) + startweight + ((type-1)|fingerprint))
+summary(model.Rdm)
 # without outliers or starting values outside of (0,1) - high influence values without sufficient data points... should remove those as well.
 
-model.x <- lmer(data=subset(trial.sum, type=="x" & incl.trials), 
+model.x <- lmer(data=subset(lm.data, type=="x"), 
                 endweight ~ startweight + (1|fingerprint))
 summary(model.x)
 
-
-
+model.y <- lmer(data=subset(lm.data, type=="y"),
+                endweight ~ startweight + (1|fingerprint))
+summary(model.y)
 
 model <- lmer(data=lm.data, endweight~ (type-1) + startweight + (1|fingerprint))
 summary(model)
-N <- 100
+N <- 1000
 model.mcmc <- mcmcsamp(model, N, saveb=TRUE)
 
 fixef.model <- as.data.frame(t(attr(model.mcmc, "fixef")))

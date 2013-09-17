@@ -1328,9 +1328,7 @@ trial.sequence <- read.csv("./data/IndivTrajectory.csv", row.names=1, stringsAsF
 library(lubridate)
 trial.sequence$time2 <- ymd_hms(trial.sequence$time2)
 
-
-#--- Mixed Model ---#
-
+# ------ Data Cleaning ------#
 is.outlier <- function(x){
 #   qs <- as.numeric(quantile(x, c(.25, .75)))
 #   iqr <- diff(qs)
@@ -1377,6 +1375,26 @@ lm.data <- subset(trial.sum, incl.startwt & incl.trials & !endwt.outlier, string
 
 trials.per.participant <- mean(ddply(lm.data, .(fingerprint), summarise, ntrials=mean(ntrials))$ntrials)
 
+#--- Flat Averages ---#
+end.trials <- (lm.data$startweight == 0 | lm.data$startweight == 1)
+
+user.avg <- ddply(subset(lm.data, end.trials), # include trials starting at 0, 1
+                  .(fingerprint, type), function(df){
+                    avg.0 <- with(subset(df, startweight==0), mean(endweight, na.rm=TRUE))
+                    avg.1 <- with(subset(df, startweight==1), mean(endweight, na.rm=TRUE))
+                    return(data.frame(fingerprint=df$fingerprint[1], type=df$type[1], 
+                                      avg.0=avg.0, avg.1=avg.1, ntrials=df$ntrials[1], 
+                                      ntrials.sub = nrow(df)))
+                  })
+
+user.avg.all <- subset(user.avg, !is.nan(rowSums(user.avg[,3:4])))
+user.avg.all$avg <- rowMeans(user.avg.all[,3:4])
+user.avg.all <- ddply(user.avg.all, .(type), transform, overall.avg = mean(avg))
+user.avg.x <- unique(subset(user.avg.all, type=="x")$overall.avg)
+user.avg.y <- unique(subset(user.avg.all, type=="y")$overall.avg)
+
+
+#--- Mixed Model ---#
 set.seed(82187)
 library(lme4)
 library(multcomp)
@@ -1479,12 +1497,51 @@ As this study was done outside a laboratory setting, we can not tell a participa
 \label{fig:overtransform}
 \end{figure}
 
+\newdo{not sure if this still needs to be in here}
 \newtext{In addition to the $x$ transformation artifact, there were a few user reports of applet lag, so that the only option to continue was to ``submit'' the trial (or ``skip'' it), even though the final graph had not rendered correctly; this resulted in a recorded value more extreme than the participant intended. To account for these technological difficulties, the exclusion criteria were applied to trials from both transformations. Importantly, in both types of trials, values outside of [\Sexpr{wlow}, \Sexpr{whigh}] demonstrate remarkable deviations from the criteria described to the participants; $x$ transformations outside of that range do not preserve the underlying function shape and concavity and $y$ transformations outside of that range have dramatically unequal line lengths. Hence, user values outside of these ranges likely indicate noncompliance or equipment malfunction. Responses were removed if they fell outside the [\Sexpr{wlow}, \Sexpr{whigh}] interval (\Sexpr{noutliers.x} $x$ and \Sexpr{noutliers.y} $y$ trials, for a total of \Sexpr{noutliers} trials).}
 
 % In order to have a consistent rule for trial removal based on these artifacts, for each starting weight, responses more than 1.5*IQR from the upper and lower quartiles were removed if they fell outside the [0,1] interval (\Sexpr{noutliers.x} $x$ and \Sexpr{noutliers.y} $y$ trials, for a total of \Sexpr{noutliers} trials). Values outside the [0,1] interval were not removed unless they were also more than 1.5*IQR from the upper and lower quartiles. The higher number of $x$ trials excluded suggest that the unique feature of the $x$ transformation demonstrated above influenced some participant responses. 
 
 Once outliers were removed, each participant completed an average of  \Sexpr{round(trials.per.participant, 2)} trials. As there were only \Sexpr{sum(!trial.sum$incl.startwt & trial.sum$incl.trials & !trial.sum$endwt.outlier)} trials with starting weight outside of [0,1] which met the other inclusion criteria, those trials were eliminated from the analysis to prevent high-influence points from adversely influencing the model. 
 
+\paragraph{Psychophysics Model} Traditionally, the method of limits requires several trials per participant, some from above the hypothesized threshold, some from below the hypothesized threshold (in this case, some with $w=0$ and some with $w=1$). These trials are then averaged to obtain a single threshold value. For this model, we will thus have to additionally exclude data from participants who did not complete one trial starting at 0 and one trial starting at 1 for each stimulus (so a participant who completed both $x$ trials and a $y$ trial starting at 0 would not be included when determining the optimal weight for $y$). \Sexpr{length(unique(user.avg.all$fingerprint))} users had sufficient data to calculate user-level optimum weights for one or both transformations using this method.
+
+For each participant $i$ and trial $j$ of trial type $T_{ij}$ with starting weight $X_{ij}$
+
+\begin{align}
+\overline{W^X_{i}} &= \frac{1}{2}\cdot 
+\frac{\sum_{j} \mathbbm{1}_{[T_{ij}=X]}\cdot \mathbbm{1}_{[X_{ij}=0]} \cdot{W_{ij}}}
+     {\sum_{j} \mathbbm{1}_{[T_{ij}=X]}\cdot \mathbbm{1}_{[X_{ij}=0]}} + 
+\frac{1}{2}\cdot 
+\frac{\sum_{j} \mathbbm{1}_{[T_{ij}=X]}\cdot \mathbbm{1}_{[X_{ij}=1]} \cdot{W_{ij}}}
+     {\sum_{j} \mathbbm{1}_{[T_{ij}=X]}\cdot \mathbbm{1}_{[X_{ij}=1]}} \\
+\overline{W^Y_{i}} &= \frac{1}{2}\cdot 
+\frac{\sum_{j} \mathbbm{1}_{[T_{ij}=Y]}\cdot \mathbbm{1}_{[X_{ij}=0]} \cdot{W_{ij}}}
+     {\sum_{j} \mathbbm{1}_{[T_{ij}=Y]}\cdot \mathbbm{1}_{[X_{ij}=0]}} + 
+\frac{1}{2}\cdot 
+\frac{\sum_{j} \mathbbm{1}_{[T_{ij}=Y]}\cdot \mathbbm{1}_{[X_{ij}=1]} \cdot{W_{ij}}}
+     {\sum_{j} \mathbbm{1}_{[T_{ij}=Y]}\cdot \mathbbm{1}_{[X_{ij}=1]}} 
+\end{align}
+
+Then, for each trial type, we can compute an average over the participants as well as compare the distributions of participant ``optimal" weight values. 
+
+\begin{figure}[htbp]\centering
+<<meanDists,echo=FALSE,out.width='.8\\linewidth', dependson='results-analysis', fig.width=5, fig.height=3, message=FALSE, warning=FALSE>>=
+ggplot(data=user.avg.all) + 
+  geom_density(aes(x=avg, fill=type)) + 
+  geom_vline(aes(xintercept=overall.avg)) +
+  geom_rug(aes(x=avg, colour=type), alpha=.9) +
+  facet_grid(type~.) +
+  scale_fill_manual("Transformation", values=c("#d6604d", "#4393c3"), guide="none") +
+  scale_colour_manual("Transformation", values=c("#d6604d", "#4393c3"), guide="none") + 
+  theme_bw() + theme(legend.position="bottom") +
+  xlim(c(-.2, 1.2)) + xlab("Optimal Weight") + ylab("Density")
+@
+\caption{Distribution of participant-level means using the standard method of limits analysis described in \citet{goldstein}. The overall means are both near 0.4, however, there is quite a bit of user-level variability. }
+\end{figure}
+As a result, according to this analysis, the optimum transformation value for $x$ is \Sexpr{round(user.avg.x, 2)}, and the optimum transformation value for $y$ is \Sexpr{round(user.avg.y, 2)}. In addition, only \Sexpr{nrow(subset(user.avg.all, avg<0 | avg > 1))} user averages were outside of the range of (0,1) for either trial. While these results suggest that the transformation is useful and that complete transformation is not necessary, we can get more precise bounds on the range of acceptable transformation weights using a linear model that can incorporate starting points other than 0 and 1, as well as data from users that completed a sufficient number of trials but did not complete a trial starting at one of the endpoints. 
+
+\paragraph{Linear Model}
 Training trials were included in the analysis after a fixed effects model incorporating type, starting weight, and training showed that there was no evidence of a significant difference between trials with and without the original mean function on the graph ($p(>|t|) = $\Sexpr{round(summary(fixedmodel)$coefficients['trainingTRUE',4], 4)}). 
 
 In order to account for user-level variability, we fit a random effects model for the corrected weight value as a function of the starting weight and trial type, with a random intercept for each participant. 
@@ -1492,12 +1549,12 @@ The variability of the random effects for each trial type are similar (\Sexpr{li
 
 
 Participant $i$'s response for trial $j$, $W_{ij}$, was modeled as a function of the correction type $T_{ij}$, and starting weight $X_{ij}$, with a random intercept for participant. 
-\begin{align}\label{model}
+\begin{align}\label{model1}
 W_{ij} &= \alpha_X \mathbbm{1}_{[T_{ij}=X]} + \alpha_Y \mathbbm{1}_{[T_{ij}=Y]} + \beta X_{ij} + \gamma_i + \epsilon_{ij}\\
 \gamma_i &\sim N(0, \eta^2), 
 \epsilon_{ij} \sim N(0, \sigma^2), \text{ and } \text{Cov}(\gamma, \epsilon) = 0\notag 
 \end{align}
-$\mathbbm{1}$ is the indicator function, that is, when the condition is true, the function is equal to 1, otherwise, the function is equal to 0. Below, $\alpha_X$ is used to model $W_{ij}$ if T_{ij} = "X", otherwise, $\alpha_Y$ is used.
+$\mathbbm{1}$ is the indicator function, that is, when the condition is true, the function is equal to 1, otherwise, the function is equal to 0. Below, $\alpha_X$ is used to model $W_{ij}$ if $T_{ij} = \text{"X"}$, otherwise, $\alpha_Y$ is used.
 
 \newdo{Points of discussion for the model: one random effect for both types of correction, because there is no significant difference between the two obvious. One $\beta$ rather than one for each correction, because the interaction between type and starting weight is not significant (effect size and $p$-value XXX).}
 The fitted model parameters are shown in tables \ref{fixedeffectsresults} and \ref{randomeffectsresults}, but for interpretation purposes, we can use MCMC simulation to simulate responses for each correction type and each participant from the model. These simulated responses can then be used to create user-level densities as well as overall densities for the quantities shown in Equation \ref{modelfcns}. 
