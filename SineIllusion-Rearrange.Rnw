@@ -1474,9 +1474,8 @@ ggplot() + theme_bw() + facet_grid(type~., scales="free") +
   theme(legend.position="bottom") + geom_point(aes(x=ests, y=32), data=ests) +
   xlim(c(-.2, 1.2)) +
   geom_point(data=ints.all, aes(x=xmax, y=0, size=factor("Range")), shape=NA, colour="grey75") +
-  guides(colour=guide_legend(order=1), fill=guide_legend(order=1), size=guide_legend("Overall Acceptable Weights", override.aes=list(shape=15, size = 10), order=3))
+  guides(colour=guide_legend(order=1), fill=guide_legend(order=1), size=guide_legend("Range of acceptable weights", override.aes=list(shape=15, size = 10), order=3))
 @
-
 
 
 Participants were recruited from Amazon Mechanical Turk and the \href{http://reddit.com/r/SampleSize}{reddit} community. \Sexpr{nparticipants} participants in total took part in the study with \Sexpr{ntrials} total evaluations. 
@@ -1543,6 +1542,7 @@ As a result, according to this analysis, the optimum transformation value for $x
 
 \paragraph{Linear Model}
 Training trials were included in the analysis after a fixed effects model incorporating type, starting weight, and training showed that there was no evidence of a significant difference between trials with and without the original mean function on the graph ($p(>|t|) = $\Sexpr{round(summary(fixedmodel)$coefficients['trainingTRUE',4], 4)}). 
+\newdo{The nomenclature of $p(>|t|) = $ is not going to fly in JCGS - it looks too much like R syntax. In case you don't just want to say $p$-value, write it out as  $p$-value=XXX based on $t_{YYY}$ distribution, where YYY are the degrees of freedom}
 
 In order to account for user-level variability, we fit a random effects model for the corrected weight value as a function of the starting weight and trial type, with a random intercept for each participant. 
 The variability of the random effects for each trial type are similar (\Sexpr{library(lme4); summary(model)@REmat[1,3]} for the overall variability as opposed to \Sexpr{summary(model2)@REmat[1,3]} and \Sexpr{summary(model2)@REmat[2,3]} for $y$ and $x$ transformations, respectively), so it is appropriate to fit a single model in order to better estimate the participant-level effects. Additionally, the interaction between starting weight and trial type was not significant, and was thus removed from the model ($p$-value = \Sexpr{anova(model, model3)$`Pr(>Chisq)`[2]}).
@@ -1554,6 +1554,7 @@ W_{ij} &= \alpha_X \mathbbm{1}_{[T_{ij}=X]} + \alpha_Y \mathbbm{1}_{[T_{ij}=Y]} 
 \gamma_i &\sim N(0, \eta^2), 
 \epsilon_{ij} \sim N(0, \sigma^2), \text{ and } \text{Cov}(\gamma, \epsilon) = 0\notag 
 \end{align}
+
 $\mathbbm{1}$ is the indicator function, that is, when the condition is true, the function is equal to 1, otherwise, the function is equal to 0. Below, $\alpha_X$ is used to model $W_{ij}$ if $T_{ij} = \text{"X"}$, otherwise, $\alpha_Y$ is used.
 
 \newdo{Points of discussion for the model: one random effect for both types of correction, because there is no significant difference between the two obvious. One $\beta$ rather than one for each correction, because the interaction between type and starting weight is not significant (effect size and $p$-value XXX).}
