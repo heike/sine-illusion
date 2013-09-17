@@ -1461,9 +1461,8 @@ ggplot() + theme_bw() + facet_grid(type~., scales="free") +
   theme(legend.position="bottom") + geom_point(aes(x=ests, y=32), data=ests) +
   xlim(c(-.2, 1.2)) +
   geom_point(data=ints.all, aes(x=xmax, y=0, size=factor("Range")), shape=NA, colour="grey75") +
-  guides(colour=guide_legend(order=1), fill=guide_legend(order=1), size=guide_legend("Overall Acceptable Weights", override.aes=list(shape=15, size = 10), order=3))
+  guides(colour=guide_legend(order=1), fill=guide_legend(order=1), size=guide_legend("Range of acceptable weights", override.aes=list(shape=15, size = 10), order=3))
 @
-
 
 \Sexpr{nparticipants} participants in total took part in the study with \Sexpr{ntrials} total evaluations. Trials with less than two total interactions (i.e. at least one adjustment plus a submission at the end of the trial) were removed because of the likelihood that the participant did not complete the required task for that trial. Trials that participants skipped were also removed from the data before analysis. Participants were asked to complete at least 10 trials after the training trials, so observations from participants who completed fewer than 4 non-outlier trials were removed from the data to allow estimation of individual random effects with some accuracy. 
  \newdo{Let's make this a list: you might need to add some information from the paragraphs above and below}
