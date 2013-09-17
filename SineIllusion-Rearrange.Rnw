@@ -1456,6 +1456,12 @@ names(ints.users) <- c("user", "type", "limit", "xmin", "x", "xmax")
 
 ests <- data.frame(ests = c(fixef(model)[1:2], fixef(model)[1:2]+fixef(model)[3]), type=rep(c("Y Transformation", "X Transformation"), 2))
 
+@
+<<results-analysis1,echo=FALSE, include=FALSE, fig.width=8, fig.height=6, dependson='results-analysis'>>=
+
+ints$label1 <- c("alpha", "alpha + beta", "alpha", "alpha + beta")
+ints$label <- sprintf("%s <= ~ %s <= %s", round(ints$xmin, 2), ints$label1, round(ints$xmax, 2))
+
 ggplot() + theme_bw() + facet_grid(type~., scales="free") + 
   geom_rect(data=ints.all, aes(xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax), 
             fill="grey75", alpha=.5) +
@@ -1470,14 +1476,14 @@ ggplot() + theme_bw() + facet_grid(type~., scales="free") +
                       breaks=c("from below", "from above"))  +
   scale_fill_manual("Approach", values=c("#d6604d", "#4393c3"),
                     breaks=c("from below", "from above")) + 
-  geom_errorbarh(aes(xmin=xmin, x=x, xmax=xmax, y=32, color=limit), data=ints) + 
-  theme(legend.position="bottom") + geom_point(aes(x=ests, y=32), data=ests) +
+  geom_errorbarh(aes(xmin=xmin, x=x, xmax=xmax, y=25, color=limit), data=ints) + 
+  theme(legend.position="bottom") + geom_point(aes(x=ests, y=25), data=ests) +
   xlim(c(-.2, 1.2)) +
   geom_point(data=ints.all, aes(x=xmax, y=0, size=factor("Range")), shape=NA, colour="grey75") +
-  guides(colour=guide_legend(order=1), fill=guide_legend(order=1), size=guide_legend("Range of acceptable weights", override.aes=list(shape=15, size = 10), order=3))
+  guides(colour=guide_legend(order=1), fill=guide_legend(order=1), size=guide_legend("Range of acceptable weights", override.aes=list(shape=15, size = 10), order=3)) +
+  geom_text(data=ints, aes(x=x, y=27.5, label=label), parse=TRUE) + ylim(c(0,30))
+
 @
-
-
 Participants were recruited from Amazon Mechanical Turk and the \href{http://reddit.com/r/SampleSize}{reddit} community. \Sexpr{nparticipants} participants in total took part in the study with \Sexpr{ntrials} total evaluations. 
 
 As this study was done outside a laboratory setting, we can not tell a participant's willingness to follow the guidelines and put in their best effort. This, besides potential technical issues (server outage, speed of response) make a careful selection of data going into the analysis unavoidable. The following exclusion criteria were used:
@@ -1569,7 +1575,7 @@ This approach to model parameters suggests that $\alpha_X$ and $\alpha_Y$ should
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[keepaspectratio=TRUE, width=.9\linewidth]{figure/fig-results-analysis}
+\includegraphics[keepaspectratio=TRUE, width=.9\linewidth]{figure/fig-results-analysis1}
 \caption{\label{fig:MixedModelResults} Simulation results from the fitted model, facetted by correction type. Fixed effects results are shown as histograms; the red values display the results when starting from an uncorrected plot and are concentrated around $w=\Sexpr{round(mean(ints$x[c(1,3)]), 2)}$; the blue values represent user-chosen weights when starting from a fully corrected plot and are concentrated around $w=\Sexpr{round(mean(ints$x[c(2,4)]), 2)}$. Additionally, 95\% Highest Posterior Density (HPD) credible intervals are shown as horizontal line segments above the histograms; these intervals are for the lower and upper bounds of the ``preferred weight interval'' tested in the experiment. User-level density curves show the individual variability around  fixed effects $\alpha_*$ and $\alpha_*+\beta$.}
 \end{figure}
 
