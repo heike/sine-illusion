@@ -1457,8 +1457,7 @@ ests <- data.frame(ests = c(fixef(model)[1:2], fixef(model)[1:2]+fixef(model)[3]
 @
 <<results-analysis1,echo=FALSE, include=FALSE, fig.width=8, fig.height=6, dependson='results-analysis'>>=
 
-ints$label1 <- c("alpha", "alpha + beta", "alpha", "alpha + beta")
-ints$label <- sprintf("%s <= ~ %s <= %s", round(ints$xmin, 2), ints$label1, round(ints$xmax, 2))
+ints$label <- c("alpha[y]", "alpha[y] + beta", "alpha[x]", "alpha[x] + beta")
 
 ggplot() + theme_bw() + facet_grid(type~., scales="free") + 
   geom_rect(data=ints.all, aes(xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax), 
@@ -1594,19 +1593,27 @@ res <- pvals.fnc(model, nsim=5000, ndigits=4)
 # print(temp, file="./figure/fixef.txt", floating=FALSE)
 
 # fixed effects table:
-fet <- res$fixed[,c( 1, 3, 4)]
-for (i in 1:3) fet[,i] <- as.numeric(fet[,i])
-fet <- rbind(fet, fet[1,]+fet[3,])
-fet <- rbind(fet, fet[2,]+fet[3,])
-fet <- fet[-3,]
+# fet <- res$fixed[,c( 1, 3, 4)]
+# for (i in 1:3) fet[,i] <- as.numeric(fet[,i])
+# fet <- rbind(fet, fet[1,]+fet[3,])
+# fet <- rbind(fet, fet[2,]+fet[3,])
+# fet <- fet[-3,]
+# 
+# fet$interval <- sprintf("(%s, %s)", fet[,2],fet[,3])
+# fet <- fet[c(1,3,2,4),]
+# names(fet) <- c( "Estimate", "95% HPD Lower", "95% HPD Upper", "95% HPD CI")
+# fet$Transformation <- c("Y","", "X", "")
+# fet$Threshold <- rep(c("Lower", "Upper"), 2)
+fet <- ints[,c(4, 3, 5)]
+fet$"95% HPD CI" <- sprintf("(%s, %s)", round(fet[,2], 3), round(fet[,3], 3))
+fet <- cbind(fet, ints[,1:2])
+fet$type <- gsub(" Transformation", "", fet$type)
+fet$type[c(2,4)] <- ""
+fet$limit <- gsub("from below", "Lower", fet$limit)
+fet$limit <- gsub("from above", "Upper", fet$limit)
+names(fet) <- c("Estimate", "Lower", "Upper", "95% HPD CI", "Transformation", "Threshold")
 
-fet$interval <- sprintf("(%s, %s)", fet[,2],fet[,3])
-fet <- fet[c(1,3,2,4),]
-names(fet) <- c( "Estimate", "95% HPD Lower", "95% HPD Upper", "95% HPD CI")
-fet$Transformation <- c("Y","", "X", "")
-fet$Threshold <- rep(c("Lower", "Upper"), 2)
-
-temp<- xtable(fet[,c(5,6,1,4)])
+temp<- xtable(fet[,c(5,6,1,4)], digits=3)
 align(temp) <- c("r", rep("c", 4))
 print(temp, file="./figure/fixef.txt", floating=FALSE, include.rownames=FALSE, add.to.row=list(pos=list(2), command="[5pt]"))
 rdm.effects.table <- res$random[,c(1, 2, 3, 5, 6, 7)]
