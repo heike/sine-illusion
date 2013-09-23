@@ -1,4 +1,4 @@
-# Analysis of data from Amazon Turk experiment conducuted 7/22/13-7/28/13.
+# Analysis of data from Amazon Turk experiment conducted 7/22/13-7/28/13.
 
 library(RMySQL)
 library(plyr)
