@@ -1159,7 +1159,7 @@ Similar to the correction of the $x$-axis,  we can use a weighted approach to fi
 (\ell_{new_w})(x) = (1-w) \cdot \ell_{old} + w \cdot (\ell_{new})(x)
 \end{equation}
 
-Note that for the quadratic correction in $y$, half-segment lengths must be weighted separatel.%y; a single segment weighting will suffice for the linear correction in $y$. 
+Note that for the quadratic correction in $y$ half-segment lengths must be weighted separatel.%y; a single segment weighting will suffice for the linear correction in $y$. 
 
 % % 
 % % $1 + 2f^\prime(x)^2 + f^\prime(x)^4 \pm \ell\cdot f^{\prime\prime}(x)\cdot f^\prime(x)^2 < 0$
@@ -1217,7 +1217,6 @@ Note that for the quadratic correction in $y$, half-segment lengths must be weig
 
 \section{Transformations in Practice -- a User Study}
 
-\done{Add an intro to this section: overview of what is addressed in this section: applet, study, results - one sentence each}
 In order to more fully understand the sine illusion and test the proposed corrections, we created an applet to both serve as a testing environment and allow users to interact with the illusion and corrections. We deployed the applet to participants recruited online, collecting their responses and other metadata. The results of the analysis suggest that the correction factors in $X$ and $Y$ are both preferrable to uncorrected data, but that full correction is not necessary to break the illusion.
 
 The goal of the study is to determine an overall `optimal' setting for the weights in each of the correction factors. That is, if the optimal weight is 0, the corrections are not effective at reducing the effect of the illusion; if the optimal weight is 1, the full correction is necessary to reduce the illusion. It is of additional interest to determine whether and how much this setting is subject-specific or population-based, whether the optimal setting depends on the starting value, and how much within-subject variability we find compared to between-subject variability. 
@@ -1254,13 +1253,13 @@ qplot(wopts, rep(1, length=length(wopts)), geom="point") + geom_vline(xintercept
 
 The study is set up as a fractional factorial design of correction type ($x$ or $y$ correction) and starting weight $w_0$. Each participant is asked to evaluate a total of twelve situations, six of each correction type, though they are allowed to complete up to 30 trials if they wish. For the first six starting weights $w_0$ values were chosen with equal probability from the set of numbers $\{0, 1, c\}$, where $c \sim U(.25, .75)$, while the second set of starting weights is randomly sampled from a distribution centered at 0.6 with mass on discrete values in the interval $(-4, 5)$, shown in figure \ref{fig:weightdist}. The distribution was chosen to have a higher coverage density around 0.6 after a pilot study indicated a preference for that value. Using a distribution with a wide range of coverage allows us to fully explore the space of plausible $w$ while focusing on weights in the $(0,1)$ interval. Table \ref{factortable} summarizes the factors under investigation in the experiment.
 }
+\newdo{What is the actual range of $c$ used in the analysis of the data? I thought you had cut it back to weights between 0 and 1. If that is the case the discussion here should reflect that.}
 \begin{figure}[h]\centering
 \includegraphics[keepaspectratio=TRUE,width=\linewidth]{figure/fig-study-weight-dist}
 \caption{Overview of possible starting weights. Weight values are discrete, but staggered so as to provide fine-grained adjustments around 0.6 and more coarse discriminatory information outside of $(0,1)$. Hollow circles indicate choices of starting weights for the first six values, filled circles represent starting weights for trials beyond the first six. All weights (with the exception of 0 and 1) are selected with equal probability.}\label{fig:weightdist}
 \end{figure}
 
 % setup of the study
-\newdo{Could you put the factors of the study into a table for a better overview?}
 \begin{table}[htbp]\centering
 \begin{tabular}{ccc}
 Factor & Stage & Values \\\hline
@@ -1279,8 +1278,7 @@ Transformation & Trial no  & $X$, $Y$\\
 Participants adjust the graph using increment and decrement buttons, and click ``submit'' to proceed to the next stimuli when they are satisfied with the adjustment. This provides a clear starting value and ending value, allowing us to assess the range of optimal values for each participant. Two ``training'' trials were provided that additionally superimposed a graph of the underlying mean function to give participants some idea of the underlying function the lines represent. This approach was taken to reduce the incidence of extremely high ``x'' correction values, because when $w>\!\!>1$, the lines still look to be of equal length but the underlying function bears little resemblance to $\sin(x)$, as shown in figure \ref{fig:overtransform}. 
 
 
-\newtext{A single `trial' begins with the presentation of a graph at the chosen starting weight, and ends when the participant submits the trial. In addition to transformation weight, type, and user submission, time-series data for each user interaction was recorded, as well as anonymized user data (partial IP address, hashed IP address, and hashed browser characteristics sufficient to provide a user 'fingerprint' to distinguish different users). }
-\done{What other records did you keep track of?}
+A single `trial' begins with the presentation of a graph at the chosen starting weight, and ends when the participant submits the trial. In addition to transformation weight, type, and user submission, time-series data for each user interaction was recorded, as well as anonymized user data (partial IP address, hashed IP address, and hashed browser characteristics) sufficient to provide a user `fingerprint' to distinguish and recognize distinct users. 
 
 \subsection{Results}
 % Data preparation
@@ -1501,14 +1499,16 @@ As this study was done outside a laboratory setting, we can not tell a participa
 \label{fig:overtransform}
 \end{figure}
 
-\newdo{not sure if this still needs to be in here}
-\newtext{In addition to the $x$ transformation artifact, there were a few user reports of applet lag, so that the only option to continue was to ``submit'' the trial (or ``skip'' it), even though the final graph had not rendered correctly; this resulted in a recorded value more extreme than the participant intended. To account for these technological difficulties, the exclusion criteria were applied to trials from both transformations. Importantly, in both types of trials, values outside of [\Sexpr{wlow}, \Sexpr{whigh}] demonstrate remarkable deviations from the criteria described to the participants; $x$ transformations outside of that range do not preserve the underlying function shape and concavity and $y$ transformations outside of that range have dramatically unequal line lengths. Hence, user values outside of these ranges likely indicate noncompliance or equipment malfunction. Responses were removed if they fell outside the [\Sexpr{wlow}, \Sexpr{whigh}] interval (\Sexpr{noutliers.x} $x$ and \Sexpr{noutliers.y} $y$ trials, for a total of \Sexpr{noutliers} trials).}
+In addition to the $x$ transformation artifact, there were a few user reports of applet lag, so that the only option to continue was to ``submit'' the trial (or ``skip'' it), even though the final graph had not rendered correctly; this resulted in a recorded value more extreme than the participant intended. To account for these technological difficulties, the exclusion criteria were applied to trials from both transformations. Importantly, in both types of trials, values outside of [\Sexpr{wlow}, \Sexpr{whigh}] demonstrate remarkable deviations from the criteria described to the participants; $x$ transformations outside of that range do not preserve the underlying function shape and concavity and $y$ transformations outside of that range show dramatically unequal line lengths. Hence, user values outside of these ranges likely indicate user noncompliance or equipment malfunction. Responses were removed if they fell outside the [\Sexpr{wlow}, \Sexpr{whigh}] interval (\Sexpr{noutliers.x} of type $X$  and \Sexpr{noutliers.y} type $Y$ trials, for a total of \Sexpr{noutliers} trials).
 
 % In order to have a consistent rule for trial removal based on these artifacts, for each starting weight, responses more than 1.5*IQR from the upper and lower quartiles were removed if they fell outside the [0,1] interval (\Sexpr{noutliers.x} $x$ and \Sexpr{noutliers.y} $y$ trials, for a total of \Sexpr{noutliers} trials). Values outside the [0,1] interval were not removed unless they were also more than 1.5*IQR from the upper and lower quartiles. The higher number of $x$ trials excluded suggest that the unique feature of the $x$ transformation demonstrated above influenced some participant responses. 
 
 Once outliers were removed, each participant completed an average of  \Sexpr{round(trials.per.participant, 2)} trials. As there were only \Sexpr{sum(!trial.sum$incl.startwt & trial.sum$incl.trials & !trial.sum$endwt.outlier)} trials with starting weight outside of [0,1] which met the other inclusion criteria, those trials were eliminated from the analysis to prevent high-influence points from adversely influencing the model. 
+\newdo{This last paragraph has to go - we can't exclude values just for being extreme. Instead, change the study setup.}
 
-\paragraph{Psychophysics Model} Traditionally, the method of limits requires several trials per participant, some from above the hypothesized threshold, some from below the hypothesized threshold (in this case, some with $w=0$ and some with $w=1$). These trials are then averaged to obtain a single threshold value. For this model, we will thus have to additionally exclude data from participants who did not complete one trial starting at 0 and one trial starting at 1 for each stimulus (so a participant who completed both $x$ trials and a $y$ trial starting at 0 would not be included when determining the optimal weight for $y$). \Sexpr{length(unique(user.avg.all$fingerprint))} users had sufficient data to calculate user-level optimum weights for one or both transformations using this method.
+
+\newdo{I'm still not convinced that we need to go there. Rather, you could put the whole discussion in a one sentence paragraph in the conclusions section. The model is worse than the stats approach, its results are less interpretable, and it doesn't allow us to use the full data. That's three strikes and out.}
+\paragraph{Psychophysics Model} Traditionally, the method of limits \newdo{what is the method of limits, and how does it fit into the psychophysics model?} requires several trials per participant, some from above the hypothesized threshold, some from below the hypothesized threshold \newdo{hold back on the example. Rather, describe the psychophysics model generally (don't forget to include literature references) and then apply it to the special case of this example. } (in this case, some with $w=0$ and some with $w=1$). These trials are then averaged to obtain a single threshold value. For this model, we will thus have to additionally exclude data from participants who did not complete one trial starting at 0 and one trial starting at 1 for each stimulus (so a participant who completed both $x$ trials and a $y$ trial starting at 0 would not be included when determining the optimal weight for $y$). \Sexpr{length(unique(user.avg.all$fingerprint))} users had sufficient data to calculate user-level optimum weights for one or both transformations using this method.
 
 For each participant $i$ and trial $j$ of trial type $T_{ij}$ with starting weight $X_{ij}$
 
@@ -1544,6 +1544,9 @@ ggplot(data=user.avg.all) +
 \caption{Distribution of participant-level means using the standard method of limits analysis described in \citet{goldstein}. The overall means are both near 0.4, however, there is quite a bit of user-level variability. }
 \end{figure}
 As a result, according to this analysis, the optimum transformation value for $x$ is \Sexpr{round(user.avg.x, 2)}, and the optimum transformation value for $y$ is \Sexpr{round(user.avg.y, 2)}. In addition, only \Sexpr{nrow(subset(user.avg.all, avg<0 | avg > 1))} user averages were outside of the range of (0,1) for either trial. While these results suggest that the transformation is useful and that complete transformation is not necessary, we can get more precise bounds on the range of acceptable transformation weights using a linear model that can incorporate starting points other than 0 and 1, as well as data from users that completed a sufficient number of trials but did not complete a trial starting at one of the endpoints. 
+
+\newdo{My attempt at a summary of this whole paragraph: A traditional approach from psychometrics (citation) to analyze this kind of data would be a XXX model (citation). However, the analysis would only allows us to make use of starting weights 0 and 1, while the results are a single estimate of an optimal adjustment under each transformation. XXX results. 
+However, this approach is too limiting, and we will instead make use of a random effects model, that not only allows us to produce a range of acceptable adjustments but also helps us with adjustment for user-specific ability and variability.}
 
 \paragraph{Linear Model}
 Training trials were included in the analysis after a fixed effects model incorporating type, starting weight, and training showed that there was no evidence of a significant difference between trials with and without the original mean function on the graph ($p(>|t|) = $\Sexpr{round(summary(fixedmodel)$coefficients['trainingTRUE',4], 4)}). 
