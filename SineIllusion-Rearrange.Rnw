@@ -1310,25 +1310,27 @@ f <- sin
 fprime <- cos
 f2prime <- function(x) -sin(x)
 dframe <- createSine(40 , len=1, f=f, fprime=fprime, f2prime=f2prime)
-wlow <- -2.5
-whigh <- 3.5
+wlowy <- -2.5
+whighy <- 3.5
+wlowx <- -2
+whighx <- 2
 ycorrlow <- with(dframe, data.frame(x=x, xstart=xstart, xend=xend, 
-                                    y=y, ystart = y - ((1-wlow)*ell/2 + (wlow)*ellx4.l), 
-                                    yend = y + ((1-wlow)*ell/2 + (wlow)*ellx4.u),
+                                    y=y, ystart = y - ((1-wlowy)*ell/2 + (wlowy)*ellx4.l), 
+                                    yend = y + ((1-wlowy)*ell/2 + (wlowy)*ellx4.u),
                                     corr = "Y", level = "low"))
 ycorrhigh <- with(dframe, data.frame(x=x, xstart=xstart, xend=xend, 
-                                     y=y, ystart = y - ((1-whigh)*ell/2+(whigh)*ellx4.l), 
-                                     yend = y + ((1-whigh)*ell/2 + (whigh)*ellx4.u),
+                                     y=y, ystart = y - ((1-whighy)*ell/2+(whighy)*ellx4.l), 
+                                     yend = y + ((1-whighy)*ell/2 + (whighy)*ellx4.u),
                                      corr = "Y", level = "high"))
 
-xcorrlow <- with(dframe, data.frame(x=correctx(x, fprime, w=wlow), 
-                                    xstart=correctx(x, fprime, w=wlow),
-                                    xend=correctx(x, fprime, w=wlow), 
+xcorrlow <- with(dframe, data.frame(x=correctx(x, fprime, w=wlowx), 
+                                    xstart=correctx(x, fprime, w=wlowx),
+                                    xend=correctx(x, fprime, w=wlowx), 
                                     y=y, ystart=ystart, yend=yend,
                                     corr = "X", level = "low"))
-xcorrhigh <- with(dframe, data.frame(x=correctx(x, fprime, w=whigh), 
-                                    xstart=correctx(x, fprime, w=whigh),
-                                    xend=correctx(x, fprime, w=whigh), 
+xcorrhigh <- with(dframe, data.frame(x=correctx(x, fprime, w=whighx), 
+                                    xstart=correctx(x, fprime, w=whighx),
+                                    xend=correctx(x, fprime, w=whighx), 
                                     y=y, ystart=ystart, yend=yend,
                                     corr = "X", level = "high"))
 correction.extremes <- rbind(ycorrlow,ycorrhigh,xcorrlow,xcorrhigh)
@@ -1348,18 +1350,28 @@ library(lubridate)
 trial.sequence$time2 <- ymd_hms(trial.sequence$time2)
 
 # ------ Data Cleaning ------#
-is.outlier <- function(x){
+wlowy <- -2.5
+whighy <- 3.5
+wlowx <- -2
+whighx <- 2
+
+is.outlier <- function(z, type){
 #   qs <- as.numeric(quantile(x, c(.25, .75)))
 #   iqr <- diff(qs)
 #   lims <- qs + c(-1, 1)*1.5*iqr
 #   !(x>=lims[1] & x <= lims[2]) & !(x>=-1 & x<=2)
-  !(x>=wlow & x<=whigh)
+  wlow <- c(wlowx, wlowy)
+  whigh <- c(whighx, whighy)
+  names(wlow) <- c("x", "y")
+  names(whigh) <- c("x", "y")
+#  browser()
+  !(z>=wlow[type] & z<=whigh[type])
 }
 
 trial.sum <- ddply(trial.sum, .(startweight), transform, 
                       incl.startwt = startweight<=1 & startweight>=0,
                       incl.trials = ntrials>3,
-                      endwt.outlier = is.outlier(endweight)) 
+                      endwt.outlier = is.outlier(endweight, as.character(type))) 
 # compute outliers for each possible start weight
 
 # #--- Plot to compare bivar. density before/after trimming
@@ -1508,7 +1520,9 @@ As this study was done outside a laboratory setting, we can not tell a participa
 \begin{itemize}
 \item Participant did not interact with the applet: we required a participant to use the adjustment at least once in order to include data for this trial. 
 \item Participants finished fewer than four trials: while participants were asked to complete twelve trials, some did not finish all of those. In order to stabilize predictions of random effects, participants' data was excluded, if there were fewer than four trials (\Sexpr{nparticipants-nparttrials} out of a total of \Sexpr{nparticipants} participants).
-\item Out-of-bounds results: weights leading to severely over- or undercorrected results were excluded from the analysis. Figure~\ref{fig:overtransform} shows results at the threshold of acceptability. Only more severely distorted results were excluded from the analysis (\Sexpr{noutliers.x} $x$ and \Sexpr{noutliers.y} $y$ trials out of \Sexpr{ntrials2} trials remaining after application of other criteria).
+\item Out-of-bounds results: weights leading to severely over- or undercorrected results were excluded from the analysis. 
+For trials to adjust $y$-values, weights outside of [\Sexpr{wlowy}, \Sexpr{whighy}]  show dramatically unequal line lengths; weights from $x$-transformations outside the range of [\Sexpr{wlowx}, \Sexpr{whighx}] do not preserve the underlying function shape and concavity 
+Figure~\ref{fig:overtransform} shows results at the threshold of acceptability. Only more severely distorted results were excluded from the analysis (\Sexpr{noutliers.x} $x$ and \Sexpr{noutliers.y} $y$ trials out of \Sexpr{ntrials2} trials remaining after application of other criteria).
 \end{itemize}
 
 % \newtext{After removing data according to these criteria, we noticed that there were many responses for the $x$ correction that tended towards the endpoints of the weight value. These responses indicated that the participant did not attempt to maintain the underlying function, and the trials should thus be excluded from calculation of the optimal weight. This occurs as a result of an artifact of the x correction which enables participants to more easily perceive a three-dimensional image at corrections outside of [0,1] at the expense of the underlying mean function, as shown in figure \ref{fig:overtransform}.}
@@ -1516,11 +1530,11 @@ As this study was done outside a laboratory setting, we can not tell a participa
 
 \begin{figure}[htbp]\centering
 \includegraphics[keepaspectratio=TRUE,width=.9\linewidth]{figure/fig-overcorrectlimits}
-\caption[Overcorrected transformations excluded from the analysis]{Transformation weights outside of the interval [\Sexpr{wlow}, \Sexpr{whigh}] produce figures which do not maintain the underlying function shape (in $x$) or which are composed of extremely uneven length lines (in $y$). Trials with final results that were more extreme than these examples were excluded from the analysis.}
+\caption[Overcorrected transformations excluded from the analysis]{Transformation weights outside of the intervals [\Sexpr{wlowy}, \Sexpr{whighy}] for $y$ and [\Sexpr{wlowx}, \Sexpr{whighx}] for $x$  produce figures which do not maintain the underlying function shape (in $x$) or which are composed of extremely uneven length lines (in $y$). Trials with final results that were more extreme than these examples were excluded from the analysis.}
 \label{fig:overtransform}
 \end{figure}
 
-In addition to the $x$ transformation artifact, there were a few user reports of applet lag, so that the only option to continue was to ``submit'' the trial (or ``skip'' it), even though the final graph had not rendered correctly; this resulted in a recorded value more extreme than the participant intended. To account for these technological difficulties, the exclusion criteria were applied to trials from both transformations. Importantly, in both types of trials, values outside of [\Sexpr{wlow}, \Sexpr{whigh}] demonstrate remarkable deviations from the criteria described to the participants; $x$ transformations outside of that range do not preserve the underlying function shape and concavity and $y$ transformations outside of that range show dramatically unequal line lengths. Hence, user values outside of these ranges likely indicate user noncompliance or equipment malfunction. Responses were removed if they fell outside the [\Sexpr{wlow}, \Sexpr{whigh}] interval (\Sexpr{noutliers.x} of type $X$  and \Sexpr{noutliers.y} type $Y$ trials, for a total of \Sexpr{noutliers} trials).
+%In addition to the $x$ transformation artifact, there were a few user reports of applet lag, so that the only option to continue was to ``submit'' the trial (or ``skip'' it), even though the final graph had not rendered correctly; this resulted in a recorded value more extreme than the participant intended. To account for these technological difficulties, the exclusion criteria were applied to trials from both transformations. Importantly, in both types of trials, values outside of [\Sexpr{wlow}, \Sexpr{whigh}] demonstrate remarkable deviations from the criteria described to the participants; $x$ transformations outside of that range do not preserve the underlying function shape and concavity and $y$ transformations outside of that range show dramatically unequal line lengths. Hence, user values outside of these ranges likely indicate user noncompliance or equipment malfunction. Responses were removed if they fell outside the [\Sexpr{wlow}, \Sexpr{whigh}] interval (\Sexpr{noutliers.x} of type $X$  and \Sexpr{noutliers.y} type $Y$ trials, for a total of \Sexpr{noutliers} trials).
 
 % In order to have a consistent rule for trial removal based on these artifacts, for each starting weight, responses more than 1.5*IQR from the upper and lower quartiles were removed if they fell outside the [0,1] interval (\Sexpr{noutliers.x} $x$ and \Sexpr{noutliers.y} $y$ trials, for a total of \Sexpr{noutliers} trials). Values outside the [0,1] interval were not removed unless they were also more than 1.5*IQR from the upper and lower quartiles. The higher number of $x$ trials excluded suggest that the unique feature of the $x$ transformation demonstrated above influenced some participant responses. 
 
@@ -1775,7 +1789,7 @@ As the slope is determined by the aspect ratio, we are free to choose it and w.l
 f(T_i(x)) = \pm a x + b_i.
 \]
 This means that $T_i$ is essentially an inverse of function $f$, with each piece defined by the   intervals on which the inverse of $f$ exists: let $\left\{x_0 = \min(x), x_1, ..., x_{K-1}, x_K = \max(x) \right\}$ be the set of values with local extrema enhanced by the boundaries of the $x$-range, i.e.  $f^\prime(x_i) = 0$ for  $i = 1, ... , K-1$ and $f^\prime(x) \neq 0$ for any other values of $x$. 
-Then each interval of the form $(x_{i-1}, x_i)$ defines one piece $T_i$ of the transfomation function $T(x)$. We will define $T_i$ now as a combination of a linear scaling function and the inverse of $f$, which we know exists for interval $(x_{i-1}, x_i)$.
+Then each interval of the form $(x_{i-1}, x_i)$ defines one piece $T_i$ of the transformation function $T(x)$. We will define $T_i$ now as a combination of a linear scaling function and the inverse of $f$, which we know exists for interval $(x_{i-1}, x_i)$.
 
 Let function $s = \s{[a,b]}{[c,d]}$ be the linear scaling function that maps  the interval $(a,b)$ linearly to the interval $(c,d)$. This function is formally defined as
 \[
