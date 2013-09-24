@@ -1217,33 +1217,42 @@ Note that for the quadratic correction in $y$ half-segment lengths must be weigh
 
 \section{Transformations in Practice -- a User Study}
 
-In order to more fully understand the sine illusion and test the proposed corrections, we created an applet to both serve as a testing environment and allow users to interact with the illusion and corrections.
+In order to more fully understand the sine illusion and test the proposed corrections, we created an applet to allow users to investigate the illusion's prominence with respect to its parameters. Users can examine the sine illusion by changing line length, the function's amplitude, and compare corrections in $x$-axis and $y$-values to uncorrected data.  All corrections proposed in this paper are  implemented in the applet located at \url{http://glimmer.rstudio.com/srvanderplas/SineIllusion/}.
 
-An applet demonstrating the effect of changing parameter values on the strength of the illusion as well as all of the correction factors we propose in this paper is available at \url{http://glimmer.rstudio.com/srvanderplas/SineIllusion/}. Users can examine the sine illusion, changing line length and function amplitude, and compare corrections in $x$-axis and $y$-values to uncorrected data. 
+We employed a second applet to collect data on users' preferences on the amount of correction used, i.e.~we are interested in identifying the `optimal'  setting for the weights  in each of the corrections. %The applet for collecting data is much more  strictly controlled (users cannot select the correction type or the initial weight used)  to allow for random assignment of trial order.  
 
-A second applet ...
-\todo{now describe the applet to collect data}
+This applet presents users with a graph that is the result of a correction in $x$ or $y$ with a randomly selected starting weight value (as used in eqns (\ref{eqn.xtrans.weighted}) and (\ref{eqn.ytrans.weighted})).
+Depending on whether the illusion is present at the starting value, users are asked to adjust the graph until the illusion  (a) is no longer apparent (adjustment of weights from the bottom) or (b) becomes visible (adjustments of weights from the top).
+This adjustment is done by clicking on a plus/minus button to either increase the amount of correction used or decrease it. Underlying this adjustment is the value of the weight $w$ as defined in eqns.~(\ref{eqn.xtrans.weighted}) and~(\ref{eqn.ytrans.weighted}), though the numerical value of $w$ was hidden from the user to prevent anchoring to a specific numerical value.
+A low  initial weight ($w_0$ close to 0) indicates that the amount of correction is low; the response from a trial like this will give us an idea of the minimal amount of weight necessary to break the illusion. A high initial weight ($w_0$ close to 1) indicates that the data is fully corrected. Asking participants to reduce the amount of adjustment until the lines appear to be the same length assumes that the correction is overcorrecting in practice, and a response from this type of trial gives us an upper boundary for the amount of weighting preferred. Generally, responses from these different types of trials do not result in the same threshold weight, but rather lead to a range of acceptable weights.
 
+%That is, if the optimal weight is 0, the corrections are not effective at reducing the effect of the illusion; if the optimal weight is 1, the full correction is necessary to reduce the illusion. 
+It is of additional interest to determine whether and how much this optimal weight is subject-specific or population-based, whether the optimal weight depends on the initial weight, and how much within-subject variability we find compared to between-subject variability. 
 
-Both applets are implemented in {\tt shiny} \citep{shiny}. 
-
-
-We deployed the applet to participants recruited online, collecting their responses and other metadata. The results of the analysis suggest that the correction factors in $X$ and $Y$ are both preferrable to uncorrected data, but that full correction is not necessary to break the illusion.
-
-The goal of the study is to determine an overall `optimal' setting for the weights in each of the correction factors. That is, if the optimal weight is 0, the corrections are not effective at reducing the effect of the illusion; if the optimal weight is 1, the full correction is necessary to reduce the illusion. It is of additional interest to determine whether and how much this setting is subject-specific or population-based, whether the optimal setting depends on the starting value, and how much within-subject variability we find compared to between-subject variability. 
-
-%\subsection{Applet Description}
-
+%A second applet ...
+%\todo{now describe the applet to collect data}
 
 \begin{figure}\centering
 \includegraphics[width=.9\linewidth]{images/shiny.pdf}
 \caption{\label{fig:shiny.app} Screenshot of the shiny application used to collect information of observers' preference with respect to an optimal correction for the illusion under each of the  transformations discussed in the previous section. }
 \end{figure}
 
+Figure~\ref{fig:shiny.app} shows a screenshot of the applet used to collect user data. This applet is also available online at \url{http://glimmer.rstudio.com/srvanderplas/SineIllusionShiny/}. 
+As the line length and function are controlled in this app, we used the linear transformation for adjusting $y$ values; the transformation does not break under any combination of parameters tested in this experiment. 
 
-Figure~\ref{fig:shiny.app} shows a screenshot of the applet used to collect user data. This applet is also available online at \url{http://glimmer.rstudio.com/srvanderplas/SineIllusionShiny/}. This applet presents users with a graph that is the result of a correction in $x$ or $y$ with a randomly selected starting weight value. Underlying this adjustment is the value of the weight $w$ as defined in eqns.~\ref{eqn.xtrans.weighted} and~\ref{eqn.ytrans.weighted}, though the numerical value of $w$ was hidden from the user to prevent anchoring to a specific numerical value.  The applet used in data collection is much more strictly controlled (as users cannot select the correction type or starting weight value) to allow for random assignment of trial order.  
 
-As the line length and function are controlled in this app, we used the linear transformation in $y$; the transformation does not break under any combination of parameters tested in this experiment. 
+
+
+Both applets are implemented in {\tt shiny} \citep{shiny}. 
+
+
+We deployed the applet to participants recruited online, collecting their responses and other metadata. The results of the analysis suggest that the correction factors in $X$ and $Y$ are both preferrable to uncorrected data, but that a full correction is not necessary to break the illusion.
+
+%The goal of the study is to determine an overall `optimal' setting for the weights in each of the correction factors. 
+
+%\subsection{Applet Description}
+
+
 
 % 
 % 
@@ -1254,41 +1263,43 @@ As the line length and function are controlled in this app, we used the linear t
 diffs <- c(0, .5, .5, .5, .5, .25, .25, .25, .25, .25, .25, .25, .25, .1, .1, .05, .05, .05, .05, .05, .05, .025, .025, .025, .025, .025, .025, .025, .025, .025, .025, .025, .025, .05, .05, .05, .05, .1, .1, .1, .1, .1, .25, .25, .25, .25, .25, .25, .5, .5, .5, .5)
 wopts <- -4 +cumsum(diffs)
 #qplot(x=wopts, geom="density") + geom_rug() + theme_bw() + ylab("Kernel Density") + xlab("w") + ggtitle("Distribution of w")
-w01 <- wopts[(wopts < 1) & (wopts > 0)]
-qplot(wopts, rep(1, length=length(wopts)), geom="point") + geom_vline(xintercept =c(0,1), colour="grey80") + theme_bw() + ylab("") + ylim(c(0.8, 1.2)) + xlab("Starting weight") + geom_point(aes(x=w01, y=rep(1, length(w01))), pch=1, size=4) + theme(axis.ticks.y=element_blank(), axis.text.y=element_blank())  + geom_point(aes(x=c(0,1), y=rep(1, 2)), pch=1, size=6) + theme(axis.ticks.y=element_blank(), axis.text.y=element_blank()) + xlim(c(-2,3))
+w01 <- wopts[(wopts <= 0.75) & (wopts >= 0.25)]
+qplot(wopts, rep(1, length=length(wopts)), geom="point") + geom_vline(xintercept =c(0,1), colour="grey80") + theme_bw() + ylab("") + ylim(c(0.8, 1.2)) + xlab("Starting weight") + geom_point(aes(x=w01, y=rep(1, length(w01))), pch=1, size=4) + theme(axis.ticks.y=element_blank(), axis.text.y=element_blank())  + geom_point(aes(x=c(0, 1), y=rep(1, 2)), pch=1, size=6) + theme(axis.ticks.y=element_blank(), axis.text.y=element_blank()) + xlim(c(-0.25,1.21))
 @
 
 \subsection{Study Design}
-\newtext{The study aims to determine the ``optimal'' transformation weight for each transformation type. Psychophysics methodology typically approaches threshold estimation by using the method of adjustment, where a stimulus is provided at a starting point above or below the hypothesized optimal value and the participant adjusts the stimulus until the stated goal is met (in this case, until the lines appear to have equal length). It is expected that there will be a difference in user-reported values from below and from above, and these values are typically averaged to produce a single threshold value. Beyond averaging these values, we use a mixed model to compare user responses for different starting points in a more continuous fashion, incorporating some of the advantages of the method of constant stimuli to more robustly estimate the optimal transformation weight. For a review of general psychophysics methodology, the method of adjustment, and the method of constant stimuli, see \citet{goldstein}.
+The study aims to determine the ``optimal'' transformation weight for each transformation type. Psychophysics methodology typically approaches threshold estimation by using the method of adjustment \citep{goldstein}, where  stimuli are provided showing states both above and below the hypothesized optimal value and  participants adjust  until the stated goal is met (in this case, until the lines appear to have equal length). It is expected that there will be a difference in user-reported values from below and from above, and these values are typically averaged to produce a single threshold value. Beyond averaging these values, we use a mixed model to compare user responses for different starting points in a more continuous fashion, incorporating some of the advantages of the method of constant stimuli to more robustly estimate the optimal transformation weight. % For a review of general psychophysics methodology, the method of adjustment, and the method of constant stimuli, see \citet{goldstein}.
 
-The study is set up as a fractional factorial design of correction type ($x$ or $y$ correction) and starting weight $w_0$. Each participant is asked to evaluate a total of twelve situations, six of each correction type, though they are allowed to complete up to 30 trials if they wish. For the first six starting weights $w_0$ values were chosen with equal probability from the set of numbers $\{0, 1, c\}$, where $c \sim U(.25, .75)$, while the second set of starting weights is randomly sampled from a distribution centered at 0.6 with mass on discrete values in the interval $(-4, 5)$, shown in figure \ref{fig:weightdist}. The distribution was chosen to have a higher coverage density around 0.6 after a pilot study indicated a preference for that value. Using a distribution with a wide range of coverage allows us to fully explore the space of plausible $w$ while focusing on weights in the $(0,1)$ interval. Table \ref{factortable} summarizes the factors under investigation in the experiment.
-}
-\newdo{What is the actual range of $c$ used in the analysis of the data? I thought you had cut it back to weights between 0 and 1. If that is the case the discussion here should reflect that.}
+The study is set up as a fractional factorial design of correction type ($x$ or $y$ correction) and starting weight $w_0$. Each participant is asked to evaluate a total of twelve situations, six of each correction type.%, though they are allowed to complete up to 30 trials if they wish. 
+For the first six starting weights $w_0$ values were chosen with equal probability from the set of numbers $\{0, 1, c\}$, where $c \sim U(.25, .75)$, while the second set of starting weights is randomly sampled from a distribution centered at 0.6 with mass on discrete values in the interval $(-0.2, 1.2)$, as shown in figure \ref{fig:weightdist}. The distribution was chosen to have a higher coverage density around 0.6 after a pilot study indicated a preference for that value. Using a distribution with a wide coverage allows us to fully explore the space of plausible weight $w$ while focusing on the $(0,1)$ interval. %Table \ref{factortable} summarizes the factors under investigation in the experiment.
+
 \begin{figure}[h]\centering
 \includegraphics[keepaspectratio=TRUE,width=\linewidth]{figure/fig-study-weight-dist}
 \caption{Overview of possible starting weights. Weight values are discrete, but staggered so as to provide fine-grained adjustments around 0.6 and more coarse discriminatory information outside of $(0,1)$. Hollow circles indicate choices of starting weights for the first six values, filled circles represent starting weights for trials beyond the first six. All weights (with the exception of 0 and 1) are selected with equal probability.}\label{fig:weightdist}
 \end{figure}
 
-% setup of the study
-\begin{table}[htbp]\centering
-\begin{tabular}{ccc}
-Factor & Stage & Values \\\hline
-Transformation & Trial no  & $X$, $Y$\\
-\multirow{2}{*}{Weight} & $ \le 6$ & $0, 1, c \in (.25, .75)$\\
-& $> 6$ & $c \in [-4, 5]$ \\
-\end{tabular}
-\caption{Summary of factors in the experiment. \newdo{you wanted to check on the  limits.}}\label{factortable}
-\end{table}
+% % setup of the study
+% \begin{table}[htbp]\centering
+% \begin{tabular}{ccc}
+% Factor & Stage & Values \\\hline
+% Transformation & Trial no  & $X$, $Y$\\
+% \multirow{2}{*}{Weight} & $ \le 6$ & $0, 1, c \in (.25, .75)$\\
+% & $> 6$ & $c \in [-4, 5]$ \\
+% \end{tabular}
+% \caption{Summary of factors in the experiment. \newdo{you wanted to check on the  limits.}}\label{factortable}
+% \end{table}
 
 %Once a participant arrives at the site, he/she 
 % Each participant is presented with a specific setting of the weight $w$, where for the first six evaluations $w$ is randomly chosen from the set of numbers $\{0, 1, c\}, c\in(.25, .75)$. The first six stimuli consist of the sine illusion, corrected in $x$ or $y$ with weight $w$, so that each participant is exposed to a factorial combination of three weights and the two correction types. Participants are free to adjust up to thirty graphs, so after the initial six, $w$ is randomly sampled from distribution centered at 0.6 with mass on $(-4, 5)$. %wopts and graph are in study-weight-dist above
 % This allows us to fully explore the space of plausible $w$ while focusing on weights in the $(0,1)$ interval.
 
 %The range of weight values the shiny app allows follows the full distribution of $w$ described above, so possible weight values are between $(-4, 5)$. 
-Participants adjust the graph using increment and decrement buttons, and click ``submit'' to proceed to the next stimuli when they are satisfied with the adjustment. This provides a clear starting value and ending value, allowing us to assess the range of optimal values for each participant. Two ``training'' trials were provided that additionally superimposed a graph of the underlying mean function to give participants some idea of the underlying function the lines represent. This approach was taken to reduce the incidence of extremely high ``x'' correction values, because when $w>\!\!>1$, the lines still look to be of equal length but the underlying function bears little resemblance to $\sin(x)$, as shown in figure \ref{fig:overtransform}. 
+A single `trial' begins with the presentation of a graph at the chosen starting weight, and ends when the participant submits the trial. Participants adjust the graph using increment and decrement buttons, and click ``submit'' to proceed to the next stimuli when they are satisfied with the adjustment. This provides a clear starting value and ending value, allowing us to assess the range of optimal values for each participant. In addition to transformation weight, type, and user submission, time-series data for each user interaction was recorded, as well as anonymized user data (partial IP address, hashed IP address, and hashed browser characteristics) sufficient to provide a user `fingerprint' to distinguish and recognize individual users. 
+
+Two ``training'' trials were provided that additionally superimposed a graph of the underlying mean function to give participants some idea of the underlying function the lines represent. This approach was taken to reduce the incidence of extremely high ``x'' correction values, because large adjustment values do not change the impression of same line length, but the resulting function bears little resemblance to a sine function, see figure~\ref{fig:overtransform} for examples of overcorrection. %because when $w>\!\!>1$, the lines still look to be of equal length but the underlying function bears little resemblance to $\sin(x)$, as shown in figure \ref{fig:overtransform}. 
 
 
-A single `trial' begins with the presentation of a graph at the chosen starting weight, and ends when the participant submits the trial. In addition to transformation weight, type, and user submission, time-series data for each user interaction was recorded, as well as anonymized user data (partial IP address, hashed IP address, and hashed browser characteristics) sufficient to provide a user `fingerprint' to distinguish and recognize distinct users. 
+
 
 \subsection{Results}
 % Data preparation
@@ -1513,8 +1524,8 @@ In addition to the $x$ transformation artifact, there were a few user reports of
 
 % In order to have a consistent rule for trial removal based on these artifacts, for each starting weight, responses more than 1.5*IQR from the upper and lower quartiles were removed if they fell outside the [0,1] interval (\Sexpr{noutliers.x} $x$ and \Sexpr{noutliers.y} $y$ trials, for a total of \Sexpr{noutliers} trials). Values outside the [0,1] interval were not removed unless they were also more than 1.5*IQR from the upper and lower quartiles. The higher number of $x$ trials excluded suggest that the unique feature of the $x$ transformation demonstrated above influenced some participant responses. 
 
-Once outliers were removed, each participant completed an average of  \Sexpr{round(trials.per.participant, 2)} trials. As there were only \Sexpr{sum(!trial.sum$incl.startwt & trial.sum$incl.trials & !trial.sum$endwt.outlier)} trials with starting weight outside of [0,1] which met the other inclusion criteria, those trials were eliminated from the analysis to prevent high-influence points from adversely influencing the model. 
-\newdo{This last paragraph has to go - we can't exclude values just for being extreme. Instead, change the study setup.}
+%Once outliers were removed, each participant completed an average of  \Sexpr{round(trials.per.participant, 2)} trials. As there were only \Sexpr{sum(!trial.sum$incl.startwt & trial.sum$incl.trials & !trial.sum$endwt.outlier)} trials with starting weight outside of [0,1] which met the other inclusion criteria, those trials were eliminated from the analysis to prevent high-influence points from adversely influencing the model. 
+%\newdo{This last paragraph has to go - we can't exclude values just for being extreme. Instead, change the study setup.}
 
 
 \newdo{I'm still not convinced that we need to go there. Rather, you could put the whole discussion in a one sentence paragraph in the conclusions section. The model is worse than the stats approach, its results are less interpretable, and it doesn't allow us to use the full data. That's three strikes and out.}

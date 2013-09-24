@@ -59,5 +59,5 @@ correct <- function(x, y, data, type){
 datasub <- read.csv("data/Ozone/Ozone-subset.csv")
 temp <- correct("Tmax", "Ozone", datasub, type="x")
 qplot(data=temp, x=Tmax.correctx, y=Ozone)
-temp <- correct("Tmax", "Ozone", datasub, type="y")
-qplot(data=temp, x=Tmax, y=Ozone.correcty)
+temp2 <- correct("Tmax", "Ozone", datasub, type="y")
+qplot(data=temp2, x=Tmax, y=Ozone.correcty)
