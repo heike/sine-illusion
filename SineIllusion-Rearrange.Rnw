@@ -1254,19 +1254,28 @@ As the line length and function are controlled in this app, we used the linear t
 diffs <- c(0, .5, .5, .5, .5, .25, .25, .25, .25, .25, .25, .25, .25, .1, .1, .05, .05, .05, .05, .05, .05, .025, .025, .025, .025, .025, .025, .025, .025, .025, .025, .025, .025, .05, .05, .05, .05, .1, .1, .1, .1, .1, .25, .25, .25, .25, .25, .25, .5, .5, .5, .5)
 wopts <- -4 +cumsum(diffs)
 #qplot(x=wopts, geom="density") + geom_rug() + theme_bw() + ylab("Kernel Density") + xlab("w") + ggtitle("Distribution of w")
-w01 <- wopts[(wopts < 1) & (wopts > 0)]
-qplot(wopts, rep(1, length=length(wopts)), geom="point") + geom_vline(xintercept =c(0,1), colour="grey80") + theme_bw() + ylab("") + ylim(c(0.8, 1.2)) + xlab("Starting weight") + geom_point(aes(x=w01, y=rep(1, length(w01))), pch=1, size=4) + theme(axis.ticks.y=element_blank(), axis.text.y=element_blank())  + geom_point(aes(x=c(0,1), y=rep(1, 2)), pch=1, size=6) + theme(axis.ticks.y=element_blank(), axis.text.y=element_blank()) + xlim(c(-2,3))
+# w01 <- wopts[(wopts < 1) & (wopts > 0)]
+w01 <- wopts[(wopts<=.75 & wopts>=.25))]
+qplot(wopts, rep(1, length=length(wopts)), geom="point") + 
+  geom_vline(xintercept =c(0,1), colour="grey80") + 
+  theme_bw() + 
+  ylab("") + ylim(c(0.8, 1.2)) + 
+  xlab("Starting weight") + xlim(c(-.2,1.2)) + 
+  geom_point(aes(x=w01, y=rep(1, length(w01))), pch=1, size=4) + 
+  theme(axis.ticks.y=element_blank(), axis.text.y=element_blank())  + 
+  geom_point(aes(x=c(0,1), y=rep(1, 2)), pch=1, size=6) + 
+  theme(axis.ticks.y=element_blank(), axis.text.y=element_blank())
 @
 
 \subsection{Study Design}
 \newtext{The study aims to determine the ``optimal'' transformation weight for each transformation type. Psychophysics methodology typically approaches threshold estimation by using the method of adjustment, where a stimulus is provided at a starting point above or below the hypothesized optimal value and the participant adjusts the stimulus until the stated goal is met (in this case, until the lines appear to have equal length). It is expected that there will be a difference in user-reported values from below and from above, and these values are typically averaged to produce a single threshold value. Beyond averaging these values, we use a mixed model to compare user responses for different starting points in a more continuous fashion, incorporating some of the advantages of the method of constant stimuli to more robustly estimate the optimal transformation weight. For a review of general psychophysics methodology, the method of adjustment, and the method of constant stimuli, see \citet{goldstein}.
 
-The study is set up as a fractional factorial design of correction type ($x$ or $y$ correction) and starting weight $w_0$. Each participant is asked to evaluate a total of twelve situations, six of each correction type, though they are allowed to complete up to 30 trials if they wish. For the first six starting weights $w_0$ values were chosen with equal probability from the set of numbers $\{0, 1, c\}$, where $c \sim U(.25, .75)$, while the second set of starting weights is randomly sampled from a distribution centered at 0.6 with mass on discrete values in the interval $(-4, 5)$, shown in figure \ref{fig:weightdist}. The distribution was chosen to have a higher coverage density around 0.6 after a pilot study indicated a preference for that value. Using a distribution with a wide range of coverage allows us to fully explore the space of plausible $w$ while focusing on weights in the $(0,1)$ interval. Table \ref{factortable} summarizes the factors under investigation in the experiment.
+The study is set up as a fractional factorial design of correction type ($x$ or $y$ correction) and starting weight $w_0$. Each participant is asked to evaluate a total of twelve situations, six of each correction type, though they are allowed to complete up to 30 trials if they wish. For the first six starting weights $w_0$ values were chosen with equal probability from the set of numbers $\{0, 1, c\}$, where $c \sim U(.25, .75)$, while the second set of starting weights is randomly sampled from a distribution centered at 0.6 with mass on discrete values in the interval $[0,1]$, shown in figure \ref{fig:weightdist}. The distribution was chosen to have a higher coverage density around 0.6 after a pilot study indicated a preference for that value. Using a distribution with a wide range of coverage allows us to fully explore the space of plausible $w$ while focusing on weights near the center of the $(0,1)$ interval. Table \ref{factortable} summarizes the factors under investigation in the experiment.
 }
-\newdo{What is the actual range of $c$ used in the analysis of the data? I thought you had cut it back to weights between 0 and 1. If that is the case the discussion here should reflect that.}
+\done{What is the actual range of $c$ used in the analysis of the data? I thought you had cut it back to weights between 0 and 1. If that is the case the discussion here should reflect that.}
 \begin{figure}[h]\centering
 \includegraphics[keepaspectratio=TRUE,width=\linewidth]{figure/fig-study-weight-dist}
-\caption{Overview of possible starting weights. Weight values are discrete, but staggered so as to provide fine-grained adjustments around 0.6 and more coarse discriminatory information outside of $(0,1)$. Hollow circles indicate choices of starting weights for the first six values, filled circles represent starting weights for trials beyond the first six. All weights (with the exception of 0 and 1) are selected with equal probability.}\label{fig:weightdist}
+\caption{Overview of possible starting weights. Weight values are discrete, but staggered so as to provide fine-grained adjustments around 0.6 and more coarse discriminatory information outside of $(0,1)$. Hollow circles indicate choices of starting weights for the first 6 trials, filled circles represent starting weights available for the remaining trials. All weights (with the exception of 0 and 1) are selected with equal probability.}\label{fig:weightdist}
 \end{figure}
 
 % setup of the study
@@ -1275,7 +1284,7 @@ The study is set up as a fractional factorial design of correction type ($x$ or 
 Factor & Stage & Values \\\hline
 Transformation & Trial no  & $X$, $Y$\\
 \multirow{2}{*}{Weight} & $ \le 6$ & $0, 1, c \in (.25, .75)$\\
-& $> 6$ & $c \in [-4, 5]$ \\
+& $> 6$ & $c \in [0,1]$ \\
 \end{tabular}
 \caption{Summary of factors in the experiment. \newdo{you wanted to check on the  limits.}}\label{factortable}
 \end{table}
@@ -1511,10 +1520,7 @@ As this study was done outside a laboratory setting, we can not tell a participa
 
 In addition to the $x$ transformation artifact, there were a few user reports of applet lag, so that the only option to continue was to ``submit'' the trial (or ``skip'' it), even though the final graph had not rendered correctly; this resulted in a recorded value more extreme than the participant intended. To account for these technological difficulties, the exclusion criteria were applied to trials from both transformations. Importantly, in both types of trials, values outside of [\Sexpr{wlow}, \Sexpr{whigh}] demonstrate remarkable deviations from the criteria described to the participants; $x$ transformations outside of that range do not preserve the underlying function shape and concavity and $y$ transformations outside of that range show dramatically unequal line lengths. Hence, user values outside of these ranges likely indicate user noncompliance or equipment malfunction. Responses were removed if they fell outside the [\Sexpr{wlow}, \Sexpr{whigh}] interval (\Sexpr{noutliers.x} of type $X$  and \Sexpr{noutliers.y} type $Y$ trials, for a total of \Sexpr{noutliers} trials).
 
-% In order to have a consistent rule for trial removal based on these artifacts, for each starting weight, responses more than 1.5*IQR from the upper and lower quartiles were removed if they fell outside the [0,1] interval (\Sexpr{noutliers.x} $x$ and \Sexpr{noutliers.y} $y$ trials, for a total of \Sexpr{noutliers} trials). Values outside the [0,1] interval were not removed unless they were also more than 1.5*IQR from the upper and lower quartiles. The higher number of $x$ trials excluded suggest that the unique feature of the $x$ transformation demonstrated above influenced some participant responses. 
-
-Once outliers were removed, each participant completed an average of  \Sexpr{round(trials.per.participant, 2)} trials. As there were only \Sexpr{sum(!trial.sum$incl.startwt & trial.sum$incl.trials & !trial.sum$endwt.outlier)} trials with starting weight outside of [0,1] which met the other inclusion criteria, those trials were eliminated from the analysis to prevent high-influence points from adversely influencing the model. 
-\newdo{This last paragraph has to go - we can't exclude values just for being extreme. Instead, change the study setup.}
+Once outliers were removed, each participant completed an average of  \Sexpr{round(trials.per.participant, 2)} trials.
 
 
 \newdo{I'm still not convinced that we need to go there. Rather, you could put the whole discussion in a one sentence paragraph in the conclusions section. The model is worse than the stats approach, its results are less interpretable, and it doesn't allow us to use the full data. That's three strikes and out.}
