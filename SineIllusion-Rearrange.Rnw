@@ -1516,11 +1516,11 @@ ggplot() + theme_bw() + facet_grid(type~., scales="free") +
   geom_point(data=ints.all, aes(x=xmax, y=0, size=factor("Range")), shape=NA, colour="grey75") +
   guides(colour=guide_legend(order=1), fill=guide_legend(order=1), size=guide_legend("Range of acceptable weights", override.aes=list(shape=15, size = 10), order=3)) +
   geom_text(data=ints, aes(x=x, y=27.5, label=label), parse=TRUE) + ylim(c(0,30))
-
 @
-Participants were recruited from Amazon Mechanical Turk and the \href{http://reddit.com/r/SampleSize}{reddit} community. \Sexpr{nparticipants} participants in total took part in the study with \Sexpr{ntrials} total evaluations. 
+Participants were recruited from Amazon Mechanical Turk and the \href{http://reddit.com/r/SampleSize}{reddit} community. %\Sexpr{nparticipants} participants in total took part in the study with \Sexpr{ntrials} total evaluations. 
 
 As this study was done outside a laboratory setting, we can not tell a participant's willingness to follow the guidelines and put in their best effort. This, besides potential technical issues (server outage, speed of response) make a careful selection of data going into the analysis unavoidable. The following exclusion criteria were used:
+\newdo{For consistency: make all references to correction types upper case letters $X$ and $Y$.}
 \begin{itemize}
 \item Participant did not interact with the applet: we required a participant to use the adjustment at least once in order to include data for this trial. 
 \item Participants finished fewer than four trials: while participants were asked to complete twelve trials, some did not finish all of those. In order to stabilize predictions of random effects, participants' data was excluded, if there were fewer than four trials (\Sexpr{nparticipants-nparttrials} out of a total of \Sexpr{nparticipants} participants).
@@ -1528,6 +1528,7 @@ As this study was done outside a laboratory setting, we can not tell a participa
 For trials to adjust $y$-values, weights outside of [\Sexpr{wlowy}, \Sexpr{whighy}]  show dramatically unequal line lengths; weights from $x$-transformations outside the range of [\Sexpr{wlowx}, \Sexpr{whighx}] do not preserve the underlying function shape and concavity 
 Figure~\ref{fig:overtransform} shows results at the threshold of acceptability. Only more severely distorted results were excluded from the analysis (\Sexpr{noutliers.x} $x$ and \Sexpr{noutliers.y} $y$ trials out of \Sexpr{ntrials2} trials remaining after application of other criteria).
 \end{itemize}
+\newtext{The following analysis is based on the cleaned data, consisting of \Sexpr{length(unique(lm.data$ipid))} participants with \Sexpr{nrow(lm.data)} valid trial results.}
 
 % \newtext{After removing data according to these criteria, we noticed that there were many responses for the $x$ correction that tended towards the endpoints of the weight value. These responses indicated that the participant did not attempt to maintain the underlying function, and the trials should thus be excluded from calculation of the optimal weight. This occurs as a result of an artifact of the x correction which enables participants to more easily perceive a three-dimensional image at corrections outside of [0,1] at the expense of the underlying mean function, as shown in figure \ref{fig:overtransform}.}
 
@@ -1554,7 +1555,7 @@ require(xtable)
 dt <- xtable(unique(user.avg.all[, c("type", "overall.avg")]))
 print(dt, include.rownames=FALSE)
 @
-\newdo{Could you make this a table and 95\% CI?}
+\newdo{Could you make this a table of means with 95\% CI?}
 
 %\paragraph{Psychophysics Model} Traditionally, the method of limits \done{what is the method of limits, and how does it fit into the psychophysics model? - this is explained in the section ``Study Design"} requires several trials per participant, some from above the hypothesized threshold, some from below the hypothesized threshold \newdo{hold back on the example. Rather, describe the psychophysics model generally (don't forget to include literature references) and then apply it to the special case of this example. } (in this case, some with $w=0$ and some with $w=1$). These trials are then averaged to obtain a single threshold value. For this model, we will thus have to additionally exclude data from participants who did not complete one trial starting at 0 and one trial starting at 1 for each stimulus (so a participant who completed both $x$ trials and a $y$ trial starting at 0 would not be included when determining the optimal weight for $y$). \Sexpr{length(unique(user.avg.all$fingerprint))} users had sufficient data to calculate user-level optimum weights for one or both transformations using this method.
 
@@ -1579,11 +1580,12 @@ print(dt, include.rownames=FALSE)
 
 \begin{figure}[htbp]\centering
 <<meanDists,echo=FALSE,out.width='.75\\linewidth', dependson='results-analysis', fig.width=7, fig.height=4, message=FALSE, warning=FALSE>>=
+user.avg.all$Type <- toupper(user.avg.all$type)
 ggplot(data=user.avg.all) + 
   geom_density(aes(x=avg, fill=type), alpha=0.8) + 
   geom_vline(aes(xintercept=overall.avg)) +
   geom_rug(aes(x=avg, colour=type)) +
-  facet_grid(type~.) +
+  facet_grid(Type~.) +
   scale_fill_manual("Transformation", values=c("#d6604d", "#4393c3"), guide="none") +
   scale_colour_manual("Transformation", values=c("#d6604d", "#4393c3"), guide="none") + 
   theme_bw() + theme(legend.position="bottom") +
@@ -1603,13 +1605,15 @@ While these results suggest that the transformation is useful and that complete 
 
 In order to account for user-level variability, we fit a random effects model for the adjusted weight value as a function of  starting weight and trial type, with a random intercept for each participant. 
 
-Participant $i$'s response for trial $j$, $W_{ij}$, was modeled as a function of the correction type $T(j)$  (where $T(j) \in $\{ X, Y\}), and starting weight $X_{ij}$, with a random intercept for participant. 
+\newdo{define ranges of i and j - how many participants did we have after the cleaning? - we should state that above.}
+\newtext{Let $W_{ij}$ denote the final adjustment to weight by participant $i$, $ 1 \le i \le XXX$, on trial $j$, $1 \le j \le n_i$. }
+We model the final weight $W_{ij}$ as a function of the correction type $T(i,j)$  (where $T(i,j) \in  \{X, Y\}$), and starting weight $X_{ij}$, with a random intercept for participant to account for subject-specific ability: 
 \begin{align}\label{model1}
-W_{ij} &= \alpha_{T(j)} + \beta X_{ij} + \gamma_i + \epsilon_{ij}\\
-\gamma_i &\sim N(0, \eta^2), 
-\epsilon_{ij} \sim N(0, \sigma^2), \text{ and } \text{Cov}(\gamma, \epsilon) = 0\notag 
+W_{ij} &= \alpha_{T(i,j)} + \beta X_{ij} + \gamma_i + \epsilon_{ij}\\
+& \gamma_i \sim N(0, \eta^2) \text{i.i.d.}, \ 
+\epsilon_{ij} \sim N(0, \sigma^2) \text{i.i.d., } \text{ and } \text{Cov}(\gamma, \epsilon) = 0\notag 
 \end{align}
-where $\alpha_{T(j)}$ is either $\alpha_X$ or $\alpha_Y$, describing the lower threshold of acceptable ranges for each of the types of correction, while $\alpha_X+\beta$ and $\alpha_Y + \beta$ describe the upper threshold of the range of acceptable weights for the respective correction.
+where $\alpha_{T(i,j)}$ is either $\alpha_X$ or $\alpha_Y$, describing the lower threshold of the acceptable range for each of the types of correction, while $\alpha_X+\beta$ and $\alpha_Y + \beta$ describe the upper thresholds for the respective correction.
 %
 %Below, $\alpha_X$ is used to model $W_{ij}$ if $T_{ij} = \text{"X"}$, otherwise, $\alpha_Y$ is used.
 % \begin{align}\label{modelfcns}
@@ -1617,19 +1621,22 @@ where $\alpha_{T(j)}$ is either $\alpha_X$ or $\alpha_Y$, describing the lower t
 % \end{align}
 %
 %This approach to model parameters suggests that $\alpha_X$ and $\alpha_Y$ should be interpreted as the lower bound of the interval of plausible weights and $\beta$ should be interpreted as the length of the interval of plausible weights. 
-$\beta$ should therefore be interpreted as the length of the interval of plausible weights. 
+$\beta$ can therefore be interpreted as the length of the interval of plausible weights. 
 Figure \ref{fig:MixedModelResults} shows density plots which demonstrate the relationship between the starting weight value and the user-submitted ``optimal'' weight value. 
+\newdo{describe the relationship in words}
 
-The fitted model parameters are shown in tables \ref{fixedeffectsresults} and \ref{randomeffectsresults}. We use MCMC simulation to generate responses for each correction type and each participant from the model, which we use to both  create user-level densities as well as population-based posterior densities for the model parameters, that allow us to report credibility intervals. 
+The fitted model parameters are shown in tables \ref{fixedeffectsresults} and \ref{randomeffectsresults}.
+\newdo{Summarise the findings of the table in words.} 
+We use MCMC simulation to generate responses for each correction type and each participant from the model, which we use to both  create user-level densities as well as population-based posterior densities for the model parameters that allow us to determine credibility intervals. 
 
 
-The variability of the random effects for each trial type are similar (\Sexpr{library(lme4); summary(model)@REmat[1,3]} for the overall variability as opposed to \Sexpr{summary(model2)@REmat[1,3]} and \Sexpr{summary(model2)@REmat[2,3]} for $y$ and $x$ transformations, respectively), so it is appropriate to fit a single variance for simplicity. Additionally, the interaction between starting weight and trial type was not significant, and was thus removed from the model ($p$-value = \Sexpr{anova(model, model3)$`Pr(>Chisq)`[2]}).
+The variability of the random effects for each trial type is similar (\Sexpr{library(lme4); summary(model)@REmat[1,3]} for the overall variability as opposed to \Sexpr{summary(model2)@REmat[1,3]} and \Sexpr{summary(model2)@REmat[2,3]} for $y$ and $x$ transformations, respectively), so it is appropriate to fit a single variance for simplicity. Additionally, the interaction between starting weight and trial type was not significant, and was thus removed from the model ($p$-value = \Sexpr{anova(model, model3)$`Pr(>Chisq)`[2]}).
 
 %\newdo{Points of discussion for the model: one random effect for both types of correction, because there is no significant difference between the two obvious. One $\beta$ rather than one for each correction, because the interaction between type and starting weight is not significant (effect size and $p$-value XXX).}
 
 %\done{Make the interpretation of $\alpha_X$ and $\alpha_Y$ as the lower threshold of plausible weights and  $\beta$ as the interval length of plausible weights  even more obvious, i.e. add a sentence to that effect :)}
 
-\begin{figure}[htbp]
+\begin{figure}[hbtp]
 \centering
 \includegraphics[keepaspectratio=TRUE, width=.9\linewidth]{figure/fig-results-analysis1}
 \caption{\label{fig:MixedModelResults} Simulation results from the fitted model, facetted by correction type. Fixed effects results are shown as histograms; the red values display the results when starting from an uncorrected plot and are concentrated around $w=\Sexpr{round(mean(ints$x[c(1,3)]), 2)}$; the blue values represent user-chosen weights when starting from a fully corrected plot and are concentrated around $w=\Sexpr{round(mean(ints$x[c(2,4)]), 2)}$. Additionally, 95\% Highest Posterior Density (HPD) credible intervals are shown as horizontal line segments above the histograms; these intervals are for the lower and upper bounds of the ``preferred weight interval'' tested in the experiment. User-level density curves show the individual variability around  fixed effects $\alpha_*$ and $\alpha_*+\beta$.}
@@ -1691,7 +1698,7 @@ print(temp, file="./figure/ranef.txt", floating=FALSE, include.rownames=FALSE)
 \caption{Model random effects, with HPD intervals computed using MCMC simulation.}\label{randomeffectsresults}
 \end{table}
 
-\newtext{MCMC simulations from the posterior distrubution for each of the coefficients suggest that the optimal $w$ lies between \Sexpr{round(ints$x[1], 3)} and \Sexpr{round(ints$x[2], 3)} for $x$ and \Sexpr{round(ints$x[3], 3)} and \Sexpr{round(ints$x[4], 3)} for $y$, where the lower value is the estimate starting at $w=0$ and moving up, and the upper value is the estimate starting at $w=1$ and moving down. This suggests that either correction is preferrable to an uncorrected graph, and that a weighted correction is preferrable to the fully corrected graph, as neither 0 nor 1 is contained in any overall interval. }
+MCMC simulations from the posterior distribution for each of the coefficients suggest that the optimal $w$ lies between \Sexpr{round(ints$x[1], 3)} and \Sexpr{round(ints$x[2], 3)} for $x$ and \Sexpr{round(ints$x[3], 3)} and \Sexpr{round(ints$x[4], 3)} for $y$, where the lower value is the estimate starting at $w=0$ and moving up, and the upper value is the estimate starting at $w=1$ and moving down. This suggests that either correction is preferrable to an uncorrected graph, and that a weighted correction is preferrable to the fully corrected graph, as neither 0 nor 1 is contained in any overall interval. 
 
 \section{Application: USHCN Data}
 We will demonstrate the occurrence of the sine illusion as well as the suggested transformations at the example of data from the United States Historical Climatology Network \cite[USHCN;][]{ushcn, ushcn2}.
