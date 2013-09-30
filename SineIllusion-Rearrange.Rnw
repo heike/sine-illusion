@@ -1274,7 +1274,7 @@ The study aims to determine the ``optimal'' transformation weight for each trans
 The study is set up as a fractional factorial design of correction type ($x$ or $y$ correction) and starting weight $w_0$. Each participant is asked to evaluate a total of twelve situations, six of each correction type.%, though they are allowed to complete up to 30 trials if they wish. 
 For the first six starting weights $w_0$ values were chosen with equal probability from the set of numbers $\{0, 1, c\}$, where $c \sim U(.25, .75)$, while the second set of starting weights is randomly sampled from a distribution centered at 0.6 with mass on discrete values in the interval $(-0.2, 1.2)$, as shown in figure \ref{fig:weightdist}. The distribution was chosen to have a higher coverage density around 0.6 after a pilot study indicated a preference for that value. Using a distribution with a wide coverage allows us to fully explore the space of plausible weight $w$ while focusing on the $(0,1)$ interval. %Table \ref{factortable} summarizes the factors under investigation in the experiment.
 
-\done{What is the actual range of $c$ used in the analysis of the data? I thought you had cut it back to weights between 0 and 1. If that is the case the discussion here should reflect that.}
+%\done{What is the actual range of $c$ used in the analysis of the data? I thought you had cut it back to weights between 0 and 1. If that is the case the discussion here should reflect that.}
 
 \begin{figure}[h]\centering
 \includegraphics[keepaspectratio=TRUE,width=\linewidth]{figure/fig-study-weight-dist}
@@ -1298,9 +1298,9 @@ For the first six starting weights $w_0$ values were chosen with equal probabili
 % This allows us to fully explore the space of plausible $w$ while focusing on weights in the $(0,1)$ interval.
 
 %The range of weight values the shiny app allows follows the full distribution of $w$ described above, so possible weight values are between $(-4, 5)$. 
-A single `trial' begins with the presentation of a graph at the chosen starting weight, and ends when the participant submits the trial. Participants adjust the graph using increment and decrement buttons, and click ``submit'' to proceed to the next stimuli when they are satisfied with the adjustment. This provides a clear starting value and ending value, allowing us to assess the range of optimal values for each participant. In addition to transformation weight, type, and user submission, time-series data for each user interaction was recorded, as well as anonymized user data (partial IP address, hashed IP address, and hashed browser characteristics) sufficient to provide a user `fingerprint' to distinguish and recognize individual users. 
+A trial begins with the presentation of a graph at the chosen starting weight $w_0$. Participants adjust the graph using increment and decrement buttons. A trial ends with the participant clicking the `submit' button, at which point the weight for the final adjustment is recorded. This provides a clear starting value and ending value, allowing us to assess the range of optimal values for each participant. In addition to weight, type, and user submission, time-series data for each user interaction are recorded, as well as anonymized user-specific data (partial IP address, hashed IP address, and hashed browser characteristics) sufficient to provide a user `fingerprint' to distinguish and recognize individual users (or rather their computer settings). 
 
-Two ``training'' trials were provided that additionally superimposed a graph of the underlying mean function to give participants some idea of the underlying function the lines represent. This approach was taken to reduce the incidence of extremely high ``x'' correction values, because large adjustment values do not change the impression of same line length, but the resulting function bears little resemblance to a sine function, see figure~\ref{fig:overtransform} for examples of overcorrection. %because when $w>\!\!>1$, the lines still look to be of equal length but the underlying function bears little resemblance to $\sin(x)$, as shown in figure \ref{fig:overtransform}. 
+Each participant is provided with two initial ``training'' trials: in the first two trials a graph of the underlying mean function is superimposed on the line segments to give participants some idea of the  function the lines represent. This approach was taken to reduce  incidences of extremely high ``x'' correction values, as large adjustment values do not change the impression of same line length, but the resulting function bears little resemblance to a sine function, see figure~\ref{fig:overtransform} for examples of overcorrection. %because when $w>\!\!>1$, the lines still look to be of equal length but the underlying function bears little resemblance to $\sin(x)$, as shown in figure \ref{fig:overtransform}. 
 
 
 
@@ -1540,78 +1540,94 @@ Figure~\ref{fig:overtransform} shows results at the threshold of acceptability. 
 
 %In addition to the $x$ transformation artifact, there were a few user reports of applet lag, so that the only option to continue was to ``submit'' the trial (or ``skip'' it), even though the final graph had not rendered correctly; this resulted in a recorded value more extreme than the participant intended. To account for these technological difficulties, the exclusion criteria were applied to trials from both transformations. Importantly, in both types of trials, values outside of [\Sexpr{wlow}, \Sexpr{whigh}] demonstrate remarkable deviations from the criteria described to the participants; $x$ transformations outside of that range do not preserve the underlying function shape and concavity and $y$ transformations outside of that range show dramatically unequal line lengths. Hence, user values outside of these ranges likely indicate user noncompliance or equipment malfunction. Responses were removed if they fell outside the [\Sexpr{wlow}, \Sexpr{whigh}] interval (\Sexpr{noutliers.x} of type $X$  and \Sexpr{noutliers.y} type $Y$ trials, for a total of \Sexpr{noutliers} trials).
 
-Once outliers were removed, each participant completed an average of  \Sexpr{round(trials.per.participant, 2)} trials.
+%Once outliers were removed, each participant completed an average of  \Sexpr{round(trials.per.participant, 2)} trials.
+%\newdo{don't emphasize that participants did more than 12 trials - we would need to use the first 12 to avoid self-selection biasing.}
 
 %Once outliers were removed, each participant completed an average of  \Sexpr{round(trials.per.participant, 2)} trials. As there were only \Sexpr{sum(!trial.sum$incl.startwt & trial.sum$incl.trials & !trial.sum$endwt.outlier)} trials with starting weight outside of [0,1] which met the other inclusion criteria, those trials were eliminated from the analysis to prevent high-influence points from adversely influencing the model. 
 %\newdo{This last paragraph has to go - we can't exclude values just for being extreme. Instead, change the study setup.}
 
-\newdo{I'm still not convinced that we need to go there. Rather, you could put the whole discussion in a one sentence paragraph in the conclusions section. The model is worse than the stats approach, its results are less interpretable, and it doesn't allow us to use the full data. That's three strikes and out.}
-\paragraph{Psychophysics Model} Traditionally, the method of limits \done{what is the method of limits, and how does it fit into the psychophysics model? - this is explained in the section ``Study Design"} requires several trials per participant, some from above the hypothesized threshold, some from below the hypothesized threshold \newdo{hold back on the example. Rather, describe the psychophysics model generally (don't forget to include literature references) and then apply it to the special case of this example. } (in this case, some with $w=0$ and some with $w=1$). These trials are then averaged to obtain a single threshold value. For this model, we will thus have to additionally exclude data from participants who did not complete one trial starting at 0 and one trial starting at 1 for each stimulus (so a participant who completed both $x$ trials and a $y$ trial starting at 0 would not be included when determining the optimal weight for $y$). \Sexpr{length(unique(user.avg.all$fingerprint))} users had sufficient data to calculate user-level optimum weights for one or both transformations using this method.
+%\newdo{I'm still not convinced that we need to go there. Rather, you could put the whole discussion in a one sentence paragraph in the conclusions section. The model is worse than the stats approach, its results are less interpretable, and it doesn't allow us to use the full data. That's three strikes and out.}
 
-For each participant $i$ and trial $j$ of trial type $T_{ij}$ with starting weight $X_{ij}$
+The psychophysic model is based on  weighted averages (by adjustment type) of all trials with starting weights $w_0 = 0$ and 1:
+<<psycho, echo=FALSE, results='asis'>>=
+require(xtable)
+dt <- xtable(unique(user.avg.all[, c("type", "overall.avg")]))
+print(dt, include.rownames=FALSE)
+@
+\newdo{Could you make this a table and 95\% CI?}
 
-\begin{align}
-\overline{W^X_{i}} &= \frac{1}{2}\cdot 
-\frac{\sum_{j} \mathbbm{1}_{[T_{ij}=X]}\cdot \mathbbm{1}_{[X_{ij}=0]} \cdot{W_{ij}}}
-     {\sum_{j} \mathbbm{1}_{[T_{ij}=X]}\cdot \mathbbm{1}_{[X_{ij}=0]}} + 
-\frac{1}{2}\cdot 
-\frac{\sum_{j} \mathbbm{1}_{[T_{ij}=X]}\cdot \mathbbm{1}_{[X_{ij}=1]} \cdot{W_{ij}}}
-     {\sum_{j} \mathbbm{1}_{[T_{ij}=X]}\cdot \mathbbm{1}_{[X_{ij}=1]}} \\
-\overline{W^Y_{i}} &= \frac{1}{2}\cdot 
-\frac{\sum_{j} \mathbbm{1}_{[T_{ij}=Y]}\cdot \mathbbm{1}_{[X_{ij}=0]} \cdot{W_{ij}}}
-     {\sum_{j} \mathbbm{1}_{[T_{ij}=Y]}\cdot \mathbbm{1}_{[X_{ij}=0]}} + 
-\frac{1}{2}\cdot 
-\frac{\sum_{j} \mathbbm{1}_{[T_{ij}=Y]}\cdot \mathbbm{1}_{[X_{ij}=1]} \cdot{W_{ij}}}
-     {\sum_{j} \mathbbm{1}_{[T_{ij}=Y]}\cdot \mathbbm{1}_{[X_{ij}=1]}} 
-\end{align}
+%\paragraph{Psychophysics Model} Traditionally, the method of limits \done{what is the method of limits, and how does it fit into the psychophysics model? - this is explained in the section ``Study Design"} requires several trials per participant, some from above the hypothesized threshold, some from below the hypothesized threshold \newdo{hold back on the example. Rather, describe the psychophysics model generally (don't forget to include literature references) and then apply it to the special case of this example. } (in this case, some with $w=0$ and some with $w=1$). These trials are then averaged to obtain a single threshold value. For this model, we will thus have to additionally exclude data from participants who did not complete one trial starting at 0 and one trial starting at 1 for each stimulus (so a participant who completed both $x$ trials and a $y$ trial starting at 0 would not be included when determining the optimal weight for $y$). \Sexpr{length(unique(user.avg.all$fingerprint))} users had sufficient data to calculate user-level optimum weights for one or both transformations using this method.
 
-Then, for each trial type, we can compute an average over the participants as well as compare the distributions of participant ``optimal" weight values. 
+%For each participant $i$ and trial $j$ of trial type $T_{ij}$ with starting weight $X_{ij}$
+
+% \begin{align}
+% \overline{W^X_{i}} &= \frac{1}{2}\cdot 
+% \frac{\sum_{j} \mathbbm{1}_{[T_{ij}=X]}\cdot \mathbbm{1}_{[X_{ij}=0]} \cdot{W_{ij}}}
+%      {\sum_{j} \mathbbm{1}_{[T_{ij}=X]}\cdot \mathbbm{1}_{[X_{ij}=0]}} + 
+% \frac{1}{2}\cdot 
+% \frac{\sum_{j} \mathbbm{1}_{[T_{ij}=X]}\cdot \mathbbm{1}_{[X_{ij}=1]} \cdot{W_{ij}}}
+%      {\sum_{j} \mathbbm{1}_{[T_{ij}=X]}\cdot \mathbbm{1}_{[X_{ij}=1]}} \\
+% \overline{W^Y_{i}} &= \frac{1}{2}\cdot 
+% \frac{\sum_{j} \mathbbm{1}_{[T_{ij}=Y]}\cdot \mathbbm{1}_{[X_{ij}=0]} \cdot{W_{ij}}}
+%      {\sum_{j} \mathbbm{1}_{[T_{ij}=Y]}\cdot \mathbbm{1}_{[X_{ij}=0]}} + 
+% \frac{1}{2}\cdot 
+% \frac{\sum_{j} \mathbbm{1}_{[T_{ij}=Y]}\cdot \mathbbm{1}_{[X_{ij}=1]} \cdot{W_{ij}}}
+%      {\sum_{j} \mathbbm{1}_{[T_{ij}=Y]}\cdot \mathbbm{1}_{[X_{ij}=1]}} 
+% \end{align}
+
+%Then, for each trial type, we can compute an average over the participants as well as compare the distributions of participant ``optimal" weight values. 
 
 \begin{figure}[htbp]\centering
-<<meanDists,echo=FALSE,out.width='.8\\linewidth', dependson='results-analysis', fig.width=5, fig.height=3, message=FALSE, warning=FALSE>>=
+<<meanDists,echo=FALSE,out.width='.75\\linewidth', dependson='results-analysis', fig.width=7, fig.height=4, message=FALSE, warning=FALSE>>=
 ggplot(data=user.avg.all) + 
-  geom_density(aes(x=avg, fill=type)) + 
+  geom_density(aes(x=avg, fill=type), alpha=0.8) + 
   geom_vline(aes(xintercept=overall.avg)) +
-  geom_rug(aes(x=avg, colour=type), alpha=.9) +
+  geom_rug(aes(x=avg, colour=type)) +
   facet_grid(type~.) +
   scale_fill_manual("Transformation", values=c("#d6604d", "#4393c3"), guide="none") +
   scale_colour_manual("Transformation", values=c("#d6604d", "#4393c3"), guide="none") + 
   theme_bw() + theme(legend.position="bottom") +
   xlim(c(-.2, 1.2)) + xlab("Optimal Weight") + ylab("Density")
 @
-\caption{Distribution of participant-level means using the standard method of limits analysis described in \citet{goldstein}. The overall means are both near 0.4, however, there is quite a bit of user-level variability. }
+\caption{Distribution of participant-level means using the standard method of limits analysis described in \citet{goldstein}. The overall means are both near 0.4, however, there is quite a bit of user-level variability. \newdo{be careful with the word distribution. what you are showing are estimated densities. }}
 \end{figure}
-As a result, according to this analysis, the optimum transformation value for $x$ is \Sexpr{round(user.avg.x, 2)}, and the optimum transformation value for $y$ is \Sexpr{round(user.avg.y, 2)}. In addition, only \Sexpr{nrow(subset(user.avg.all, avg<0 | avg > 1))} user averages were outside of the range of (0,1) for either trial. While these results suggest that the transformation is useful and that complete transformation is not necessary, we can get more precise bounds on the range of acceptable transformation weights using a linear model that can incorporate starting points other than 0 and 1, as well as data from users that completed a sufficient number of trials but did not complete a trial starting at one of the endpoints. 
+According to this analysis, the optimum transformation value for $x$ is \Sexpr{round(user.avg.x, 2)}, and the optimum transformation value for $y$ is \Sexpr{round(user.avg.y, 2)}. %In addition, only \Sexpr{nrow(subset(user.avg.all, avg<0 | avg > 1))} user averages were outside of the range of (0,1) for either trial. 
+While these results suggest that the transformation is useful and that complete transformation is not necessary, we can get more precise bounds on the range of acceptable transformation weights using a linear model that can incorporate starting points other than 0 and 1, and at the same time allow for user-specific variability. % as well as data from users that completed a sufficient number of trials but did not complete a trial starting at one of the endpoints. 
 
-\newdo{My attempt at a summary of this whole paragraph: A traditional approach from psychometrics (citation) to analyze this kind of data would be a XXX model (citation). However, the analysis would only allows us to make use of starting weights 0 and 1, while the results are a single estimate of an optimal adjustment under each transformation. XXX results. 
-However, this approach is too limiting, and we will instead make use of a random effects model, that not only allows us to produce a range of acceptable adjustments but also helps us with adjustment for user-specific ability and variability.}
+%\newdo{My attempt at a summary of this whole paragraph: A traditional approach from psychometrics (citation) to analyze this kind of data would be a XXX model (citation). However, the analysis would only allows us to make use of starting weights 0 and 1, while the results are a single estimate of an optimal adjustment under each transformation. XXX results. 
+%However, this approach is too limiting, and we will instead make use of a random effects model, that not only allows us to produce a range of acceptable adjustments but also helps us with adjustment for user-specific ability and variability.}
 
-\paragraph{Linear Model}
-Training trials were included in the analysis after a fixed effects model incorporating type, starting weight, and training showed that there was no evidence of a significant difference between trials with and without the original mean function on the graph ($p(>|t|) = $\Sexpr{round(summary(fixedmodel)$coefficients['trainingTRUE',4], 4)}). 
-\newdo{The nomenclature of $p(>|t|) = $ is not going to fly in JCGS - it looks too much like R syntax. In case you don't just want to say $p$-value, write it out as  $p$-value=XXX based on $t_{YYY}$ distribution, where YYY are the degrees of freedom}
+%\paragraph{Linear Model}
+%Training trials were included in the analysis after a fixed effects model incorporating type, starting weight, and training showed that there was no evidence of a significant difference between trials with and without the original mean function on the graph ($p(>|t|) = $\Sexpr{round(summary(fixedmodel)$coefficients['trainingTRUE',4], 4)}). 
+%\newdo{The nomenclature of $p(>|t|) = $ is not going to fly in JCGS - it looks too much like R syntax. In case you don't just want to say $p$-value, write it out as  $p$-value=XXX based on $t_{YYY}$ distribution, where YYY are the degrees of freedom}
 
-In order to account for user-level variability, we fit a random effects model for the corrected weight value as a function of the starting weight and trial type, with a random intercept for each participant. 
-The variability of the random effects for each trial type are similar (\Sexpr{library(lme4); summary(model)@REmat[1,3]} for the overall variability as opposed to \Sexpr{summary(model2)@REmat[1,3]} and \Sexpr{summary(model2)@REmat[2,3]} for $y$ and $x$ transformations, respectively), so it is appropriate to fit a single model in order to better estimate the participant-level effects. Additionally, the interaction between starting weight and trial type was not significant, and was thus removed from the model ($p$-value = \Sexpr{anova(model, model3)$`Pr(>Chisq)`[2]}).
+In order to account for user-level variability, we fit a random effects model for the adjusted weight value as a function of  starting weight and trial type, with a random intercept for each participant. 
 
-
-Participant $i$'s response for trial $j$, $W_{ij}$, was modeled as a function of the correction type $T_{ij}$, and starting weight $X_{ij}$, with a random intercept for participant. 
+Participant $i$'s response for trial $j$, $W_{ij}$, was modeled as a function of the correction type $T(j)$  (where $T(j) \in $\{ X, Y\}), and starting weight $X_{ij}$, with a random intercept for participant. 
 \begin{align}\label{model1}
-W_{ij} &= \alpha_X \mathbbm{1}_{[T_{ij}=X]} + \alpha_Y \mathbbm{1}_{[T_{ij}=Y]} + \beta X_{ij} + \gamma_i + \epsilon_{ij}\\
+W_{ij} &= \alpha_{T(j)} + \beta X_{ij} + \gamma_i + \epsilon_{ij}\\
 \gamma_i &\sim N(0, \eta^2), 
 \epsilon_{ij} \sim N(0, \sigma^2), \text{ and } \text{Cov}(\gamma, \epsilon) = 0\notag 
 \end{align}
+where $\alpha_{T(j)}$ is either $\alpha_X$ or $\alpha_Y$, describing the lower threshold of acceptable ranges for each of the types of correction, while $\alpha_X+\beta$ and $\alpha_Y + \beta$ describe the upper threshold of the range of acceptable weights for the respective correction.
+%
+%Below, $\alpha_X$ is used to model $W_{ij}$ if $T_{ij} = \text{"X"}$, otherwise, $\alpha_Y$ is used.
+% \begin{align}\label{modelfcns}
+% \underbrace{\alpha + \beta \cdot 0}_{\text{Approach from below}} \quad & \quad \underbrace{\alpha + \beta\cdot 1}_{\text{Approach from above}}
+% \end{align}
+%
+%This approach to model parameters suggests that $\alpha_X$ and $\alpha_Y$ should be interpreted as the lower bound of the interval of plausible weights and $\beta$ should be interpreted as the length of the interval of plausible weights. 
+$\beta$ should therefore be interpreted as the length of the interval of plausible weights. 
+Figure \ref{fig:MixedModelResults} shows density plots which demonstrate the relationship between the starting weight value and the user-submitted ``optimal'' weight value. 
 
-$\mathbbm{1}$ is the indicator function, that is, when the condition is true, the function is equal to 1, otherwise, the function is equal to 0. Below, $\alpha_X$ is used to model $W_{ij}$ if $T_{ij} = \text{"X"}$, otherwise, $\alpha_Y$ is used.
+The fitted model parameters are shown in tables \ref{fixedeffectsresults} and \ref{randomeffectsresults}. We use MCMC simulation to generate responses for each correction type and each participant from the model, which we use to both  create user-level densities as well as population-based posterior densities for the model parameters, that allow us to report credibility intervals. 
 
-\newdo{Points of discussion for the model: one random effect for both types of correction, because there is no significant difference between the two obvious. One $\beta$ rather than one for each correction, because the interaction between type and starting weight is not significant (effect size and $p$-value XXX).}
-The fitted model parameters are shown in tables \ref{fixedeffectsresults} and \ref{randomeffectsresults}, but for interpretation purposes, we can use MCMC simulation to simulate responses for each correction type and each participant from the model. These simulated responses can then be used to create user-level densities as well as overall densities for the quantities shown in Equation \ref{modelfcns}. 
-\begin{align}\label{modelfcns}
-\underbrace{\alpha + \beta \cdot 0}_{\text{Approach from below}} \quad & \quad \underbrace{\alpha + \beta\cdot 1}_{\text{Approach from above}}
-\end{align}
 
-This approach to model parameters suggests that $\alpha_X$ and $\alpha_Y$ should be interpreted as the lower bound of the interval of plausible weights and $\beta$ should be interpreted as the length of the interval of plausible weights. 
-\done{Make the interpretation of $\alpha_X$ and $\alpha_Y$ as the lower threshold of plausible weights and  $\beta$ as the interval length of plausible weights  even more obvious, i.e. add a sentence to that effect :)}
-\newtext{Figure \ref{fig:MixedModelResults} shows density plots which demonstrate the relationship between the starting weight value and the user-submitted ``optimal'' weight value. }
+The variability of the random effects for each trial type are similar (\Sexpr{library(lme4); summary(model)@REmat[1,3]} for the overall variability as opposed to \Sexpr{summary(model2)@REmat[1,3]} and \Sexpr{summary(model2)@REmat[2,3]} for $y$ and $x$ transformations, respectively), so it is appropriate to fit a single variance for simplicity. Additionally, the interaction between starting weight and trial type was not significant, and was thus removed from the model ($p$-value = \Sexpr{anova(model, model3)$`Pr(>Chisq)`[2]}).
+
+%\newdo{Points of discussion for the model: one random effect for both types of correction, because there is no significant difference between the two obvious. One $\beta$ rather than one for each correction, because the interaction between type and starting weight is not significant (effect size and $p$-value XXX).}
+
+%\done{Make the interpretation of $\alpha_X$ and $\alpha_Y$ as the lower threshold of plausible weights and  $\beta$ as the interval length of plausible weights  even more obvious, i.e. add a sentence to that effect :)}
 
 \begin{figure}[htbp]
 \centering
@@ -1620,7 +1636,7 @@ This approach to model parameters suggests that $\alpha_X$ and $\alpha_Y$ should
 \end{figure}
 
 
-\done{Describe the reason for the approach taken - connect to sensory experiments that try to bound perceptual effects by approaching from both above and below.\\ Done above in the experiment description section, just before the applet was described.}
+%\done{Describe the reason for the approach taken - connect to sensory experiments that try to bound perceptual effects by approaching from both above and below.\\ Done above in the experiment description section, just before the applet was described.}
 <<modelres, echo=FALSE, include=FALSE, dependson='results-analysis'>>=
 library(languageR) # gets p-values for lmer models
 library(xtable)
