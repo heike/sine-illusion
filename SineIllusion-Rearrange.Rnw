@@ -1444,7 +1444,7 @@ modeltest <- lmer(endweight ~ type -1 + startweight + (type-1|fingerprint), data
 fixedmodel <- lm(endweight~(type-1) +startweight + training, data=lm.data)
 
 model <- lmer(data=lm.data, endweight~ (type-1) + startweight + (1|fingerprint))
-model2 <- lmer(data=lm.data, endweight~ (type-1) + startweight + (type-1|fingerprint))
+model2 <- lmer(data=lm.data, endweight~ (type-1) + startweight + (type|fingerprint))
 model3 <- lmer(data=lm.data, endweight~ (type-1) + type:startweight + (1|fingerprint))
 
 
@@ -1647,7 +1647,7 @@ The variability of the random effects for each trial type is similar (\Sexpr{lib
 <<modelres, echo=FALSE, include=FALSE, dependson='results-analysis'>>=
 library(languageR) # gets p-values for lmer models
 library(xtable)
-res <- pvals.fnc(model, nsim=5000, ndigits=4)
+res <- pvals.fnc(model, nsim=5000, ndigits=4, withMCMC=TRUE)
 # fixed.effects.table <- res$fixed[,c(3, 1, 4, 5)]
 # fixed.effects.table$interval <- sprintf("(%s, %s)", res$fixed[,3],res$fixed[,4])
 # names(fixed.effects.table) <- c("95% HPD Lower", "Estimate", "95% HPD Upper", "MCMC p-value", "95% HPD CI")
@@ -1695,7 +1695,8 @@ print(temp, file="./figure/ranef.txt", floating=FALSE, include.rownames=FALSE)
 \end{table}
 \begin{table}[htbp]\centering
 \input{figure/ranef.txt}
-\caption{Model random effects, with HPD intervals computed using MCMC simulation.}\label{randomeffectsresults}
+\caption{Model random effects, with HPD intervals computed using MCMC simulation.}\label{randomeffectsresults
+\Sexpr{quantile(probs=c(0.025, 0.5, 0.975), as.vector(model.mcmc@sigma))}}
 \end{table}
 
 MCMC simulations from the posterior distribution for each of the coefficients suggest that the optimal $w$ lies between \Sexpr{round(ints$x[1], 3)} and \Sexpr{round(ints$x[2], 3)} for $x$ and \Sexpr{round(ints$x[3], 3)} and \Sexpr{round(ints$x[4], 3)} for $y$, where the lower value is the estimate starting at $w=0$ and moving up, and the upper value is the estimate starting at $w=1$ and moving down. This suggests that either correction is preferrable to an uncorrected graph, and that a weighted correction is preferrable to the fully corrected graph, as neither 0 nor 1 is contained in any overall interval. 
