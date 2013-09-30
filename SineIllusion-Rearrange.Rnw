@@ -1589,7 +1589,7 @@ ggplot(data=user.avg.all) +
   theme_bw() + theme(legend.position="bottom") +
   xlim(c(-.2, 1.2)) + xlab("Optimal Weight") + ylab("Density")
 @
-\caption{Distribution of participant-level means using the standard method of limits analysis described in \citet{goldstein}. The overall means are both near 0.4, however, there is quite a bit of user-level variability. \newdo{be careful with the word distribution. what you are showing are estimated densities. }}
+\caption{Estimated density of participant-level means using the standard method of limits analysis described in \citet{goldstein}. The overall means are both near 0.4, however, there is quite a bit of user-level variability.}
 \end{figure}
 According to this analysis, the optimum transformation value for $x$ is \Sexpr{round(user.avg.x, 2)}, and the optimum transformation value for $y$ is \Sexpr{round(user.avg.y, 2)}. %In addition, only \Sexpr{nrow(subset(user.avg.all, avg<0 | avg > 1))} user averages were outside of the range of (0,1) for either trial. 
 While these results suggest that the transformation is useful and that complete transformation is not necessary, we can get more precise bounds on the range of acceptable transformation weights using a linear model that can incorporate starting points other than 0 and 1, and at the same time allow for user-specific variability. % as well as data from users that completed a sufficient number of trials but did not complete a trial starting at one of the endpoints. 
