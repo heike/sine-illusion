@@ -1780,9 +1780,9 @@ After removing the averages in Figure \ref{fig:boxplot-temp} to yield Figure \re
 source("code/correctData.R")
 ushcn$temp <- ushcn$value/100
 ushcn$time <- decimal_date(ushcn$Time)
-ushcn.cor <- correct("time", "temp", subset(ushcn, Year>1995), type="x")
-ggplot() + geom_jitter(aes(time.correctx, value/100), data=subset(ushcn.cor, Year>1995), size=1)+ geom_smooth() + 
-  ylab("Temperature (in Celsius)") + theme_bw() + theme(plot.margin = unit(c(0,6,0,0), "cm")) + xlab("Year") 
+# ushcn.cor <- correct("time", "temp", subset(ushcn, Year>1995), type="x")
+# ggplot() + geom_jitter(aes(time.correctx, value/100), data=subset(ushcn.cor, Year>1995), size=1)+ geom_smooth() + 
+#   ylab("Temperature (in Celsius)") + theme_bw() + theme(plot.margin = unit(c(0,6,0,0), "cm")) + xlab("Year") 
 # ggsave(file="figure/monthly-temps.pdf", width=12, height=4.5)
 
 @
