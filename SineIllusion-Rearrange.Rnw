@@ -1448,7 +1448,7 @@ fixedmodel <- lm(endweight~(type-1) +startweight + training, data=lm.data)
 
 model <- lmer(data=lm.data, endweight~ (type-1) + startweight + (1|fingerprint))
 model2 <- lmer(data=lm.data, endweight~ (type-1) + startweight + (type|fingerprint))
-model3 <- lmer(data=lm.data, endweight~ (type-1) + type:startweight + (1|fingerprint))
+model3 <- lmer(data=lm.data, endweight~ (type-1) + type:startweight + (type|fingerprint))
 
 
 # summary(model)
@@ -1537,13 +1537,14 @@ ggplot() + theme_bw() + facet_grid(type~., scales="free") + ylim(c(0, 25)) +
   theme(legend.position="bottom") + geom_point(aes(x=ests, y=20), data=ests) +
   xlim(c(-.2, 1.2)) +
 #   geom_point(data=ints.all, aes(x=xmax, y=0, size=factor("Range")), shape=NA, colour="grey75") +
-#   guides(colour=guide_legend(order=1), fill=guide_legend(order=1), size=guide_legend("Range of acceptable weights", override.aes=list(shape=15, size = 10), order=3)) +
+#   guides(colour=guide_legend(order=1), fill=guide_legend(order=1), size=guide_legend("Range of\nacceptable weights", override.aes=list(shape=15, size = 10), order=3)) +
   geom_text(data=ints, aes(x=x, y=22.5, label=label), parse=TRUE) + 
-  geom_text(data=ints.all, aes(x=x, y=23.5, label="Range of acceptable weights"))
+  geom_text(data=ints.all, colour="grey30", aes(x=x, y=15.5, label="Range of\nacceptable weights"))
 
 @
 Participants were recruited from Amazon Mechanical Turk and the \href{http://reddit.com/r/SampleSize}{reddit} community. %\Sexpr{nparticipants} participants in total took part in the study with \Sexpr{ntrials} total evaluations. 
 
+\newdo{We need to go through the paper and get rid of the 95\% HDP intervals ... we are not doing MCMC anymore, so this needs to be adjusted}
 As this study was done outside a laboratory setting, we can not tell a participant's willingness to follow the guidelines and put in their best effort. This, besides potential technical issues (server outage, speed of response) make a careful selection of data going into the analysis unavoidable. The following exclusion criteria were used:
 \begin{itemize}
 \item Participant did not interact with the applet: we required a participant to use the adjustment at least once in order to include data for this trial. 
@@ -1579,7 +1580,8 @@ require(xtable)
 dt <- xtable(unique(user.avg.all[, c("type", "overall.avg")]))
 print(dt, include.rownames=FALSE)
 @
-\newdo{Could you make this a table of means with 95\% CI?\\ What kind of CI? Just estimated from the density? Or do you want me to use a Wald interval and assume normality?}
+\newdo{Could you make this a table of means with 95\% CI?\\ What kind of CI? Just estimated from the density? Or do you want me to use a Wald interval and assume normality?\\
+I guess the psychophysics guys would estimate standard deviation from the sample and put it in a Wald CI ...}
 
 %\paragraph{Psychophysics Model} Traditionally, the method of limits \done{what is the method of limits, and how does it fit into the psychophysics model? - this is explained in the section ``Study Design"} requires several trials per participant, some from above the hypothesized threshold, some from below the hypothesized threshold \newdo{hold back on the example. Rather, describe the psychophysics model generally (don't forget to include literature references) and then apply it to the special case of this example. } (in this case, some with $w=0$ and some with $w=1$). These trials are then averaged to obtain a single threshold value. For this model, we will thus have to additionally exclude data from participants who did not complete one trial starting at 0 and one trial starting at 1 for each stimulus (so a participant who completed both $x$ trials and a $y$ trial starting at 0 would not be included when determining the optimal weight for $y$). \Sexpr{length(unique(user.avg.all$fingerprint))} users had sufficient data to calculate user-level optimum weights for one or both transformations using this method.
 
@@ -1629,8 +1631,7 @@ While these results suggest that the transformation is useful and that complete 
 
 In order to account for user-level variability, we fit a random effects model for the adjusted weight value as a function of  starting weight and trial type, with a random intercept for each participant. 
 
-\done{define ranges of i and j - how many participants did we have after the cleaning? - we should state that above.\\ It is stated above. (2nd bullet point on the exclusion criteria)}
-\newtext{Let $W_{ij}$ denote the final adjustment to weight by participant $i$, $ 1 \le i \le \Sexpr{nparticipants}$, on trial $j$, $1 \le j \le n_i$. }
+Let $W_{ij}$ denote the final adjustment to weight by participant $i$, $ 1 \le i \le \Sexpr{nparticipants}$ \newdo{We can't use nparticipants - that's too many, we need to get rid of the invalid ones ... I think we only have 126 actual participants}, on trial $j$, $1 \le j \le n_i$. 
 We model the final weight $W_{ij}$ as a function of the correction type $T(i,j)$  (where $T(i,j) \in  \{X, Y\}$), and starting weight $X_{ij}$, with a random intercept for participant to account for subject-specific ability: 
 \begin{align}\label{model1}
 W_{ij} &= \alpha_{T(i,j)} + \beta X_{ij} + \gamma_{i, T(i,j)} + \epsilon_{ij}\\
@@ -1654,7 +1655,7 @@ The fitted model parameters are shown in tables \ref{fixedeffectsresults} and \r
 We use MCMC simulation to generate responses for each correction type and each participant from the model, which we use to both  create user-level densities as well as population-based posterior densities for the model parameters that allow us to determine credibility intervals. 
 
 
-The variability of the random effects for each trial type is similar; but the model benefits significantly from allowing separate random effects for individual's variability by correction type ( \Sexpr{library(lme4); summary(model2)@REmat[1,3]} and \Sexpr{summary(model2)@REmat[2,3]} for $Y$ and $X$ transformations, respectively, as opposed to \Sexpr{ summary(model)@REmat[1,3]} for the overall variability). The interaction between starting weight and trial type was not significant, however, and was thus removed from the model ($p-value = \Sexpr{anova(model2, model3)$`Pr(>Chisq)`[2]}$).
+The variability of the random effects for each trial type is similar; but the model benefits significantly from allowing separate random effects for individual's variability by correction type (\Sexpr{library(lme4); summary(model2)@REmat[1,3]} and \Sexpr{summary(model2)@REmat[2,3]} for $Y$ and $X$ transformations, respectively, as opposed to \Sexpr{ summary(model)@REmat[1,3]} for the overall variability). The interaction between starting weight and trial type was not significant, however, and was thus removed from the model ($p$-value = \Sexpr{anova(model2, model3)$`Pr(>Chisq)`[2]}).
 
 %\newdo{Points of discussion for the model: one random effect for both types of correction, because there is no significant difference between the two obvious. One $\beta$ rather than one for each correction, because the interaction between type and starting weight is not significant (effect size and $p$-value XXX).}
 
@@ -1830,14 +1831,14 @@ ushcn$time <- decimal_date(ushcn$Time)
 \section{Conclusion}
 The sine illusion is a persistent and powerful illusion that is very difficult to counteract without modifying the visual stimulus directly. While ``fixing" data is anathema to typical statistical procedures, we cannot counteract the illusion and represent the data visually without some intervention. The proposals in this paper for transformations in $X$ and $Y$ provide the means to temporarily correct the data as a diagnostic measure, perhaps using an applet or R package for that purpose. These corrections are significant not only because of their implications for statistical graphics, but because previous attempts to resolve optical illusions using geometry have not met with success \citep{westheimer2008illusions}. These corrections are only a first step and could be improved upon; currently, the corrections break down for extreme (secant) values, but multiple iterations of the correction procedure will likely resolve some of these issues (though iteration removes the convenience of a functional form for the transformation). Similarly, all of the corrections proposed here extend the line lengths (or for actual data, increase the deviation from the smooth line) -- some normalization might make the necessary corrections less noticeable. 
 
-Our primary goal is to raise awareness of the illusion and its implications for statistics; the use of plots to guide the modeling process can leave us vulnerable to overlooking changes in the variance due to the illusion. While best practice has  been to plot the residuals separately, this removes the context of the data and is not practical before there is a model. In addition, the cognitive load required to interpret residuals separately from a model line can be reduced by showing the corrected data and model line together on the same plot. The proposed transformations require only a nonparametric smooth, maintain the context of the data, and require less cognitive load to interpret. While systematically modifying the data is uncommon in the statistical world, this approach is not out of place in the visual arts; the columns of the Parthenon are wider at the center than at the ends to ensure that they appear straight (counteracting the Hering illusion)\citep(naturalscenes, hering), similarly, painters often correct the hues used in shadows to account for color constancy in the brain. 
+Our primary goal is to raise awareness of the illusion and its implications for statistics; the use of plots to guide the modeling process can leave us vulnerable to overlooking changes in the variance due to the illusion. While best practice has  been to plot the residuals separately, this removes the context of the data and is not practical before there is a model. In addition, the cognitive load required to interpret residuals separately from a model line can be reduced by showing the corrected data and model line together on the same plot. The proposed transformations require only a nonparametric smooth, maintain the context of the data, and require less cognitive load to interpret. While systematically modifying the data is uncommon in the statistical world, this approach is not out of place in the visual arts; in an approach to counteract the effects of the Hering illusion \citep(naturalscenes, hering) the columns of the Parthenon are wider at the center than at the ends to ensure that they appear straight. Similarly, painters often correct the hues used in shadows to account for color constancy in the brain. 
 
-\begin{itemize}\item Raise Awareness\item ``Fixing" data is tricky and usually beyond a statistician's comfort zone, but we could see this as part of an applet where the ``fix" is done temporarily as a diagnostic measure
-\item iterative process - we're only doing first step. but then we don't have an explicit functional expression anymore
-\item we're only extending line lengths -- some normalization might help
-\item there's a long tradition in other disciplines of adjusting work for human cognition, e.g.~painters correct (what exactly? color shades based on context), architecture: columns of Parthenon are curved to appear straight,  floor and top are curved inwardly to appear straight from a distance.
-\item transformations allows us to keep the context, whereas best practice of trend removal does not do that and requires extra cognitive load to process the information.
-\end{itemize}
+% \begin{itemize}\item Raise Awareness\item ``Fixing" data is tricky and usually beyond a statistician's comfort zone, but we could see this as part of an applet where the ``fix" is done temporarily as a diagnostic measure
+% \item iterative process - we're only doing first step. but then we don't have an explicit functional expression anymore
+% \item we're only extending line lengths -- some normalization might help
+% \item there's a long tradition in other disciplines of adjusting work for human cognition, e.g.~painters correct (what exactly? color shades based on context), architecture: columns of Parthenon are curved to appear straight,  floor and top are curved inwardly to appear straight from a distance.
+% \item transformations allows us to keep the context, whereas best practice of trend removal does not do that and requires extra cognitive load to process the information.
+% \end{itemize}
 %
 %
 \bibliographystyle{asa}
