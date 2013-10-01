@@ -1722,7 +1722,7 @@ print(ranefCIstab, include.rownames=FALSE, file="./figure/ranef.txt", floating=F
 \end{table}
 \begin{table}[htbp]\centering
 \input{figure/ranef.txt}
-\caption{Overview of random effects for model~(\ref{model1}), including 95\% confidence intervals based on parameteric boostrap results ($N$=1000).}\label{randomeffectsresults
+\caption{Overview of random effects for model~(\ref{model1}), including 95\% confidence intervals based on parameteric boostrap results ($N$=1000).}\label{randomeffectsresults}
 \Sexpr{quantile(probs=c(0.025, 0.5, 0.975), as.vector(model.mcmc@sigma))}}
 \end{table}
 
