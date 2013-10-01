@@ -1644,7 +1644,7 @@ The variability of the random effects for each trial type is similar; but the mo
 
 
 %\done{Describe the reason for the approach taken - connect to sensory experiments that try to bound perceptual effects by approaching from both above and below.\\ Done above in the experiment description section, just before the applet was described.}
-<<<<<<< HEAD
+
 <<model-sim, echo=FALSE, include=FALSE, dependson='results-analysis'>>=
 # library(languageR) # gets p-values for lmer models
 # library(xtable)
@@ -1758,30 +1758,6 @@ names(ranefCIs)[4] <- "95% C.I."
 
 ranefCIstab <- xtable(ranefCIs, align=c("r","r", "c", "c", "c"), digits=3)
 print(ranefCIstab, include.rownames=FALSE, file="./figure/ranef.txt", floating=FALSE)
-=======
-<<modelres, echo=FALSE, include=FALSE, dependson='results-analysis'>>=
-library(xtable)
-
-fet <- ints[,c(4, 3, 5)]
-fet$"95% HPD CI" <- sprintf("(%.3f, %.3f)", fet[,2], fet[,3])
-fet <- cbind(fet, ints[,1:2])
-fet$type <- gsub(" Transformation", "", fet$type)
-fet$type[c(2,4)] <- ""
-fet$limit <- gsub("from below", "Lower", fet$limit)
-fet$limit <- gsub("from above", "Upper", fet$limit)
-names(fet) <- c("Estimate", "Lower", "Upper", "95% HPD CI", "Transformation", "Threshold")
-
-temp<- xtable(fet[,c(5,6,1,4)], digits=3)
-align(temp) <- c("r", rep("c", 4))
-print(temp, file="./figure/fixef.txt", floating=FALSE, include.rownames=FALSE, add.to.row=list(pos=list(2), command="[5pt]"))
-rdm.effects.table <- attributes(summary(model))$REmat
-# rdm.effects.table <- res$random[,c(1, 2, 3, 5, 6, 7)]
-names(rdm.effects.table) <- c("Groups", "Name", "Variance", "Std.Dev")
-rdm.effects.table[1,1] <- "Participant"
-temp <- xtable(rdm.effects.table)
-align(temp) <- c("r", "l", "l", rep("c", 2))
-print(temp, file="./figure/ranef.txt", floating=FALSE, include.rownames=FALSE)
->>>>>>> 27a3a521f89000cc04394e4e1f1932da5c7ffcc3
 @
 \begin{table}[htbp]\centering
 \input{figure/fixef.txt}
