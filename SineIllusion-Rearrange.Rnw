@@ -1555,7 +1555,7 @@ require(xtable)
 dt <- xtable(unique(user.avg.all[, c("type", "overall.avg")]))
 print(dt, include.rownames=FALSE)
 @
-\newdo{Could you make this a table of means with 95\% CI?}
+\newdo{Could you make this a table of means with 95\% CI?\\ What kind of CI? Just estimated from the density? Or do you want me to use a Wald interval and assume normality?}
 
 %\paragraph{Psychophysics Model} Traditionally, the method of limits \done{what is the method of limits, and how does it fit into the psychophysics model? - this is explained in the section ``Study Design"} requires several trials per participant, some from above the hypothesized threshold, some from below the hypothesized threshold \newdo{hold back on the example. Rather, describe the psychophysics model generally (don't forget to include literature references) and then apply it to the special case of this example. } (in this case, some with $w=0$ and some with $w=1$). These trials are then averaged to obtain a single threshold value. For this model, we will thus have to additionally exclude data from participants who did not complete one trial starting at 0 and one trial starting at 1 for each stimulus (so a participant who completed both $x$ trials and a $y$ trial starting at 0 would not be included when determining the optimal weight for $y$). \Sexpr{length(unique(user.avg.all$fingerprint))} users had sufficient data to calculate user-level optimum weights for one or both transformations using this method.
 
@@ -1591,7 +1591,7 @@ ggplot(data=user.avg.all) +
   theme_bw() + theme(legend.position="bottom") +
   xlim(c(-.2, 1.2)) + xlab("Optimal Weight") + ylab("Density")
 @
-\caption{Distribution of participant-level means using the standard method of limits analysis described in \citet{goldstein}. The overall means are both near 0.4, however, there is quite a bit of user-level variability. \newdo{be careful with the word distribution. what you are showing are estimated densities. }}
+\caption{Estimated density of participant-level means using the standard method of limits analysis described in \citet{goldstein}. The overall means are both near 0.4, however, there is quite a bit of user-level variability.}
 \end{figure}
 According to this analysis, the optimum transformation value for $x$ is \Sexpr{round(user.avg.x, 2)}, and the optimum transformation value for $y$ is \Sexpr{round(user.avg.y, 2)}. %In addition, only \Sexpr{nrow(subset(user.avg.all, avg<0 | avg > 1))} user averages were outside of the range of (0,1) for either trial. 
 While these results suggest that the transformation is useful and that complete transformation is not necessary, we can get more precise bounds on the range of acceptable transformation weights using a linear model that can incorporate starting points other than 0 and 1, and at the same time allow for user-specific variability. % as well as data from users that completed a sufficient number of trials but did not complete a trial starting at one of the endpoints. 
@@ -1605,8 +1605,8 @@ While these results suggest that the transformation is useful and that complete 
 
 In order to account for user-level variability, we fit a random effects model for the adjusted weight value as a function of  starting weight and trial type, with a random intercept for each participant. 
 
-\newdo{define ranges of i and j - how many participants did we have after the cleaning? - we should state that above.}
-\newtext{Let $W_{ij}$ denote the final adjustment to weight by participant $i$, $ 1 \le i \le XXX$, on trial $j$, $1 \le j \le n_i$. }
+\done{define ranges of i and j - how many participants did we have after the cleaning? - we should state that above.\\ It is stated above. (2nd bullet point on the exclusion criteria)}
+\newtext{Let $W_{ij}$ denote the final adjustment to weight by participant $i$, $ 1 \le i \le \Sexpr{nparticipants}$, on trial $j$, $1 \le j \le n_i$. }
 We model the final weight $W_{ij}$ as a function of the correction type $T(i,j)$  (where $T(i,j) \in  \{X, Y\}$), and starting weight $X_{ij}$, with a random intercept for participant to account for subject-specific ability: 
 \begin{align}\label{model1}
 W_{ij} &= \alpha_{T(i,j)} + \beta X_{ij} + \gamma_{i, T(i,j)} + \epsilon_{ij}\\
@@ -1644,6 +1644,7 @@ The variability of the random effects for each trial type is similar; but the mo
 
 
 %\done{Describe the reason for the approach taken - connect to sensory experiments that try to bound perceptual effects by approaching from both above and below.\\ Done above in the experiment description section, just before the applet was described.}
+<<<<<<< HEAD
 <<model-sim, echo=FALSE, include=FALSE, dependson='results-analysis'>>=
 # library(languageR) # gets p-values for lmer models
 # library(xtable)
@@ -1757,6 +1758,30 @@ names(ranefCIs)[4] <- "95% C.I."
 
 ranefCIstab <- xtable(ranefCIs, align=c("r","r", "c", "c", "c"), digits=3)
 print(ranefCIstab, include.rownames=FALSE, file="./figure/ranef.txt", floating=FALSE)
+=======
+<<modelres, echo=FALSE, include=FALSE, dependson='results-analysis'>>=
+library(xtable)
+
+fet <- ints[,c(4, 3, 5)]
+fet$"95% HPD CI" <- sprintf("(%.3f, %.3f)", fet[,2], fet[,3])
+fet <- cbind(fet, ints[,1:2])
+fet$type <- gsub(" Transformation", "", fet$type)
+fet$type[c(2,4)] <- ""
+fet$limit <- gsub("from below", "Lower", fet$limit)
+fet$limit <- gsub("from above", "Upper", fet$limit)
+names(fet) <- c("Estimate", "Lower", "Upper", "95% HPD CI", "Transformation", "Threshold")
+
+temp<- xtable(fet[,c(5,6,1,4)], digits=3)
+align(temp) <- c("r", rep("c", 4))
+print(temp, file="./figure/fixef.txt", floating=FALSE, include.rownames=FALSE, add.to.row=list(pos=list(2), command="[5pt]"))
+rdm.effects.table <- attributes(summary(model))$REmat
+# rdm.effects.table <- res$random[,c(1, 2, 3, 5, 6, 7)]
+names(rdm.effects.table) <- c("Groups", "Name", "Variance", "Std.Dev")
+rdm.effects.table[1,1] <- "Participant"
+temp <- xtable(rdm.effects.table)
+align(temp) <- c("r", "l", "l", rep("c", 2))
+print(temp, file="./figure/ranef.txt", floating=FALSE, include.rownames=FALSE)
+>>>>>>> 27a3a521f89000cc04394e4e1f1932da5c7ffcc3
 @
 \begin{table}[htbp]\centering
 \input{figure/fixef.txt}
@@ -1871,10 +1896,11 @@ ushcn$time <- decimal_date(ushcn$Time)
 
 %\clearpage
 \section{Conclusion}
+The sine illusion is a persistent and powerful illusion that is very difficult to counteract without modifying the visual stimulus directly. While ``fixing" data is anathema to typical statistical procedures, we cannot counteract the illusion and represent the data visually without some intervention. The proposals in this paper for transformations in $X$ and $Y$ provide the means to temporarily correct the data as a diagnostic measure, perhaps using an applet or R package for that purpose. These corrections are significant not only because of their implications for statistical graphics, but because previously attempts to resolve optical illusions using geometry have not met with success \citep{westheimer2008illusions}. These correcttions are only a first step and could be improved upon; currently, the corrections break down at extreme secant values, but multiple iterations of the correction procedure will likely resolve some of these issues (though iteration removes the convenience of a functional form for the transformation). Similarly, all of the corrections proposed here extend the line lengths (or for actual data, increase the deviation from the smooth line) - some normalization might make the necessary corrections less noticeable. 
+
+Our primary goal is to raise awareness of the illusion and its implications for statistics; the use of plots to guide the modeling process can leave us vulnerable to overlooking changes in the variance due to the illusion. While best practice has  been to plot the residuals separately, this removes the context of the data and is not practical before there is a model. In addition, the cognitive load required to interpret residuals separately from a model line can be reduced by showing the corrected data and model line together on the same plot. The proposed transformations require only a nonparametric smooth, maintain the context of the data, and require less cognitive load to interpret. While systematically modifying the data is uncommon in the statistical world, this approach is not out of place in the visual arts; the columns of the Parthenon are wider at the center than at the ends to ensure that they appear straight, similarly, painters often correct the hues used in shadows to account for color constancy in the brain. 
+
 \begin{itemize}\item Raise Awareness\item ``Fixing" data is tricky and usually beyond a statistician's comfort zone, but we could see this as part of an applet where the ``fix" is done temporarily as a diagnostic measure
-
-Such a correction is significant not only because of its effect on statistical graphics, but because previously attempts to resolve optical illusions using geometry have not met with success \citep{westheimer2008illusions}.
-
 \item iterative process - we're only doing first step. but then we don't have an explicit functional expression anymore
 \item we're only extending line lengths -- some normalization might help
 \item there's a long tradition in other disciplines of adjusting work for human cognition, e.g.~painters correct (what exactly? color shades based on context), architecture: columns of Parthenon are curved to appear straight,  floor and top are curved inwardly to appear straight from a distance.
