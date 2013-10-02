@@ -1814,14 +1814,14 @@ Figure \ref{fig:raw-temp}  shows temperature data from 422 stations across the U
 After removing the averages in Figure \ref{fig:boxplot-temp} to yield Figure \ref{fig:boxplot-resid-temp} the impression of higher variability in the peaks is only partially confirmed: there is higher variability in the winter, and lower variability in the summer, though there are more outliers in the summer than in the winter.
 
 <<correct-ushcn,echo=FALSE,cache=TRUE>>=
+library(grid)
 source("code/correctData.R")
 ushcn$temp <- ushcn$value/100
 ushcn$time <- decimal_date(ushcn$Time)
-# ushcn.cor <- correct("time", "temp", subset(ushcn, Year>1995), type="x")
-# ggplot() + geom_jitter(aes(time.correctx, value/100), data=subset(ushcn.cor, Year>1995), size=1)+ geom_smooth() + 
-#   ylab("Temperature (in Celsius)") + theme_bw() + theme(plot.margin = unit(c(0,6,0,0), "cm")) + xlab("Year") 
-# ggsave(file="figure/monthly-temps.pdf", width=12, height=4.5)
-
+ushcn.cor <- correct("time", "temp", subset(ushcn, Year>2008), type="x")
+ggplot() + geom_jitter(aes(time.correctx, value/100), data=subset(ushcn.cor, Year>1995), size=1)+ geom_smooth() + 
+  ylab("Temperature (in Celsius)") + theme_bw() + theme(plot.margin = unit(c(0,6,0,0), "cm")) + xlab("Year") 
+ggsave(file="figure/ushcn-x-corrected.pdf", width=12, height=4.5)
 @
 \paragraph{Transformation in $X$}
 \todo[inline]{figure of transformation and discussion}
