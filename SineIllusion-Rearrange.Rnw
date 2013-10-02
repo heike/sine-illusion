@@ -1855,7 +1855,7 @@ ushcn.cor2$variable <- gsub("temp", "Uncorrected", ushcn.cor2$variable)
 
 ushcn.cor.y <- rbind(ushcn.cor, subset(ushcn.cor2, variable!="Uncorrected"))
 ushcn.cor.y$variable <- factor(ushcn.cor.y$variable, levels=c("Corrected (w=1)", "Corrected (w=0.40)", "Uncorrected"))
-rm(list("ushcn.cor", "ushcn.cor2"))
+rm(list=c("ushcn.cor", "ushcn.cor2"))
 
 ggplot(aes(x=time, y=value, group=variable), data=ushcn.cor.y) + 
   geom_jitter(size=1)+ 
