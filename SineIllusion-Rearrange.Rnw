@@ -1814,21 +1814,74 @@ Figure \ref{fig:raw-temp}  shows temperature data from 422 stations across the U
 \paragraph{Trend removal}
 After removing the averages in Figure \ref{fig:boxplot-temp} to yield Figure \ref{fig:boxplot-resid-temp} the impression of higher variability in the peaks is only partially confirmed: there is higher variability in the winter, and lower variability in the summer, though there are more outliers in the summer than in the winter.
 
-<<correct-ushcn,echo=FALSE,cache=TRUE>>=
+<<correct-ushcn,echo=FALSE,cache=TRUE, include=FALSE>>=
 library(grid)
+library(gridExtra)
 source("code/correctData.R")
 ushcn$temp <- ushcn$value/100
 ushcn$time <- decimal_date(ushcn$Time)
-ushcn.cor <- correct("time", "temp", subset(ushcn, Year>2008), type="x")
-ggplot() + geom_jitter(aes(time.correctx, value/100), data=subset(ushcn.cor, Year>1995), size=1)+ geom_smooth() + 
-  ylab("Temperature (in Celsius)") + theme_bw() + theme(plot.margin = unit(c(0,6,0,0), "cm")) + xlab("Year") 
-ggsave(file="figure/ushcn-x-corrected.pdf", width=12, height=4.5)
+ushcn.cor <- correct("time", "temp", subset(ushcn[,-c(4, 5)], Year>2008), type="x", weight=1)
+ushcn.cor <- melt(ushcn.cor, id.vars=c(1:7, 10))
+ushcn.cor$variable <- gsub("time.correctx", "Corrected (w=1)", ushcn.cor$variable)
+ushcn.cor$variable <- gsub("time", "Uncorrected", ushcn.cor$variable)
+
+ushcn.cor2 <- correct("time", "temp", subset(ushcn[,-c(4, 5)], Year>2008), type="x", weight=.36)
+ushcn.cor2 <- melt(ushcn.cor2, id.vars=c(1:7, 10))
+ushcn.cor2$variable <- gsub("time.correctx", "Corrected (w=0.36)", ushcn.cor2$variable)
+ushcn.cor2$variable <- gsub("time", "Uncorrected", ushcn.cor2$variable)
+
+ushcn.cor <- rbind(ushcn.cor, subset(ushcn.cor2, variable!="Uncorrected"))
+ushcn.cor$variable <- factor(ushcn.cor$variable, levels=c("Corrected (w=1)", "Corrected (w=0.36)", "Uncorrected"))
+
+ggplot(aes(x=value, y=temp, group=variable), data=ushcn.cor) + 
+  geom_jitter(size=1)+ 
+  facet_grid(variable~.) +
+  geom_line(aes(y=temp.fit), colour="blue") + 
+  xlab("Year") +  
+  ylab("Temperature (in Celsius)") + 
+  theme_bw()
+ggsave(file="figure/ushcn-x-corrected.pdf", width=12, height=6)
+
+ushcn.cor <- correct("time", "temp", subset(ushcn[,-c(4, 5)], Year>2008), type="y", weight=1)
+ushcn.cor <- melt(ushcn.cor, id.vars=c(1:6, 8, 10))
+ushcn.cor$variable <- gsub("temp.correcty", "Corrected (w=1)", ushcn.cor$variable)
+ushcn.cor$variable <- gsub("temp", "Uncorrected", ushcn.cor$variable)
+
+ushcn.cor2 <- correct("time", "temp", subset(ushcn[,-c(4, 5)], Year>2008), type="y", weight=.40)
+ushcn.cor2 <- melt(ushcn.cor2, id.vars=c(1:6, 8, 10))
+ushcn.cor2$variable <- gsub("temp.correcty", "Corrected (w=0.40)", ushcn.cor2$variable)
+ushcn.cor2$variable <- gsub("temp", "Uncorrected", ushcn.cor2$variable)
+
+ushcn.cor <- rbind(ushcn.cor, subset(ushcn.cor2, variable!="Uncorrected"))
+ushcn.cor$variable <- factor(ushcn.cor$variable, levels=c("Corrected (w=1)", "Corrected (w=0.40)", "Uncorrected"))
+
+ggplot(aes(x=time, y=value, group=variable), data=ushcn.cor) + 
+  geom_jitter(size=1)+ 
+  facet_grid(variable~., scales="free_y") +
+  geom_line(aes(y=temp.fit), colour="blue") + 
+  xlab("Year") +  
+  ylab("Temperature (in Celsius)") + 
+  theme_bw()
+ggsave(file="figure/ushcn-y-corrected.pdf", width=12, height=6)
 @
 \paragraph{Transformation in $X$}
-\todo[inline]{figure of transformation and discussion}
-\paragraph{Transformation of $Y$}
-\todo[inline]{figure of transformation and discussion}
+In order to limit computational requirements, we applied the X transformation to four years of the ushcn data using the unweighted transformation and the weighted transformation with w=0.36. This value was chosen as it is approximately the midpoint of the range of acceptable values determined experimentally. The corrected and uncorrected data with fitted cubic splines are shown in Figure \ref{fig:ushcn-x-correct}. 
 
+\begin{figure}[htbp]
+\centering
+\includegraphics[keepaspectratio=TRUE,width=.9\linewidth]{figure/ushcn-x-corrected}
+\caption{Four years of USHCN data corrected using the x-transformation with w=1 and with w=0.36. At w=1, the transformation is severe, but it is clear that the variance decreases in the summer months and increases in the winter. When w=0.36, the transformation is much less noticable but results in a near-constant absolute slope of the fitted line, removing the presence of the sine illusion without excessively distorting the underlying function shape.}
+\label{fig:ushcn-x-correct}
+\end{figure}
+The minor effect of the weighted transformation on individual x-values contrasts with the effectiveness of the transformation in reducing the illusion; this is best seen in the fitted line, which is distinctly (piecewise) curved in the uncorrected data and appears to be much more piecewise linear in the corrected data, even at the reduced weighted value. 
+
+\paragraph{Transformation of $Y$}
+We also applied the Y transformation to four years of the ushcn data using the unweighted transformation and the weighted transformation with w=0.40. This value was chosen as it is approximately the midpoint of the range of acceptable values determined experimentally. The corrected and uncorrected data with fitted cubic splines are shown in Figure \ref{fig:ushcn-y-correct}. 
+\begin{figure}[htbp]
+\centering
+\includegraphics[keepaspectratio=TRUE,width=.9\linewidth]{figure/ushcn-y-corrected}
+\label{fig:ushcn-y-correct}
+\end{figure}
 %\clearpage
 \section{Conclusion}
 The sine illusion is a persistent and powerful illusion that is very difficult to counteract without modifying the visual stimulus directly. While ``fixing" data is anathema to typical statistical procedures, we cannot counteract the illusion and represent the data visually without some intervention. The proposals in this paper for transformations in $X$ and $Y$ provide the means to temporarily correct the data as a diagnostic measure, perhaps using an applet or R package for that purpose. These corrections are significant not only because of their implications for statistical graphics, but because previous attempts to resolve optical illusions using geometry have not met with success \citep{westheimer2008illusions}. These corrections are only a first step and could be improved upon; currently, the corrections break down for extreme (secant) values, but multiple iterations of the correction procedure will likely resolve some of these issues (though iteration removes the convenience of a functional form for the transformation). Similarly, all of the corrections proposed here extend the line lengths (or for actual data, increase the deviation from the smooth line) -- some normalization might make the necessary corrections less noticeable. 
