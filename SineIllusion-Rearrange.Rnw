@@ -1454,7 +1454,7 @@ model3 <- lmer(data=lm.data, endweight~ (type-1) + type:startweight + (type|fing
 # summary(model)
 N <- 1000
 
-model2.sim <- simulate(model2, nsim=1000)
+model2.sim <- simulate(model2, nsim=N)
 res <- llply(model2.sim, function(x) model2 <- lmer(data=lm.data, x~ (type-1) + startweight + (type-1|fingerprint)))
 
 # extract pieces for confidence intervals
@@ -1516,10 +1516,12 @@ ints.all$x <- rowMeans(ints.all[,2:3])
 
 ests <- data.frame(ests = c(fixef(model2)[1:2], fixef(model2)[1:2]+fixef(model2)[3]), type=rep(c("Y Transformation", "X Transformation"), 2))
 
-@
-<<results-analysis1,echo=FALSE, include=FALSE, fig.width=8, fig.height=6, dependson='results-analysis'>>=
+var2 <- as.numeric(c(attr(VarCorr(model2)$fingerprint, "stddev"), attr(VarCorr(model2), "sc")))
 
-ggplot() + theme_bw() + facet_grid(type~., scales="free") + ylim(c(0, 25)) +
+anovaprob <- anova(model2, model3)$`Pr(>Chisq)`[2]
+@
+<<results-analysis1,echo=FALSE, include=FALSE, fig.width=8, fig.height=5, dependson='results-analysis'>>=
+ggplot() + theme_bw() + facet_grid(type~., scales="free") + ylim(c(0, 27)) +
   geom_rect(data=ints.all, aes(xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax), 
             fill="grey75", alpha=.5) +
   geom_histogram(data=sim.fixed, aes(x=value, y=..density.., group=limit, fill=limit), binwidth=.01, position="identity") + 
@@ -1652,10 +1654,10 @@ Figure \ref{fig:MixedModelResults} shows density plots which demonstrate the rel
 
 The fitted model parameters are shown in tables \ref{fixedeffectsresults} and \ref{randomeffectsresults}.
 \newdo{Summarise the findings of the table in words.} 
-We use MCMC simulation to generate responses for each correction type and each participant from the model, which we use to both  create user-level densities as well as population-based posterior densities for the model parameters that allow us to determine credibility intervals. 
+We use parametric bootstrap to generate responses for each correction type and each participant from the model, which we use to both  create user-level densities, population-level densities, and bootstrap intervals for model parameters. 
 
 
-The variability of the random effects for each trial type is similar; but the model benefits significantly from allowing separate random effects for individual's variability by correction type (\Sexpr{library(lme4); summary(model2)@REmat[1,3]} and \Sexpr{summary(model2)@REmat[2,3]} for $Y$ and $X$ transformations, respectively, as opposed to \Sexpr{ summary(model)@REmat[1,3]} for the overall variability). The interaction between starting weight and trial type was not significant, however, and was thus removed from the model ($p$-value = \Sexpr{anova(model2, model3)$`Pr(>Chisq)`[2]}).
+The variability of the random effects for each trial type is similar; but the model benefits significantly from allowing separate random effects for individual's variability by correction type ( \Sexpr{var2[1]} and \Sexpr{var2[2]} for $Y$ and $X$ transformations, respectively, as opposed to \Sexpr{var2[3]} for the overall variability). The interaction between starting weight and trial type was not significant, however, and was thus removed from the model ($p-value = \Sexpr{anovaprob}$).
 
 %\newdo{Points of discussion for the model: one random effect for both types of correction, because there is no significant difference between the two obvious. One $\beta$ rather than one for each correction, because the interaction between type and starting weight is not significant (effect size and $p$-value XXX).}
 
@@ -1664,7 +1666,7 @@ The variability of the random effects for each trial type is similar; but the mo
 \begin{figure}[hbtp]
 \centering
 \includegraphics[keepaspectratio=TRUE, width=.9\linewidth]{figure/fig-results-analysis1}
-\caption{\label{fig:MixedModelResults} Simulation results from the fitted model, facetted by correction type. Fixed effects results are shown as histograms; the red values display the results when starting from an uncorrected plot and are concentrated around $w=\Sexpr{round(mean(ints$x[c(1,3)]), 2)}$; the blue values represent user-chosen weights when starting from a fully corrected plot and are concentrated around $w=\Sexpr{round(mean(ints$x[c(2,4)]), 2)}$. Additionally, 95\% Highest Posterior Density (HPD) credible intervals are shown as horizontal line segments above the histograms; these intervals are for the lower and upper bounds of the ``preferred weight interval'' tested in the experiment. User-level density curves show the individual variability around  fixed effects $\alpha_*$ and $\alpha_*+\beta$.}
+\caption{Simulation results from the fitted model, facetted by correction type. Fixed effects results are shown as histograms; the red values display the results when starting from an uncorrected plot and are concentrated around $w=\Sexpr{round(mean(ints$x[c(1,3)]), 2)}$; the blue values represent user-chosen weights when starting from a fully corrected plot and are concentrated around $w=\Sexpr{round(mean(ints$x[c(2,4)]), 2)}$. Additionally, 95\% bootstrap intervals are shown as horizontal line segments above the histograms; these intervals are for the lower and upper bounds of the ``preferred weight interval" tested in the experiment. User-level density curves show the individual variability around  fixed effects $\alpha_*$ and $\alpha_*+\beta$.}\label{fig:MixedModelResults}
 \end{figure}
 
 
@@ -1727,7 +1729,7 @@ print(ranefCIstab, include.rownames=FALSE, file="./figure/ranef.txt", floating=F
 %\Sexpr{quantile(probs=c(0.025, 0.5, 0.975), as.vector(model.mcmc@sigma))}}
 \end{table}
 
-MCMC simulations from the posterior distribution for each of the coefficients suggest that the optimal $w$ lies between \Sexpr{round(ints$x[1], 3)} and \Sexpr{round(ints$x[2], 3)} for $x$ and \Sexpr{round(ints$x[3], 3)} and \Sexpr{round(ints$x[4], 3)} for $y$, where the lower value is the estimate starting at $w=0$ and moving up, and the upper value is the estimate starting at $w=1$ and moving down. This suggests that either correction is preferrable to an uncorrected graph, and that a weighted correction is preferrable to the fully corrected graph, as neither 0 nor 1 is contained in any overall interval. 
+Bootstrap simulations for each of the coefficients suggest that the optimal $w$ lies between \Sexpr{round(ints$x[1], 3)} and \Sexpr{round(ints$x[2], 3)} for $x$ and \Sexpr{round(ints$x[3], 3)} and \Sexpr{round(ints$x[4], 3)} for $y$, where the lower value is the estimate starting at $w=0$ and moving up, and the upper value is the estimate starting at $w=1$ and moving down. This suggests that either correction is preferrable to an uncorrected graph, and that a weighted correction is preferrable to the fully corrected graph, as neither 0 nor 1 is contained in any overall interval. 
 
 \section{Application: USHCN Data}
 We will demonstrate the occurrence of the sine illusion as well as the suggested transformations at the example of data from the United States Historical Climatology Network \cite[USHCN;][]{ushcn, ushcn2}.
