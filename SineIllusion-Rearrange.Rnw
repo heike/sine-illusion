@@ -1451,11 +1451,17 @@ model2 <- lmer(data=lm.data, endweight~ (type-1) + startweight + (type|fingerpri
 model3 <- lmer(data=lm.data, endweight~ (type-1) + type:startweight + (type|fingerprint))
 
 
-# summary(model)
-N <- 1000
-
-model2.sim <- simulate(model2, nsim=N)
-res <- llply(model2.sim, function(x) model2 <- lmer(data=lm.data, x~ (type-1) + startweight + (type-1|fingerprint)))
+if (!file.exists("modelsim.RData")) {
+  # summary(model)
+  N <- 1000
+  
+  model2.sim <- simulate(model2, nsim=N)
+  res <- llply(model2.sim, function(x) model2 <- lmer(data=lm.data, x~ (type-1) + 
+                                                        startweight+ (type-1|fingerprint)))
+  save(res, file="modelsim.RData")
+} else {
+  load("modelsim.RData")
+}
 
 # extract pieces for confidence intervals
 ranefs <- ldply(res, function(x) attr(VarCorr(x)$fingerprint, which="stddev"))
