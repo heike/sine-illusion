@@ -1,17 +1,13 @@
 # Functions to correct actual data in x and y
 library(ggplot2)
-correct.x <- function(x, y, data, weight=NULL){ 
+correct.x <- function(x, y, data, model, f, fprime, f2prime=NULL, weight=NULL, ratio=1){ 
   if(length(weight)<1) weight=.36
   # since .361 is the midpoint of the left and right estimates of optimal values.
-  
-  model <- smooth.spline(data[,x], data[,y], df=floor(length(unique(data[,x]))/2))
 
-  f <- function(z) predict(model, x=z)$y
-  fprime <- function(z) abs(predict(model, x=z, deriv=1)$y)
   a <- min(data[,x])
   b <- max(data[,x])
   
-  const <- integrate(function(z) fprime(z), a, b, subdivisions=100*length(unique(data[,x])))$value
+  const <- integrate(function(z) abs(fprime(z)), a, b, subdivisions=100*length(unique(data[,x])))$value
   trans <- sapply(data[,x], function(i) integrate(function(z) abs(fprime(z)), a, i, subdivisions=100*length(unique(data[,x])))$value*(b-a)/const + a)
   #   const <- sum(abs(fprime(data[,x])))
   #   trans <- cumsum(abs(fprime(data[,x])))*(b-a)/const+a                  
@@ -22,14 +18,10 @@ correct.x <- function(x, y, data, weight=NULL){
   data
 }
 
-correct.y <- function(x, y, data, weight=NULL){
+correct.y <- function(x, y, data, model, f, fprime, f2prime=NULL, weight=NULL, ratio=1){
   if(length(weight)<1) weight = .40
   # since .407 is the midpoint of the left and right estimates of optimal values.
   
-  model <- smooth.spline(data[,x], data[,y], df=floor(length(unique(data[,x]))/2))
-  f <- function(z) predict(model, x=z)$y
-  fprime <- function(z) predict(model, x=z, deriv=1)$y
-  f2prime <- function(z) predict(model, x=z, deriv=2)$y
   
   df <- data.frame(x=data[,x], y=data[,y], 
                    pred=f(data[,x]), 
@@ -37,35 +29,43 @@ correct.y <- function(x, y, data, weight=NULL){
                    deriv2 = f2prime(data[,x]))
   df$resid <- df$y - df$pred
   
-  dy <- diff(range(df$y))
+  dy <- diff(range(df$pred))
+  dy1 <- diff(range(df$y))
   dx <- diff(range(df$x))
-  a <- dx/dy # aspect ratio : line "length" correction
-
+#   a <- dy/dy1  # aspect ratio : line "length" correction
+  a <- ratio
+  df$ell <-abs(df$resid)
+  
   # linear correction
-  df$ell <- abs(df$resid)
-  data[,paste(y, "correcty", sep=".")] <- 
-    df$pred + sign(df$resid)*(weight*(df$ell * sqrt(1 + a^2*df$deriv^2)) + (1-weight)*df$ell)
-  data[,paste(y, "fit", sep=".")] <- f(data[,x])
-  
+  cor <- (weight*sqrt(1 + a^2*fprime(df$x)^2) + (1-weight))
+  data[,paste(y, "correcty", sep=".")] <- df$pred + df$resid*cor
+#   
+
 #   # quadratic correction
-#   fp <- a*df$deriv
-#   f2p <- a*df$deriv2
+#   fp <- a*fprime(data[,x])
+#   f2p <- a*f2prime(data[,x])
 #   v <- 1 + fp^2
+#   
+#   a2 <- .5*fp^2*f2p
+#   b2 <- v
+#   c2 <- df$ell/2
+#   lambdapinv <- 0.5*(sqrt(v^2-f2p*fp^2*df$ell) + v)    
 #   lambdaminv <- 0.5*(sqrt(v^2+f2p*fp^2*df$ell) + v)
-#   lambdapinv <- 0.5*(sqrt(v^2-f2p*fp^2*df$ell) + v)
-#   data[,paste(y, "correcty", sep=".")] <- df$pred + sign(df$resid)*(
-#     (df$resid>=0)*0.5*abs(lambdaminv)/sqrt(v) + 
-#     (df$resid< 0)*0.5*abs(lambdapinv)/sqrt(v)
+#   
+#   lower <- abs(lambdapinv)/sqrt(v)
+#   upper <- abs(lambdaminv)/sqrt(v)
+#   data[,paste(y, "correcty", sep=".")] <- df$pred + (
+#     (df$resid>=0)*upper*df$resid + (df$resid<0)*lower*df$resid
 #     )
-#   use one correction if neg. resid, another if positive
   
+  data[,paste(y, "fit", sep=".")] <- f(data[,x])
   data
 
 }
 
-correct <- function(x, y, data, type, weight=NULL){
-  if(type=="x") correct.x(x, y, data, weight)
-  else correct.y(x, y, data, weight)
+correct <- function(x, y, data, type, model, f, fprime, f2prime=NULL, weight=NULL, ratio=1){
+  if(type=="x") correct.x(x, y, data, model, f, fprime, f2prime=NULL, weight, ratio)
+  else correct.y(x, y, data, model, f, fprime, f2prime=NULL, weight, ratio)
 }
 
 # datasub <- read.csv("data/Ozone/Ozone-subset.csv")
