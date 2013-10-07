@@ -690,6 +690,7 @@ Figure \ref{fig:xtrans-example} demonstrates not only the effect of transformati
 \subsection{Transformation in $Y$}
 Understanding the geometry of the sine illusion leads to another approach to counteracting  the conflict between the orthogonal width and the vertical length of the segment. 
 
+\newdo{Where is $\ell$ defined???}
 %All of our approaches in this section are based on a comparison of the orthogonal width to the vertical length of lines. 
 %%Studies have shown \cite{XXX, YYY} that onlookers generally evaluate orthogonal width rather than vertical or horizontal widths of lines.
 %By adjusting the vertical width in such a way that the (perceived) orthogonal width displays the quantity of interest, we can match an onlooker's intuitive evaluation of a situation  with the data values we want to present.
@@ -1045,10 +1046,11 @@ where $v = 1 + f^\prime(x_0)^2$.
 <<UncorRresults, echo=FALSE, fig.width=4, fig.height=3, out.width='\\linewidth'>>=
 dframe <- createSine(40,1, f=f, fprime=fprime, f2prime=f2prime)
  qplot(x=x, xend=xend, y = f(x) -ell/2, yend=f(x) +ell/2, geom="segment", data=dframe) +
-   theme(panel.background=element_blank(), axis.title = element_blank()) + 
+  theme_bw() + 
+   theme(axis.title = element_blank(), plot.margin=unit(rep(0,4), "lines")) + 
    coord_equal(ratio=1)+ 
    xlab("x") + ylab("y") +
-   scale_x_continuous(breaks=seq(0, 2*pi, by=pi/2), minor_breaks=minor.axis.correction,
+   scale_x_continuous(breaks=seq(0, 2*pi, by=pi/2), minor_breaks=seq(pi/4, 2*pi-pi/4, by=pi/2),
                       labels=c("0", expression(paste(pi,"/2")), expression(pi), expression(paste("3",pi, "/2")), expression(paste("2",pi))))
 @
 \caption{Uncorrected}
@@ -1058,7 +1060,8 @@ dframe <- createSine(40,1, f=f, fprime=fprime, f2prime=f2prime)
 <<LinearResults,echo=FALSE, fig.width=4, fig.height=3, out.width='\\linewidth'>>=
 dframe <- createSine(40,1, f=f, fprime=fprime, f2prime=f2prime)
  qplot(x=x, xend=xend, y = f(x) -ellx/2, yend=f(x) +ellx/2, geom="segment", data=dframe) +
-   theme(panel.background=element_blank(), axis.title = element_blank()) + 
+     theme_bw() + 
+   theme(axis.title = element_blank(), plot.margin=unit(rep(0,4), "lines")) + 
    coord_equal(ratio=1)+ 
    xlab("x") + ylab("y") +
    scale_x_continuous(breaks=seq(0, 2*pi, by=pi/2), minor_breaks=minor.axis.correction,
@@ -1071,18 +1074,17 @@ dframe <- createSine(40,1, f=f, fprime=fprime, f2prime=f2prime)
 <<CtsAdjustedResults,echo=FALSE, dependson='CtsQuadratic', fig.width=4, fig.height=3, out.width='\\linewidth'>>=
 dframe <- createSine(n = 40, len = 1, f=f, fprime=fprime, f2prime=f2prime) 
 qplot(x=x, xend=x, y=y+ellx4.u, yend=y-ellx4.l, geom="segment", data=dframe, linetype=I(1)) +   
-   theme(panel.background=element_blank(), axis.title = element_blank()) + 
+     theme_bw() + 
+   theme(axis.title = element_blank(), plot.margin=unit(rep(0,4), "lines")) + 
    coord_equal(ratio=1)+ 
    xlab("x") + ylab("y") +
    scale_x_continuous(breaks=seq(0, 2*pi, by=pi/2), minor_breaks=minor.axis.correction,
                       labels=c("0", expression(paste(pi,"/2")), expression(pi), expression(paste("3",pi, "/2")), expression(paste("2",pi))))
 @
-\caption{Quadratic correction }
+\caption{Quadratic correction}
 \end{subfigure}
 \caption[Quadratic Approximation]{
-In the quadratic approximation top and bottom segments of the vertical lines are adjusted separately.
-\newdo{The gridlines are off - can you please double check?; the boxes are also gone missing;
-could you try to make the pictures a bit bigger - plot.margins of 0 should do the trick}}
+In the quadratic approximation top and bottom segments of the vertical lines are adjusted separately.}
 \label{fig:GeneralQuadraticCorrection} 
 \end{figure}
 
@@ -1407,7 +1409,7 @@ noutliers.y <- sum(trial.sum$endwt.outlier & trial.sum$type=="y")
 ntrials2 <- nrow(subset(trial.sum, incl.startwt & incl.trials))
 
 lm.data <- subset(trial.sum, incl.startwt & incl.trials & !endwt.outlier, stringsAsFactors=FALSE)
-
+nparticipant2 <- length(unique(lm.data$fingerprint))
 
 trials.per.participant <- mean(ddply(lm.data, .(fingerprint), summarise, ntrials=mean(ntrials))$ntrials)
 
@@ -1552,7 +1554,7 @@ ggplot() + theme_bw() + facet_grid(type~., scales="free") + ylim(c(0, 27)) +
 @
 Participants were recruited from Amazon Mechanical Turk and the \href{http://reddit.com/r/SampleSize}{reddit} community. %\Sexpr{nparticipants} participants in total took part in the study with \Sexpr{ntrials} total evaluations. 
 
-\newdo{We need to go through the paper and get rid of the 95\% HDP intervals ... we are not doing MCMC anymore, so this needs to be adjusted}
+\done{We need to go through the paper and get rid of the 95\% HDP intervals ... we are not doing MCMC anymore, so this needs to be adjusted}
 As this study was done outside a laboratory setting, we can not tell a participant's willingness to follow the guidelines and put in their best effort. This, besides potential technical issues (server outage, speed of response) make a careful selection of data going into the analysis unavoidable. The following exclusion criteria were used:
 \begin{itemize}
 \item Participant did not interact with the applet: we required a participant to use the adjustment at least once in order to include data for this trial. 
@@ -1585,11 +1587,16 @@ Figure~\ref{fig:overtransform} shows results at the threshold of acceptability. 
 The psychophysics model is based on  weighted averages (by adjustment type) of all trials with starting weights $w_0 = 0$ and 1:
 <<psycho, echo=FALSE, results='asis'>>=
 require(xtable)
-dt <- xtable(unique(user.avg.all[, c("type", "overall.avg")]))
-print(dt, include.rownames=FALSE)
+dt.int <- ddply(user.avg.all, .(type), summarize, overall.avg=unique(overall.avg), sd=sd(avg))
+model <- lm(avg~type-1, data=user.avg.all)
+temp <- as.data.frame(cbind(coef(model), confint(model)))
+temp$CI <- sprintf("(%.04f, %.04f)", temp[,2], temp[,3])
+rownames(temp) <- c("X", "Y")
+names(temp)[1] <- "Estimate"
+temp <- temp[,c(1, 4)]
+dt <- xtable(temp)
+print(dt)
 @
-\newdo{Could you make this a table of means with 95\% CI?\\ What kind of CI? Just estimated from the density? Or do you want me to use a Wald interval and assume normality?\\
-I guess the psychophysics guys would estimate standard deviation from the sample and put it in a Wald CI ...}
 
 %\paragraph{Psychophysics Model} Traditionally, the method of limits \done{what is the method of limits, and how does it fit into the psychophysics model? - this is explained in the section ``Study Design"} requires several trials per participant, some from above the hypothesized threshold, some from below the hypothesized threshold \newdo{hold back on the example. Rather, describe the psychophysics model generally (don't forget to include literature references) and then apply it to the special case of this example. } (in this case, some with $w=0$ and some with $w=1$). These trials are then averaged to obtain a single threshold value. For this model, we will thus have to additionally exclude data from participants who did not complete one trial starting at 0 and one trial starting at 1 for each stimulus (so a participant who completed both $x$ trials and a $y$ trial starting at 0 would not be included when determining the optimal weight for $y$). \Sexpr{length(unique(user.avg.all$fingerprint))} users had sufficient data to calculate user-level optimum weights for one or both transformations using this method.
 
@@ -1639,7 +1646,7 @@ While these results suggest that the transformation is useful and that complete 
 
 In order to account for user-level variability, we fit a random effects model for the adjusted weight value as a function of  starting weight and trial type, with a random intercept for each participant. 
 
-Let $W_{ij}$ denote the final adjustment to weight by participant $i$, $ 1 \le i \le \Sexpr{nparticipants}$ \newdo{We can't use nparticipants - that's too many, we need to get rid of the invalid ones ... I think we only have 126 actual participants}, on trial $j$, $1 \le j \le n_i$. 
+Let $W_{ij}$ denote the final adjustment to weight by participant $i$, $ 1 \le i \le \Sexpr{nparticipant2}$ , on trial $j$, $1 \le j \le n_i$. 
 We model the final weight $W_{ij}$ as a function of the correction type $T(i,j)$  (where $T(i,j) \in  \{X, Y\}$), and starting weight $X_{ij}$, with a random intercept for participant to account for subject-specific ability: 
 \begin{align}\label{model1}
 W_{ij} &= \alpha_{T(i,j)} + \beta X_{ij} + \gamma_{i, T(i,j)} + \epsilon_{ij}\\
@@ -1655,11 +1662,10 @@ W_{ij} &= \alpha_{T(i,j)} + \beta X_{ij} + \gamma_{i, T(i,j)} + \epsilon_{ij}\\
 %
 %This approach to model parameters suggests that $\alpha_X$ and $\alpha_Y$ should be interpreted as the lower bound of the interval of plausible weights and $\beta$ should be interpreted as the length of the interval of plausible weights. 
 $\beta$ can therefore be interpreted as the length of the interval of plausible weights. 
-Figure \ref{fig:MixedModelResults} shows density plots which demonstrate the relationship between the starting weight value and the user-submitted ``optimal'' weight value. 
-\newdo{describe the relationship in words}
+Figure \ref{fig:MixedModelResults} shows density plots which demonstrate the relationship between the starting weight value and the user-submitted ``optimal'' weight value. Higher starting weights are associated with higher user-submitted values, and lower starting weights are associated with lower user-submitted values. As users had to increment or decrement the weight value, this suggests that there is a range of acceptable values, and as users entered that range, they proceeded to the next trial. 
 
-The fitted model parameters are shown in tables \ref{fixedeffectsresults} and \ref{randomeffectsresults}.
-\newdo{Summarise the findings of the table in words.} 
+The fitted model parameters are shown in tables \ref{fixedeffectsresults} and \ref{randomeffectsresults}. Each transformation type has a lower bound (corresponding to starting at $w=0$) and an upper bound (corresponding to starting at $w=1$); these values are derived from the linear model parameters, where the lower bound is $\alpha_{T(i,j)}$ and the upper bound is $\alpha_{T(i,j)}+\beta X_{ij}$. The $X$ and $Y$ bounds are similar, with $X$ bounds slightly lower than $Y$ bounds; that is, the optimal weight is slightly higher for $Y$ than for $X$. In addition, Table \ref{randomeffectsresults} shows that the variability within a single individual's trials is higher than the variability within participants in both types of trials. 
+
 We use parametric bootstrap to generate responses for each correction type and each participant from the model, which we use to both  create user-level densities, population-level densities, and bootstrap intervals for model parameters. 
 
 
@@ -1735,7 +1741,7 @@ print(ranefCIstab, include.rownames=FALSE, file="./figure/ranef.txt", floating=F
 %\Sexpr{quantile(probs=c(0.025, 0.5, 0.975), as.vector(model.mcmc@sigma))}}
 \end{table}
 
-Bootstrap simulations for each of the coefficients suggest that the optimal $w$ lies between \Sexpr{round(ints$x[1], 3)} and \Sexpr{round(ints$x[2], 3)} for $x$ and \Sexpr{round(ints$x[3], 3)} and \Sexpr{round(ints$x[4], 3)} for $y$, where the lower value is the estimate starting at $w=0$ and moving up, and the upper value is the estimate starting at $w=1$ and moving down. This suggests that either correction is preferrable to an uncorrected graph, and that a weighted correction is preferrable to the fully corrected graph, as neither 0 nor 1 is contained in any overall interval. 
+Bootstrap simulations for each of the coefficients suggest that the optimal $w$ lies between \Sexpr{round(ints$x[2], 3)} and \Sexpr{round(ints$x[3], 3)} for $x$ and \Sexpr{round(ints$x[1], 3)} and \Sexpr{round(ints$x[4], 3)} for $y$, where the lower value is the estimate starting at $w=0$ and moving up, and the upper value is the estimate starting at $w=1$ and moving down. This suggests that either correction is preferrable to an uncorrected graph, and that a weighted correction is preferrable to the fully corrected graph, as neither 0 nor 1 is contained in any overall interval. 
 
 \section{Application: USHCN Data}
 We will demonstrate the occurrence of the sine illusion as well as the suggested transformations at the example of data from the United States Historical Climatology Network \cite[USHCN;][]{ushcn, ushcn2}.
@@ -1826,12 +1832,16 @@ library(gridExtra)
 source("code/correctData.R")
 ushcn$temp <- ushcn$value/100
 ushcn$time <- decimal_date(ushcn$Time)
-ushcn.cor <- correct("time", "temp", subset(ushcn[,-c(4, 5)], Year>2008), type="x", weight=1)
+model <- lm(temp~time + sin(2*pi*time) + cos(2*pi*time), data=ushcn)
+f <- function(x){37.345515048 + -0.008496204*x -0.415575133*sin(2*pi*x) -11.751984486*cos(2*pi*x)}
+fprime <- function(x){-0.008496204 -0.415575133*2*pi*cos(2*pi*x) +11.751984486*2*pi*sin(2*pi*x)}
+f2prime <- function(x){(2*pi)^2*(0.415575133*sin(2*pi*x) +11.751984486*cos(2*pi*x))}
+ushcn.cor <- correct("time", "temp", subset(ushcn[,-c(4, 5)], Year>2008), type="x", f=f, fprime=fprime, f2prime=f2prime, weight=1)
 ushcn.cor <- melt(ushcn.cor, id.vars=c(1:7, 10))
 ushcn.cor$variable <- gsub("time.correctx", "Corrected (w=1)", ushcn.cor$variable)
 ushcn.cor$variable <- gsub("time", "Uncorrected", ushcn.cor$variable)
 
-ushcn.cor2 <- correct("time", "temp", subset(ushcn[,-c(4, 5)], Year>2008), type="x", weight=.36)
+ushcn.cor2 <- correct("time", "temp", subset(ushcn[,-c(4, 5)], Year>2008), type="x", f=f, fprime=fprime, f2prime=f2prime, weight=.36)
 ushcn.cor2 <- melt(ushcn.cor2, id.vars=c(1:7, 10))
 ushcn.cor2$variable <- gsub("time.correctx", "Corrected (w=0.36)", ushcn.cor2$variable)
 ushcn.cor2$variable <- gsub("time", "Uncorrected", ushcn.cor2$variable)
@@ -1843,18 +1853,18 @@ rm(list=c("ushcn.cor", "ushcn.cor2"))
 ggplot(aes(x=value, y=temp, group=variable), data=ushcn.cor.x) + 
   geom_jitter(size=1, position = position_jitter(width = 1/36))+ 
   facet_grid(variable~.) +
-  geom_line(aes(y=temp.fit), colour="blue") + 
+  geom_line(data=ushcn.cor.x, aes(y=temp.fit), colour="blue") + 
   xlab("Year") +  
   ylab("Temperature (in Celsius)") + 
   theme_bw()
 ggsave(file="figure/ushcn-x-corrected.pdf", width=12, height=6)
 
-ushcn.cor <- correct("time", "temp", subset(ushcn[,-c(4, 5)], Year>2008), type="y", weight=1)
+ushcn.cor <- correct("time", "temp", subset(ushcn[,-c(4, 5)], Year>2008), type="y", f=f, fprime=fprime, f2prime=f2prime, weight=1, ratio=1/60)
 ushcn.cor <- melt(ushcn.cor, id.vars=c(1:6, 8, 10))
 ushcn.cor$variable <- gsub("temp.correcty", "Corrected (w=1)", ushcn.cor$variable)
 ushcn.cor$variable <- gsub("temp", "Uncorrected", ushcn.cor$variable)
 
-ushcn.cor2 <- correct("time", "temp", subset(ushcn[,-c(4, 5)], Year>2008), type="y", weight=.40)
+ushcn.cor2 <- correct("time", "temp", subset(ushcn[,-c(4, 5)], Year>2008), type="y", f=f, fprime=fprime, f2prime=f2prime, weight=.40, ratio=1/60)
 ushcn.cor2 <- melt(ushcn.cor2, id.vars=c(1:6, 8, 10))
 ushcn.cor2$variable <- gsub("temp.correcty", "Corrected (w=0.40)", ushcn.cor2$variable)
 ushcn.cor2$variable <- gsub("temp", "Uncorrected", ushcn.cor2$variable)
@@ -1865,7 +1875,7 @@ rm(list=c("ushcn.cor", "ushcn.cor2"))
 
 ggplot(aes(x=time, y=value, group=variable), data=ushcn.cor.y) + 
   geom_jitter(size=1)+ 
-  facet_grid(variable~., scales="free_y") +
+  facet_grid(variable~.) +
   geom_line(aes(y=temp.fit), colour="blue") + 
   xlab("Year") +  
   ylab("Temperature (in Celsius)") + 
@@ -1878,7 +1888,7 @@ In order to limit computational requirements, we applied the X transformation to
 \begin{figure}[htbp]
 \centering
 \includegraphics[keepaspectratio=TRUE,width=.9\linewidth]{figure/ushcn-x-corrected}
-\caption{Four years of USHCN data corrected using the x-transformation with w=1 and with w=0.36. At w=1, the transformation is severe, but it is clear that the variance decreases in the summer months and increases in the winter. When w=0.36, the transformation is much less noticable but results in a near-constant absolute slope of the fitted line, removing the presence of the sine illusion without excessively distorting the underlying function shape.}
+\caption{Four years of USHCN data corrected using the $X$ transformation with w=1 and with w=0.36. At w=1, the transformation is severe, but it is clear that the variance decreases in the summer months and increases in the winter. When w=0.36, the transformation is much less noticable but results in a near-constant absolute slope of the fitted line, removing the presence of the sine illusion without excessively distorting the underlying function shape.}
 \label{fig:ushcn-x-correct}
 \end{figure}
 The minor effect of the weighted transformation on individual x-values contrasts with the effectiveness of the transformation in reducing the illusion; this is best seen in the fitted line, which is distinctly (piecewise) curved in the uncorrected data and appears to be much more piecewise linear in the corrected data, even at the reduced weighted value. 
@@ -1888,8 +1898,10 @@ We also applied the Y transformation to four years of the ushcn data using the u
 \begin{figure}[htbp]
 \centering
 \includegraphics[keepaspectratio=TRUE,width=.9\linewidth]{figure/ushcn-y-corrected}
+\caption{Four years of USHCN data corrected using the $Y$ transformation with $w=1$ and $w=0.40$. The transformations are relatively slight but have a notable impact on the visual salience of outliers in summer temperature, allowing the viewer to recognize that summer temperatures are less variable but more prone to outliers, while winter temperatures are more variable with fewer outliers. The $w=0.40$ transformation serves as a middle ground between untransformed and fully transformed data.}
 \label{fig:ushcn-y-correct}
 \end{figure}
+\newdo{The $y$ correction is unnoticeable because the aspect ratio is sooo weird in this plot. Our correction factor is 1/90, because we have 4 years of data and 60 degrees temp difference, spread over a plot that is 2in high by 12 in wide. For demonstration purposes, I've tweaked it to be 1/60 instead, which shows some slight differences.}
 %\clearpage
 \section{Conclusion}
 The sine illusion is a persistent and powerful illusion that is very difficult to counteract without modifying the visual stimulus directly. While ``fixing" data is anathema to typical statistical procedures, we cannot counteract the illusion and represent the data visually without some intervention. The proposals in this paper for transformations in $X$ and $Y$ provide the means to temporarily correct the data as a diagnostic measure, perhaps using an applet or R package for that purpose. These corrections are significant not only because of their implications for statistical graphics, but because previous attempts to resolve optical illusions using geometry have not met with success \citep{westheimer2008illusions}. These corrections are only a first step and could be improved upon; currently, the corrections break down for extreme (secant) values, but multiple iterations of the correction procedure will likely resolve some of these issues (though iteration removes the convenience of a functional form for the transformation). Similarly, all of the corrections proposed here extend the line lengths (or for actual data, increase the deviation from the smooth line) -- some normalization might make the necessary corrections less noticeable. 
