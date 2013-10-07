@@ -1824,12 +1824,16 @@ library(gridExtra)
 source("code/correctData.R")
 ushcn$temp <- ushcn$value/100
 ushcn$time <- decimal_date(ushcn$Time)
-ushcn.cor <- correct("time", "temp", subset(ushcn[,-c(4, 5)], Year>2008), type="x", weight=1)
+model <- lm(temp~time + sin(2*pi*time) + cos(2*pi*time), data=ushcn)
+f <- function(x){37.345515048 + -0.008496204*x -0.415575133*sin(2*pi*x) -11.751984486*cos(2*pi*x)}
+fprime <- function(x){-0.008496204 -0.415575133*2*pi*cos(2*pi*x) +11.751984486*2*pi*sin(2*pi*x)}
+f2prime <- function(x){(2*pi)^2*(0.415575133*sin(2*pi*x) +11.751984486*cos(2*pi*x))}
+ushcn.cor <- correct("time", "temp", subset(ushcn[,-c(4, 5)], Year>2008), type="x", f=f, fprime=fprime, f2prime=f2prime, weight=1)
 ushcn.cor <- melt(ushcn.cor, id.vars=c(1:7, 10))
 ushcn.cor$variable <- gsub("time.correctx", "Corrected (w=1)", ushcn.cor$variable)
 ushcn.cor$variable <- gsub("time", "Uncorrected", ushcn.cor$variable)
 
-ushcn.cor2 <- correct("time", "temp", subset(ushcn[,-c(4, 5)], Year>2008), type="x", weight=.36)
+ushcn.cor2 <- correct("time", "temp", subset(ushcn[,-c(4, 5)], Year>2008), type="x", f=f, fprime=fprime, f2prime=f2prime, weight=.36)
 ushcn.cor2 <- melt(ushcn.cor2, id.vars=c(1:7, 10))
 ushcn.cor2$variable <- gsub("time.correctx", "Corrected (w=0.36)", ushcn.cor2$variable)
 ushcn.cor2$variable <- gsub("time", "Uncorrected", ushcn.cor2$variable)
@@ -1841,18 +1845,18 @@ rm(list=c("ushcn.cor", "ushcn.cor2"))
 ggplot(aes(x=value, y=temp, group=variable), data=ushcn.cor.x) + 
   geom_jitter(size=1, position = position_jitter(width = 1/36))+ 
   facet_grid(variable~.) +
-  geom_line(aes(y=temp.fit), colour="blue") + 
+  geom_line(data=ushcn.cor.x, aes(y=temp.fit), colour="blue") + 
   xlab("Year") +  
   ylab("Temperature (in Celsius)") + 
   theme_bw()
 ggsave(file="figure/ushcn-x-corrected.pdf", width=12, height=6)
 
-ushcn.cor <- correct("time", "temp", subset(ushcn[,-c(4, 5)], Year>2008), type="y", weight=1)
+ushcn.cor <- correct("time", "temp", subset(ushcn[,-c(4, 5)], Year>2008), type="y", f=f, fprime=fprime, f2prime=f2prime, weight=1, ratio=1/50)
 ushcn.cor <- melt(ushcn.cor, id.vars=c(1:6, 8, 10))
 ushcn.cor$variable <- gsub("temp.correcty", "Corrected (w=1)", ushcn.cor$variable)
 ushcn.cor$variable <- gsub("temp", "Uncorrected", ushcn.cor$variable)
 
-ushcn.cor2 <- correct("time", "temp", subset(ushcn[,-c(4, 5)], Year>2008), type="y", weight=.40)
+ushcn.cor2 <- correct("time", "temp", subset(ushcn[,-c(4, 5)], Year>2008), type="y", f=f, fprime=fprime, f2prime=f2prime, weight=.40, ratio=1/50)
 ushcn.cor2 <- melt(ushcn.cor2, id.vars=c(1:6, 8, 10))
 ushcn.cor2$variable <- gsub("temp.correcty", "Corrected (w=0.40)", ushcn.cor2$variable)
 ushcn.cor2$variable <- gsub("temp", "Uncorrected", ushcn.cor2$variable)
@@ -1863,7 +1867,7 @@ rm(list=c("ushcn.cor", "ushcn.cor2"))
 
 ggplot(aes(x=time, y=value, group=variable), data=ushcn.cor.y) + 
   geom_jitter(size=1)+ 
-  facet_grid(variable~., scales="free_y") +
+  facet_grid(variable~.) +
   geom_line(aes(y=temp.fit), colour="blue") + 
   xlab("Year") +  
   ylab("Temperature (in Celsius)") + 
@@ -1888,6 +1892,7 @@ We also applied the Y transformation to four years of the ushcn data using the u
 \includegraphics[keepaspectratio=TRUE,width=.9\linewidth]{figure/ushcn-y-corrected}
 \label{fig:ushcn-y-correct}
 \end{figure}
+\newdo{The $y$ correction is unnoticeable because the aspect ratio is sooo weird in this plot. Our correction factor is 1/90, because we have 4 years of data and 60 degrees temp difference, spread over a plot that is 2in high by 12 in wide. For demonstration purposes, I've tweaked it to be 1/50 instead, which shows some slight differences.}
 %\clearpage
 \section{Conclusion}
 The sine illusion is a persistent and powerful illusion that is very difficult to counteract without modifying the visual stimulus directly. While ``fixing" data is anathema to typical statistical procedures, we cannot counteract the illusion and represent the data visually without some intervention. The proposals in this paper for transformations in $X$ and $Y$ provide the means to temporarily correct the data as a diagnostic measure, perhaps using an applet or R package for that purpose. These corrections are significant not only because of their implications for statistical graphics, but because previous attempts to resolve optical illusions using geometry have not met with success \citep{westheimer2008illusions}. These corrections are only a first step and could be improved upon; currently, the corrections break down for extreme (secant) values, but multiple iterations of the correction procedure will likely resolve some of these issues (though iteration removes the convenience of a functional form for the transformation). Similarly, all of the corrections proposed here extend the line lengths (or for actual data, increase the deviation from the smooth line) -- some normalization might make the necessary corrections less noticeable. 
