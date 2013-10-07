@@ -1890,6 +1890,7 @@ We also applied the Y transformation to four years of the ushcn data using the u
 \begin{figure}[htbp]
 \centering
 \includegraphics[keepaspectratio=TRUE,width=.9\linewidth]{figure/ushcn-y-corrected}
+\caption{Four years of USHCN data corrected using the $Y$ transformation with $w=1$ and $w=0.40$. The transformations are relatively slight but have a notable impact on the visual salience of outliers in summer temperature, allowing the viewer to recognize that summer temperatures are less variable but more prone to outliers, while winter temperatures are more variable with fewer outliers. The $w=0.40$ transformation serves as a middle ground between untransformed and fully transformed data.}
 \label{fig:ushcn-y-correct}
 \end{figure}
 \newdo{The $y$ correction is unnoticeable because the aspect ratio is sooo weird in this plot. Our correction factor is 1/90, because we have 4 years of data and 60 degrees temp difference, spread over a plot that is 2in high by 12 in wide. For demonstration purposes, I've tweaked it to be 1/50 instead, which shows some slight differences.}
