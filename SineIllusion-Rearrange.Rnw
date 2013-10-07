@@ -1081,12 +1081,10 @@ qplot(x=x, xend=x, y=y+ellx4.u, yend=y-ellx4.l, geom="segment", data=dframe, lin
    scale_x_continuous(breaks=seq(0, 2*pi, by=pi/2), minor_breaks=minor.axis.correction,
                       labels=c("0", expression(paste(pi,"/2")), expression(pi), expression(paste("3",pi, "/2")), expression(paste("2",pi))))
 @
-\caption{Quadratic correction }
+\caption{Quadratic correction}
 \end{subfigure}
 \caption[Quadratic Approximation]{
-In the quadratic approximation top and bottom segments of the vertical lines are adjusted separately.
-\newdo{The gridlines are off - can you please double check?; the boxes are also gone missing;
-could you try to make the pictures a bit bigger - plot.margins of 0 should do the trick}}
+In the quadratic approximation top and bottom segments of the vertical lines are adjusted separately.}
 \label{fig:GeneralQuadraticCorrection} 
 \end{figure}
 
@@ -1550,7 +1548,7 @@ ggplot() + theme_bw() + facet_grid(type~., scales="free") + ylim(c(0, 27)) +
 @
 Participants were recruited from Amazon Mechanical Turk and the \href{http://reddit.com/r/SampleSize}{reddit} community. %\Sexpr{nparticipants} participants in total took part in the study with \Sexpr{ntrials} total evaluations. 
 
-\newdo{We need to go through the paper and get rid of the 95\% HDP intervals ... we are not doing MCMC anymore, so this needs to be adjusted}
+\done{We need to go through the paper and get rid of the 95\% HDP intervals ... we are not doing MCMC anymore, so this needs to be adjusted}
 As this study was done outside a laboratory setting, we can not tell a participant's willingness to follow the guidelines and put in their best effort. This, besides potential technical issues (server outage, speed of response) make a careful selection of data going into the analysis unavoidable. The following exclusion criteria were used:
 \begin{itemize}
 \item Participant did not interact with the applet: we required a participant to use the adjustment at least once in order to include data for this trial. 
@@ -1583,11 +1581,16 @@ Figure~\ref{fig:overtransform} shows results at the threshold of acceptability. 
 The psychophysics model is based on  weighted averages (by adjustment type) of all trials with starting weights $w_0 = 0$ and 1:
 <<psycho, echo=FALSE, results='asis'>>=
 require(xtable)
-dt <- xtable(unique(user.avg.all[, c("type", "overall.avg")]))
-print(dt, include.rownames=FALSE)
+dt.int <- ddply(user.avg.all, .(type), summarize, overall.avg=unique(overall.avg), sd=sd(avg))
+model <- lm(avg~type-1, data=user.avg.all)
+temp <- as.data.frame(cbind(coef(model), confint(model)))
+temp$CI <- sprintf("(%.04f, %.04f)", temp[,2], temp[,3])
+rownames(temp) <- c("X", "Y")
+names(temp)[1] <- "Estimate"
+temp <- temp[,c(1, 4)]
+dt <- xtable(temp)
+print(dt)
 @
-\newdo{Could you make this a table of means with 95\% CI?\\ What kind of CI? Just estimated from the density? Or do you want me to use a Wald interval and assume normality?\\
-I guess the psychophysics guys would estimate standard deviation from the sample and put it in a Wald CI ...}
 
 %\paragraph{Psychophysics Model} Traditionally, the method of limits \done{what is the method of limits, and how does it fit into the psychophysics model? - this is explained in the section ``Study Design"} requires several trials per participant, some from above the hypothesized threshold, some from below the hypothesized threshold \newdo{hold back on the example. Rather, describe the psychophysics model generally (don't forget to include literature references) and then apply it to the special case of this example. } (in this case, some with $w=0$ and some with $w=1$). These trials are then averaged to obtain a single threshold value. For this model, we will thus have to additionally exclude data from participants who did not complete one trial starting at 0 and one trial starting at 1 for each stimulus (so a participant who completed both $x$ trials and a $y$ trial starting at 0 would not be included when determining the optimal weight for $y$). \Sexpr{length(unique(user.avg.all$fingerprint))} users had sufficient data to calculate user-level optimum weights for one or both transformations using this method.
 
@@ -1653,11 +1656,10 @@ W_{ij} &= \alpha_{T(i,j)} + \beta X_{ij} + \gamma_{i, T(i,j)} + \epsilon_{ij}\\
 %
 %This approach to model parameters suggests that $\alpha_X$ and $\alpha_Y$ should be interpreted as the lower bound of the interval of plausible weights and $\beta$ should be interpreted as the length of the interval of plausible weights. 
 $\beta$ can therefore be interpreted as the length of the interval of plausible weights. 
-Figure \ref{fig:MixedModelResults} shows density plots which demonstrate the relationship between the starting weight value and the user-submitted ``optimal'' weight value. 
-\newdo{describe the relationship in words}
+Figure \ref{fig:MixedModelResults} shows density plots which demonstrate the relationship between the starting weight value and the user-submitted ``optimal'' weight value. Higher starting weights are associated with higher user-submitted values, and lower starting weights are associated with lower user-submitted values. As users had to increment or decrement the weight value, this suggests that there is a range of acceptable values, and as users entered that range, they proceeded to the next trial. 
 
-The fitted model parameters are shown in tables \ref{fixedeffectsresults} and \ref{randomeffectsresults}.
-\newdo{Summarise the findings of the table in words.} 
+The fitted model parameters are shown in tables \ref{fixedeffectsresults} and \ref{randomeffectsresults}. Each transformation type has a lower bound (corresponding to starting at $w=0$) and an upper bound (corresponding to starting at $w=1$); these values are derived from the linear model parameters, where the lower bound is $\alpha_{T(i,j)}$ and the upper bound is $\alpha_{T(i,j)}+\beta X_{ij}$. The $X$ and $Y$ bounds are similar, with $X$ bounds slightly lower than $Y$ bounds; that is, the optimal weight is slightly higher for $Y$ than for $X$. In addition, Table \ref{randomeffectsresults} shows that the variability within a single individual's trials is higher than the variability within participants in both types of trials. 
+
 We use parametric bootstrap to generate responses for each correction type and each participant from the model, which we use to both  create user-level densities, population-level densities, and bootstrap intervals for model parameters. 
 
 
@@ -1851,12 +1853,12 @@ ggplot(aes(x=value, y=temp, group=variable), data=ushcn.cor.x) +
   theme_bw()
 ggsave(file="figure/ushcn-x-corrected.pdf", width=12, height=6)
 
-ushcn.cor <- correct("time", "temp", subset(ushcn[,-c(4, 5)], Year>2008), type="y", f=f, fprime=fprime, f2prime=f2prime, weight=1, ratio=1/50)
+ushcn.cor <- correct("time", "temp", subset(ushcn[,-c(4, 5)], Year>2008), type="y", f=f, fprime=fprime, f2prime=f2prime, weight=1, ratio=1/60)
 ushcn.cor <- melt(ushcn.cor, id.vars=c(1:6, 8, 10))
 ushcn.cor$variable <- gsub("temp.correcty", "Corrected (w=1)", ushcn.cor$variable)
 ushcn.cor$variable <- gsub("temp", "Uncorrected", ushcn.cor$variable)
 
-ushcn.cor2 <- correct("time", "temp", subset(ushcn[,-c(4, 5)], Year>2008), type="y", f=f, fprime=fprime, f2prime=f2prime, weight=.40, ratio=1/50)
+ushcn.cor2 <- correct("time", "temp", subset(ushcn[,-c(4, 5)], Year>2008), type="y", f=f, fprime=fprime, f2prime=f2prime, weight=.40, ratio=1/60)
 ushcn.cor2 <- melt(ushcn.cor2, id.vars=c(1:6, 8, 10))
 ushcn.cor2$variable <- gsub("temp.correcty", "Corrected (w=0.40)", ushcn.cor2$variable)
 ushcn.cor2$variable <- gsub("temp", "Uncorrected", ushcn.cor2$variable)
@@ -1893,7 +1895,7 @@ We also applied the Y transformation to four years of the ushcn data using the u
 \caption{Four years of USHCN data corrected using the $Y$ transformation with $w=1$ and $w=0.40$. The transformations are relatively slight but have a notable impact on the visual salience of outliers in summer temperature, allowing the viewer to recognize that summer temperatures are less variable but more prone to outliers, while winter temperatures are more variable with fewer outliers. The $w=0.40$ transformation serves as a middle ground between untransformed and fully transformed data.}
 \label{fig:ushcn-y-correct}
 \end{figure}
-\newdo{The $y$ correction is unnoticeable because the aspect ratio is sooo weird in this plot. Our correction factor is 1/90, because we have 4 years of data and 60 degrees temp difference, spread over a plot that is 2in high by 12 in wide. For demonstration purposes, I've tweaked it to be 1/50 instead, which shows some slight differences.}
+\newdo{The $y$ correction is unnoticeable because the aspect ratio is sooo weird in this plot. Our correction factor is 1/90, because we have 4 years of data and 60 degrees temp difference, spread over a plot that is 2in high by 12 in wide. For demonstration purposes, I've tweaked it to be 1/60 instead, which shows some slight differences.}
 %\clearpage
 \section{Conclusion}
 The sine illusion is a persistent and powerful illusion that is very difficult to counteract without modifying the visual stimulus directly. While ``fixing" data is anathema to typical statistical procedures, we cannot counteract the illusion and represent the data visually without some intervention. The proposals in this paper for transformations in $X$ and $Y$ provide the means to temporarily correct the data as a diagnostic measure, perhaps using an applet or R package for that purpose. These corrections are significant not only because of their implications for statistical graphics, but because previous attempts to resolve optical illusions using geometry have not met with success \citep{westheimer2008illusions}. These corrections are only a first step and could be improved upon; currently, the corrections break down for extreme (secant) values, but multiple iterations of the correction procedure will likely resolve some of these issues (though iteration removes the convenience of a functional form for the transformation). Similarly, all of the corrections proposed here extend the line lengths (or for actual data, increase the deviation from the smooth line) -- some normalization might make the necessary corrections less noticeable. 
