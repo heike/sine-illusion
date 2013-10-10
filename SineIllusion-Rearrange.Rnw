@@ -1836,8 +1836,19 @@ model <- lm(temp~time + sin(2*pi*time) + cos(2*pi*time), data=ushcn)
 f <- function(x){37.345515048 + -0.008496204*x -0.415575133*sin(2*pi*x) -11.751984486*cos(2*pi*x)}
 fprime <- function(x){-0.008496204 -0.415575133*2*pi*cos(2*pi*x) +11.751984486*2*pi*sin(2*pi*x)}
 f2prime <- function(x){(2*pi)^2*(0.415575133*sin(2*pi*x) +11.751984486*cos(2*pi*x))}
-asp <- ((4/3)/70)/(10/12) # image vs coordinate aspect ratio 
-startyear <- 2000
+asp <- .025 # image vs coordinate aspect ratio 
+startyear <- 1995
+gridlines <- seq(1996, 2013, .3)
+minor.axis.correction <- 
+  c(correct("x", "y", data.frame(x=gridlines, y=f(gridlines)), type="x", f=f, fprime=fprime, f2prime=f2prime, weight=1)$x.correctx, 
+    correct("x", "y", data.frame(x=gridlines, y=f(gridlines)), type="x", f=f, fprime=fprime, f2prime=f2prime, weight=.36)$x.correctx
+  )
+                           
+dots <- data.frame(x = minor.axis.correction, 
+                   y = rep(-10, length(minor.axis.correction)), 
+                   variable = rep(c("Corrected (w=1)", "Corrected (w=0.36)"), 
+                                  each=length(gridlines)))
+
 
 ushcn.cor <- correct("time", "temp", subset(ushcn[,-c(4, 5)], Year>startyear), type="x", f=f, fprime=fprime, f2prime=f2prime, weight=1)
 ushcn.cor <- melt(ushcn.cor, id.vars=c(1:7, 10))
@@ -1850,13 +1861,16 @@ ushcn.cor2$variable <- gsub("time.correctx", "Corrected (w=0.36)", ushcn.cor2$va
 ushcn.cor2$variable <- gsub("time", "Uncorrected", ushcn.cor2$variable)
 
 ushcn.cor.x <- rbind(ushcn.cor, subset(ushcn.cor2, variable!="Uncorrected"))
-ushcn.cor.x$variable <- factor(ushcn.cor.x$variable, levels=c("Corrected (w=1)", "Corrected (w=0.36)", "Uncorrected"))
+ushcn.cor.x <- subset(ushcn.cor.x, variable!="Uncorrected" & value>=1996)
+# ushcn.cor.x$variable <- factor(ushcn.cor.x$variable, levels=c("Corrected (w=1)", "Corrected (w=0.36)", "Uncorrected"))
+ushcn.cor.x$variable <- factor(ushcn.cor.x$variable, levels=c("Corrected (w=1)", "Corrected (w=0.36)"))
 rm(list=c("ushcn.cor", "ushcn.cor2"))
 
-ggplot(aes(x=value, y=temp, group=variable), data=ushcn.cor.x) + 
-  geom_jitter(size=1, position = position_jitter(width = 1/36), alpha=.75)+ 
+ggplot(data=ushcn.cor.x) + 
+  geom_jitter(aes(x=value, y=temp, group=variable), size=1.5, position = position_jitter(width = 1/36), alpha=.75)+ 
   facet_grid(variable~.) +
-  geom_line(data=ushcn.cor.x, aes(y=temp.fit), colour="steelblue", size=1.5) + 
+  geom_line(data=ushcn.cor.x, aes(x=value, y=temp.fit), colour="steelblue", size=1.5) + 
+  geom_rug(data=dots, aes(x=x))+
   xlab("Year") +  
   ylab("Temperature (in Celsius)") + 
   theme_bw()
@@ -1873,7 +1887,9 @@ ushcn.cor2$variable <- gsub("temp.correcty", "Corrected (w=0.40)", ushcn.cor2$va
 ushcn.cor2$variable <- gsub("temp", "Uncorrected", ushcn.cor2$variable)
 
 ushcn.cor.y <- rbind(ushcn.cor, subset(ushcn.cor2, variable!="Uncorrected"))
-ushcn.cor.y$variable <- factor(ushcn.cor.y$variable, levels=c("Corrected (w=1)", "Corrected (w=0.40)", "Uncorrected"))
+ushcn.cor.y <- subset(ushcn.cor.y, variable!="Uncorrected" & time>=1996)
+# ushcn.cor.y$variable <- factor(ushcn.cor.y$variable, levels=c("Corrected (w=1)", "Corrected (w=0.40)", "Uncorrected"))
+ushcn.cor.y$variable <- factor(ushcn.cor.y$variable, levels=c("Corrected (w=1)", "Corrected (w=0.40)"))
 rm(list=c("ushcn.cor", "ushcn.cor2"))
 
 ggplot(aes(x=time, y=value, group=variable), data=ushcn.cor.y) + 
@@ -1886,22 +1902,22 @@ ggplot(aes(x=time, y=value, group=variable), data=ushcn.cor.y) +
 ggsave(file="figure/ushcn-y-corrected.pdf", width=10, height=8)
 @
 \paragraph{Transformation in $X$}
-In order to limit computational requirements, we applied the X transformation to the most recent twelve years of the ushcn data using the unweighted transformation and the weighted transformation with w=0.36. This value was chosen as it is approximately the midpoint of the range of acceptable values determined experimentally. The corrected and uncorrected data with fitted cubic splines are shown in Figure \ref{fig:ushcn-x-correct}. 
+We applied the X transformation to the ushcn data using the unweighted transformation and the weighted transformation with w=0.36. This value was chosen as it is approximately the midpoint of the range of acceptable values determined experimentally. The corrected and uncorrected data with fitted cubic splines are shown in Figure \ref{fig:ushcn-x-correct}. 
 
 \begin{figure}[htbp]
 \centering
 \includegraphics[keepaspectratio=TRUE,width=.9\linewidth]{figure/ushcn-x-corrected}
-\caption{Twelve years of USHCN data corrected using the $X$ transformation with w=1 and with w=0.36. At w=1, the transformation is severe, but it is clear that the variance decreases in the summer months and increases in the winter. When w=0.36, the transformation is much less noticable but results in a near-constant absolute slope of the fitted line, removing the presence of the sine illusion without excessively distorting the underlying function shape.}
+\caption{USHCN temperature data from 1996-2010 corrected using the $X$ transformation with w=1 and with w=0.36. At w=1, the transformation is severe, but it is clear that the variance decreases in the summer months and increases in the winter. When w=0.36, the transformation is much less noticable but results in a near-constant absolute slope of the fitted line, removing the presence of the sine illusion without excessively distorting the underlying function shape.}
 \label{fig:ushcn-x-correct}
 \end{figure}
 The minor effect of the weighted transformation on individual x-values contrasts with the effectiveness of the transformation in reducing the illusion; this is best seen in the fitted line, which is distinctly (piecewise) curved in the uncorrected data and appears to be much more piecewise linear in the corrected data, even at the reduced weighted value. 
 
 \paragraph{Transformation of $Y$}
-We also applied the Y transformation to twelve years of the ushcn data using the unweighted transformation and the weighted transformation with w=0.40. This value was chosen as it is approximately the midpoint of the range of acceptable values determined experimentally. The corrected and uncorrected data with fitted cubic splines are shown in Figure \ref{fig:ushcn-y-correct}. 
+We also applied the Y transformation to the ushcn data using the unweighted transformation and the weighted transformation with w=0.40. This value was chosen as it is approximately the midpoint of the range of acceptable values determined experimentally. The corrected and uncorrected data with fitted cubic splines are shown in Figure \ref{fig:ushcn-y-correct}. 
 \begin{figure}[htbp]
 \centering
 \includegraphics[keepaspectratio=TRUE,width=.9\linewidth]{figure/ushcn-y-corrected}
-\caption{Twelve years of USHCN data corrected using the $Y$ transformation with $w=1$ and $w=0.40$. The transformations are relatively slight but have a notable impact on the visual salience of outliers in summer temperature, allowing the viewer to recognize that summer temperatures are less variable but more prone to outliers, while winter temperatures are more variable with fewer outliers. The $w=0.40$ transformation serves as a middle ground between untransformed and fully transformed data.}
+\caption{USHCN temperature data corrected using the $Y$ transformation with $w=1$ and $w=0.40$. The transformations are relatively slight but have a notable impact on the visual salience of outliers in summer temperature, allowing the viewer to recognize that summer temperatures are less variable but more prone to outliers, while winter temperatures are more variable with fewer outliers. The $w=0.40$ transformation serves as a middle ground between untransformed and fully transformed data.}
 \label{fig:ushcn-y-correct}
 \end{figure}
 %\clearpage

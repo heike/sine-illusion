@@ -7,8 +7,8 @@ correct.x <- function(x, y, data, model, f, fprime, f2prime=NULL, weight=NULL, r
   a <- min(data[,x])
   b <- max(data[,x])
   
-  const <- integrate(function(z) abs(fprime(z)), a, b, subdivisions=100*length(unique(data[,x])))$value
-  trans <- sapply(data[,x], function(i) integrate(function(z) abs(fprime(z)), a, i, subdivisions=100*length(unique(data[,x])))$value*(b-a)/const + a)
+  const <- integrate(function(z) abs(fprime(z)), a, b, subdivisions=1000*length(unique(data[,x])), abs.tol=0.001, rel.tol=0.001)$value
+  trans <- sapply(data[,x], function(i) integrate(function(z) abs(fprime(z)), a, i, subdivisions=1000*length(unique(data[,x])), abs.tol=0.001, rel.tol=0.001)$value*(b-a)/const + a)
   #   const <- sum(abs(fprime(data[,x])))
   #   trans <- cumsum(abs(fprime(data[,x])))*(b-a)/const+a                  
   
