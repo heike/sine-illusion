@@ -1304,13 +1304,9 @@ For the first six starting weights $w_0$ values were chosen with equal probabili
 A trial begins with the presentation of a graph at the chosen starting weight $w_0$. Participants adjust the graph using increment and decrement buttons. A trial ends with the participant clicking the `submit' button, at which point the weight for the final adjustment is recorded. This provides a clear starting value and ending value, allowing us to assess the range of optimal values for each participant. In addition to weight, type, and user submission, time-series data for each user interaction are recorded, as well as anonymized user-specific data (partial IP address, hashed IP address, and hashed browser characteristics) sufficient to provide a user `fingerprint' to distinguish and recognize individual users (or rather their computer settings). 
 
 Each participant is provided with two initial ``training'' trials: in the first two trials a graph of the underlying mean function is superimposed on the line segments to give participants some idea of the  function the lines represent. This approach was taken to reduce  incidences of extremely high ``x'' correction values, as large adjustment values do not change the impression of same line length, but the resulting function bears little resemblance to a sine function, see figure~\ref{fig:overtransform} for examples of overcorrection. %because when $w>\!\!>1$, the lines still look to be of equal length but the underlying function bears little resemblance to $\sin(x)$, as shown in figure \ref{fig:overtransform}. 
-
-
-
-
-\subsection{Results}
+%
 % Data preparation
-
+%
 <<overcorrectlimits, out.width='.45\\linewidth', fig.width=6, fig.height=4, dependson='xtransform', echo=FALSE, include=FALSE>>=
 # what do the different corrections look like outside of the boundary region for outliers?
 f <- sin
@@ -1349,7 +1345,7 @@ qplot(data=correction.extremes, geom="segment", x=xstart, xend=xend, y=ystart, y
        axis.title = element_blank(), axis.ticks = element_blank(), 
        axis.text = element_blank()) + coord_equal(ratio=1)
 @
-
+%
 <<results-analysis,echo=FALSE, cache=TRUE, include=FALSE, fig.width=8, fig.height=6, dependson='overcorrectlimits'>>=
 trial.sum <- read.csv("./data/SummaryTable.csv", row.names=1, stringsAsFactors=FALSE)
 trial.sequence <- read.csv("./data/IndivTrajectory.csv", row.names=1, stringsAsFactors=FALSE)
@@ -1555,14 +1551,22 @@ ggplot() + theme_bw() + facet_grid(type~., scales="free") + ylim(c(0, 27)) +
   scale_fill_manual("Approach", values=c("#d6604d", "#4393c3"),
                     breaks=c("From Below", "From Above")) + 
   geom_errorbarh(aes(xmin=xmin, x=x, xmax=xmax, y=20, color=limit), data=ints) + 
-  theme(legend.position="bottom") + geom_point(aes(x=ests, y=20), data=ests) +
+  theme(legend.position="bottom", plot.margin=unit(c(0,0,0,0), unit="cm")) + geom_point(aes(x=ests, y=20), data=ests) +
   xlim(c(-.2, 1.2)) +
 #   geom_point(data=ints.all, aes(x=xmax, y=0, size=factor("Range")), shape=NA, colour="grey75") +
 #   guides(colour=guide_legend(order=1), fill=guide_legend(order=1), size=guide_legend("Range of\nacceptable weights", override.aes=list(shape=15, size = 10), order=3)) +
   geom_text(data=ints, aes(x=x, y=22.5, label=label), parse=TRUE) + 
-  geom_text(data=ints.all, colour="grey30", aes(x=x, y=15.5, label="Range of\nacceptable weights"))
+  geom_text(data=ints.all, colour="grey30", aes(x=x, y=15.5, label="Range of\nacceptable weights")) + theme(plot.margin=unit(c(0,0,0,0), unit="cm"))
 
 @
+\begin{figure}[htbp]\centering
+\includegraphics[keepaspectratio=TRUE,width=.9\linewidth]{figure/fig-overcorrectlimits}
+\caption[Overcorrected transformations excluded from the analysis]{Transformation weights outside of the intervals [\Sexpr{wlowy}, \Sexpr{whighy}] for $y$ and [\Sexpr{wlowx}, \Sexpr{whighx}] for $x$  produce figures which do not maintain the underlying function shape (in $x$) or which are composed of extremely uneven length lines (in $y$). Trials with final results that were more extreme than these examples were excluded from the analysis.}
+\label{fig:overtransform}
+\end{figure}
+
+\subsection{Results}
+%
 Participants were recruited from Amazon Mechanical Turk and the \href{http://reddit.com/r/SampleSize}{reddit} community. %\Sexpr{nparticipants} participants in total took part in the study with \Sexpr{ntrials} total evaluations. 
 
 As this study was done outside a laboratory setting, we can not tell a participant's willingness to follow the guidelines and put in their best effort. This, besides potential technical issues (server outage, speed of response) make a careful selection of data going into the analysis unavoidable. The following exclusion criteria were used:
@@ -1570,19 +1574,17 @@ As this study was done outside a laboratory setting, we can not tell a participa
 \item Participant did not interact with the applet: we required a participant to use the adjustment at least once in order to include data for this trial. 
 \item Participants finished fewer than four trials: while participants were asked to complete twelve trials, some did not finish all of those. In order to stabilize predictions of random effects, participants' data was excluded, if there were fewer than four trials (\Sexpr{nparticipants-nparttrials} out of a total of \Sexpr{nparticipants} participants).
 \item Out-of-bounds results: weights leading to severely over- or undercorrected results were excluded from the analysis. 
-For trials to adjust $Y$-values, weights outside of [\Sexpr{wlowy}, \Sexpr{whighy}]  show dramatically unequal line lengths; weights from $X$-transformations outside the range of [\Sexpr{wlowx}, \Sexpr{whighx}] do not preserve the underlying function shape and concavity 
+For trials to adjust $Y$-values, weights outside of [\Sexpr{wlowy}, \Sexpr{whighy}]  show dramatically unequal line lengths; weights from $X$-transformations outside the range of [\Sexpr{wlowx}, \Sexpr{whighx}] do not preserve the underlying function shape and concavity. 
 Figure~\ref{fig:overtransform} shows results at the threshold of acceptability. Only more severely distorted results were excluded from the analysis (\Sexpr{noutliers.x} of the $X$ and \Sexpr{noutliers.y} of the $Y$ trials out of \Sexpr{ntrials2} trials remaining after application of other criteria).
 \end{itemize}
+
+
 The following analysis is based on the cleaned data, consisting of \Sexpr{length(unique(lm.data$ipid))} participants with \Sexpr{nrow(lm.data)} valid trial results.
 
 % \newtext{After removing data according to these criteria, we noticed that there were many responses for the $x$ correction that tended towards the endpoints of the weight value. These responses indicated that the participant did not attempt to maintain the underlying function, and the trials should thus be excluded from calculation of the optimal weight. This occurs as a result of an artifact of the x correction which enables participants to more easily perceive a three-dimensional image at corrections outside of [0,1] at the expense of the underlying mean function, as shown in figure \ref{fig:overtransform}.}
 
 
-\begin{figure}[htbp]\centering
-\includegraphics[keepaspectratio=TRUE,width=.9\linewidth]{figure/fig-overcorrectlimits}
-\caption[Overcorrected transformations excluded from the analysis]{Transformation weights outside of the intervals [\Sexpr{wlowy}, \Sexpr{whighy}] for $y$ and [\Sexpr{wlowx}, \Sexpr{whighx}] for $x$  produce figures which do not maintain the underlying function shape (in $x$) or which are composed of extremely uneven length lines (in $y$). Trials with final results that were more extreme than these examples were excluded from the analysis.}
-\label{fig:overtransform}
-\end{figure}
+
 
 %In addition to the $x$ transformation artifact, there were a few user reports of applet lag, so that the only option to continue was to ``submit'' the trial (or ``skip'' it), even though the final graph had not rendered correctly; this resulted in a recorded value more extreme than the participant intended. To account for these technological difficulties, the exclusion criteria were applied to trials from both transformations. Importantly, in both types of trials, values outside of [\Sexpr{wlow}, \Sexpr{whigh}] demonstrate remarkable deviations from the criteria described to the participants; $x$ transformations outside of that range do not preserve the underlying function shape and concavity and $y$ transformations outside of that range show dramatically unequal line lengths. Hence, user values outside of these ranges likely indicate user noncompliance or equipment malfunction. Responses were removed if they fell outside the [\Sexpr{wlow}, \Sexpr{whigh}] interval (\Sexpr{noutliers.x} of type $X$  and \Sexpr{noutliers.y} type $Y$ trials, for a total of \Sexpr{noutliers} trials).
 
@@ -1630,7 +1632,7 @@ print(dt)
 %Then, for each trial type, we can compute an average over the participants as well as compare the distributions of participant ``optimal" weight values. 
 
 \begin{figure}[htbp]\centering
-<<meanDists,echo=FALSE,out.width='.75\\linewidth', dependson='results-analysis', fig.width=7, fig.height=4, message=FALSE, warning=FALSE>>=
+<<meanDists,echo=FALSE,out.width='.65\\linewidth', dependson='results-analysis', fig.width=7, fig.height=4, message=FALSE, warning=FALSE>>=
 user.avg.all$Type <- toupper(user.avg.all$type)
 ggplot(data=user.avg.all) + 
   geom_density(aes(x=avg, fill=type), alpha=0.8) + 
@@ -1675,24 +1677,10 @@ We can therefore interpret $\beta$ as the length of the interval of plausible we
 
 \begin{figure}[hbtp]
 \centering
-\includegraphics[keepaspectratio=TRUE, width=.9\linewidth]{figure/fig-results-analysis1}
+\includegraphics[keepaspectratio=TRUE, width=.85\linewidth]{figure/fig-results-analysis1}
 \caption{Simulation results from the fitted model, facetted by correction type. Fixed effects results are shown as histograms; the red values display the results when starting from an uncorrected plot and are concentrated around $w=\Sexpr{round(mean(ints$x[c(1,3)]), 2)}$; the blue values represent user-chosen weights when starting from a fully corrected plot and are concentrated around $w=\Sexpr{round(mean(ints$x[c(2,4)]), 2)}$. Additionally, 95\% bootstrap intervals are shown as horizontal line segments above the histograms; these intervals are for the lower and upper bounds of the ``preferred weight interval" tested in the experiment. User-level density curves show the individual variability around  fixed effects $\alpha_*$ and $\alpha_*+\beta$.}\label{fig:MixedModelResults}
 \end{figure}
-
 Figure \ref{fig:MixedModelResults} shows density plots which demonstrate the relationship between the starting weight value and the user-submitted ``optimal'' weight value. Higher starting weights are associated with higher user-submitted values, and lower starting weights are associated with lower user-submitted values. As users had to increment or decrement the weight value, this suggests that there is a range of acceptable values, and as users entered that range, they proceeded to the next trial. 
-
-The fitted model parameters are shown in tables \ref{fixedeffectsresults} and \ref{randomeffectsresults}. Each transformation type has a lower bound (corresponding to starting at $w=0$) and an upper bound (corresponding to starting at $w=1$); these values are derived from the linear model parameters, where the lower bound is $\alpha_{T(i,j)}$ and the upper bound is $\alpha_{T(i,j)}+\beta X_{ij}$. The $X$ and $Y$ bounds are similar, with $X$ bounds slightly lower than $Y$ bounds; that is, the optimal weight is slightly higher for $Y$ than for $X$. In addition, Table \ref{randomeffectsresults} shows that the variability within a single individual's trials is higher than the variability within participants in both types of trials. 
-
-We use parametric bootstrap to generate responses for each correction type and each participant from the model, which we use to both  create user-level densities, population-level densities, and bootstrap intervals for model parameters. 
-
-
-The variability of the random effects for each trial type is similar; but the model benefits significantly from allowing separate random effects for individual's variability by correction type (\Sexpr{var2[1]} and \Sexpr{var2[2]} for $Y$ and $X$ transformations, respectively, as opposed to \Sexpr{var2[3]} for the overall variability). The interaction between starting weight and trial type was not significant, however, and was thus removed from the model ($p$-value = \Sexpr{anovaprob}).
-
-%\newdo{Points of discussion for the model: one random effect for both types of correction, because there is no significant difference between the two obvious. One $\beta$ rather than one for each correction, because the interaction between type and starting weight is not significant (effect size and $p$-value XXX).}
-
-%\done{Make the interpretation of $\alpha_X$ and $\alpha_Y$ as the lower threshold of plausible weights and  $\beta$ as the interval length of plausible weights  even more obvious, i.e. add a sentence to that effect :)}
-
-
 
 <<modelres, echo=FALSE, results='hide', dependson='results-analysis'>>=
 require(xtable)
@@ -1744,7 +1732,6 @@ print(ranefCIstab, include.rownames=FALSE, file="./figure/ranef.txt", floating=F
 @
 \begin{table}[htbp]\centering
 \input{figure/fixef.txt}
-
 \caption{Fixed effect estimates of model~(\ref{model1}) for the boundaries for reasonable weights. In parentheses,  95\% parametric bootstrap confidence intervals are given based on model (\ref{model1}) ($N$=1000).}\label{fixedeffectsresults}
 \end{table}
 \begin{table}[hbtp]\centering
@@ -1752,6 +1739,20 @@ print(ranefCIstab, include.rownames=FALSE, file="./figure/ranef.txt", floating=F
 \caption{Overview of random effects for model~(\ref{model1}), including 95\% confidence intervals based on parameteric boostrap results ($N$=1000).}\label{randomeffectsresults}
 %\Sexpr{quantile(probs=c(0.025, 0.5, 0.975), as.vector(model.mcmc@sigma))}}
 \end{table}
+
+The fitted model parameters are shown in tables \ref{fixedeffectsresults} and \ref{randomeffectsresults}. Each transformation type has a lower bound (corresponding to starting at $w=0$) and an upper bound (corresponding to starting at $w=1$); these values are derived from the linear model parameters, where the lower bound is $\alpha_{T(i,j)}$ and the upper bound is $\alpha_{T(i,j)}+\beta X_{ij}$. The $X$ and $Y$ bounds are similar, with $X$ bounds slightly lower than $Y$ bounds; that is, the optimal weight is slightly higher for $Y$ than for $X$. In addition, Table \ref{randomeffectsresults} shows that the variability within a single individual's trials is higher than the variability within participants in both types of trials. 
+
+We use parametric bootstrap to generate responses for each correction type and each participant from the model, which we use to both  create user-level densities, population-level densities, and bootstrap intervals for model parameters. 
+
+
+The variability of the random effects for each trial type is similar; but the model benefits significantly from allowing separate random effects for individual's variability by correction type (\Sexpr{var2[1]} and \Sexpr{var2[2]} for $Y$ and $X$ transformations, respectively, as opposed to \Sexpr{var2[3]} for the overall variability). The interaction between starting weight and trial type was not significant, however, and was thus removed from the model ($p$-value = \Sexpr{anovaprob}).
+
+%\newdo{Points of discussion for the model: one random effect for both types of correction, because there is no significant difference between the two obvious. One $\beta$ rather than one for each correction, because the interaction between type and starting weight is not significant (effect size and $p$-value XXX).}
+
+%\done{Make the interpretation of $\alpha_X$ and $\alpha_Y$ as the lower threshold of plausible weights and  $\beta$ as the interval length of plausible weights  even more obvious, i.e. add a sentence to that effect :)}
+
+
+
 
 Bootstrap simulations for each of the coefficients suggest that the optimal $w$ lies between \Sexpr{round(ints$x[2], 3)} and \Sexpr{round(ints$x[3], 3)} for $x$ and \Sexpr{round(ints$x[1], 3)} and \Sexpr{round(ints$x[4], 3)} for $y$, where the lower value is the estimate starting at $w=0$ and moving up, and the upper value is the estimate starting at $w=1$ and moving down. This suggests that either correction is preferrable to an uncorrected graph, and that a weighted correction is preferrable to the fully corrected graph, as neither 0 nor 1 is contained in any overall interval. 
 
@@ -1848,7 +1849,7 @@ fprime <- function(x){-0.008496204 -0.415575133*2*pi*cos(2*pi*x) +11.751984486*2
 f2prime <- function(x){(2*pi)^2*(0.415575133*sin(2*pi*x) +11.751984486*cos(2*pi*x))}
 asp <- .025 # image vs coordinate aspect ratio 
 startyear <- 1995
-gridlines <- seq(1996, 2013, .3)
+gridlines <- seq(1996, 2013, 1/6)
 minor.axis.correction <- 
   c(correct("x", "y", data.frame(x=gridlines, y=f(gridlines)), type="x", f=f, fprime=fprime, f2prime=f2prime, weight=1)$x.correctx, 
     correct("x", "y", data.frame(x=gridlines, y=f(gridlines)), type="x", f=f, fprime=fprime, f2prime=f2prime, weight=.36)$x.correctx
