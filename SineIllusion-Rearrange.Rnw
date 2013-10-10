@@ -1469,6 +1469,17 @@ if (!file.exists("modelsim.RData")) {
 ranefs <- ldply(res, function(x) attr(VarCorr(x)$fingerprint, which="stddev"))
 ranefCIs <- ldply(ranefs[,-1], function(x) quantile(x, probs=c(0.025, 0.975)))
 
+dframe  <- ldply(res, function(x) {
+  out <- ranef(x)$fingerprint
+  out$fingerprint <- rownames(ranef(x)$fingerprint)
+  out$starty <-   out$typey + fixef(x)[1]
+  out$endy <-   out$typey + fixef(x)[1] + fixef(x)[3]
+  out$startx <-   out$typex + fixef(x)[2]
+  out$endx <-   out$typex + fixef(x)[2] + fixef(x)[3]
+  out
+})
+
+
 sigma2 <- ldply(res, function(x) sigma(x))
 sigmaCI <- quantile(sigma2[,2], probs=c(0.025, 0.975))
 
@@ -1660,7 +1671,14 @@ W_{ij} &= \alpha_{T(i,j)} + \beta X_{ij} + \gamma_{i, T(i,j)} + \epsilon_{ij}\\
 % \end{align}
 %
 %This approach to model parameters suggests that $\alpha_X$ and $\alpha_Y$ should be interpreted as the lower bound of the interval of plausible weights and $\beta$ should be interpreted as the length of the interval of plausible weights. 
-$\beta$ can therefore be interpreted as the length of the interval of plausible weights. 
+We can therefore interpret $\beta$ as the length of the interval of plausible weights. 
+
+\begin{figure}[hbtp]
+\centering
+\includegraphics[keepaspectratio=TRUE, width=.9\linewidth]{figure/fig-results-analysis1}
+\caption{Simulation results from the fitted model, facetted by correction type. Fixed effects results are shown as histograms; the red values display the results when starting from an uncorrected plot and are concentrated around $w=\Sexpr{round(mean(ints$x[c(1,3)]), 2)}$; the blue values represent user-chosen weights when starting from a fully corrected plot and are concentrated around $w=\Sexpr{round(mean(ints$x[c(2,4)]), 2)}$. Additionally, 95\% bootstrap intervals are shown as horizontal line segments above the histograms; these intervals are for the lower and upper bounds of the ``preferred weight interval" tested in the experiment. User-level density curves show the individual variability around  fixed effects $\alpha_*$ and $\alpha_*+\beta$.}\label{fig:MixedModelResults}
+\end{figure}
+
 Figure \ref{fig:MixedModelResults} shows density plots which demonstrate the relationship between the starting weight value and the user-submitted ``optimal'' weight value. Higher starting weights are associated with higher user-submitted values, and lower starting weights are associated with lower user-submitted values. As users had to increment or decrement the weight value, this suggests that there is a range of acceptable values, and as users entered that range, they proceeded to the next trial. 
 
 The fitted model parameters are shown in tables \ref{fixedeffectsresults} and \ref{randomeffectsresults}. Each transformation type has a lower bound (corresponding to starting at $w=0$) and an upper bound (corresponding to starting at $w=1$); these values are derived from the linear model parameters, where the lower bound is $\alpha_{T(i,j)}$ and the upper bound is $\alpha_{T(i,j)}+\beta X_{ij}$. The $X$ and $Y$ bounds are similar, with $X$ bounds slightly lower than $Y$ bounds; that is, the optimal weight is slightly higher for $Y$ than for $X$. In addition, Table \ref{randomeffectsresults} shows that the variability within a single individual's trials is higher than the variability within participants in both types of trials. 
@@ -1668,17 +1686,12 @@ The fitted model parameters are shown in tables \ref{fixedeffectsresults} and \r
 We use parametric bootstrap to generate responses for each correction type and each participant from the model, which we use to both  create user-level densities, population-level densities, and bootstrap intervals for model parameters. 
 
 
-The variability of the random effects for each trial type is similar; but the model benefits significantly from allowing separate random effects for individual's variability by correction type ( \Sexpr{var2[1]} and \Sexpr{var2[2]} for $Y$ and $X$ transformations, respectively, as opposed to \Sexpr{var2[3]} for the overall variability). The interaction between starting weight and trial type was not significant, however, and was thus removed from the model ($p-value = \Sexpr{anovaprob}$).
+The variability of the random effects for each trial type is similar; but the model benefits significantly from allowing separate random effects for individual's variability by correction type (\Sexpr{var2[1]} and \Sexpr{var2[2]} for $Y$ and $X$ transformations, respectively, as opposed to \Sexpr{var2[3]} for the overall variability). The interaction between starting weight and trial type was not significant, however, and was thus removed from the model ($p$-value = \Sexpr{anovaprob}).
 
 %\newdo{Points of discussion for the model: one random effect for both types of correction, because there is no significant difference between the two obvious. One $\beta$ rather than one for each correction, because the interaction between type and starting weight is not significant (effect size and $p$-value XXX).}
 
 %\done{Make the interpretation of $\alpha_X$ and $\alpha_Y$ as the lower threshold of plausible weights and  $\beta$ as the interval length of plausible weights  even more obvious, i.e. add a sentence to that effect :)}
 
-\begin{figure}[hbtp]
-\centering
-\includegraphics[keepaspectratio=TRUE, width=.9\linewidth]{figure/fig-results-analysis1}
-\caption{Simulation results from the fitted model, facetted by correction type. Fixed effects results are shown as histograms; the red values display the results when starting from an uncorrected plot and are concentrated around $w=\Sexpr{round(mean(ints$x[c(1,3)]), 2)}$; the blue values represent user-chosen weights when starting from a fully corrected plot and are concentrated around $w=\Sexpr{round(mean(ints$x[c(2,4)]), 2)}$. Additionally, 95\% bootstrap intervals are shown as horizontal line segments above the histograms; these intervals are for the lower and upper bounds of the ``preferred weight interval" tested in the experiment. User-level density curves show the individual variability around  fixed effects $\alpha_*$ and $\alpha_*+\beta$.}\label{fig:MixedModelResults}
-\end{figure}
 
 
 <<modelres, echo=FALSE, results='hide', dependson='results-analysis'>>=
@@ -1734,7 +1747,7 @@ print(ranefCIstab, include.rownames=FALSE, file="./figure/ranef.txt", floating=F
 
 \caption{Fixed effect estimates of model~(\ref{model1}) for the boundaries for reasonable weights. In parentheses,  95\% parametric bootstrap confidence intervals are given based on model (\ref{model1}) ($N$=1000).}\label{fixedeffectsresults}
 \end{table}
-\begin{table}[htbp]\centering
+\begin{table}[hbtp]\centering
 \input{figure/ranef.txt}
 \caption{Overview of random effects for model~(\ref{model1}), including 95\% confidence intervals based on parameteric boostrap results ($N$=1000).}\label{randomeffectsresults}
 %\Sexpr{quantile(probs=c(0.025, 0.5, 0.975), as.vector(model.mcmc@sigma))}}
@@ -1822,9 +1835,6 @@ ggplot()  + geom_boxplot(aes(Year+(Month-1)/12, resid/100, group=Year+(Month-1)/
 \end{figure}
 Figure \ref{fig:raw-temp}  shows temperature data from 422 stations across the US with similar elevation and latitude. Raw monthly temperatures are overlaid by a fit from a `baseline' model. The deviations from the fit in the extremes of the fit suggest that the baseline model is not quite able to capture all of the variability in summer and winter peaks. However, the model used is actually based on averages in each time point. This model is not susceptible to shrinkage, so the question of higher variability in the peaks becomes the question of separating this perceived variability into the part introduced by the illusion and the part actually present in the data.
 
-\paragraph{Trend removal}
-After removing the averages in Figure \ref{fig:boxplot-temp} to yield Figure \ref{fig:boxplot-resid-temp} the impression of higher variability in the peaks is only partially confirmed: there is higher variability in the winter, and lower variability in the summer, though there are more outliers in the summer than in the winter.
-
 <<correct-ushcn,echo=FALSE,cache=TRUE, include=FALSE>>=
 library(grid)
 library(gridExtra)
@@ -1901,10 +1911,14 @@ ggplot(aes(x=time, y=value, group=variable), data=ushcn.cor.y) +
   theme_bw()
 ggsave(file="figure/ushcn-y-corrected.pdf", width=10, height=8)
 @
+
+\paragraph{Trend removal}
+After removing the averages in Figure \ref{fig:boxplot-temp} to yield Figure \ref{fig:boxplot-resid-temp} the impression of higher variability in the peaks is only partially confirmed: there is higher variability in the winter, and lower variability in the summer, though there are more outliers in the summer than in the winter.
+
 \paragraph{Transformation in $X$}
 We applied the X transformation to the ushcn data using the unweighted transformation and the weighted transformation with w=0.36. This value was chosen as it is approximately the midpoint of the range of acceptable values determined experimentally. The corrected and uncorrected data with fitted cubic splines are shown in Figure \ref{fig:ushcn-x-correct}. 
 
-\begin{figure}[htbp]
+\begin{figure}[hbtp]
 \centering
 \includegraphics[keepaspectratio=TRUE,width=.9\linewidth]{figure/ushcn-x-corrected}
 \caption{USHCN temperature data from 1996-2010 corrected using the $X$ transformation with w=1 and with w=0.36. At w=1, the transformation is severe, but it is clear that the variance decreases in the summer months and increases in the winter. When w=0.36, the transformation is much less noticable but results in a near-constant absolute slope of the fitted line, removing the presence of the sine illusion without excessively distorting the underlying function shape.}
@@ -1914,14 +1928,14 @@ The minor effect of the weighted transformation on individual x-values contrasts
 
 \paragraph{Transformation of $Y$}
 We also applied the Y transformation to the ushcn data using the unweighted transformation and the weighted transformation with w=0.40. This value was chosen as it is approximately the midpoint of the range of acceptable values determined experimentally. The corrected and uncorrected data with fitted cubic splines are shown in Figure \ref{fig:ushcn-y-correct}. 
-\begin{figure}[htbp]
+\begin{figure}[hbtp]
 \centering
 \includegraphics[keepaspectratio=TRUE,width=.9\linewidth]{figure/ushcn-y-corrected}
 \caption{USHCN temperature data corrected using the $Y$ transformation with $w=1$ and $w=0.40$. The transformations are relatively slight but have a notable impact on the visual salience of outliers in summer temperature, allowing the viewer to recognize that summer temperatures are less variable but more prone to outliers, while winter temperatures are more variable with fewer outliers. The $w=0.40$ transformation serves as a middle ground between untransformed and fully transformed data.}
 \label{fig:ushcn-y-correct}
 \end{figure}
 %\clearpage
-\section{Conclusion}
+\section{Conclusions}
 The sine illusion is a persistent and powerful illusion that is very difficult to counteract without modifying the visual stimulus directly. While ``fixing" data is anathema to typical statistical procedures, we cannot counteract the illusion and represent the data visually without some intervention. The proposals in this paper for transformations in $X$ and $Y$ provide the means to temporarily correct the data as a diagnostic measure, perhaps using an applet or R package for that purpose. These corrections are significant not only because of their implications for statistical graphics, but because previous attempts to resolve optical illusions using geometry have not met with success \citep{westheimer2008illusions}. These corrections are only a first step and could be improved upon; currently, the corrections break down for extreme (secant) values, but multiple iterations of the correction procedure will likely resolve some of these issues (though iteration removes the convenience of a functional form for the transformation). Similarly, all of the corrections proposed here extend the line lengths (or for actual data, increase the deviation from the smooth line) -- some normalization might make the necessary corrections less noticeable. 
 
 Our primary goal is to raise awareness of the illusion and its implications for statistics; the use of plots to guide the modeling process can leave us vulnerable to overlooking changes in the variance due to the illusion. While best practice has  been to plot the residuals separately, this removes the context of the data and is not practical before there is a model. In addition, the cognitive load required to interpret residuals separately from a model line can be reduced by showing the corrected data and model line together on the same plot. The proposed transformations require only a nonparametric smooth, maintain the context of the data, and require less cognitive load to interpret. While systematically modifying the data is uncommon in the statistical world, this approach is not out of place in the visual arts; in an approach to counteract the effects of the Hering illusion \citep(naturalscenes, hering) the columns of the Parthenon are wider at the center than at the ends to ensure that they appear straight. Similarly, painters often correct the hues used in shadows to account for color constancy in the brain. 
