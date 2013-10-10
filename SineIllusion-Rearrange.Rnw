@@ -1854,9 +1854,9 @@ ushcn.cor.x$variable <- factor(ushcn.cor.x$variable, levels=c("Corrected (w=1)",
 rm(list=c("ushcn.cor", "ushcn.cor2"))
 
 ggplot(aes(x=value, y=temp, group=variable), data=ushcn.cor.x) + 
-  geom_jitter(size=1.5, position = position_jitter(width = 1/36), alpha=.75)+ 
+  geom_jitter(size=1, position = position_jitter(width = 1/36), alpha=.75)+ 
   facet_grid(variable~.) +
-  geom_line(data=ushcn.cor.x, aes(y=temp.fit), colour="red", size=1.5) + 
+  geom_line(data=ushcn.cor.x, aes(y=temp.fit), colour="steelblue", size=1.5) + 
   xlab("Year") +  
   ylab("Temperature (in Celsius)") + 
   theme_bw()
@@ -1877,9 +1877,9 @@ ushcn.cor.y$variable <- factor(ushcn.cor.y$variable, levels=c("Corrected (w=1)",
 rm(list=c("ushcn.cor", "ushcn.cor2"))
 
 ggplot(aes(x=time, y=value, group=variable), data=ushcn.cor.y) + 
-  geom_jitter(size=1.5, alpha=.75)+ 
+  geom_jitter(size=1, alpha=.75)+ 
   facet_grid(variable~.) +
-  geom_line(aes(y=temp.fit), colour="red", size=1.5) + 
+  geom_line(aes(y=temp.fit), colour="steelblue", size=1.5) + 
   xlab("Year") +  
   ylab("Temperature (in Celsius)") + 
   theme_bw()
