@@ -690,7 +690,6 @@ Figure \ref{fig:xtrans-example} demonstrates not only the effect of transformati
 \subsection{Transformation in $Y$}
 Understanding the geometry of the sine illusion leads to another approach to counteracting  the conflict between the orthogonal width and the vertical length of the segment. 
 
-\newdo{Where is $\ell$ defined???}
 %All of our approaches in this section are based on a comparison of the orthogonal width to the vertical length of lines. 
 %%Studies have shown \cite{XXX, YYY} that onlookers generally evaluate orthogonal width rather than vertical or horizontal widths of lines.
 %By adjusting the vertical width in such a way that the (perceived) orthogonal width displays the quantity of interest, we can match an onlooker's intuitive evaluation of a situation  with the data values we want to present.
@@ -854,7 +853,7 @@ As sketched out in figure~\ref{fig:GeneralCorrection} we want to first find the 
 \caption[General correction approach]{ General correction approach. This approach may require numerical optimization to obtain exact solutions for $(x_1, y_1)$ and $(x_2, y_2)$.}\label{fig:GeneralCorrection}
 \end{SCfigure}
 
-The orthogonal width is given as the line segment between endpoints $(x_1, f_1(x_1))$ and $(x_2, f_2(x_2))$, where $f_1$ and $f_2$ denote the vertical shifts of function $f$ by $-\ell/2$ and $\ell/2$, respectively.
+The orthogonal width is given as the line segment between endpoints $(x_1, f_1(x_1))$ and $(x_2, f_2(x_2))$, where $f_1$ and $f_2$ denote the vertical shifts of function $f$ by $-\ell/2$ and $\ell/2$, respectively (that is, $\ell$ is the overall line length, and $\ell/2$ is the length of the upper or lower segment).
 These endpoints are determined as the intersection of the line  orthogonal to the tangent line in $(x, f(x))$ and the graphs resulting from vertical shifts of $f$ by $\pm \ell/2$.
 
 The function describing the orthogonal line through $(x_o, f(x_o))$ is given in point-vector form as 
