@@ -1814,7 +1814,7 @@ vp1 <- viewport(x = 0.955, y = 0.91, height = unit(2.5, "cm"), width =  unit(4, 
 print(p, vp = vp1)
 @
 % \includegraphics[width=\textwidth]{monthly-temps}
-\caption{Raw monthly maximum temperatures (in Celsius) between 1996 and 2012 at 422 stations across the US (as indicated on the map) with similar elevation and latitude. The blue line shows fitted temperatures from a baseline model. The plot suggests that the model fails to capture the more extreme values in summer and winter. \label{fig:raw-temp}}
+\caption{Raw monthly maximum temperatures (in Celsius) between 1996 and 2012 at 380 stations across the US (as indicated on the map) with similar elevation and latitude. The blue line shows fitted temperatures from a baseline model. The plot suggests that the model fails to capture the more extreme values in summer and winter. \label{fig:raw-temp}}
 \end{figure}
 
 \begin{figure}[hbtp]\centering
@@ -1825,7 +1825,7 @@ ggplot()  + geom_boxplot(aes(Time, value/100, group=interaction(Year, Month)), o
 # ggsave(file="figure/monthly-temps.pdf", width=12, height=4.5)
 @
 
-\caption{Monthly boxplot of maximum temperatures (in Celsius) between 1996 and 2012 at 422 stations. The boxplots suggest that there is more variation in the winter months than in the other seasons. Summer, Fall and Spring appear to have similar temperature variability, and there are more outliers in the Summer.}\label{fig:boxplot-temp}\label{fig:box-temp}
+\caption{Monthly boxplot of maximum temperatures (in Celsius) between 1996 and 2012 at 380 stations. The boxplots suggest that there is more variation in the winter months than in the other seasons. Summer, Fall and Spring appear to have similar temperature variability, and there are more outliers in the Summer.}\label{fig:boxplot-temp}\label{fig:box-temp}
 \end{figure}
 
 
@@ -1838,7 +1838,7 @@ ggplot()  + geom_boxplot(aes(Year+(Month-1)/12, resid/100, group=Year+(Month-1)/
 @
 \caption{Boxplots of the de-seasonalized residuals provide more insight into the seasonal variance: Winters show more variation in temperatures, while summers show much less variation in temperatures. \label{fig:boxplot-resid-temp}}
 \end{figure}
-Figure \ref{fig:raw-temp}  shows temperature data from 422 stations across the US with similar elevation and latitude. Raw monthly temperatures are overlaid by a fit from a `baseline' model. The deviations from the fit in the extremes of the fit suggest that the baseline model is not quite able to capture all of the variability in summer and winter peaks. However, the model used is actually based on averages in each time point. This model is not susceptible to shrinkage, so the question of higher variability in the peaks becomes the question of separating this perceived variability into the part introduced by the illusion and the part actually present in the data.
+Figure \ref{fig:raw-temp}  shows temperature data from 380 stations across the US with similar elevation and latitude. Raw monthly temperatures are overlaid by a fit from a `baseline' model. The deviations from the fit in the extremes of the fit suggest that the baseline model is not quite able to capture all of the variability in summer and winter peaks. However, the model used is actually based on averages in each time point. This model is not susceptible to shrinkage, so the question of higher variability in the peaks becomes the question of separating this perceived variability into the part introduced by the illusion and the part actually present in the data.
 
 <<correct-ushcn,echo=FALSE,cache=TRUE, include=FALSE>>=
 library(grid)
