@@ -1601,7 +1601,7 @@ The following analysis is based on the cleaned data, consisting of \Sexpr{nparti
 %\newdo{I'm still not convinced that we need to go there. Rather, you could put the whole discussion in a one sentence paragraph in the conclusions section. The model is worse than the stats approach, its results are less interpretable, and it doesn't allow us to use the full data. That's three strikes and out.}
 
 The psychophysics model is based on  weighted averages (by adjustment type) of all trials with starting weights $w_0 = 0$ and 1:
-<<psycho, echo=FALSE, results='asis'>>=
+<<psycho, echo=FALSE, results='asis', ref.label='psychotable'>>=
 require(xtable)
 dt.int <- ddply(user.avg.all, .(type), summarize, overall.avg=unique(overall.avg), sd=sd(avg))
 model <- lm(avg~type-1, data=user.avg.all)
@@ -1637,20 +1637,34 @@ print(dt)
 
 \begin{figure}[htbp]\centering
 <<meanDists,echo=FALSE,out.width='.65\\linewidth', dependson='results-analysis', fig.width=7, fig.height=4, message=FALSE, warning=FALSE>>=
+dt.int <- ddply(user.avg.all, .(type), summarize, overall.avg=unique(overall.avg), sd=sd(avg))
+model <- lm(avg~type-1, data=user.avg.all)
+temp <- as.data.frame(cbind(coef(model), confint(model)))
+temp$CI <- sprintf("(%.04f, %.04f)", temp[,2], temp[,3])
+rownames(temp) <- c("X", "Y")
+psycho.ints <- temp
+names(psycho.ints) <- c("Estimate", "Lower", "Upper", "CI")
+psycho.ints$Type <- rownames(psycho.ints)
+psycho.ints <- melt(psycho.ints[,-4], id.vars=c("Type"), value.name="x", variable.name="est.type")
+psycho.ints$est <- "95% CI"
+psycho.ints$est[which(psycho.ints$est.type=="Estimate")] <- "Mean"
+psycho.ints$est <- factor(psycho.ints$est, levels=c("Mean", "95% CI"))
+
 user.avg.all$Type <- toupper(user.avg.all$type)
 ggplot(data=user.avg.all) + 
   geom_density(aes(x=avg, fill=type), alpha=0.8) + 
-  geom_vline(aes(xintercept=overall.avg)) +
+  geom_segment(data=psycho.ints, aes(x=x, xend=x, y=Inf, yend=-Inf, linetype=est, group=est.type)) +
   geom_rug(aes(x=avg, colour=type)) +
   facet_grid(Type~.) +
   scale_fill_manual("Transformation", values=c("#d6604d", "#4393c3"), guide="none") +
-  scale_colour_manual("Transformation", values=c("#d6604d", "#4393c3"), guide="none") + 
+  scale_colour_manual("Transformation", values=c("#d6604d", "#4393c3"), guide="none") +
+  scale_linetype_discrete("Model") +
   theme_bw() + theme(legend.position="bottom") +
   xlim(c(-.2, 1.2)) + xlab("Optimal Weight") + ylab("Density")
 @
-\caption{Estimated density of participant-level means using the standard method of limits analysis described in \citet{goldstein}. The overall means are both near 0.4, however, there is quite a bit of user-level variability.}
+\caption{Estimated density of participant-level means using the standard method of limits analysis described in \citet{goldstein}. The overall means are both near 0.4, however, there is quite a bit of user-level variability.}\label{fig:psycho}
 \end{figure}
-According to this analysis, the optimum transformation value for $x$ is \Sexpr{round(user.avg.x, 2)}, and the optimum transformation value for $y$ is \Sexpr{round(user.avg.y, 2)}. %In addition, only \Sexpr{nrow(subset(user.avg.all, avg<0 | avg > 1))} user averages were outside of the range of (0,1) for either trial. 
+According to this analysis, the optimum transformation value for $x$ is \Sexpr{round(user.avg.x, 2)}, and the optimum transformation value for $y$ is \Sexpr{round(user.avg.y, 2)}. Figure \ref{fig:psycho} shows the estimates and 95\% Wald intervals for the mean, as well as estimated density of participant-level responses. %In addition, only \Sexpr{nrow(subset(user.avg.all, avg<0 | avg > 1))} user averages were outside of the range of (0,1) for either trial. 
 While these results suggest that the transformation is useful and that complete transformation is not necessary, we can get more precise bounds on the range of acceptable transformation weights using a linear model that can incorporate starting points other than 0 and 1, and at the same time allow for user-specific variability. % as well as data from users that completed a sufficient number of trials but did not complete a trial starting at one of the endpoints. 
 
 %\newdo{My attempt at a summary of this whole paragraph: A traditional approach from psychometrics (citation) to analyze this kind of data would be a XXX model (citation). However, the analysis would only allows us to make use of starting weights 0 and 1, while the results are a single estimate of an optimal adjustment under each transformation. XXX results. 
@@ -1677,7 +1691,7 @@ W_{ij} &= \alpha_{T(i,j)} + \beta X_{ij} + \gamma_{i, T(i,j)} + \epsilon_{ij}\\
 % \end{align}
 %
 %This approach to model parameters suggests that $\alpha_X$ and $\alpha_Y$ should be interpreted as the lower bound of the interval of plausible weights and $\beta$ should be interpreted as the length of the interval of plausible weights. 
-We can therefore interpret $\beta$ as the length of the interval of plausible weights. 
+We can therefore interpret $\beta$ as the length of the interval of plausible weights. Additionally, we can interpret the quantity $(\alpha_* + \beta/2)$ as equivalent to the estimate of the optimal weight using the psychophysics methodology.
 
 \begin{figure}[hbtp]
 \centering
