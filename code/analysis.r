@@ -41,7 +41,8 @@ library(doMC)
 # 
 # tab$training <- (tab$time2>ymd("2013-7-21") & (tab$q+tab$skip)<2) 
 #   # two "training" questions added on 7.21.13 that may be biased... test?
-# 
+# tab <- subset(tab, tab$time<ymd("2013-8-15"))
+#   # remove trials after August 15, 2013 - not part of this experiment.
 # #------------------ Data Reshaping -------------------------
 # # dataset of individual questions with each individual observation and time. 
 # trial.sequence <- ddply(tab, .(iphash, fingerprint, ipid, q, skip, type, ntrials), transform,
@@ -57,6 +58,10 @@ library(doMC)
 # 
 # # dataset of individual questions, but without each individual change
 # # Includes only trials where the participant interacted with the graph at least twice. 
+# trials.removed <- subset(trial.sequence, len<=2 & seq<=1)
+# nrow(unique(trials.removed[,c("iphash", "fingerprint", "trialnum")])) 
+# # number of trials removed for not interacting with the applet
+# 
 # trial.sum <- ddply(subset(trial.sequence, len>2 & seq>1), .(iphash, fingerprint, ipid, q, skip, type, ntrials), 
 #               function(df){
 #                 with(df, 
