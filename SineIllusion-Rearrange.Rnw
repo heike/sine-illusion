@@ -881,7 +881,7 @@ In order to get  actual numeric values for $\lambda$, we need to find end points
 
 Note that  the above system of equations involves function values $f(x)$, which implies that solving this system  requires numerical optimization for any but the most simple functions $f$.
 
-In the following two sections we are going to use Taylor approximations of first and second order to find approximate solutions to the end points.
+In the following two sections we are going to use Taylor approximations of first and second order to find approximate solutions to the end points. These approximations are shown in figure \ref{fig:linear.quadratic}.
 
 
 % 
