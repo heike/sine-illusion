@@ -28,6 +28,8 @@
 \newcommand{\range}[1]{{\text{range}\left(#1\right)}}
 \newcommand{\s}[2]{{_{#1}s^{ #2}}}
 \newcommand{\atan}[1]{\text{atan}\left({#1}\right)}
+\newcommand{\xR}{\mathbb{R}}
+
 \newcommand{\done}[2][inline]{\todo[color=SpringGreen, #1]{#2}}  % for todos that have been seen and dealt with
 \newcommand{\meh}[2][inline]{\todo[color=White, #1]{#2}}   % for todos that may no longer be relevant 
 \newcommand{\comment}[2][inline]{\todo[color=SkyBlue, #1]{#2}} % for comments that may not be "to-do"s
@@ -853,19 +855,19 @@ As sketched out in figure~\ref{fig:GeneralCorrection} we want to first find the 
 \caption[General correction approach]{ General correction approach. This approach may require numerical optimization to obtain exact solutions for $(x_1, y_1)$ and $(x_2, y_2)$.}\label{fig:GeneralCorrection}
 \end{SCfigure}
 
-The orthogonal width is given as the line segment between endpoints $(x_1, f_1(x_1))$ and $(x_2, f_2(x_2))$, where $f_1$ and $f_2$ denote the vertical shifts of function $f$ by $-\ell/2$ and $\ell/2$, respectively (that is, $\ell$ is the overall line length, and $\ell/2$ is the length of the upper or lower segment).
-These endpoints are determined as the intersection of the line  orthogonal to the tangent line in $(x, f(x))$ and the graphs resulting from vertical shifts of $f$ by $\pm \ell/2$.
+The orthogonal width (see sketch in figure~\ref{fig:GeneralCorrection}) is given as the line segment between endpoints $(x_1, f_1(x_1))$ and $(x_2, f_2(x_2))$, where $f_1$ and $f_2$ denote the vertical shifts of function $f$ by $-\ell/2$ and $\ell/2$, respectively, where $\ell$ is defined as the overall line length, $\ell > 0, \ell \in \xR$.
+These endpoints are determined as the intersection of the line  orthogonal to the tangent line in $(x, f(x))$ and the graphs resulting from the vertical shifts of $f$.
 
 The function describing the orthogonal line through $(x_o, f(x_o))$ is given in point-vector form as 
 \[
 {x_o \choose f(x_o)} + \lambda {f^\prime(x_o) \choose 1}, 
 \]
 for any real-valued $\lambda$.
-The advantage of using point vector form is that it allows us to solve for parameter $\lambda$ easily, which gives us easy access to the extant (half-)widths, which are given as 
-\[
+The advantage of using point vector form is that it allows us to solve for parameter $\lambda$ easily, which gives us easy access to the extant (half-)widths,  as: 
+\begin{equation}\label{eqn.halfwidth}
 |\lambda| \sqrt{1 + f^\prime(x_o)^2}.
-\]
-This expression describes the quantity that we perceive rather than the quantity that we want to display ($\ell/2$), which leads us to a general expression of the correction factor as
+\end{equation}
+Eqn. (\ref{eqn.halfwidth}) describes the quantity that we perceive rather than the quantity that we want to display ($\ell/2$), which leads us to a general expression of the correction factor as
 \begin{eqnarray*}
  \ell/2 \cdot \left(|\lambda| \sqrt{1 + f^\prime(x_o)^2}\right)^{-1}.
 \end{eqnarray*}
@@ -880,7 +882,7 @@ In order to get  actual numeric values for $\lambda$, we need to find end points
 
 Note that  the above system of equations involves function values $f(x)$, which implies that solving this system  requires numerical optimization for any but the most simple functions $f$.
 
-In the following two sections we are going to use Taylor approximations of first and second order to find approximate solutions to the end points. These approximations are shown in figure \ref{fig:linear.quadratic}.
+In the following two sections we are making use of Taylor approximations of first and second order to find approximate solutions to  end points as sketched out in figure \ref{fig:linear.quadratic}.
 
 
 % 
@@ -1019,14 +1021,15 @@ qplot(data=df.real, x=x, y=y, geom="line") +
 \paragraph{Linear Approximation to $f(x)$}\hfill\newline
 For the linear approximation we make use of $f(x) \approx f(x_0) + (x - x_0) f^\prime(x_0)$, which together with  equations~\ref{eqn.general} and \ref{eqn.general.2} yields a correction factor in $x_0$ of
 \[
-\ell_{\text{new}} = \ell_{\text{old}} \sqrt{1 +  f^\prime(x_0)^2}.
+\ell_{\text{new}}(x_0) = \ell_{\text{old}} \sqrt{1 +  f^\prime(x_0)^2}.
 \]
 % A comparison of the sketches for the linear approach (in Fig. \ref{fig:linear-GeneralCorrection}) and the trigonometric approach (in Fig. \ref{fig:trig}) shows that they are the same. They do, indeed, lead to the same correction factor.
 % 
-Note that the linear method yields the same result as a varying slope extension from a trigonometric approach as suggested by \citet{schonlau:2003} and used in \citet{marie:2013}
+Note that the linear method gives the same result as a varying slope extension from a trigonometric approach  suggested by \citet{schonlau:2003} and used in \citet{marie:2013}
 %Previous work in \citet{schonlau:2003, marie:2013} used the adjustment in eqn.~(\ref{eqn.adjust}) for a line with constant slope. We have to extend this approach to a functional form with varying slope. This is the approach taken in the next sections.
 
-The asymmetric nature of the distortion suggests that we may want to use a second-order Taylor polynomial approximation to $f(x)$ to account for the asymmetry in the extant widths on either side of the center trendline.
+%The asymmetric nature of the distortion suggests that we may want to use 
+A second-order Taylor polynomial approximation to $f(x)$ additionally accounts for the asymmetry in the extant widths on either side of the center trendline.
 
 \paragraph{Quadratic Approximation to $f(x)$}\hfill\newline
 %
@@ -1036,8 +1039,8 @@ f^{\prime\prime}(x_0)  f^\prime(x_0)^2 \lambda^2  + 2(f^\prime(x_0)^2 + 1) \lamb
 \end{eqnarray*}
 which leads us to corrections for the half lengths as (see appendix \ref{app.quadratic} for details):
 \begin{eqnarray}\label{eqn.q1}
-\ell_{\text{new}_1} &=& 1 /2 \cdot  \left(v + \sqrt{ v^2 +  f^{\prime\prime}(x_0) f^\prime(x_0)^2\cdot  \ell_{\text{old}}}\right) \cdot v^{-1/2} \\\label{eqn.q2}
-\ell_{\text{new}_2} &=& 1 /2 \cdot  \left(v + \sqrt{ v^2 -  f^{\prime\prime}(x_0) f^\prime(x_0)^2\cdot  \ell_{\text{old}}}\right) \cdot v^{-1/2} 
+\ell_{\text{new}_1}(x_0) &=& 1 /2 \cdot  \left(v + \sqrt{ v^2 +  f^{\prime\prime}(x_0) f^\prime(x_0)^2\cdot  \ell_{\text{old}}}\right) \cdot v^{-1/2} \\\label{eqn.q2}
+\ell_{\text{new}_2}(x_0) &=& 1 /2 \cdot  \left(v + \sqrt{ v^2 -  f^{\prime\prime}(x_0) f^\prime(x_0)^2\cdot  \ell_{\text{old}}}\right) \cdot v^{-1/2} 
 \end{eqnarray}
 where $v = 1 + f^\prime(x_0)^2$.
 \begin{figure}[h!btp]
@@ -1088,12 +1091,8 @@ In the quadratic approximation top and bottom segments of the vertical lines are
 \end{figure}
 
 Adjusting the top and bottom segments of the vertical lines separately so that the extant width is constant breaks the illusion, but slightly distorts the sinusoidal shape of the peaks.
-
-Figure \ref{fig:GeneralQuadraticCorrection} shows the correction factor based on a quadratic approximation compared to the untransformed data. 
-
-
-%As shown in Figure \ref{quadratic-GeneralCorrection}, the solution of this equation provides endpoints $(x_l, y_l)$ and $(x_2, y_2)$ which can then be used to compute the extant width of each half-segment $m$. 
-
+%
+Figure~\ref{fig:GeneralQuadraticCorrection} shows the correction factor based on a quadratic approximation compared to the untransformed data. 
 Unlike the linear solution, the half-segments here are not necessarily of the same length, and thus there are separate correction factors for each half-segment. 
 %The correction factors are $(\ell/2)/(m_u)$ and $(\ell/2)/(m_l)$ respectively. 
 <<CtsQuadratic, echo=FALSE, include=FALSE, fig.width=6, fig.height=4>>=
@@ -1152,16 +1151,16 @@ dev.off()
 % \end{figure}
 
 %\subsection{Mathematical Properties of Transformation}
-The quadratic correction breaks whenever the expression in the square root of eqn~\ref{eqn.q1} becomes negative, i.e.~whenever $v^2 \pm \ell\cdot f^{\prime\prime}(x)\cdot f^\prime(x)^2 < 0$.
-This happens for  combinations of large values of $\ell$, which signify a large vertical extent, or large conditional variability $E[Y|X]$, and simultaneous large changes in the slope of the main trend, i.e.~large values of the curvature $f^{\prime\prime}(x)$. In the linear approximation of $f$ the same situation leads to a massive overcorrection of the vertical lines, making the `corrected' function look almost unrecognizable. 
+The quadratic correction breaks whenever the expression in the square root of eqn.~(\ref{eqn.q1}) becomes negative, i.e.~whenever $v^2 \pm \ell\cdot f^{\prime\prime}(x)\cdot f^\prime(x)^2 < 0$.
+This happens for  combinations of large values of $\ell$, which signify a large vertical extent, or large conditional variability $E[Y|X]$, and simultaneous large changes in the slope of the main trend, i.e.~large values of the curvature $f^{\prime\prime}(x)$. In the linear approximation of $f$ the same situation leads to a massive overcorrection of the vertical lines, changing the shape of the `corrected' function beyond recognition.
 
 Similar to the correction of the $x$-axis,  we can use a weighted approach to find a balance between counteracting the illusion and representating the  original data:
 %In order to balance these goals for  the quadratic correction in $y$, half-segment lengths must be weighted separately; a single segment weighting will suffice for the linear correction in $y$. 
 \begin{equation}\label{eqn.ytrans.weighted}
-(\ell_{new_w})(x) = (1-w) \cdot \ell_{old} + w \cdot (\ell_{new})(x)
+\ell_{new_w}(x) = (1-w) \cdot \ell_{old} + w \cdot \ell_{new}(x)
 \end{equation}
 
-Note that for the quadratic correction in $y$ half-segment lengths must be weighted separatel.%y; a single segment weighting will suffice for the linear correction in $y$. 
+%Note that for the quadratic correction in $y$ half-segment lengths must be weighted separatel.%y; a single segment weighting will suffice for the linear correction in $y$. 
 
 % % 
 % % $1 + 2f^\prime(x)^2 + f^\prime(x)^4 \pm \ell\cdot f^{\prime\prime}(x)\cdot f^\prime(x)^2 < 0$
@@ -1223,10 +1222,11 @@ In order to more fully understand the sine illusion and test the proposed correc
 
 We employed a second applet to collect data on users' preferences on the amount of correction used, i.e.~we are interested in identifying the `optimal'  setting for the weights  in each of the corrections. %The applet for collecting data is much more  strictly controlled (users cannot select the correction type or the initial weight used)  to allow for random assignment of trial order.  
 
-This applet presents users with a graph that is the result of a correction in $x$ or $y$ with a randomly selected starting weight value (as used in eqns (\ref{eqn.xtrans.weighted}) and (\ref{eqn.ytrans.weighted})).
-Depending on whether the illusion is present at the starting value, users are asked to adjust the graph until the illusion  (a) is no longer apparent (adjustment of weights from the bottom) or (b) becomes visible (adjustments of weights from the top).
-This adjustment is done by clicking on a plus/minus button to either increase the amount of correction used or decrease it. Underlying this adjustment is the value of the weight $w$ as defined in eqns.~(\ref{eqn.xtrans.weighted}) and~(\ref{eqn.ytrans.weighted}), though the numerical value of $w$ was hidden from the user to prevent anchoring to a specific numerical value.
-A low  initial weight ($w_0$ close to 0) indicates that the amount of correction is low; the response from a trial like this will give us an idea of the minimal amount of weight necessary to break the illusion. A high initial weight ($w_0$ close to 1) indicates that the data is fully corrected. Asking participants to reduce the amount of adjustment until the lines appear to be the same length assumes that the correction is overcorrecting in practice, and a response from this type of trial gives us an upper boundary for the amount of weighting preferred. Generally, responses from these different types of trials do not result in the same threshold weight, but rather lead to a range of acceptable weights.
+This applet presents users with a graph that is the result of a correction in $x$ or $y$ with a randomly selected starting weight value.
+%Depending on whether the illusion is present at the starting value, 
+Users are asked to adjust the graph until the illusion  (a) is no longer apparent (adjustment of weights from the bottom) or (b) becomes visible (adjustments of weights from the top).
+This adjustment is done by clicking on a plus/minus button to either increase or decrease the amount of correction used. Underlying this adjustment is the value of the weight $w$ as defined in eqns.~(\ref{eqn.xtrans.weighted}) and~(\ref{eqn.ytrans.weighted}). The numerical value of $w$ was hidden from the user to prevent anchoring to a specific numerical value.
+A low  initial weight ($w_0$ close to 0) indicates that the amount of correction is low and the response from a trial like this will give us an idea of the minimal amount of weight necessary to break the illusion, while a high initial weight ($w_0$ close to 1) indicates that the data is fully corrected. We asked participants to reduce the amount of adjustment until the lines appear to be the same length assumes that the correction is overcorrecting in practice, and a response from this type of trial gives us an upper boundary for the amount of weighting preferred. Generally, responses from the two different types of trials do not result in the same threshold weight, but rather lead to a range of acceptable weights.
 
 %That is, if the optimal weight is 0, the corrections are not effective at reducing the effect of the illusion; if the optimal weight is 1, the full correction is necessary to reduce the illusion. 
 It is of additional interest to determine whether and how much this optimal weight is subject-specific or population-based, whether the optimal weight depends on the initial weight, and how much within-subject variability we find compared to between-subject variability. 
@@ -1239,15 +1239,12 @@ It is of additional interest to determine whether and how much this optimal weig
 \caption{\label{fig:shiny.app} Screenshot of the shiny application used to collect information of observers' preference with respect to an optimal correction for the illusion under each of the  transformations discussed in the previous section. }
 \end{figure}
 
-Figure~\ref{fig:shiny.app} shows a screenshot of the applet used to collect user data. This applet is also available online at \url{http://glimmer.rstudio.com/srvanderplas/SineIllusionShiny/}. 
-As the line length and function are controlled in this app, we used the linear transformation for adjusting $y$ values; the transformation does not break under any combination of parameters tested in this experiment. 
-
-
-
+Figure~\ref{fig:shiny.app} shows a screenshot of the applet used to collect user data. This applet is  available online at \url{http://glimmer.rstudio.com/srvanderplas/SineIllusionShiny/}. 
+Line length and function are controlled in this app, and we used the linear transformation for adjusting $y$ values; the transformation does not break under any combination of parameters tested in this experiment. 
 
 Both applets are implemented in {\tt shiny} \citep{shiny}. 
 
-
+\noindent
 We deployed the applet to participants recruited online, collecting their responses and other metadata. The results of the analysis suggest that the correction factors in $X$ and $Y$ are both preferrable to uncorrected data, but that a full correction is not necessary to break the illusion.
 
 %The goal of the study is to determine an overall `optimal' setting for the weights in each of the correction factors. 
