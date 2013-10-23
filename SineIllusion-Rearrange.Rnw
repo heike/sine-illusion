@@ -63,12 +63,14 @@ source("code/functions.r")
 \begin{document}
 \maketitle
 \begin{abstract}
-The sine illusion, which is part of a set of optical illusions which occur based on a conflict between a stimuli and the real-world situation which can cause similar stimuli, has a notable impact on perception of time-series data with a seasonal component. In this paper, we discuss the reasons for the illusion and various strategies which might be useful to break the illusion or reduce its strength, demonstrating the presence of the illusion in real-world and theoretical situations. We also present data from user studies which demonstrate the dramatic effect the sine illusion can have on conclusions drawn from displayed data.
+Graphical representations have to be true to the data they display. Computational tools ensure this on a technical level. But we also need to take `flaws' of the human perceptual system into account. The sine illusion provides an example where human perception leads to systematic bias in the assessment of the optical stimulus, with a particularly notable impact on perception of time-series data with a seasonal component. In this paper, we discuss the reasons for the illusion and various strategies  useful to break the illusion or reduce its strength. We demonstrate the presence of the illusion in real-world and theoretical situations. We also present data from a user study which demonstrate the dramatic effect the sine illusion can have on conclusions drawn from displayed data.
 \end{abstract}
-\tableofcontents
+%\tableofcontents
+
+
 
 \section{Introduction}
-Graphics are powerful tools for summarizing large or complex data. The main premise of statistical graphics is that any graphical representation of the data has to be ``true'' to the data \citep[see e.g.][]{tufte, wainer:2000, robbins:2005} i.e.~a measurable quantity of a graphical element in the representation has to  directly reflect some aspect of the underlying data. Generally, we see a lot of discussion on keeping true to the data in the framework of (ab)using three dimensional effects in graphics. \citep{tufte} goes as far as defining a {\it lie-factor} of a chart as the ratio of the size of an effect in the data compared to the size of an effect shown, with the premise that any large deviations from one indicate a misuse of graphical techniques. Computational tools help us ensure technical trueness -- but this brings up the additional question of how we deal with situations that involve innate inability or trigger learned misperceptions in the audience. In this paper we want to raise awareness for one of these situations, show that it occurs frequently in our dealings with graphics and provide a set of strategies at solving or avoiding it.
+Graphics are powerful tools for summarizing large or complex data. But they rely on the main premise that any graphical representation of the data has to be ``true'' to the data \citep[see e.g.][]{tufte, wainer:2000, robbins:2005} i.e.~a measurable quantity of a graphical element in the representation has to  directly reflect some aspect of the underlying data. Generally, we see a lot of discussion on keeping true to the data in the framework of (ab)using three dimensional effects in graphics. \citep{tufte} goes as far as defining a {\it lie-factor} of a chart as the ratio of the size of an effect in the data compared to the size of an effect shown, with the premise that any large deviations from one indicate a misuse of graphical techniques. Computational tools help us ensure technical trueness -- but this brings up the additional question of how we deal with situations that involve innate inability or trigger learned misperceptions in the audience. In this paper we want to raise awareness for one of these situations, show that it occurs frequently in our dealings with graphics and provide a set of strategies at solving or avoiding it.
 
 
 <<example,echo=FALSE, include=FALSE>>=
@@ -387,7 +389,7 @@ qplot(x=x, y=y, geom="line", data=dframe, colour=I("grey50")) + theme_bw() +
                      labels=c("0", expression(paste(pi,"/2")), expression(pi), 
                               expression(paste("3",pi, "/2")), expression(paste("2",pi)))) +
   scale_linetype_manual("", values=c(1,2)) + 
-  theme(legend.key.width = unit(3, "line"))
+  theme(legend.key.width = unit(3, "line"), plot.margin = unit(c(0,0,0,0), "cm")) 
 @
 \begin{figure}[h!tbp]
 \centering
@@ -423,8 +425,7 @@ If this is the case, then it may be  possible to correct the graphical display f
 %, we must overcome the visual bias due to the sine illusion. 
 
 Simply raising people's awareness of the presence of this illusion is not enough,
-as  this illusion is incredibly difficult to overcome even when we are aware of its presence: our brains simply cannot ``un-see" the illusion. 
-
+as  this illusion is incredibly difficult, if not impossible, to overcome even when we are aware of its presence: our brains simply cannot ``un-see" the illusion. 
 
 What follows is a compilation of several approaches to correct for or mitigate the effect of the illusion, intended primarily to demonstrate how pervasive the illusion is and the extreme measures necessary to remove its effect. 
 % do not change this to its'
@@ -623,12 +624,10 @@ Figures \ref{fig:xtrans2} - \ref{fig:xtrans4} show the effect of different shrin
 The extent  to which we can shrink the adjustment back to the original function  varies with the aspect ratio of the chart and the shape of the function. It might also be influenced by the audience's experience with the sine illusion, resulting in very subjective choices of an
 %, but merits further investigation, as it may be possible to find an 
 ``optimal weighting" for specific situations which minimizes distortion and maximizes the correspondence between inferences made from the data and inferences made using the visual display.
-%\comment{I'm not sure we want to say it depends on the audience's experience - I suspect that people with experience are more likely to use a "when do I no longer see it" approach, rather than a "when do I see it approach", i.e. looking at the limit from 0->1 instead of the more naive approach of 1->0. We might want to do a short experiment involving "yes or no" tests instead of graduated approaches - say, 3 plots of x, 3 plots of y, 3 distractor plots for each subject. We could probably just mix this into the shiny experiment... }
+
 
 Note, that we only make use of the transformation $T$ in the form of $f \circ T$. This allows us to avoid an explicit calculation of the transformation $T$, which in particular  involves a computation of the inverse of $f$ leading to potentially computationally  very intensive solutions. 
 
-%\FloatBarrier
-%\clearpage
 <<xtrans-example, echo=FALSE, include=FALSE, dependson='xtransform', fig.width=6, fig.height=6>>=
 library(locfit)
 
@@ -686,120 +685,10 @@ Figure \ref{fig:xtrans-example} shows the original data side-by-side with the tr
 \caption{Original data and data after $x$-transformation. The increasing variance is easier to see when $x$ has been transformed, because the slope is now uniform.\label{fig:xtrans-example}}
 \end{figure}
 Figure \ref{fig:xtrans-example} demonstrates not only the effect of transformation of the $x$-axis, but also that the transformation is not particularly misleading in this example.The granularity of the data in this example provides an implicit measure of the strength of the transformation along the $x$-axis and the transformation is also clearly evident in the labels along the $x$-axis. 
-% While we typically prefer that our axis transformations are monotone, this transformation provides additional utility that a monotone transformation does not. \newdo{ the transformation is monotone - it only goes up and doesn't reverse the temperatures. it's even continuous, but it is not differentiable. }
-% 
-% \todo[inline]{add more explanation, etc here so that it's not orphaned.}
+
 \subsection{Transformation in $Y$}
 Understanding the geometry of the sine illusion leads to another approach to counteracting  the conflict between the orthogonal width and the vertical length of the segment. 
 
-%All of our approaches in this section are based on a comparison of the orthogonal width to the vertical length of lines. 
-%%Studies have shown \cite{XXX, YYY} that onlookers generally evaluate orthogonal width rather than vertical or horizontal widths of lines.
-%By adjusting the vertical width in such a way that the (perceived) orthogonal width displays the quantity of interest, we can match an onlooker's intuitive evaluation of a situation  with the data values we want to present.
-%
-%% 
-%
-%\begin{SCfigure}
-%\centering
-%% \includegraphics[width=0.3\linewidth]{images/linewidth}
-%\includegraphics[width=.35\linewidth]{figure/fig-geometry}
-%\caption{Sketch of line width assessments: The solid line shows vertical width, the dotted line shows  width orthogonal to the slope. \label{fig:linewidth}}
-%\end{SCfigure}
-%
-%As Figure \ref{fig:linewidth} shows, orthogonal $w_o$ and vertical $w_v$ line widths are related -- the orthogonal line width depends on the angle under which the line is drawn. Mathematically, we have:
-%\begin{equation}\label{eqn.adjust}
-%w_o = w_v \cos \theta,
-%\end{equation}
-%where $\theta$ is the acute angle between the orthogonal line and the vertical, that is, $\theta \in (-\pi, \pi]$. The relationship between $\theta$ and extant width for $y = \sin(x)$ can be seen in Figure~\ref{fig:OrthogonalWidth}.
-
-
-%Figure \ref{fig:linewidth} shows a more simplified illustration of $\theta$, the angle of the orthogonal line to the vertical. 
-
-% \subsubsection{Trigonometry Method}\label{trig}
-% 
-% 
-% 
-% The approach that we take here is sketched out in figure \ref{fig:trig}: 
-% we evaluate the slope of function $f$ in position $x$, find an approximation of the extant width as $m = \ell \cos{\theta}$, and adjust $\ell$ based on the ratio of vertical and extant width. The corresponding angle $\theta$ is determined by the slope of function $f$ in $x$, i.e.
-% %
-% <<trigmethodcartoon,echo=FALSE, include=FALSE, cache=FALSE>>=
-% f <- function(x) 2*sin(x)
-% fprime <- function(x) 2*cos(x)
-% f2prime <- function(x) -2*sin(x)
-% df <- createSine(40 , len=1, f=f, fprime=fprime, f2prime=f2prime)[5:16,]
-% a <- 9
-% dfsec <- getSecantSegment(df$x[a], df=df, f, fprime, f2prime)
-% dfslope <- data.frame(xstart=df$x[a]+.5, xend=df$x[a]-.9, ystart=fprime(df$x[a])*.5+df$y[a], yend=-.9*fprime(df$x[a])+df$y[a])
-% dfslope2 <- data.frame(xstart=df$x[a]+.5, xend=df$x[a]-.3, ystart=fprime(df$x[a])*.5+df$y[a]+.5, yend=-.3*fprime(df$x[a])+df$y[a]+.5)
-% ftsize <- 4
-% 
-% df <- createSine(40 , len=1, f=f, fprime=fprime, f2prime=f2prime)[5:16,]
-% 
-% a <- 9
-% df.real <- data.frame(x=seq(df$x[1], df$x[12], by=.001))
-% df.real$y <- f(df.real$x)
-% df.real$yupper <- fprime(df$x[a])*(df.real$x-df$x[a])+f(df$x[a])+.5
-% df.real$yupper[which(abs(df.real$x-2)>.5)] <- NA
-% df.real$ylower <- fprime(df$x[a])*(df.real$x-df$x[a])+f(df$x[a])-.5
-% df.real$ylower[which(abs(df.real$x-2)>.5)] <- NA
-% df.real$sec <- -1/fprime(df$x[a])*(df.real$x-df$x[a])+f(df$x[a])
-% df.real$sec[which(abs(df.real$x-2)>.5)] <- NA
-% dfslope <- data.frame(xstart=df$x[a]+.5, xend=df$x[a]-.9, ystart=fprime(df$x[a])*.5+df$y[a], yend=-.9*fprime(df$x[a])+df$y[a])
-% dfslope2 <- data.frame(xstart=df$x[a]+.5, xend=df$x[a]-.3, ystart=fprime(df$x[a])*.5+df$y[a]+.5, yend=-.3*fprime(df$x[a])+df$y[a]+.5)
-% 
-% cairo_pdf("./figure/fig-trigmethodcartoon.pdf", width=5, height=5)
-% qplot(data=df.real, x=x, y=y, geom="line") +
-%   theme(panel.grid.major=element_blank(), 
-% #      panel.background = element_rect(fill = "white", colour = "black"),
-%       panel.background=element_blank(),  
-%       panel.grid.minor=element_blank(),
-%       axis.title = element_blank(), axis.ticks = element_blank(), 
-%       axis.text = element_blank()) +  
-%   coord_equal(ratio=1) +
-%   geom_line(data=df.real,aes(y=yupper), linetype=3) + 
-%   geom_line(data=df.real,aes(y=ylower), linetype=4) + 
-%   geom_segment(data=df, aes(x=xstart, y=ystart, xend=xend, yend=yend), colour="grey50") + 
-%   geom_segment(data=df[a,], aes(x=xstart, y=ystart, xend=xend, yend=yend), colour="black", size=1.5)+
-%   geom_line(data=df.real, aes(y=sec)) + 
-%   geom_text(data=dfslope, aes(x=xend+.1, y=yend+.05, label="slope: paste(f, \"'\", (x))"), parse=TRUE, hjust=0, vjust=1) +
-%   geom_text(aes(x=mean(c(dfsec$sec.xstart, df$xend[a], df$x[a], df$x[a])), 
-%                 y=mean(c(dfsec$sec.ystart, df$yend[a], df$y[a], df$y[a]))-.25 
-%                 ), label="theta", parse=TRUE, size=ftsize+1, data=data.frame()) +
-%   geom_text(aes(x=df.real$x[which.min(df.real$sec)], y=min(df.real$sec, na.rm=TRUE)-.05), 
-%                 label="slope: paste(-1/f, \"'\", (x))", parse=TRUE, hjust=.75, vjust=1, data=data.frame()) +
-%   geom_text(data=df[a,], aes(x=.5*xend-.075 + .5*x, y=.5*yend+.5*y+0.05, label="paste(frac(\u2113, 2))"), size=ftsize+1, face="bold", parse=TRUE) +
-%   geom_text(aes(x=.5*dfsec$sec.xstart+ .5*dfsec$x +.33 , y=.5*dfsec$sec.ystart+.5*dfsec$y+0.225), label="paste(frac(m, 2))", parse=TRUE, face="plain", data=data.frame()) + 
-%   xlab("x") + ylab("y") +
-%   geom_segment(data=dfslope, aes(x=xstart, y=ystart, xend=xend, yend=yend), linetype=2) + theme(axis.title=element_blank(), axis.text=element_blank(), axis.ticks=element_blank(), axis.line=element_blank(), panel.grid=element_blank())
-% dev.off()
-% @
-% \begin{SCfigure}
-% \centering
-% \includegraphics[keepaspectratio=TRUE,width=.5\linewidth]{figure/fig-trigmethodcartoon}
-% \caption[Geometry of the trig correction approach]{Geometry of the trigonometry correction approach. $\ell$ denotes the length of the  vertical segment, $m$ is the extant width, $\theta$ denotes the angle between the line segments.
-% \label{fig:trig}}
-% \end{SCfigure}
-% % 
-% % Our goal is to make the segment $m$ appear as long as the segment $\ell$. As the angle $\theta$ is determined by the slope of the tangent line, that is, 
-% $$\tan \theta = \left|f^\prime(x)\right|.$$ 
-% Solving for $\theta$ leaves us with a ratio of orthogonal and vertical width of 
-% $$\left[\cos(\atan{\left|f^\prime(x)\right|})\right]^{-1} = \ell/m.$$ 
-% 
-% That is, we have to scale $\ell$ by a factor of 
-% $\left[\cos(\atan{\left|f^\prime(x)\right|})\right]^{-1}$
-% to make the extant width $m$ appear as long as $\ell$ in the original graph: 
-% % We first multiply the vertical width by a factor of $1/\cos\theta$, where $\theta$ is the angle under which the line is drawn. This angle is given by the slope of the function, mathematically we know that in position $x$ the angle $\theta(x)$ of function $f(x)$ is given as:
-% % \[
-% % \tan \theta (x) = f^\prime (x).
-% % \]
-% % We only distinguish the size, not the sign of the angle, which gives us an overall correction factor for the line width in vertical direction of 
-% \begin{equation}\label{trigCorrection}
-% \ell_{\text{new}} = \ell\cdot\left(\cos\left[\atan{\left| f^\prime (x) \right|}\right]\right)^{-1} = \ell \cdot \sqrt{1 + |f^\prime(x)^2|}
-% \end{equation}
-% The last equality follows directly when using $y = \atan{|f^\prime(x|}$ in the formula below:
-% \begin{eqnarray*}
-% \cos(y) = 1/\text{sec}(y) = 1/\sqrt{1+ \tan^2 y}.\\
-% \end{eqnarray*}
-% 
  <<trigFix, echo=FALSE, include=FALSE, fig.width=4, fig.height=3>>=
 dframe <- createSine(40,1, f=f, fprime=fprime, f2prime=f2prime)
  qplot(x=x, xend=xend, y = f(x) -ell/2, yend=f(x) +ell/2, geom="segment", data=dframe) +
@@ -814,7 +703,7 @@ dframe <- createSine(40,1, f=f, fprime=fprime, f2prime=f2prime)
    coord_equal(ratio=1)+ 
    xlab("x") + ylab("y") +
    scale_x_continuous(breaks=seq(0, 2*pi, by=pi/2), minor_breaks=minor.axis.correction,
-                      labels=c("0", expression(paste(pi,"/2")), expression(pi), expression(paste("3",pi, "/2")), expression(paste("2",pi))))
+                      labels=c("0", expression(paste(pi,"/2")), expression(pi), expression(paste("3",pi, "/2")), expression(paste("2",pi)))) 
   
 #  
 #  qplot(x=x, xend=xend, y = f(x) -ellx2/2, yend=f(x) +ellx2/2, geom="segment", data=dframe) +
@@ -824,26 +713,6 @@ dframe <- createSine(40,1, f=f, fprime=fprime, f2prime=f2prime)
 #    scale_x_continuous(breaks=seq(0, 2*pi, by=pi/2), minor_breaks=minor.axis.correction,
 #                       labels=c("0", expression(paste(pi,"/2")), expression(pi), expression(paste("3",pi, "/2")), expression(paste("2",pi)))) 
  @
-% \begin{figure}[h!btp]
-% \begin{subfigure}[b]{.48\linewidth}\centering
-% \includegraphics[width=\linewidth,keepaspectratio=TRUE]{figure/fig-trigFix1}
-% \caption{Uncorrected}
-% \end{subfigure}
-% \begin{subfigure}[b]{.48\linewidth}\centering
-% \includegraphics[width=\linewidth,keepaspectratio=TRUE]{figure/fig-trigFix2}
-% \caption{Trigonometric correction}
-% \end{subfigure}
-% \caption[Demonstration of Trig Correction Fix]{\label{fig:trigFix} 
-% Fix of the sine illusion by using the factor of $1/\cos\left(\atan{|\cos(x)|}\right)$ to adjust the vertical extent of the lines.}
-% \end{figure}
-% 
-% The correction is shown in Figure \ref{fig:trigFix}. 
-% The assumption underlying this correction is the existence of a differentiable function $f$ describing the relationship between $X$ and $Y$,
-%  as the correction is based on the slope of the orthogonal line given by $-1/f^\prime(x)$.
-% 
-% \comment{The correction factor seems to over-correct. Is this just something that happens to the trained eye? We might need people to test for it.\\ I agree, because it looks a bit overcorrected to me as well.}
-% 
-% \subsubsection{A General Correction Method}
 Let again the function $f$ describe the general relationship between variables $X$ and $Y$. 
 
 
@@ -1264,20 +1133,22 @@ wopts <- -4 +cumsum(diffs)
 #qplot(x=wopts, geom="density") + geom_rug() + theme_bw() + ylab("Kernel Density") + xlab("w") + ggtitle("Distribution of w")
 # w01 <- wopts[(wopts < 1) & (wopts > 0)]
 w01 <- wopts[(wopts <= 0.75) & (wopts >= 0.25)]
-qplot(wopts, rep(1, length=length(wopts)), geom="point") + geom_vline(xintercept =c(0,1), colour="grey80") + theme_bw() + ylab("") + ylim(c(0.8, 1.2)) + xlab("Starting weight") + geom_point(aes(x=w01, y=rep(1, length(w01))), pch=1, size=4) + theme(axis.ticks.y=element_blank(), axis.text.y=element_blank())  + geom_point(aes(x=c(0, 1), y=rep(1, 2)), pch=1, size=6) + theme(axis.ticks.y=element_blank(), axis.text.y=element_blank()) + xlim(c(-0.25,1.21))
+ggplot() + geom_vline(xintercept =c(0,1), colour="grey80") + theme_bw() + ylab("") + ylim(c(0.8, 1.2)) + xlab("Starting weight") + geom_point(aes(x=w01, y=rep(1, length(w01))), size=4) + theme(axis.ticks.y=element_blank(), axis.text.y=element_blank())  + geom_point(aes(x=c(0, 1), y=rep(1, 2)),  size=6) + theme(axis.ticks.y=element_blank(), axis.text.y=element_blank()) + xlim(c(-0.25,1.21))
 @
 
 \subsection{Study Design}
 The study aims to determine the ``optimal'' transformation weight for each transformation type. Psychophysics methodology typically approaches threshold estimation by using the method of adjustment \citep{goldstein}, where  stimuli are provided showing states both above and below the hypothesized optimal value and  participants adjust  until the stated goal is met (in this case, until the lines appear to have equal length). It is expected that there will be a difference in user-reported values from below and from above, and these values are typically averaged to produce a single threshold value. Beyond averaging these values, we use a mixed model to compare user responses for different starting points in a more continuous fashion, incorporating some of the advantages of the method of constant stimuli to more robustly estimate the optimal transformation weight. % For a review of general psychophysics methodology, the method of adjustment, and the method of constant stimuli, see \citet{goldstein}.
 
 The study is set up as a fractional factorial design of correction type ($x$ or $y$ correction) and starting weight $w_0$. Each participant is asked to evaluate a total of twelve situations, six of each correction type.
-The starting weights were distributed as follows: Each user was given a trial of each type starting at 0 and 1, and then the remaining four trials of each type had starting weights chosen with equal probability from $c \in \left\{0.25, 0.3, 0.35, 0.4, 0.45, 0.5, 0.525, \right.$ $\left. 0.55, 0.575, 0.6, 0.625, 0.65, 0.675, 0.7, 0.725, 0.75\right\}$. The possible starting values are shown in figure \ref{fig:weightdist}; possible user-submitted results are shown as solid circles, while starting weights are represented as unfilled circles. This  distribution of starting weights was chosen to have a higher coverage density around 0.6 after a pilot study indicated a preference for that value. Using a distribution with a wide coverage allows us to fully explore the space of plausible weight $w$ while focusing on the $(0,1)$ interval and enabling precise estimation of the optimal $w$ in the region indicated by the pilot study. %Table \ref{factortable} summarizes the factors under investigation in the experiment.
+Starting weights were chosen as follows: each user was given a trial of each type starting at 0 and 1. The remaining four trials of each type had starting weights chosen with equal probability from $\left\{0.25, 0.3, 0.35, 0.4, 0.45, 0.5, 0.525, \right.$ $\left. 0.55, 0.575, 0.6, 0.625, 0.65, 0.675, 0.7, 0.725, 0.75\right\}$ (see figure~\ref{fig:weightdist}). 
+%possible user-submitted results are shown as solid circles, while starting weights are represented as unfilled circles. 
+We decided to  have a higher coverage density for starting weights around 0.6 after a pilot study indicated a preference for that value. Using a distribution with a wide coverage allows us to more fully explore the space of plausible weights $w$ while focusing on the $(0,1)$ interval and enabling precise estimation of the optimal weight in the region indicated by the pilot study. %Table \ref{factortable} summarizes the factors under investigation in the experiment.
 
 %\done{What is the actual range of $c$ used in the analysis of the data? I thought you had cut it back to weights between 0 and 1. If that is the case the discussion here should reflect that.}
 
 \begin{figure}[h]\centering
 \includegraphics[keepaspectratio=TRUE,width=\linewidth]{figure/fig-study-weight-dist}
-\caption{Overview of possible starting weights. Weight values are discrete, but staggered so as to provide fine-grained adjustments around 0.6 and more coarse discriminatory information outside of $(0,1)$. Hollow circles indicate choices of starting weights for the first 6 trials, filled circles represent weights available for users to submit. All starting weights (with the exception of 0 and 1) are selected with equal probability.}\label{fig:weightdist}
+\caption{Overview of possible starting weights. Weight values are discrete, but staggered so as to provide fine-grained adjustments around 0.6 and more coarse discriminatory information toward the outside.}\label{fig:weightdist}
 \end{figure}
 
 % % setup of the study
@@ -1297,9 +1168,9 @@ The starting weights were distributed as follows: Each user was given a trial of
 % This allows us to fully explore the space of plausible $w$ while focusing on weights in the $(0,1)$ interval.
 
 %The range of weight values the shiny app allows follows the full distribution of $w$ described above, so possible weight values are between $(-4, 5)$. 
-A trial begins with the presentation of a graph at the chosen starting weight $w_0$. Participants adjust the graph using increment and decrement buttons. A trial ends with the participant clicking the `submit' button, at which point the weight for the final adjustment is recorded. This provides a clear starting value and ending value, allowing us to assess the range of optimal values for each participant. In addition to weight, type, and user submission, time-series data for each user interaction are recorded, as well as anonymized user-specific data (partial IP address, hashed IP address, and hashed browser characteristics) sufficient to provide a user `fingerprint' to distinguish and recognize individual users (or rather their computer settings). 
+A trial begins with the presentation of a graph at the chosen starting weight $w_0$. Participants adjust the graph using increment and decrement buttons. A trial ends with the participant clicking the `submit' button, at which point the weight for the final adjustment is recorded. This provides a clear starting value and ending value, allowing us to assess the range of optimal values for each participant. In addition to starting weight, correction type, and user chosen weight, time-series data for each user interaction are recorded \newdo{what time series data is recorded?}, as well as anonymized user-specific data (partial IP address, hashed IP address, and hashed browser characteristics) sufficient to provide a user `fingerprint' to distinguish and recognize individual users (or rather their computer settings). 
 
-Each participant is provided with two initial ``training'' trials: in the first two trials a graph of the underlying mean function is superimposed on the line segments to give participants some idea of the  function the lines represent. This approach was taken to reduce  incidences of extremely high ``x'' correction values, as large adjustment values do not change the impression of same line length, but the resulting function bears little resemblance to a sine function, see figure~\ref{fig:overtransform} for examples of overcorrection. %because when $w>\!\!>1$, the lines still look to be of equal length but the underlying function bears little resemblance to $\sin(x)$, as shown in figure \ref{fig:overtransform}. 
+Each participant is provided with two initial ``training'' trials in which the  graph of the underlying mean function is superimposed on the line segments to give participants some idea of the  function the lines represent. This approach was taken to reduce  incidences of extremely high  correction values under the $X$ transformation, as large adjustment values do not change the impression of same line length, but the resulting function bears little resemblance to a sine function, see figure~\ref{fig:overtransform} for examples of overcorrection. %because when $w>\!\!>1$, the lines still look to be of equal length but the underlying function bears little resemblance to $\sin(x)$, as shown in figure \ref{fig:overtransform}. 
 %
 % Data preparation
 %
@@ -1610,26 +1481,6 @@ dt <- xtable(temp)
 print(dt)
 @
 
-%\paragraph{Psychophysics Model} Traditionally, the method of limits \done{what is the method of limits, and how does it fit into the psychophysics model? - this is explained in the section ``Study Design"} requires several trials per participant, some from above the hypothesized threshold, some from below the hypothesized threshold \newdo{hold back on the example. Rather, describe the psychophysics model generally (don't forget to include literature references) and then apply it to the special case of this example. } (in this case, some with $w=0$ and some with $w=1$). These trials are then averaged to obtain a single threshold value. For this model, we will thus have to additionally exclude data from participants who did not complete one trial starting at 0 and one trial starting at 1 for each stimulus (so a participant who completed both $x$ trials and a $y$ trial starting at 0 would not be included when determining the optimal weight for $y$). \Sexpr{length(unique(user.avg.all$fingerprint))} users had sufficient data to calculate user-level optimum weights for one or both transformations using this method.
-
-%For each participant $i$ and trial $j$ of trial type $T_{ij}$ with starting weight $X_{ij}$
-
-% \begin{align}
-% \overline{W^X_{i}} &= \frac{1}{2}\cdot 
-% \frac{\sum_{j} \mathbbm{1}_{[T_{ij}=X]}\cdot \mathbbm{1}_{[X_{ij}=0]} \cdot{W_{ij}}}
-%      {\sum_{j} \mathbbm{1}_{[T_{ij}=X]}\cdot \mathbbm{1}_{[X_{ij}=0]}} + 
-% \frac{1}{2}\cdot 
-% \frac{\sum_{j} \mathbbm{1}_{[T_{ij}=X]}\cdot \mathbbm{1}_{[X_{ij}=1]} \cdot{W_{ij}}}
-%      {\sum_{j} \mathbbm{1}_{[T_{ij}=X]}\cdot \mathbbm{1}_{[X_{ij}=1]}} \\
-% \overline{W^Y_{i}} &= \frac{1}{2}\cdot 
-% \frac{\sum_{j} \mathbbm{1}_{[T_{ij}=Y]}\cdot \mathbbm{1}_{[X_{ij}=0]} \cdot{W_{ij}}}
-%      {\sum_{j} \mathbbm{1}_{[T_{ij}=Y]}\cdot \mathbbm{1}_{[X_{ij}=0]}} + 
-% \frac{1}{2}\cdot 
-% \frac{\sum_{j} \mathbbm{1}_{[T_{ij}=Y]}\cdot \mathbbm{1}_{[X_{ij}=1]} \cdot{W_{ij}}}
-%      {\sum_{j} \mathbbm{1}_{[T_{ij}=Y]}\cdot \mathbbm{1}_{[X_{ij}=1]}} 
-% \end{align}
-
-%Then, for each trial type, we can compute an average over the participants as well as compare the distributions of participant ``optimal" weight values. 
 
 \begin{figure}[htbp]\centering
 <<meanDists,echo=FALSE,out.width='.65\\linewidth', dependson='results-analysis', fig.width=7, fig.height=4, message=FALSE, warning=FALSE>>=
@@ -1694,7 +1545,7 @@ We can therefore interpret $\beta$ as the length of the interval of plausible we
 \includegraphics[keepaspectratio=TRUE, width=.85\linewidth]{figure/fig-results-analysis1}
 \caption{Simulation results from the fitted model, facetted by correction type. Fixed effects results are shown as histograms; the red values display the results when starting from an uncorrected plot and are concentrated around $w=\Sexpr{round(subset(ints, type=="X Transformation" & limit=="From Below")$x, 2)}$ for $X$ and $w=\Sexpr{round(subset(ints, type=="Y Transformation" & limit=="From Below")$x, 2)}$ for $Y$; the blue values represent user-chosen weights when starting from a fully corrected plot and are concentrated around $w=\Sexpr{round(subset(ints, type=="X Transformation" & limit=="From Above")$x, 2)}$ for $X$ and $w=\Sexpr{round(subset(ints, type=="Y Transformation" & limit=="From Above")$x, 2)}$ for $Y$. Additionally, 95\% bootstrap intervals are shown as horizontal line segments above the histograms; these intervals are for the lower and upper bounds of the ``preferred weight interval" tested in the experiment. User-level density curves show the individual variability around  fixed effects $\alpha_*$ and $\alpha_*+\beta$.}\label{fig:MixedModelResults}
 \end{figure}
-Figure \ref{fig:MixedModelResults} shows density plots which demonstrate the relationship between the starting weight value and the user-submitted ``optimal'' weight value. Higher starting weights are associated with higher user-submitted values, and lower starting weights are associated with lower user-submitted values. As users had to increment or decrement the weight value, this suggests that there is a range of acceptable values, and as users entered that range, they proceeded to the next trial. 
+Figure \ref{fig:MixedModelResults} gives an overview of the relationship between  starting weights and  user-submitted ``optimal'' weight values. Higher starting weights are associated with higher user-submitted values, and lower starting weights are associated with lower user-submitted values. 
 
 <<modelres, echo=FALSE, results='hide', dependson='results-analysis'>>=
 require(xtable)
@@ -1745,16 +1596,45 @@ ranefCIstab <- xtable(ranefCIs, align=c("r","r", "c", "c", "c"), digits=3)
 print(ranefCIstab, include.rownames=FALSE, file="./figure/ranef.txt", floating=FALSE)
 @
 \begin{table}[htbp]\centering
-\input{figure/fixef.txt}
+%\input{figure/fixef.txt}
+% latex table generated in R 3.0.1 by xtable 1.7-1 package
+% Tue Oct 15 14:37:59 2013
+\begin{tabular}{cclcc}
+  \hline
+Transformation & Threshold &  \multicolumn{1}{c}{Parameter} & Estimate & 95\% C.I. \\ 
+  \hline
+X & Lower & $\alpha_X$ & 0.097 & (0.045, 0.150) \\ 
+   & Upper& $\alpha_X + \beta$  & 0.625 & (0.570, 0.682) \\ 
+  Y & Lower& $\alpha_Y$  & 0.143 & (0.097, 0.188) \\ 
+   & Upper& $\alpha_Y + \beta$  & 0.671 & (0.626, 0.718) \\ 
+   \hline
+\end{tabular}
+
+
 \caption{Fixed effect estimates of model~(\ref{model1}) for the boundaries for reasonable weights. In parentheses,  95\% parametric bootstrap confidence intervals are given based on model (\ref{model1}) ($N$=1000).}\label{fixedeffectsresults}
 \end{table}
 \begin{table}[hbtp]\centering
-\input{figure/ranef.txt}
+%\input{figure/ranef.txt}
+% latex table generated in R 3.0.1 by xtable 1.7-1 package
+% Tue Oct 15 14:37:59 2013
+\begin{tabular}{rcccc}
+  \hline
+Groups & Correction & Parameter & Estimate & 95\% C.I. \\ 
+  \hline
+  Participant & X &$\eta_X$  & 0.171 & (0.167, 0.247) \\ 
+  Participant & Y &$\eta_Y$ &  0.145 & (0.107, 0.179) \\ 
+  Residual &  &$\sigma$ &  0.304 & (0.290, 0.317) \\ 
+   \hline
+\end{tabular}
+
 \caption{Overview of random effects for model~(\ref{model1}), including 95\% confidence intervals based on parameteric boostrap results ($N$=1000).}\label{randomeffectsresults}
 %\Sexpr{quantile(probs=c(0.025, 0.5, 0.975), as.vector(model.mcmc@sigma))}}
 \end{table}
 
-The fitted model parameters are shown in tables \ref{fixedeffectsresults} and \ref{randomeffectsresults}. Each transformation type has a lower bound (corresponding to starting at $w=0$) and an upper bound (corresponding to starting at $w=1$); these values are derived from the linear model parameters, where the lower bound is $\alpha_{T(i,j)}$ and the upper bound is $\alpha_{T(i,j)}+\beta X_{ij}$. The $X$ and $Y$ bounds are similar, with $X$ bounds slightly lower than $Y$ bounds; that is, the optimal weight is slightly higher for $Y$ than for $X$. In addition, Table \ref{randomeffectsresults} shows that the variability within a single individual's trials is higher than the variability within participants in both types of trials. 
+The fitted model parameters are shown in tables \ref{fixedeffectsresults} and \ref{randomeffectsresults}. 
+%Each transformation type has a lower bound (corresponding to starting at $w=0$) and an upper bound (corresponding to starting at $w=1$); these values are derived from the linear model parameters, where the lower bound is $\alpha_{T(i,j)}$ and the upper bound is $\alpha_{T(i,j)}+\beta X_{ij}$. 
+The ranges of optimal weights are similar under both transformations. Boundaries for the $X$ transformation are slightly lower than boundaries for $Y$. 
+Table \ref{randomeffectsresults} gives an overview of the variance estimates. 95\% confidence intervals are, based on 1000-fold paramteric bootstrap of model~\ref{model1}. All variance components are significant and relevant; variability within a single individual's trials is about half the size of variability across  participants. 
 
 We use parametric bootstrap to generate responses for each correction type and each participant from the model, which we use to both  create user-level densities, population-level densities, and bootstrap intervals for model parameters. 
 
@@ -1931,7 +1811,7 @@ ggsave(file="figure/ushcn-y-corrected.pdf", width=10, height=8)
 After removing the averages in Figure \ref{fig:boxplot-temp} to yield Figure \ref{fig:boxplot-resid-temp} the impression of higher variability in the peaks is only partially confirmed: there is higher variability in the winter, and lower variability in the summer, though there are more outliers in the summer than in the winter.
 
 \paragraph{Transformation in $X$}
-We applied the X transformation to the ushcn data using the unweighted transformation and the weighted transformation with w=0.36. This value was chosen as it is approximately the midpoint of the range of acceptable values determined experimentally. The corrected and uncorrected data with fitted cubic splines are shown in Figure \ref{fig:ushcn-x-correct}. 
+We applied the X transformation to the USHCN data using the unweighted transformation and the weighted transformation with w=0.36. This value was chosen as it is approximately the midpoint of the range of acceptable values determined experimentally. The corrected and uncorrected data with fitted cubic splines are shown in Figure \ref{fig:ushcn-x-correct}. 
 
 \begin{figure}[hbtp]
 \centering
@@ -1949,11 +1829,14 @@ We also applied the Y transformation to the ushcn data using the unweighted tran
 \caption{USHCN temperature data corrected using the $Y$ transformation with $w=1$ and $w=0.40$. The transformations are relatively slight but have a notable impact on the visual salience of outliers in summer temperature, allowing the viewer to recognize that summer temperatures are less variable but more prone to outliers, while winter temperatures are more variable with fewer outliers. The $w=0.40$ transformation serves as a middle ground between untransformed and fully transformed data.}
 \label{fig:ushcn-y-correct}
 \end{figure}
+
 %\clearpage
 \section{Conclusions}
 The sine illusion is a persistent and powerful illusion that is very difficult to counteract without modifying the visual stimulus directly. While ``fixing" data is anathema to typical statistical procedures, we cannot counteract the illusion and represent the data visually without some intervention. The proposals in this paper for transformations in $X$ and $Y$ provide the means to temporarily correct the data as a diagnostic measure, perhaps using an applet or R package for that purpose. These corrections are significant not only because of their implications for statistical graphics, but because previous attempts to resolve optical illusions using geometry have not met with success \citep{westheimer2008illusions}. These corrections are only a first step and could be improved upon; currently, the corrections break down for extreme (secant) values, but multiple iterations of the correction procedure will likely resolve some of these issues (though iteration removes the convenience of a functional form for the transformation). Similarly, all of the corrections proposed here extend the line lengths (or for actual data, increase the deviation from the smooth line) -- some normalization might make the necessary corrections less noticeable. 
 
-Our primary goal is to raise awareness of the illusion and its implications for statistics; the use of plots to guide the modeling process can leave us vulnerable to overlooking changes in the variance due to the illusion. While best practice has  been to plot the residuals separately, this removes the context of the data and is not practical before there is a model. In addition, the cognitive load required to interpret residuals separately from a model line can be reduced by showing the corrected data and model line together on the same plot. The proposed transformations require only a nonparametric smooth, maintain the context of the data, and require less cognitive load to interpret. While systematically modifying the data is uncommon in the statistical world, this approach is not out of place in the visual arts; in an approach to counteract the effects of the Hering illusion \citep{naturalscenes,hering} the columns of the Parthenon are wider at the center than at the ends to ensure that they appear straight. Similarly, painters often correct the hues used in shadows to account for color constancy in the brain. 
+Our primary goal is to raise awareness of the illusion and its implications for statistics; the use of plots to guide the modeling process can leave us vulnerable to overlooking changes in the variance due to the illusion. While best practice has  been to plot the residuals separately, this removes the context of the data and is not practical before there is a model. In addition, the cognitive load required to interpret residuals separately from a model line can be reduced by showing the corrected data and model line together on the same plot. The proposed transformations require only a nonparametric smooth, maintain the context of the data, and require less cognitive load to interpret. While systematically modifying the data is uncommon in the statistical world, this approach is not out of place in the visual arts or architecture; as far back as 2000 BC \newdo{check on date - no internet right now} the builders of the Parthenon ensured a straight appearance of the columns from afar, by widening columns at the center, thereby counteracting the effects of the Hering illusion \citep{naturalscenes,hering}.  Similarly, painters often correct color hues used in shadows to account for color constancy in the brain. 
+
+The data for this study was collected with approval from  IRB-ID 13-257.
 
 % \begin{itemize}\item Raise Awareness\item ``Fixing" data is tricky and usually beyond a statistician's comfort zone, but we could see this as part of an applet where the ``fix" is done temporarily as a diagnostic measure
 % \item iterative process - we're only doing first step. but then we don't have an explicit functional expression anymore
@@ -2041,7 +1924,7 @@ a &=& f^{\prime\prime}(x_0) f^\prime(x_0)^2 \\
 b &=& 2(1 + f^\prime(x_0)^2) \hspace{.5in} > 0 \text{ for all } x \\
 c &=& \pm \ell 
 \end{eqnarray*}
-For a valid solution for the correction factor, we have to assume that $\lambda$ is a factor that extends the original extant width (in absolute value). \todo[inline]{Im not quite sure why the other values are not solutions, but they lead to solutions that don't work.}
+For a valid solution for the correction factor, we have to assume that $\lambda$ is a factor that extends the original extant width (in absolute value). 
 %This means that for $c = - \ell$, we can only make use of $\lambda_{-}$, while for $c = +\ell$, the only valid solution is given as $\lambda_{+}$:
 \begin{eqnarray*}
 \lambda_{1/2} &=& \ell \left(v + \sqrt{ v^2 \pm  f^{\prime\prime}(x_0) f^\prime(x_0)^2\cdot \ell}\right)^{-1} 
