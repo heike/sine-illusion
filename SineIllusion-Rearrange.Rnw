@@ -1,5 +1,5 @@
 % !TeX program = pdfLaTeX
-\documentclass[12pt]{article}
+\documentclass[12pt, doublespace]{article}
 \usepackage{natbib}
 \usepackage{fullpage}
 \usepackage{color}
