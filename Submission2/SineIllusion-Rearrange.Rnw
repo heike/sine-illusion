@@ -58,7 +58,7 @@ source("code/functions.r")
 
 
 \title{Signs of the Sine Illusion -- why we need to care}
-\author{Susan Vanderplas, Heike Hofmann}%, Dianne Cook}%, Xiaoyue Cheng}
+\author{Susan Vanderplas, Heike Hofmann}
 
 \begin{document}
 \maketitle
@@ -70,7 +70,7 @@ Graphical representations have to be true to the data they display. Computationa
 
 
 \section{Introduction}
-Graphics are powerful tools for summarizing large or complex data. But they rely on the main premise that any graphical representation of the data has to be ``true'' to the data \citep[see e.g.][]{tufte, wainer:2000, robbins:2005} i.e.~a measurable quantity of a graphical element in the representation has to  directly reflect some aspect of the underlying data. Generally, we see a lot of discussion on keeping true to the data in the framework of (ab)using three dimensional effects in graphics. \citep{tufte} goes as far as defining a {\it lie-factor} of a chart as the ratio of the size of an effect in the data compared to the size of an effect shown, with the premise that any large deviations from one indicate a misuse of graphical techniques. Computational tools help us ensure technical trueness -- but this brings up the additional question of how we deal with situations that involve innate inability or trigger learned misperceptions in the audience. In this paper we want to raise awareness for one of these situations, show that it occurs frequently in our dealings with graphics and provide a set of strategies at solving or avoiding it.
+Graphics are powerful tools for summarizing large or complex data. But they rely on the main premise that any graphical representation of the data has to be ``true'' to the data \citep[see e.g.][]{tufte, wainer:2000, robbins:2005} i.e.~a measurable quantity of a graphical element in the representation has to  directly reflect some aspect of the underlying data. Generally, we see a lot of discussion on keeping true to the data in the framework of (ab)using three dimensional effects in graphics. \citep{tufte} goes as far as defining a {\it lie-factor} of a chart as the ratio of the size of an effect in the data compared to the size of an effect shown, with the premise that any large deviations from one indicate a misuse of graphical techniques. Computational tools help us ensure technical trueness -- but this brings up the additional question of how we deal with situations that involve innate inability or trigger learned misperceptions in the audience. In this paper we want to raise awareness for one of these situations, show that it occurs frequently in our dealings with graphics and provide a set of strategies for solving or avoiding it.
 
 
 <<example,echo=FALSE, include=FALSE>>=
@@ -100,7 +100,10 @@ qplot(data=datasub, x=jitter(Tmax), y=resid, geom="point", colour=I("grey20"), a
 As a first example let us consider the relationship between ozone concentration and temperature. Ozone concentrations were measured from \Sexpr{nsite} locations in the Houston area \citep{epa}, and temperature data is provided by the NCDC \citep{noaa} site at Hobby International Airport, located near the center of Houston. 
 
 Figure~\ref{fig:example1} shows daily measurements of 8-hour average ozone concentration and temperature at several sites in Houston, for days in 2011 with temperatures above $45^\circ$F  and dew points of less than $60^\circ$F. %(as ozone concentration is related to temperature and humidity)
-A loess smooth line is added for reference. Does the variability of ozone concentrations stay the same across the range of temperatures? We might agree that there is an increase in variability of ozone concentrations for temperatures above $80^\circ$F, but based on figure~\ref{fig:example1} not doubt    homogeneity  elsewhere. 
+A loess smooth line is added for reference. 
+\newtext{Those types of plots are often used to give an overview of the relationship between two variables. The trendline summarizes this relationship, while the points show raw measurement to allow an assessment of the overall size of the data, the amount of (marginal) variability presented, as well as the (conditional) variability along the trendline. It is the latter task that we cannot answer satisfactorily. While}
+%Does the variability of ozone concentrations stay the same across the range of temperatures? 
+we might agree that there is an increase in variability of ozone concentrations for temperatures above $80^\circ$F, we will not doubt homogeneity  elsewhere based on figure~\ref{fig:example1}. 
 
 % Is the variance trend in (a) consistent with the residual plot in (b)?
 % 
@@ -127,10 +130,10 @@ f <- function(x) 2*sin(x)
 fprime <- function(x) 2*cos(x)
 f2prime <- function(x) -2*sin(x)
 @
-<<original, dependson='functions', echo=FALSE, fig.width=5, fig.height=5, include=FALSE>>=
+<<original, dependson='functions', echo=FALSE, fig.width=5, fig.height=4, include=FALSE>>=
 qplot(x=x, xend=xend, y = ystart, yend=yend, geom="segment", data=createSine(40, 1, f=f, fprime=fprime, f2prime)) +
   theme(panel.grid.major=element_blank(), panel.background = element_rect(fill = "white", 
-                colour = "black"), plot.margin = unit(c(-1,0,-3,0), "cm"), 
+                colour = "black"), plot.margin = unit(c(0,0,-0.5,-0.5), "cm"), 
        panel.grid.minor=element_blank(), panel.background=element_blank(),
        axis.title = element_blank(), axis.ticks = element_blank(), 
        axis.text = element_blank()) + coord_equal(ratio=1)
@@ -157,7 +160,7 @@ qplot(x=xstart, xend=xend, y = ystart, yend=yend, geom="segment", data=df1, colo
                              xend = c(mean(df1$x[19:20]), mean(df1$x[19:20]), df1$x[20]),
                              y = c(df1$ystart[20], df1$ystart[20], df1$yend[20]), 
                              yend = c(df1$ystart[20], df1$yend[20], df1$yend[20])), size=1) +
-  geom_text(aes(x=df1$x[19], y=df1$y[20], label="\u2113"), hjust=1, vjust=.5, size=10, colour="grey60")
+  geom_text(aes(x=df1$x[19], y=df1$y[20], label="\u2113"), hjust=1, vjust=.5, size=10, colour="grey60") + theme(plot.margin = unit(c(-1,0,-3,0), "cm"))
 dev.off()
 @
 \begin{figure}[hbtp]
@@ -168,8 +171,8 @@ dev.off()
 %The right graph illustrates the parameters determining the appearance of the illusion: $s$ denotes the amplitude of the function, $\ell$ the length of the line segments.
 \end{figure}
 %The first documentation we could find of this illusion,
-More recently the illusion has been shown in non-sinusoidal curves \citep{cleveland:1984, schonlau:2003, robbins:2005, marie:2013}, but the underlying effect seems to be the same, in the sense the illusion is not triggered by the periodic nature of the underlying trendline but only by  changes to its slope. Figure \ref{fig:twoillusions-simulation} shows three panels, which all exhibit the illusion. From left to right, the trend comes from (a) a periodic function, (b) a periodic component added to an exponential function, and (c) an exponential function on its own.
-While all three graphs seem to show nonconstant variance along the main trend; in reality, the variance is constant in all of them. Clearly, the illusion does not rely on the periodicity of the function for which it was named, but is a symptom of the change in curvature that comes with the periodicity.
+More recently the illusion has been shown in non-sinusoidal curves \citep{cleveland:1984, schonlau:2003, robbins:2005, marie:2013}, but the underlying effect seems to be the same, in the sense that the illusion is not triggered by the periodic nature of the underlying trendline but only by  changes to its slope. Figure \ref{fig:twoillusions-simulation} shows three panels, which all exhibit the illusion. From left to right, the trend stems from (a) a periodic function, (b) a periodic component added to an exponential function, and (c) an exponential function on its own.
+While all three graphs seem to show nonconstant variance along the main trend; in reality, it is constant. Clearly, the illusion does not rely on the periodicity of the function for which it was named, but is a symptom of the change in curvature that comes with the periodicity.
 %, instead the ``line width illusion" and the ``sine illusion" are symptoms of the same phenomenon, even though the cognitive literature and the graphics literature refer to the illusion differently. 
 
 
@@ -226,9 +229,10 @@ qplot(x,y, geom="jitter", alpha=I(alph))+
 \caption{Set of three scatterplots of simulated data with constant variance. Plot (a) shows seasonality without any underlying trend, (b) shows seasonality superimposed on a quadratic trend, and (c) shows a quadratic trend without seasonality. Though all three sets of simulated data have constant variance, none of the variances appear constant due to the sine illusion.}\label{fig:twoillusions-simulation}
 \end{figure}
 
-Sections \ref{perceptualexplanations} and \ref{statisticalgraphics} explore the perceptual and statistical literature examining this illusion.
+Next, %Sections  \ref{statisticalgraphics} and \ref{perceptualexplanations}
+we give an overview of the perceptual and statistical literature regarding this illusion.
 %\FloatBarrier
-\subsection{Statistical Graphics and the Sine Illusion}\label{statisticalgraphics}
+\paragraph{The sine illusion in Statistical Graphics}\label{statisticalgraphics}\hfill\newline
 The sine illusion demonstrated in Figures \ref{fig:exampleFull1} and \ref{fig:original} has been frequently noted in statistical graphics, though usually not as an optical illusion. Rather, the problem is typically identified as the difficulty of visually subtracting two curves, and the resulting erroneous conclusions when this process goes awry. Figure \ref{fig:playfair-debt} presents the possibly oldest example of this common phenomenon \citep{playfair, playfair2}: Playfair's chart of the balance of trade between England and the East Indies shows time series of the trade value for imports  and exports between the countries in the 18th century. The shaded area on the chart is named ``balance against England", suggesting that the difference between the lines is of main importance. This difference in trading values is encoded as the difference between the lines along the vertical axis. However, the 
  vertical distance  between  two lines provides a  much less visually salient cue than the orthogonal width between the lines. This results in  an underestimation \citep{cleveland:1984} of the difference in trades around 1763, which is of a much higher (about 1.5 fold) magnitude as around 1770, but appears  smaller than that.  
 % that is, the width of the line segment which is perpendicular to the tangent line at a given point.
@@ -243,7 +247,7 @@ The sine illusion demonstrated in Figures \ref{fig:exampleFull1} and \ref{fig:or
 %Another example of the illusion is shown in Figure \ref{fig:robbins-graph} \citep{robbins:2005}, which contains two  exponential curves shifted vertically by a constant.%, i.e.~$f_1(x) = e^x$ and $f_2(x) = e^x + 1$.  
 %In spite of this constant vertical distance, the lines appear to be closing in on each other. %$x=2.5$ than at $x=0$, even though mathematically it is obvious that the distance between them is constant. 
 %
-The line width illusion is triggered by the change in slope -- as the slope increases, the apparent distance between the two lines decreases. %, even though the lines represent a constant vertical shift.
+%The line width illusion is triggered by the change in slope -- as the slope increases, the apparent distance between the two lines decreases. %, even though the lines represent a constant vertical shift.
 %<<effectivegraphsfig,echo=FALSE, include=FALSE>>=
 %x <- seq(0, 2.5, .01)
 %y1 <- exp(x)
@@ -258,7 +262,7 @@ The line width illusion is triggered by the change in slope -- as the slope incr
 %\end{SCfigure}
 
 %\FloatBarrier
-\subsection{Perceptual Explanations for the Sine Illusion}\label{perceptualexplanations}
+\paragraph{Perceptual Explanations for the Sine Illusion}\label{perceptualexplanations}\hfill\newline
 While not thoroughly examined in the sensation and perception literature, the sine illusion has been classified as part of a group of geometrical optical misperceptions  related to the M\"uller-Lyer illusion \citep{day:1991} or the Poggendorf illusion \citep{poggendorf}, which puts the illusion into the framework of context-based illusions.
 \cite{day:1991} suggest that
 the sine illusion occurs due to misapplication of perceptual experience with the three-dimensional world to a two-dimensional ``artificial" display of data. 
@@ -302,7 +306,7 @@ persp(x, z, data.persp,  xlab="", ylab="", zlab="", theta=0, phi=45, border="bla
 \includegraphics[width=\linewidth, keepaspectratio=TRUE, trim=0in 1.5in 0in 1.5in]{figure/fig-ribbon-illusion2}
 \caption{Perspective plot, vanishing point near infinity.\label{ribbon2}}
 \end{subfigure}
-\caption{Two different perspective projections of the same data responsible for the sine illusion. The first projection angles the lines and appears much more natural, but the second projection suggests that the lines do not need to be angled to create the same three-dimensional impression.\label{ribbon}}
+\caption{Two different perspective projections of the same data responsible for the sine illusion. The first projection angles the lines and appears more natural, but the second projection suggests that the lines do not need to be angled to create the same three-dimensional impression.\label{ribbon}}
 \end{figure}
 
 
@@ -323,7 +327,7 @@ qplot(x=x, xend=xend, y = ystart*ell, yend=yend*ell, geom="segment", data=dframe
        panel.grid.minor.x=element_blank(), panel.background=element_blank(),
        axis.title = element_blank(), axis.ticks = element_blank(), 
        axis.text = element_blank(), 
-        plot.margin = unit(c(.1,.1,.1,.1), "cm")) + coord_equal(ratio=1) + 
+        plot.margin = unit(c(0,-.5,-.5,-1), "cm")) + coord_equal(ratio=1) + 
   geom_segment(size=1.5, data=dframe[c(31, 38),]) 
 @
 \begin{SCfigure}
@@ -332,24 +336,24 @@ qplot(x=x, xend=xend, y = ystart*ell, yend=yend*ell, geom="segment", data=dframe
 \includegraphics[width=.5\linewidth]{figure/fig-originalgrid}
 \end{SCfigure}
 
-While it is typically a bad idea to use three-dimensional representations when two dimensions are adequate to display the data \citep{tufte}, it might present a viable avenue to counteract a visual illusion. However, creating a three-dimensional projection of two-dimensional data is not simple. The projection that best resolves the illusion  likely is highly subjective and influenced by choices of angle and color gradient for depth cues. 
+While it is typically a bad idea to use three-dimensional representations when two dimensions are adequate to display the data \citep{tufte}, it might present a viable avenue to counteract this  illusion. However, creating a three-dimensional projection of two-dimensional data is not simple. The projection that best resolves the illusion  likely is highly subjective and influenced by choices of angle and color gradient for depth cues. 
 %and would also lead to distortions and instability in the visual display. In particular, there does not seem to be an simple guideline for determining the projection angle or color gradient  to create the illusory depth to remove the optical illusion. 
 
 %That is, the illusion breaks down if the visual heuristic is pre-empted by an attempt to view the graph as if it were three dimensional or if each piece is considered without the surrounding context. 
 
-The contextual cues of the overall trend are critical to the sine illusion's effect;  the illusion  only  holds when a substantial portion of the graph is considered simultaneously, which triggers our innate ability of perceiving one whole rather than the individual parts it consists of \citep[principle of grouping][]{wolfe2012sensation}.
+The contextual cues of the overall trend are critical to the sine illusion's effect;  the illusion  only  holds when a substantial portion of the graph is considered simultaneously, which triggers our innate ability of perceiving one whole rather than the individual parts it consists of \citep[principle of grouping; ][]{wolfe2012sensation}.
 %without regard to the perceptual mechanisms at play. 
-Considering only one or two line segments at a time resolves the illusion. The bold lines in figure~\ref{fig:original-grid} are clearly of the same length.  Comparisons of individual line lengths is visually a fairly simple task, and is done with a relatively high accuracy \citep{cleveland:1984}. 
+Considering only two line segments at a time resolves the illusion. The bold lines in figure~\ref{fig:original-grid} are clearly of the same length.  Comparisons of individual line lengths is visually a fairly simple task, and is done with a relatively high accuracy \citep{cleveland:1984}. 
 \citet{day:1991} contains a more thorough discussion of how much surrounding context is required for the illusion to persist. 
 %The illusion arises when sufficient context is available to induce an ambiguously three-dimensional figure.
 
 %\FloatBarrier
-\subsection{Geometry of the Illusion}
+\paragraph{Geometry of the Illusion}\hfill\newline
 %We have previously alluded to the fact that the sine illusion depends on the change in the slope of the underlying function; what follows is a geometric explanation of why this occurs. 
 %Our perceptual system is particularly well optimized for three dimensions; in figure~\ref{fig:original}  this leads us to perceive the  shortest line between the top and bottom curves as the distance between the curves, i.e. the {\it orthogonal} width,  rather than the vertical distance. 
 In Figure~\ref{fig:original} we have seen that the our preference in evaluating line width is to assess {\it orthogonal} width rather than the difference along the vertical axis. 
 Figure~\ref{fig:OrthogonalWidth} demonstrates the change in orthogonal width as the slope of the line tangent to the graph of $f$ changes; these changes correspond to our perception of apparent line length. 
-<<transform-illustration,echo=FALSE, message=FALSE, warning=FALSE, include=FALSE, fig.width=7.5, fig.height=5>>=
+<<transform-illustration,echo=FALSE, message=FALSE, warning=FALSE, include=FALSE, fig.width=8.5, fig.height=5>>=
 f <- function(x) 2*sin(x)
 fprime <- function(x) 2*cos(x)
 f2prime <- function(x) -2*sin(x)
@@ -393,7 +397,7 @@ qplot(x=x, y=y, geom="line", data=dframe, colour=I("grey50")) + theme_bw() +
 @
 \begin{figure}[h!tbp]
 \centering
-\includegraphics[width=.75\linewidth, keepaspectratio=TRUE]{fig-transform-illustration}
+\includegraphics[width=.85\linewidth, keepaspectratio=TRUE]{fig-transform-illustration}
 \caption{\label{fig:OrthogonalWidth} The sine illusion with  lines  orthogonal to the tangent line at $f(x)$. The perception that the vertical length changes with $f(x)$ corresponds to changes in actual orthogonal width due to the change in secant angle. 
 }
 \end{figure}
@@ -421,13 +425,13 @@ qplot(data=ribbon, x=x, ymin=ybottom, ymax=ytop, geom="ribbon", fill=I("grey")) 
   coord_equal(ratio=1) + scale_linetype("") + theme(plot.margin = unit(c(-1,-1,-2,-2), "lines"))
 @
 At the same time, our preference for assessing figure width based on the orthogonal width suggests that the underlying illusion may be a function of geometry rather than some unknown visual or neural process that occurs subconsciously. %, i.e. in the time between perception of the stimulus and conscious thought. 
-If this is the case, then it may be  possible to correct the graphical display for the illusion to minimize its misleading effect. A geometrical correction that  --at least temporarily-- counteracts the illusion is be a valuable tool in visual analysis, as this illusion very persistently affects our judgment of very common tasks  such e.g.~the assessment of conditional variability of data along a trend line.
+In this  case it may be  possible to correct the graphical display for the illusion to minimize its misleading effect. A geometrical correction that  --at least temporarily-- counteracts the illusion is be a valuable tool in visual analysis, as this illusion very persistently affects our judgment of very common tasks  such as e.g.~the assessment of conditional variability of data along a trend line.
 %, we must overcome the visual bias due to the sine illusion. 
 
 Simply raising people's awareness of the presence of this illusion is not enough,
-as  this illusion is incredibly difficult, if not impossible, to overcome even when we are aware of its presence: our brains simply cannot ``un-see" the illusion. 
+as it is incredibly difficult, if not impossible, to overcome this illusion even when we are aware of its presence: our brains simply cannot ``un-see" it. 
 
-What follows is a compilation of several approaches to correct for or mitigate the effect of the illusion, intended primarily to demonstrate how pervasive the illusion is and the extreme measures necessary to remove its effect. 
+What follows is a compilation of several approaches to correct for or mitigate the effect of the illusion. Our primary intention here id to demonstrate the persaviness of the illusion is and the extreme measures necessary to remove its effect. 
 % do not change this to its'
 
 \section{Breaking the Illusion}
@@ -835,7 +839,7 @@ qplot(data=df.real, x=x, y=y, geom="line")+
             parse=TRUE, hjust=1, vjust=.25) + 
   geom_text(data=df.real[which.max(df.real$sec),], aes(x=x-.05, y=sec+.05, label="paste(group('(',list(x[2],y[2]),')'))"), 
             parse=TRUE, hjust=0, vjust=.25)  + 
-  theme(axis.title=element_blank(), axis.text=element_blank(), axis.ticks=element_blank(), axis.line=element_blank(), panel.grid=element_blank())
+  theme(axis.title=element_blank(), axis.text=element_blank(), axis.ticks=element_blank(), axis.line=element_blank(), panel.grid=element_blank(), plot.margin=unit(c(0,0,-1,0), "cm"))
 
 
 df <- createSine(40 , len=1, f=f, fprime=fprime, f2prime=f2prime)[5:16,]
@@ -871,7 +875,8 @@ qplot(data=df.real, x=x, y=y, geom="line") +
             parse=TRUE, hjust=1, vjust=.25) + 
   geom_text(data=df.real[which.max(df.real$sec),], aes(x=x-.05, y=sec+.05, label="paste(group('(',list(x[2],y[2]),')'))"), 
             parse=TRUE, hjust=0, vjust=.25)  + 
-  theme(axis.title=element_blank(), axis.text=element_blank(), axis.ticks=element_blank(), axis.line=element_blank(), panel.grid=element_blank())
+  theme(axis.title=element_blank(), axis.text=element_blank(), axis.ticks=element_blank(), axis.line=element_blank(), panel.grid=element_blank(),
+        plot.margin=unit(c(0,0,-1,0), "cm"))
 @
 
 
@@ -1133,21 +1138,22 @@ wopts <- -4 +cumsum(diffs)
 #qplot(x=wopts, geom="density") + geom_rug() + theme_bw() + ylab("Kernel Density") + xlab("w") + ggtitle("Distribution of w")
 # w01 <- wopts[(wopts < 1) & (wopts > 0)]
 w01 <- wopts[(wopts <= 0.75) & (wopts >= 0.25)]
-ggplot() + geom_vline(xintercept =c(0,1), colour="grey80") + theme_bw() + ylab("") + ylim(c(0.8, 1.2)) + xlab("Starting weight") + geom_point(aes(x=w01, y=rep(1, length(w01))), size=4) + theme(axis.ticks.y=element_blank(), axis.text.y=element_blank())  + geom_point(aes(x=c(0, 1), y=rep(1, 2)),  size=6) + theme(axis.ticks.y=element_blank(), axis.text.y=element_blank()) + xlim(c(-0.25,1.21))
+ggplot() + geom_vline(xintercept =c(0,1), colour="grey80") + theme_bw() + ylab("") + ylim(c(0.8, 1.2)) + xlab("Starting weight") + geom_point(aes(x=w01, y=rep(1, length(w01))), size=4) + theme(axis.ticks.y=element_blank(), axis.text.y=element_blank())  + geom_point(aes(x=c(0, 1), y=rep(1, 2)),  size=6) + theme(axis.ticks.y=element_blank(), axis.text.y=element_blank(), plot.margin=unit(c(0,0,0,0), "cm")) + xlim(c(-0.25,1.21))
 @
 
 \subsection{Study Design}
 The study aims to determine the ``optimal'' transformation weight for each transformation type. Psychophysics methodology typically approaches threshold estimation by using the method of adjustment \citep{goldstein}, where  stimuli are provided showing states both above and below the hypothesized optimal value and  participants adjust  until the stated goal is met (in this case, until the lines appear to have equal length). It is expected that there will be a difference in user-reported values from below and from above, and these values are typically averaged to produce a single threshold value. Beyond averaging these values, we use a mixed model to compare user responses for different starting points in a more continuous fashion, incorporating some of the advantages of the method of constant stimuli to more robustly estimate the optimal transformation weight. % For a review of general psychophysics methodology, the method of adjustment, and the method of constant stimuli, see \citet{goldstein}.
 
 The study is set up as a fractional factorial design of correction type ($x$ or $y$ correction) and starting weight $w_0$. Each participant is asked to evaluate a total of twelve situations, six of each correction type.
-Starting weights were chosen as follows: each user was given a trial of each type starting at 0 and 1. The remaining four trials of each type had starting weights chosen with equal probability from $\left\{0.25, 0.3, 0.35, 0.4, 0.45, 0.5, 0.525, \right.$ $\left. 0.55, 0.575, 0.6, 0.625, 0.65, 0.675, 0.7, 0.725, 0.75\right\}$ (see figure~\ref{fig:weightdist}). 
+Starting weights were chosen as follows: each user was given a trial of each type starting at 0 and 1. The remaining four trials of each type had starting weights chosen with equal probability from $0.25$ to $0.75$ %\left\{0.25, 0.3, 0.35, 0.4, 0.45, 0.5, 0.525, \right.$ $\left. 0.55, 0.575, 0.6, 0.625, 0.65, 0.675, 0.7, 0.725, 0.75\right\}$ 
+(see figure~\ref{fig:weightdist}). 
 %possible user-submitted results are shown as solid circles, while starting weights are represented as unfilled circles. 
 We decided to  have a higher coverage density for starting weights around 0.6 after a pilot study indicated a preference for that value. Using a distribution with a wide coverage allows us to more fully explore the space of plausible weights $w$ while focusing on the $(0,1)$ interval and enabling precise estimation of the optimal weight in the region indicated by the pilot study. %Table \ref{factortable} summarizes the factors under investigation in the experiment.
 
 %\done{What is the actual range of $c$ used in the analysis of the data? I thought you had cut it back to weights between 0 and 1. If that is the case the discussion here should reflect that.}
 
 \begin{figure}[h]\centering
-\includegraphics[keepaspectratio=TRUE,width=\linewidth]{figure/fig-study-weight-dist}
+\includegraphics[keepaspectratio=TRUE,width=0.8\linewidth]{figure/fig-study-weight-dist}
 \caption{Overview of possible starting weights. Weight values are discrete, but staggered so as to provide fine-grained adjustments around 0.6 and more coarse discriminatory information toward the outside.}\label{fig:weightdist}
 \end{figure}
 
@@ -1174,7 +1180,7 @@ Each participant is provided with two initial ``training'' trials in which the  
 %
 % Data preparation
 %
-<<overcorrectlimits, out.width='.45\\linewidth', fig.width=6, fig.height=4, dependson='xtransform', echo=FALSE, include=FALSE>>=
+<<overcorrectlimits, out.width='.45\\linewidth', fig.width=6.5, fig.height=3, dependson='xtransform', echo=FALSE, include=FALSE>>=
 # what do the different corrections look like outside of the boundary region for outliers?
 f <- sin
 fprime <- cos
@@ -1207,7 +1213,7 @@ correction.extremes <- rbind(ycorrlow,ycorrhigh,xcorrlow,xcorrhigh)
 qplot(data=correction.extremes, geom="segment", x=xstart, xend=xend, y=ystart, yend=yend) +
   facet_grid(corr~level) + ylab("") + xlab("")  +
   theme(panel.grid.major=element_blank(), panel.background = element_rect(fill = "white", 
-                colour = "black"), plot.margin = unit(c(-1,0,-3,0), "cm"), 
+                colour = "black"), plot.margin = unit(c(0,0,0,0), "cm"), 
        panel.grid.minor=element_blank(), panel.background=element_blank(),
        axis.title = element_blank(), axis.ticks = element_blank(), 
        axis.text = element_blank()) + coord_equal(ratio=1)
@@ -1431,7 +1437,7 @@ ggplot() + theme_bw() + facet_grid(type~., scales="free") + ylim(c(0, 27)) +
 
 @
 \begin{figure}[htbp]\centering
-\includegraphics[keepaspectratio=TRUE,width=.9\linewidth]{figure/fig-overcorrectlimits}
+\includegraphics[keepaspectratio=TRUE,width=.8\linewidth]{figure/fig-overcorrectlimits}
 \caption[ Overcorrected transformations excluded from the analysis]{Transformation weights outside of the intervals $[\Sexpr{wlowy}, \Sexpr{whighy}]$ for $y$ and $[\Sexpr{wlowx}, \Sexpr{whighx}]$ for $x$  produce figures which do not maintain the underlying function shape (in $x$) or which are composed of extremely uneven length lines (in $y$). Trials with final results that were more extreme than these examples were excluded from the analysis.}
 \label{fig:overtransform}
 \end{figure}
