@@ -451,7 +451,7 @@ Each of these ideas is discussed in more detail in this section.
 \cite{cleveland:1984, cleveland:1985} discuss the perceptual difficulty of judging the difference between two curves plotted in the same chart, and alternatively, recommend to display the difference between the two curves directly. This is in line with  recommendations  for good graphics to `show the data' rather than make the reader derive some aspect of it \citep[e.g.][]{wainer:2000}. In particular, de-trending data to focus on residual structure is the generally accepted procedure for assessing model fit. 
  Figure \ref{fig:cleveland-figure}(a) shows a scatterplot of data with a trend. A loess smooth is used to estimate the trendline. A visual assessment of variability along this trendline
 might result in a description such as `homogeneous variance or slightly increasing variance for  negative $x$, followed by a dramatic decrease in vertical variability for positive $x$'.  
-Once the residuals are separated from the trendline as shown on the right hand side of the figure, it becomes apparent that this first assessment of conditional variability was not correct, and the steadily decrease along the horizontal axis becomes visible.
+Once the residuals are separated from the trendline as shown on the right hand side of the figure, it becomes apparent that this first assessment of conditional variability was not correct, and the decreasing variance along the horizontal axis becomes visible.
  
 While the illusion is not apparent when trend line and variability in the  residual structure are shown separately, this separation  %Removing the trend and showing variability separately does largely remove the sine illusion, but it also 
 makes it  more difficult to evaluate the overall  pattern in the data, as we  must base any judgment on two charts; either by combining information from two graphs or by mentally re-composing the original graph (at which point, the sine-illusion becomes a factor). To minimize cognitive demands  we ideally want to tell the whole story with a single graph. 
@@ -1694,8 +1694,8 @@ monthly$time <- as.Date(monthly$time)
 \begin{figure}[hbtp]
 \centering
 <<rawtemp, dependson='readdata', echo=FALSE, echo=FALSE, fig.width=12, fig.height=4.5, out.width='\\textwidth',cache=TRUE>>=
-ggplot()  + geom_jitter(aes(Time, value/100), data=subset(ushcn, Year>1995), size=1, shape=I(1), colour=I("grey30"), alpha=I(.90)) +
-  geom_line(aes(time, avg/100), data=subset(monthly, year(time)>1995), colour="black", size=1.5) + 
+ggplot()  + geom_jitter(aes(Time, value/100), data=subset(ushcn, Year>2007), size=1, shape=I(1), colour=I("grey30"), alpha=I(.90)) +
+  geom_line(aes(time, avg/100), data=subset(monthly, year(time)>2007), colour="black", size=1.5) + 
   ylab("Temperature (in Celsius)") + theme_bw() + theme(plot.margin = unit(c(0,6,0,0), "cm")) + xlab("Year")
 # ggsave(file="figure/monthly-temps.pdf", width=12, height=4.5)
 
@@ -1713,18 +1713,18 @@ vp1 <- viewport(x = 0.955, y = 0.91, height = unit(2.5, "cm"), width =  unit(4, 
 print(p, vp = vp1)
 @
 % \includegraphics[width=\textwidth]{monthly-temps}
-\caption{Raw monthly maximum temperatures (in Celsius) between 1996 and 2012 at 380 stations across the US (as indicated on the map) with similar elevation and latitude. The blue line shows fitted temperatures from a baseline model. The plot suggests that the model fails to capture the more extreme values in summer and winter. \label{fig:raw-temp}}
+\caption{Raw monthly maximum temperatures (in Celsius) between 2008 and 2012 at 380 stations across the US (as indicated on the map) with similar elevation and latitude. The line shows fitted temperatures from a baseline model. The plot suggests that the model fails to capture the more extreme values in summer and winter. \label{fig:raw-temp}}
 \end{figure}
 
 \begin{figure}[hbtp]\centering
 <<boxtemp, dependson='readdata', echo=FALSE, fig.width=12, fig.height=4.5, out.width='\\textwidth',cache=TRUE>>=
-ggplot()  + geom_boxplot(aes(Time, value/100, group=interaction(Year, Month)), outlier.size=1, fill = "grey65", data=subset(ushcn, Year>1995)) + theme_bw() + 
+ggplot()  + geom_boxplot(aes(Time, value/100, group=interaction(Year, Month)), outlier.size=1, fill = "grey65", data=subset(ushcn, Year>2007)) + theme_bw() + 
   #geom_line(aes(time, avg/100), data=subset(monthly, year(time)<1995), colour="steelblue", size=1.5, alpha=.5) + 
   ylab("Temperature (in Celsius)")+ xlab("Year")
 # ggsave(file="figure/monthly-temps.pdf", width=12, height=4.5)
 @
 
-\caption{Monthly boxplot of maximum temperatures (in Celsius) between 1996 and 2012 at 380 stations. The boxplots suggest that there is more variation in the winter months than in the other seasons. Summer, Fall and Spring appear to have similar temperature variability, and there are more outliers in the Summer.}\label{fig:boxplot-temp}\label{fig:box-temp}
+\caption{Monthly boxplot of maximum temperatures (in Celsius) between 2008 and 2012 at 380 stations. The boxplots suggest that there is more variation in the winter months than in the other seasons. Summer, Fall and Spring appear to have similar temperature variability, and there are more outliers in the Summer.}\label{fig:boxplot-temp}\label{fig:box-temp}
 \end{figure}
 
 
@@ -1820,18 +1820,18 @@ ggsave(file="figure/ushcn-y-corrected.pdf", width=10, height=8)
 After removing the averages in Figure \ref{fig:boxplot-temp} to yield Figure \ref{fig:boxplot-resid-temp} the impression of higher variability in the peaks is only partially confirmed: there is higher variability in the winter, and lower variability in the summer, though there are more outliers in the summer than in the winter.
 
 \paragraph{Transformation in $X$}
-We applied the X transformation to the USHCN data using the unweighted transformation and the weighted transformation with w=0.36. This value was chosen as it is approximately the midpoint of the range of acceptable values determined experimentally. The corrected and uncorrected data with fitted cubic splines are shown in Figure \ref{fig:ushcn-x-correct}. 
+We applied the X transformation to the USHCN data using the unweighted transformation and the weighted transformation with $w=0.36$. This value was chosen as it is approximately the midpoint of the range of acceptable values determined experimentally. The corrected and uncorrected data with fitted cubic splines are shown in Figure \ref{fig:ushcn-x-correct}. 
 
 \begin{figure}[hbtp]
 \centering
 \includegraphics[keepaspectratio=TRUE,width=.9\linewidth]{figure/ushcn-x-corrected}
-\caption{USHCN temperature data from 1996-2010 corrected using the $X$ transformation with w=1 and with w=0.36. At w=1, the transformation is severe, but it is clear that the variance decreases in the summer months and increases in the winter. When w=0.36, the transformation is much less noticable but results in a near-constant absolute slope of the fitted line, removing the presence of the sine illusion without excessively distorting the underlying function shape.}
+\caption{USHCN temperature data from 2008-2012 corrected using the $X$ transformation with $w=1$ and with $w=0.36$. At $w=1$, the transformation is severe, but it is clear that the variance decreases in the summer months and increases in the winter. When $w=0.36$, the transformation is much less noticable but results in a near-constant absolute slope of the fitted line, removing the presence of the sine illusion without excessively distorting the underlying function shape.}
 \label{fig:ushcn-x-correct}
 \end{figure}
 The minor effect of the weighted transformation on individual x-values contrasts with the effectiveness of the transformation in reducing the illusion; this is best seen in the fitted line, which is distinctly (piecewise) curved in the uncorrected data and appears to be much more piecewise linear in the corrected data, even at the reduced weighted value. 
 
 \paragraph{Transformation of $Y$}
-We also applied the Y transformation to the ushcn data using the unweighted transformation and the weighted transformation with w=0.40. This value was chosen as it is approximately the midpoint of the range of acceptable values determined experimentally. The corrected and uncorrected data with fitted cubic splines are shown in Figure \ref{fig:ushcn-y-correct}. 
+We also applied the Y transformation to the ushcn data using the unweighted transformation and the weighted transformation with $w=0.40$. This value was chosen as it is approximately the midpoint of the range of acceptable values determined experimentally. The corrected and uncorrected data with fitted cubic splines are shown in Figure \ref{fig:ushcn-y-correct}. 
 \begin{figure}[hbtp]
 \centering
 \includegraphics[keepaspectratio=TRUE,width=.9\linewidth]{figure/ushcn-y-corrected}
