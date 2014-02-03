@@ -71,7 +71,7 @@ Graphical representations have to be true to the data they display. Computationa
 
 \section{Introduction}
 Graphics are powerful tools for summarizing large or complex data. But they rely on the main premise that any graphical representation of the data has to be ``true'' to the data \citep[see e.g.][]{tufte, wainer:2000, robbins:2005} i.e.~a measurable quantity of a graphical element in the representation has to  directly reflect some aspect of the underlying data. Generally, we see a lot of discussion on keeping true to the data in the framework of (ab)using three dimensional effects in graphics. \citep{tufte} goes as far as defining a {\it lie-factor} of a chart as the ratio of the size of an effect in the data compared to the size of an effect shown, with the premise that any large deviations from one indicate a misuse of graphical techniques. Computational tools help us ensure technical trueness -- but this brings up the additional question of how we deal with situations that involve innate inability or trigger learned misperceptions in the audience. In this paper we want to raise awareness for one of these situations, show that it occurs frequently in our dealings with graphics and provide a set of strategies for solving or avoiding it.
-
+\newdo{Main message: Sine illusion is there, and the correction provides evidence that the illusion is there. }
 
 <<example,echo=FALSE, include=FALSE>>=
 #source("./data/NewOzoneData.R")
@@ -235,7 +235,7 @@ we give an overview of the perceptual and statistical literature regarding this 
 \paragraph{The sine illusion in Statistical Graphics}\label{statisticalgraphics}\hfill\newline
 The sine illusion demonstrated in Figures \ref{fig:exampleFull1} and \ref{fig:original} has been frequently noted in statistical graphics, though usually not as an optical illusion. Rather, the problem is typically identified as the difficulty of visually subtracting two curves, and the resulting erroneous conclusions when this process goes awry. Figure \ref{fig:playfair-debt} presents the possibly oldest example of this common phenomenon \citep{playfair, playfair2}: Playfair's chart of the balance of trade between England and the East Indies shows time series of the trade value for imports  and exports between the countries in the 18th century. The shaded area on the chart is named ``balance against England", suggesting that the difference between the lines is of main importance. This difference in trading values is encoded as the difference between the lines along the vertical axis. However, the 
  vertical distance  between  two lines provides a  much less visually salient cue than the orthogonal width between the lines. This results in  an underestimation \citep{cleveland:1984} of the difference in trades around 1763, which is of a much higher (about 1.5 fold) magnitude as around 1770, but appears  smaller than that.  
-% that is, the width of the line segment which is perpendicular to the tangent line at a given point.
+\newdo{Point to newer example?}
 
 \begin{figure}[h!tbp]
 \centering
@@ -336,7 +336,7 @@ qplot(x=x, xend=xend, y = ystart*ell, yend=yend*ell, geom="segment", data=dframe
 \includegraphics[width=.5\linewidth]{figure/fig-originalgrid}
 \end{SCfigure}
 
-While it is typically a bad idea to use three-dimensional representations when two dimensions are adequate to display the data \citep{tufte}, it might present a viable avenue to counteract this  illusion. However, creating a three-dimensional projection of two-dimensional data is not simple. The projection that best resolves the illusion  likely is highly subjective and influenced by choices of angle and color gradient for depth cues. 
+While it is typically a bad idea to use three-dimensional representations when two dimensions are adequate to display the data \citep{tufte, cleveland:1984}, it might present a viable avenue to counteract this  illusion. However, creating a three-dimensional projection of two-dimensional data is not simple. The projection that best resolves the illusion likely is highly subjective and influenced by choices of angle and color gradient for depth cues. \done{As there is not a single three-dimensional projection that corresponds to the two-dimensional data, this approach would only produce further visual ambiguity.}
 %and would also lead to distortions and instability in the visual display. In particular, there does not seem to be an simple guideline for determining the projection angle or color gradient  to create the illusory depth to remove the optical illusion. 
 
 %That is, the illusion breaks down if the visual heuristic is pre-empted by an attempt to view the graph as if it were three dimensional or if each piece is considered without the surrounding context. 
@@ -447,6 +447,7 @@ We consider the following three approaches:
 Each of these ideas is discussed in more detail in this section.
 
 \subsection{Trend Removal}
+\newdo{Emphasize that multiple plots imply higher cognitive load (Wainer 1984) and that good  charts usually have to answer multiple questions.}
 \cite{cleveland:1984, cleveland:1985} discuss the perceptual difficulty of judging the difference between two curves plotted in the same chart, and alternatively, recommend to display the difference between the two curves directly. This is in line with  recommendations  for good graphics to `show the data' rather than make the reader derive some aspect of it \citep[e.g.][]{wainer:2000}. In particular, de-trending data to focus on residual structure is the generally accepted procedure for assessing model fit. 
  Figure \ref{fig:cleveland-figure}(a) shows a scatterplot of data with a trend. A loess smooth is used to estimate the trendline. A visual assessment of variability along this trendline
 might result in a description such as `homogeneous variance or slightly increasing variance for  negative $x$, followed by a dramatic decrease in vertical variability for positive $x$'.  
@@ -1529,6 +1530,7 @@ While these results suggest that the transformation is useful and that complete 
 
 In order to account for user-level variability, we fit a random effects model for the adjusted weight value as a function of  starting weight and trial type, with a random intercept for each participant. 
 
+\move{Move to appendix:}
 Let $W_{ij}$ denote the final adjustment to weight by participant $i$, $ 1 \le i \le \Sexpr{nparticipant2}$ , on trial $j$, $1 \le j \le n_i$. 
 We model the final weight $W_{ij}$ as a function of the correction type $T(i,j)$  (where $T(i,j) \in  \{X, Y\}$), and starting weight $X_{ij}$, with a random intercept for participant to account for subject-specific ability: 
 \begin{align}\label{model1}
@@ -1657,6 +1659,7 @@ The variability of the random effects for each trial type is similar; but the mo
 Bootstrap simulations for each of the coefficients suggest that the optimal $w$ lies between \Sexpr{round(ints$x[2], 3)} and \Sexpr{round(ints$x[3], 3)} for $x$ and \Sexpr{round(ints$x[1], 3)} and \Sexpr{round(ints$x[4], 3)} for $y$, where the lower value is the estimate starting at $w=0$ and moving up, and the upper value is the estimate starting at $w=1$ and moving down. This suggests that either correction is preferrable to an uncorrected graph, and that a weighted correction is preferrable to the fully corrected graph, as neither 0 nor 1 is contained in any overall interval. 
 
 \section{Application: USHCN Data}
+\done{reduce to 5 years of data}
 We will demonstrate the occurrence of the sine illusion as well as the suggested transformations at the example of data from the United States Historical Climatology Network \cite[USHCN;][]{ushcn, ushcn2}.
 
 <<readdata, echo=FALSE>>=
@@ -1677,7 +1680,7 @@ station.sub <- read.csv("data/substations.csv")
 ushcn.full <- ushcn
 monthly.full <- monthly
 
-ushcn <- subset(ushcn, ID%in%station.sub$ID)
+ushcn <- subset(ushcn, ID%in%station.sub$ID & Year>2007)
 library(plyr)
 suppressMessages(require(lubridate))
 suppressMessages(require(ggplot2))
@@ -1691,8 +1694,8 @@ monthly$time <- as.Date(monthly$time)
 \begin{figure}[hbtp]
 \centering
 <<rawtemp, dependson='readdata', echo=FALSE, echo=FALSE, fig.width=12, fig.height=4.5, out.width='\\textwidth',cache=TRUE>>=
-ggplot()  + geom_jitter(aes(Time, value/100), data=subset(ushcn, Year>1995), size=1) + 
-  geom_line(aes(time, avg/100), data=subset(monthly, year(time)>1995), colour="steelblue", size=1.5) + 
+ggplot()  + geom_jitter(aes(Time, value/100), data=subset(ushcn, Year>1995), size=1, shape=I(1), colour=I("grey30"), alpha=I(.90)) +
+  geom_line(aes(time, avg/100), data=subset(monthly, year(time)>1995), colour="black", size=1.5) + 
   ylab("Temperature (in Celsius)") + theme_bw() + theme(plot.margin = unit(c(0,6,0,0), "cm")) + xlab("Year")
 # ggsave(file="figure/monthly-temps.pdf", width=12, height=4.5)
 
@@ -1747,9 +1750,9 @@ model <- lm(temp~time + sin(2*pi*time) + cos(2*pi*time), data=ushcn)
 f <- function(x){37.345515048 + -0.008496204*x -0.415575133*sin(2*pi*x) -11.751984486*cos(2*pi*x)}
 fprime <- function(x){-0.008496204 -0.415575133*2*pi*cos(2*pi*x) +11.751984486*2*pi*sin(2*pi*x)}
 f2prime <- function(x){(2*pi)^2*(0.415575133*sin(2*pi*x) +11.751984486*cos(2*pi*x))}
-asp <- .025 # image vs coordinate aspect ratio 
-startyear <- 1995
-gridlines <- seq(1996, 2013, 1/6)
+asp <- .0125 # image vs coordinate aspect ratio 
+startyear <- 2007
+gridlines <- seq(startyear+1, 2013, 1/6)
 minor.axis.correction <- 
   c(correct("x", "y", data.frame(x=gridlines, y=f(gridlines)), type="x", f=f, fprime=fprime, f2prime=f2prime, weight=1)$x.correctx, 
     correct("x", "y", data.frame(x=gridlines, y=f(gridlines)), type="x", f=f, fprime=fprime, f2prime=f2prime, weight=.36)$x.correctx
@@ -1772,15 +1775,15 @@ ushcn.cor2$variable <- gsub("time.correctx", "Corrected (w=0.36)", ushcn.cor2$va
 ushcn.cor2$variable <- gsub("time", "Uncorrected", ushcn.cor2$variable)
 
 ushcn.cor.x <- rbind(ushcn.cor, subset(ushcn.cor2, variable!="Uncorrected"))
-ushcn.cor.x <- subset(ushcn.cor.x, variable!="Uncorrected" & value>=1996)
+ushcn.cor.x <- subset(ushcn.cor.x, variable!="Uncorrected" & Year>startyear)
 # ushcn.cor.x$variable <- factor(ushcn.cor.x$variable, levels=c("Corrected (w=1)", "Corrected (w=0.36)", "Uncorrected"))
 ushcn.cor.x$variable <- factor(ushcn.cor.x$variable, levels=c("Corrected (w=1)", "Corrected (w=0.36)"))
 rm(list=c("ushcn.cor", "ushcn.cor2"))
 
 ggplot(data=ushcn.cor.x) + 
-  geom_jitter(aes(x=value, y=temp, group=variable), size=1.5, position = position_jitter(width = 1/36), alpha=.75)+ 
+  geom_jitter(aes(x=value, y=temp, group=variable), size=1.5, position = position_jitter(width = 1/36), shape=I(1), colour=I("grey30"), alpha=I(.75))+ 
   facet_grid(variable~.) +
-  geom_line(data=ushcn.cor.x, aes(x=value, y=temp.fit), colour="steelblue", size=1.5) + 
+  geom_line(data=ushcn.cor.x, aes(x=value, y=temp.fit), colour="black", size=1.5) + 
   geom_rug(data=dots, aes(x=x))+
   xlab("Year") +  
   ylab("Temperature (in Celsius)") + 
@@ -1798,17 +1801,17 @@ ushcn.cor2$variable <- gsub("temp.correcty", "Corrected (w=0.40)", ushcn.cor2$va
 ushcn.cor2$variable <- gsub("temp", "Uncorrected", ushcn.cor2$variable)
 
 ushcn.cor.y <- rbind(ushcn.cor, subset(ushcn.cor2, variable!="Uncorrected"))
-ushcn.cor.y <- subset(ushcn.cor.y, variable!="Uncorrected" & time>=1996)
+ushcn.cor.y <- subset(ushcn.cor.y, variable!="Uncorrected" & Year>startyear)
 # ushcn.cor.y$variable <- factor(ushcn.cor.y$variable, levels=c("Corrected (w=1)", "Corrected (w=0.40)", "Uncorrected"))
 ushcn.cor.y$variable <- factor(ushcn.cor.y$variable, levels=c("Corrected (w=1)", "Corrected (w=0.40)"))
 rm(list=c("ushcn.cor", "ushcn.cor2"))
 
 ggplot(aes(x=time, y=value, group=variable), data=ushcn.cor.y) + 
-  geom_jitter(size=1, alpha=.75)+ 
+  geom_jitter(size=1, shape=I(1), colour=I("grey30"), alpha=I(.75))+ 
   facet_grid(variable~.) +
-  geom_line(aes(y=temp.fit), colour="steelblue", size=1.5) + 
+  geom_line(aes(y=temp.fit), colour="black", size=1.5) + 
   xlab("Year") +  
-  ylab("Temperature (in Celsius)") + 
+  ylab("Adjusted Temperature (in Celsius)") + 
   theme_bw()
 ggsave(file="figure/ushcn-y-corrected.pdf", width=10, height=8)
 @
