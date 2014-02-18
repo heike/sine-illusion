@@ -1415,7 +1415,7 @@ var2 <- as.numeric(c(attr(VarCorr(model2)$fingerprint, "stddev"), attr(VarCorr(m
 
 anovaprob <- anova(model2, model3)$`Pr(>Chisq)`[2]
 @
-<<results-analysis1,echo=FALSE, include=FALSE, fig.width=7, fig.height=4.5, dependson='results-analysis'>>=
+<<results-analysis1,echo=FALSE, include=FALSE, fig.width=8, fig.height=4, dependson='results-analysis'>>=
 ggplot() + theme_bw() + facet_grid(type~., scales="free") + ylim(c(0, 27)) +
   geom_rect(data=ints.all, aes(xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax), 
             fill="grey75", alpha=.5) +
@@ -1436,7 +1436,7 @@ ggplot() + theme_bw() + facet_grid(type~., scales="free") + ylim(c(0, 27)) +
 #   geom_point(data=ints.all, aes(x=xmax, y=0, size=factor("Range")), shape=NA, colour="grey75") +
 #   guides(colour=guide_legend(order=1), fill=guide_legend(order=1), size=guide_legend("Range of\nacceptable weights", override.aes=list(shape=15, size = 10), order=3)) +
   geom_text(data=ints, aes(x=x, y=22.5, label=label), parse=TRUE) + 
-  geom_text(data=ints.all, colour="grey30", aes(x=x, y=15.5, label="Range of\nacceptable weights")) + theme(plot.margin=unit(c(0,0,0,0), unit="cm"), legend.position=c(.92, .9))
+  geom_text(data=ints.all, colour="grey30", aes(x=x, y=15.5, label="Range of\nacceptable weights")) + theme(plot.margin=unit(c(0,0,0,0), unit="cm"), legend.position=c(.92, .85))
 
 @
 \begin{figure}[htbp]\centering
