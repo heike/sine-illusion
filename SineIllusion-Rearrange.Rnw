@@ -884,11 +884,11 @@ qplot(data=df.real, x=x, y=y, geom="line") +
 
 
 \begin{figure}[h!]\centering
-\begin{subfigure}[t]{0.495\textwidth}\centering
+\begin{subfigure}[t]{0.4\textwidth}\centering
 \includegraphics[keepaspectratio=TRUE,width=0.9\textwidth]{figure/fig-generalcorrectioncartoon2}
 \caption{Linear Approximation}\label{fig:linear-GeneralCorrection}
 \end{subfigure}
-\begin{subfigure}[t]{0.495\textwidth}\centering
+\begin{subfigure}[t]{0.4\textwidth}\centering
 \includegraphics[keepaspectratio=TRUE,width=0.9\textwidth]{figure/fig-generalcorrectioncartoon3}
 \caption{Quadratic Approximation}\label{fig:quadratic-GeneralCorrection}
 \end{subfigure}
