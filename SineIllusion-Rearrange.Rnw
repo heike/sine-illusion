@@ -42,7 +42,7 @@
 
 <<setup, fig.keep='all', cache=FALSE, echo=FALSE, eval=TRUE>>=
 rm(list=ls())
-options(replace.assign=TRUE,width=70)
+options(replace.assign=TRUE,width=70,scipen=3)
 require(knitr)
 opts_chunk$set(fig.path='figure/fig-', cache.path='cache/', fig.align='center', fig.width=5, fig.height=5, fig.show='hold', par=TRUE, cache=TRUE, concordance=TRUE, autodep=TRUE)
 library(reshape2)
@@ -1476,7 +1476,8 @@ The following analysis is based on the cleaned data, consisting of \Sexpr{nparti
 
 %\newdo{I'm still not convinced that we need to go there. Rather, you could put the whole discussion in a one sentence paragraph in the conclusions section. The model is worse than the stats approach, its results are less interpretable, and it doesn't allow us to use the full data. That's three strikes and out.}
 
-\begin{figure}[htbp]\centering
+\begin{SCfigure}\centering
+\caption{Estimated density of participant-level means using the standard method of limits analysis described in \citet{goldstein}. The overall means are both near 0.4, however, there is quite a bit of user-level variability.}\label{fig:psycho}
 <<meanDists,echo=FALSE,out.width='.6\\linewidth', dependson='results-analysis', fig.width=8, fig.height=4, message=FALSE, warning=FALSE>>=
 dt.int <- ddply(user.avg.all, .(type), summarize, overall.avg=unique(overall.avg), sd=sd(avg))
 model <- lm(avg~type-1, data=user.avg.all)
@@ -1503,8 +1504,7 @@ ggplot(data=user.avg.all) +
   theme_bw() + #theme(legend.position="bottom") +
   xlim(c(-.2, 1.2)) + xlab("Optimal Weight") + ylab("Density")
 @
-\caption{Estimated density of participant-level means using the standard method of limits analysis described in \citet{goldstein}. The overall means are both near 0.4, however, there is quite a bit of user-level variability.}\label{fig:psycho}
-\end{figure}
+\end{SCfigure}
 The psychophysics model is based on  weighted averages (by adjustment type) of all trials with starting weights $w_0 = 0$ and 1:
 <<psycho, echo=FALSE, results='asis', ref.label='psychotable'>>=
 require(xtable)
@@ -1634,7 +1634,7 @@ ggplot()  + geom_boxplot(aes(Time, value/100, group=interaction(Year, Month)), o
 % \end{figure}
 Figure \ref{fig:raw-temp}  shows temperature data from 380 stations across the US with similar elevation and latitude. Raw monthly temperatures are overlaid by a fit from a `baseline' model. The deviations from the fit in the summer and winter suggest that the baseline model is not quite able to capture all of the variability in summer and winter peaks. However, the model used is actually based on averages in each time point. This model is not susceptible to shrinkage, so the question of higher variability in the peaks becomes the question of separating this perceived variability into the part introduced by the illusion and the part actually present in the data. 
 
-Figures \ref{fig:raw-temp} and \ref{fig:boxplot-temp} together suggest that winter months have the most variability, while spring, summer, and fall have similar variability. In fact, the variance of fall months is greatest (\Sexpr{round(season.variation[3,2])}), followed by winter (\Sexpr{round(season.variation[4,2])}), spring (\Sexpr{round(season.variation[1,2])}) and finally summer (\Sexpr{round(season.variation[2,2])}). In fact, the winter variability is \Sexpr{round(with(season.variation, Variance[4]/Variance[2]), 1)} times that of the summer variation. The sine illusion hides these differences in variance effectively, and additionally minimizes the size of the variance in spring and fall. The problem here is not the graphic itself, as Figure \ref{fig:raw-temp} is true to the data, but rather that our brains cannot translate the graph into quantitative measurements with any accuracy.
+Figures \ref{fig:raw-temp} and \ref{fig:boxplot-temp} together suggest that winter months have the most variability, while spring, summer, and fall have similar variability. In fact, the variance of fall months is greatest (\Sexpr{round(season.variation[3,2])}), followed by winter (\Sexpr{round(season.variation[4,2])}), spring (\Sexpr{round(season.variation[1,2])}) and finally summer (\Sexpr{round(season.variation[2,2])}). In fact, the winter variability is \Sexpr{round(with(season.variation, Variance[4]/Variance[2]), 1)} times that of the summer variation. The sine illusion hides these differences in variance effectively, and additionally minimizes the size of the variance in spring and fall. The problem here is not the graphic itself, as Figure \ref{fig:raw-temp} is true to the data, but rather that our brains cannot translate the graph into quantitative measurements with sufficient accuracy.
 
 <<correct-ushcn,echo=FALSE,cache=TRUE, include=FALSE>>=
 library(grid)
