@@ -163,13 +163,14 @@ qplot(x=xstart, xend=xend, y = ystart, yend=yend, geom="segment", data=df1, colo
   geom_text(aes(x=df1$x[19], y=df1$y[20], label="\u2113"), hjust=1, vjust=.5, size=10, colour="grey60") + theme(plot.margin = unit(c(-1,0,-3,0), "cm"))
 dev.off()
 @
-\begin{figure}[hbtp]
+\begin{SCfigure}
 \centering
-\includegraphics[keepaspectratio=true, width=.5\linewidth]{figure/fig-original}
-% \includegraphics[keepaspectratio=true, width=\linewidth]{fig-original-redo.pdf}
 \caption{The original sine illusion was demonstrated on evenly spaced vertical lines centered around a sinusoidal curve of $f(x) = \sin(x)$. The lines in the peak and trough of the curve appear to be longer than in the other regions.\label{fig:original}}
+\includegraphics[keepaspectratio=true, width=.4\linewidth]{figure/fig-original}
+% \includegraphics[keepaspectratio=true, width=\linewidth]{fig-original-redo.pdf}
+
 %The right graph illustrates the parameters determining the appearance of the illusion: $s$ denotes the amplitude of the function, $\ell$ the length of the line segments.
-\end{figure}
+\end{SCfigure}
 %The first documentation we could find of this illusion,
 More recently the illusion has been shown in non-sinusoidal curves \citep{cleveland:1984, schonlau:2003, robbins:2005, marie:2013}, but the underlying effect seems to be the same, in the sense that the illusion is not triggered by the periodic nature of the underlying trendline but only by  changes to its slope. Figure \ref{fig:twoillusions-simulation} shows three panels, which all exhibit the illusion. From left to right, the trend stems from (a) a periodic function, (b) a periodic component added to an exponential function, and (c) an exponential function on its own.
 While all three graphs seem to show nonconstant variance along the main trend; in reality, it is constant. Clearly, the illusion does not rely on the periodicity of the function for which it was named, but is a symptom of the change in curvature that comes with the periodicity.
@@ -239,7 +240,7 @@ The sine illusion demonstrated in Figures \ref{fig:exampleFull1} and \ref{fig:or
 
 \begin{figure}[h!tbp]
 \centering
-\includegraphics[keepaspectratio=TRUE,width=.8\linewidth]{images/PlayfairExportImports}
+\includegraphics[keepaspectratio=TRUE,width=.7\linewidth]{images/PlayfairExportImports}
 \caption{Playfair's graph of exports to and imports from the East Indies demonstrates that the line width illusion is not only found on sinusoidal curves but is present whenever the slope of the lines change dramatically. The increase in both imports and exports circa 1763 does not appear to portray as large of a deficit as that in 1710, even though they are of similar magnitude.}
 \label{fig:playfair-debt}
 \end{figure}
@@ -332,7 +333,7 @@ qplot(x=x, xend=xend, y = ystart*ell, yend=yend*ell, geom="segment", data=dframe
 \begin{SCfigure}
 \centering
 \caption{\label{fig:original-grid} The sine illusion with two individual lines highlighted. Horizontal grid lines do not help  to resolve the illusion, even though they provide a clear basis for comparison of line lengths. Readers are much better at assessing the length of the two singled out line segments; they are equal.}
-\includegraphics[width=.5\linewidth]{figure/fig-originalgrid}
+\includegraphics[width=.4\linewidth]{figure/fig-originalgrid}
 \end{SCfigure}
 
 % While it is typically a bad idea to use three-dimensional representations when two dimensions are adequate to display the data \citep{tufte, cleveland:1984}, it might present a viable avenue to counteract this  illusion.
@@ -354,7 +355,7 @@ Considering only two line segments at a time resolves the illusion. The bold lin
 %Our perceptual system is particularly well optimized for three dimensions; in figure~\ref{fig:original}  this leads us to perceive the  shortest line between the top and bottom curves as the distance between the curves, i.e. the {\it orthogonal} width,  rather than the vertical distance. 
 In Figure~\ref{fig:original} we have seen that the our preference in evaluating line width is to assess {\it orthogonal} width rather than the difference along the vertical axis. 
 Figure~\ref{fig:OrthogonalWidth} demonstrates the change in orthogonal width as the slope of the line tangent to the graph of $f$ changes; these changes correspond to our perception of apparent line length. 
-<<transform-illustration,echo=FALSE, message=FALSE, warning=FALSE, include=FALSE, fig.width=8.5, fig.height=5>>=
+<<transform-illustration,echo=FALSE, message=FALSE, warning=FALSE, include=FALSE, fig.width=6.25, fig.height=5>>=
 f <- function(x) 2*sin(x)
 fprime <- function(x) 2*cos(x)
 f2prime <- function(x) -2*sin(x)
@@ -394,14 +395,14 @@ qplot(x=x, y=y, geom="line", data=dframe, colour=I("grey50")) + theme_bw() +
                      labels=c("0", expression(paste(pi,"/2")), expression(pi), 
                               expression(paste("3",pi, "/2")), expression(paste("2",pi)))) +
   scale_linetype_manual("", values=c(1,2)) + 
-  theme(legend.key.width = unit(3, "line"), plot.margin = unit(c(0,0,0,0), "cm")) 
+  theme(legend.key.width = unit(3, "line"), plot.margin = unit(c(0,0,0,0), "cm"), legend.position=c(0, -1)) 
 @
-\begin{figure}[h!tbp]
+\begin{SCfigure}
 \centering
-\includegraphics[width=.85\linewidth, keepaspectratio=TRUE]{fig-transform-illustration}
 \caption{\label{fig:OrthogonalWidth} The sine illusion with  lines  orthogonal to the tangent line at $f(x)$. The perception that the vertical length changes with $f(x)$ corresponds to changes in actual orthogonal width due to the change in secant angle. 
 }
-\end{figure}
+\includegraphics[width=.5\linewidth, keepaspectratio=TRUE]{fig-transform-illustration}
+\end{SCfigure}
 %Secants and vertical lines are both shown  in figure~\ref{fig:OrthogonalWidth}. 
 The illusion is most pronounced in regions where the angle between the orthogonal  and the vertical line is large. 
 The perceived length of the vertical line changes with the angle of the line perpendicular to the slope of $\sin(x)$, suggesting that the sine illusion stems from a conflict between the visual system's perception of figure width and the mathematical judgement necessary to determine the length of the vertical lines. 
