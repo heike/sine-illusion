@@ -395,7 +395,7 @@ qplot(x=x, y=y, geom="line", data=dframe, colour=I("grey50")) + theme_bw() +
                      labels=c("0", expression(paste(pi,"/2")), expression(pi), 
                               expression(paste("3",pi, "/2")), expression(paste("2",pi)))) +
   scale_linetype_manual("", values=c(1,2)) + 
-  theme(legend.key.width = unit(3, "line"), plot.margin = unit(c(0,0,0,0), "cm"), legend.position=c(0, -1)) 
+  theme(legend.key.width = unit(3, "line"), plot.margin = unit(c(0,0,0,0), "cm"), legend.position=c(.2,.2)) 
 @
 \begin{SCfigure}
 \centering
