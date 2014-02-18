@@ -1609,7 +1609,7 @@ vp1 <- viewport(x = 0.955, y = 0.91, height = unit(2.5, "cm"), width =  unit(4, 
 print(p, vp = vp1)
 @
 % \includegraphics[width=\textwidth]{monthly-temps}
-\caption{Raw monthly maximum temperatures (in Celsius) between 2008 and 2013 at 380 stations across the US (as indicated on the map) with similar elevation and latitude. The line shows fitted temperatures from a baseline model. The plot suggests that the model fails to capture the more extreme values in summer and winter. \label{fig:raw-temp}}
+\caption{Raw monthly maximum temperatures (in Celsius) between 2008 and 2013 at 380 stations across the US (as indicated on the map) with similar elevation and latitude. The line shows fitted temperatures from a baseline model. \label{fig:raw-temp}}
 \end{figure}
 
 \begin{figure}[hbtp]\centering
