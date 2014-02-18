@@ -1478,7 +1478,7 @@ The following analysis is based on the cleaned data, consisting of \Sexpr{nparti
 
 \begin{SCfigure}\centering
 \caption{Estimated density of participant-level means using the standard method of limits analysis described in \citet{goldstein}. The overall means are both near 0.4, however, there is quite a bit of user-level variability.}\label{fig:psycho}
-<<meanDists,echo=FALSE,out.width='.6\\linewidth', dependson='results-analysis', fig.width=8, fig.height=4, message=FALSE, warning=FALSE>>=
+<<meanDists,echo=FALSE,out.width='.5\\linewidth', dependson='results-analysis', fig.width=6, fig.height=4, message=FALSE, warning=FALSE>>=
 dt.int <- ddply(user.avg.all, .(type), summarize, overall.avg=unique(overall.avg), sd=sd(avg))
 model <- lm(avg~type-1, data=user.avg.all)
 temp <- as.data.frame(cbind(coef(model), confint(model)))
@@ -1502,7 +1502,8 @@ ggplot(data=user.avg.all) +
   scale_colour_manual("Transformation", values=c("#d6604d", "#4393c3"), guide="none") +
   scale_linetype_discrete("Model") +
   theme_bw() + #theme(legend.position="bottom") +
-  xlim(c(-.2, 1.2)) + xlab("Optimal Weight") + ylab("Density")
+  xlim(c(-.2, 1.2)) + xlab("Optimal Weight") + ylab("Density") +
+  theme(legend.position=c(.9, .8))
 @
 \end{SCfigure}
 The psychophysics model is based on  weighted averages (by adjustment type) of all trials with starting weights $w_0 = 0$ and 1:
