@@ -725,10 +725,10 @@ Let again the function $f$ describe the general relationship between variables $
 
 As sketched out in figure~\ref{fig:GeneralCorrection} we want to first find the orthogonal (extant) width in a point $(x_0, f(x_o))$ on the graph, which corresponds to the  perceived width, and then correct the vertical width accordingly to match with the audience's expectation.
 
-\begin{SCfigure}
+\begin{SCfigure}[2]
 \centering
-\includegraphics[keepaspectratio=TRUE,width=.4\linewidth]{figure/fig-generalcorrectioncartoon3}
 \caption[General correction approach]{ General correction approach. This approach may require numerical optimization to obtain exact solutions for $(x_1, y_1)$ and $(x_2, y_2)$.}\label{fig:GeneralCorrection}
+\includegraphics[keepaspectratio=TRUE,width=.33\textwidth]{figure/fig-generalcorrectioncartoon3}
 \end{SCfigure}
 
 The orthogonal width (see sketch in figure~\ref{fig:GeneralCorrection}) is given as the line segment between endpoints $(x_1, f_1(x_1))$ and $(x_2, f_2(x_2))$, where $f_1$ and $f_2$ denote the vertical shifts of function $f$ by $-\ell/2$ and $\ell/2$, respectively, where $\ell$ is defined as the overall line length, $\ell > 0, \ell \in \xR$.
