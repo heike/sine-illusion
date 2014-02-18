@@ -1112,7 +1112,7 @@ It is of additional interest to determine whether and how much these optimal wei
 %\todo{now describe the applet to collect data}
 
 \begin{figure}\centering
-\includegraphics[width=.9\linewidth]{images/shiny.pdf}
+\includegraphics[width=.8\linewidth]{images/shiny.pdf}
 \caption{\label{fig:shiny.app} Screenshot of the shiny application used to collect information of observers' preference with respect to an optimal correction for the illusion under each of the  transformations discussed in the previous section. }
 \end{figure}
 
