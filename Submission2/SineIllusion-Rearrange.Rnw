@@ -42,7 +42,7 @@
 
 <<setup, fig.keep='all', cache=FALSE, echo=FALSE, eval=TRUE>>=
 rm(list=ls())
-options(replace.assign=TRUE,width=70)
+options(replace.assign=TRUE,width=70,scipen=3)
 require(knitr)
 opts_chunk$set(fig.path='figure/fig-', cache.path='cache/', fig.align='center', fig.width=5, fig.height=5, fig.show='hold', par=TRUE, cache=TRUE, concordance=TRUE, autodep=TRUE)
 library(reshape2)
@@ -163,13 +163,11 @@ qplot(x=xstart, xend=xend, y = ystart, yend=yend, geom="segment", data=df1, colo
   geom_text(aes(x=df1$x[19], y=df1$y[20], label="\u2113"), hjust=1, vjust=.5, size=10, colour="grey60") + theme(plot.margin = unit(c(-1,0,-3,0), "cm"))
 dev.off()
 @
-\begin{figure}[hbtp]
+\begin{SCfigure}[2][hbtp]
 \centering
-\includegraphics[keepaspectratio=true, width=.5\linewidth]{figure/fig-original}
-% \includegraphics[keepaspectratio=true, width=\linewidth]{fig-original-redo.pdf}
 \caption{The original sine illusion was demonstrated on evenly spaced vertical lines centered around a sinusoidal curve of $f(x) = \sin(x)$. The lines in the peak and trough of the curve appear to be longer than in the other regions.\label{fig:original}}
-%The right graph illustrates the parameters determining the appearance of the illusion: $s$ denotes the amplitude of the function, $\ell$ the length of the line segments.
-\end{figure}
+\includegraphics[keepaspectratio=true, width=.4\linewidth]{figure/fig-original}
+\end{SCfigure}
 %The first documentation we could find of this illusion,
 More recently the illusion has been shown in non-sinusoidal curves \citep{cleveland:1984, schonlau:2003, robbins:2005, marie:2013}, but the underlying effect seems to be the same, in the sense that the illusion is not triggered by the periodic nature of the underlying trendline but only by  changes to its slope. Figure \ref{fig:twoillusions-simulation} shows three panels, which all exhibit the illusion. From left to right, the trend stems from (a) a periodic function, (b) a periodic component added to an exponential function, and (c) an exponential function on its own.
 While all three graphs seem to show nonconstant variance along the main trend; in reality, it is constant. Clearly, the illusion does not rely on the periodicity of the function for which it was named, but is a symptom of the change in curvature that comes with the periodicity.
@@ -240,7 +238,7 @@ The sine illusion demonstrated in Figures \ref{fig:exampleFull1} and \ref{fig:or
 
 \begin{figure}[h!tbp]
 \centering
-\includegraphics[keepaspectratio=TRUE,width=.8\linewidth]{images/PlayfairExportImports}
+\includegraphics[keepaspectratio=TRUE,width=.7\linewidth]{images/PlayfairExportImports}
 \caption{Playfair's graph of exports to and imports from the East Indies demonstrates that the line width illusion is not only found on sinusoidal curves but is present whenever the slope of the lines change dramatically. The increase in both imports and exports circa 1763 does not appear to portray as large of a deficit as that in 1710, even though they are of similar magnitude.}
 \label{fig:playfair-debt}
 \end{figure}
@@ -332,7 +330,7 @@ qplot(x=x, xend=xend, y = ystart*ell, yend=yend*ell, geom="segment", data=dframe
 \begin{SCfigure}
 \centering
 \caption{\label{fig:original-grid} The sine illusion with two individual lines highlighted. Horizontal grid lines do not help  to resolve the illusion, even though they provide a clear basis for comparison of line lengths. Readers are much better at assessing the length of the two singled out line segments; they are equal.}
-\includegraphics[width=.5\linewidth]{figure/fig-originalgrid}
+\includegraphics[width=.4\linewidth]{figure/fig-originalgrid}
 \end{SCfigure}
 
 \newtext{Recreating the three-dimensional context of the sine illusion might resolve the distortion, even if increasing the dimensionality of a graph is generally not recommended \citep{tufte, cleveland:1984} (though \citet{spence:1990} suggests that in certain cases additional dimensions are not misleading). While creating a three-dimensional projection of two-dimensional data might counteract the illusion, the process of projecting the data accurately into a higher dimension is not simple. The projection that best resolves the illusion likely is highly subjective and influenced by choices of angle and color gradient for depth cues. As there is not a single three-dimensional projection that corresponds to the two-dimensional data, this approach would only produce further visual ambiguity.}
@@ -353,7 +351,7 @@ Considering only two line segments at a time resolves the illusion. The bold lin
 %Our perceptual system is particularly well optimized for three dimensions; in figure~\ref{fig:original}  this leads us to perceive the  shortest line between the top and bottom curves as the distance between the curves, i.e. the {\it orthogonal} width,  rather than the vertical distance. 
 In Figure~\ref{fig:original} we have seen that the our preference in evaluating line width is to assess {\it orthogonal} width rather than the difference along the vertical axis. 
 Figure~\ref{fig:OrthogonalWidth} demonstrates the change in orthogonal width as the slope of the line tangent to the graph of $f$ changes; these changes correspond to our perception of apparent line length. 
-<<transform-illustration,echo=FALSE, message=FALSE, warning=FALSE, include=FALSE, fig.width=8.5, fig.height=5>>=
+<<transform-illustration,echo=FALSE, message=FALSE, warning=FALSE, include=FALSE, fig.width=6.25, fig.height=5>>=
 f <- function(x) 2*sin(x)
 fprime <- function(x) 2*cos(x)
 f2prime <- function(x) -2*sin(x)
@@ -393,14 +391,14 @@ qplot(x=x, y=y, geom="line", data=dframe, colour=I("grey50")) + theme_bw() +
                      labels=c("0", expression(paste(pi,"/2")), expression(pi), 
                               expression(paste("3",pi, "/2")), expression(paste("2",pi)))) +
   scale_linetype_manual("", values=c(1,2)) + 
-  theme(legend.key.width = unit(3, "line"), plot.margin = unit(c(0,0,0,0), "cm")) 
+  theme(legend.key.width = unit(3, "line"), plot.margin = unit(c(0,0,0,0), "cm"), legend.position=c(.2, .2)) 
 @
-\begin{figure}[h!tbp]
+\begin{SCfigure}[2][h!tbp]
 \centering
-\includegraphics[width=.85\linewidth, keepaspectratio=TRUE]{fig-transform-illustration}
 \caption{\label{fig:OrthogonalWidth} The sine illusion with  lines  orthogonal to the tangent line at $f(x)$. The perception that the vertical length changes with $f(x)$ corresponds to changes in actual orthogonal width due to the change in secant angle. 
 }
-\end{figure}
+\includegraphics[width=.5\linewidth, keepaspectratio=TRUE]{fig-transform-illustration}
+\end{SCfigure}
 %Secants and vertical lines are both shown  in figure~\ref{fig:OrthogonalWidth}. 
 The illusion is most pronounced in regions where the angle between the orthogonal  and the vertical line is large. 
 The perceived length of the vertical line changes with the angle of the line perpendicular to the slope of $\sin(x)$, suggesting that the sine illusion stems from a conflict between the visual system's perception of figure width and the mathematical judgement necessary to determine the length of the vertical lines. 
@@ -1413,7 +1411,7 @@ var2 <- as.numeric(c(attr(VarCorr(model2)$fingerprint, "stddev"), attr(VarCorr(m
 
 anovaprob <- anova(model2, model3)$`Pr(>Chisq)`[2]
 @
-<<results-analysis1,echo=FALSE, include=FALSE, fig.width=8, fig.height=5, dependson='results-analysis'>>=
+<<results-analysis1,echo=FALSE, include=FALSE, fig.width=8, fig.height=4, dependson='results-analysis'>>=
 ggplot() + theme_bw() + facet_grid(type~., scales="free") + ylim(c(0, 27)) +
   geom_rect(data=ints.all, aes(xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax), 
             fill="grey75", alpha=.5) +
@@ -1429,13 +1427,10 @@ ggplot() + theme_bw() + facet_grid(type~., scales="free") + ylim(c(0, 27)) +
   scale_fill_manual("Approach", values=c("#d6604d", "#4393c3"),
                     breaks=c("From Below", "From Above")) + 
   geom_errorbarh(aes(xmin=xmin, x=x, xmax=xmax, y=20, color=limit), data=ints) + 
-  theme(legend.position="bottom", plot.margin=unit(c(0,0,0,0), unit="cm")) + geom_point(aes(x=ests, y=20), data=ests) +
+  geom_point(aes(x=ests, y=20), data=ests) +
   xlim(c(-.2, 1.2)) +
-#   geom_point(data=ints.all, aes(x=xmax, y=0, size=factor("Range")), shape=NA, colour="grey75") +
-#   guides(colour=guide_legend(order=1), fill=guide_legend(order=1), size=guide_legend("Range of\nacceptable weights", override.aes=list(shape=15, size = 10), order=3)) +
   geom_text(data=ints, aes(x=x, y=22.5, label=label), parse=TRUE) + 
-  geom_text(data=ints.all, colour="grey30", aes(x=x, y=15.5, label="Range of\nacceptable weights")) + theme(plot.margin=unit(c(0,0,0,0), unit="cm"))
-
+  geom_text(data=ints.all, colour="grey30", aes(x=x, y=15.5, label="Range of\nacceptable weights")) + theme(plot.margin=unit(c(0,0,0,0), unit="cm"), legend.position=c(.92, .85))
 @
 \begin{figure}[htbp]\centering
 \includegraphics[keepaspectratio=TRUE,width=.8\linewidth]{figure/fig-overcorrectlimits}
@@ -1474,7 +1469,8 @@ The following analysis is based on the cleaned data, consisting of \Sexpr{nparti
 
 %\newdo{I'm still not convinced that we need to go there. Rather, you could put the whole discussion in a one sentence paragraph in the conclusions section. The model is worse than the stats approach, its results are less interpretable, and it doesn't allow us to use the full data. That's three strikes and out.}
 
-\begin{figure}[htbp]\centering
+\begin{SCfigure}[2][htbp]\centering
+\caption{Estimated density of participant-level means using the standard method of limits analysis described in \citet{goldstein}. The overall means are both near 0.4, however, there is quite a bit of user-level variability.}\label{fig:psycho}
 <<meanDists,echo=FALSE,out.width='.6\\linewidth', dependson='results-analysis', fig.width=8, fig.height=4, message=FALSE, warning=FALSE>>=
 dt.int <- ddply(user.avg.all, .(type), summarize, overall.avg=unique(overall.avg), sd=sd(avg))
 model <- lm(avg~type-1, data=user.avg.all)
@@ -1499,10 +1495,10 @@ ggplot(data=user.avg.all) +
   scale_colour_manual("Transformation", values=c("#d6604d", "#4393c3"), guide="none") +
   scale_linetype_discrete("Model") +
   theme_bw() + #theme(legend.position="bottom") +
-  xlim(c(-.2, 1.2)) + xlab("Optimal Weight") + ylab("Density")
+  xlim(c(-.2, 1.2)) + xlab("Optimal Weight") + ylab("Density") +
+  theme(legend.position=c(.9,.8))
 @
-\caption{Estimated density of participant-level means using the standard method of limits analysis described in \citet{goldstein}. The overall means are both near 0.4, however, there is quite a bit of user-level variability.}\label{fig:psycho}
-\end{figure}
+\end{SCfigure}
 The psychophysics model is based on  weighted averages (by adjustment type) of all trials with starting weights $w_0 = 0$ and 1:
 <<psycho, echo=FALSE, results='asis', ref.label='psychotable'>>=
 require(xtable)
@@ -1632,7 +1628,7 @@ ggplot()  + geom_boxplot(aes(Year+(Month-1)/12, resid/100, group=Year+(Month-1)/
 
 Figure \ref{fig:raw-temp}  shows temperature data from 380 stations across the US with similar elevation and latitude. Raw monthly temperatures are overlaid by a fit from a `baseline' model. The deviations from the fit in the summer and winter suggest that the baseline model is not quite able to capture all of the variability in summer and winter peaks. However, the model used is actually based on averages in each time point. This model is not susceptible to shrinkage, so the question of higher variability in the peaks becomes the question of separating this perceived variability into the part introduced by the illusion and the part actually present in the data. 
 
-Figures \ref{fig:raw-temp} and \ref{fig:boxplot-temp} together suggest that winter months have the most variability, while spring, summer, and fall have similar variability. In fact, the variance of fall months is greatest (\Sexpr{round(season.variation[3,2])}), followed by winter (\Sexpr{round(season.variation[4,2])}), spring (\Sexpr{round(season.variation[1,2])}) and finally summer (\Sexpr{round(season.variation[2,2])}). In fact, the winter variability is \Sexpr{round(with(season.variation, Variance[4]/Variance[2]), 1)} times that of the summer variation. The sine illusion hides these differences in variance effectively, and additionally minimizes the size of the variance in spring and fall. The problem here is not the graphic itself, as Figure \ref{fig:raw-temp} is true to the data, but rather that our brains cannot translate the graph into quantitative measurements with any accuracy.
+Figures \ref{fig:raw-temp} and \ref{fig:boxplot-temp} together suggest that winter months have the most variability, while spring, summer, and fall have similar variability. In fact, the variance of fall months is greatest (\Sexpr{round(season.variation[3,2])}), followed by winter (\Sexpr{round(season.variation[4,2])}), spring (\Sexpr{round(season.variation[1,2])}) and finally summer (\Sexpr{round(season.variation[2,2])}). In fact, the winter variability is \Sexpr{round(with(season.variation, Variance[4]/Variance[2]), 1)} times that of the summer variation. The sine illusion hides these differences in variance effectively, and additionally minimizes the size of the variance in spring and fall. The problem here is not the graphic itself, as Figure \ref{fig:raw-temp} is true to the data, but rather that our brains cannot translate the graph into quantitative measurements with sufficient accuracy.
 
 <<correct-ushcn,echo=FALSE,cache=TRUE, include=FALSE>>=
 library(grid)
@@ -1660,12 +1656,12 @@ dots <- data.frame(x = minor.axis.correction,
 
 
 ushcn.cor <- correct("time", "temp", subset(ushcn[,-c(4, 5)], Year>startyear), type="x", f=f, fprime=fprime, f2prime=f2prime, weight=1)
-ushcn.cor <- melt(ushcn.cor, id.vars=c(1:7, 10))
+ushcn.cor <- melt(ushcn.cor, id.vars=c(1:8, 11))
 ushcn.cor$variable <- gsub("time.correctx", "Corrected (w=1)", ushcn.cor$variable)
 ushcn.cor$variable <- gsub("time", "Uncorrected", ushcn.cor$variable)
 
 ushcn.cor2 <- correct("time", "temp", subset(ushcn[,-c(4, 5)], Year>startyear), type="x", f=f, fprime=fprime, f2prime=f2prime, weight=.36)
-ushcn.cor2 <- melt(ushcn.cor2, id.vars=c(1:7, 10))
+ushcn.cor2 <- melt(ushcn.cor2, id.vars=c(1:8, 11))
 ushcn.cor2$variable <- gsub("time.correctx", "Corrected (w=0.36)", ushcn.cor2$variable)
 ushcn.cor2$variable <- gsub("time", "Uncorrected", ushcn.cor2$variable)
 
@@ -1686,12 +1682,12 @@ ggplot(data=ushcn.cor.x) +
 ggsave(file="figure/ushcn-x-corrected.pdf", width=10, height=8)
 
 ushcn.cor <- correct("time", "temp", subset(ushcn[,-c(4, 5)], Year>startyear), type="y", f=f, fprime=fprime, f2prime=f2prime, weight=1, ratio=asp)
-ushcn.cor <- melt(ushcn.cor, id.vars=c(1:6, 8, 10))
+ushcn.cor <- melt(ushcn.cor, id.vars=c(1:7, 9, 11))
 ushcn.cor$variable <- gsub("temp.correcty", "Corrected (w=1)", ushcn.cor$variable)
 ushcn.cor$variable <- gsub("temp", "Uncorrected", ushcn.cor$variable)
 
 ushcn.cor2 <- correct("time", "temp", subset(ushcn[,-c(4, 5)], Year>startyear), type="y", f=f, fprime=fprime, f2prime=f2prime, weight=.40, ratio=asp)
-ushcn.cor2 <- melt(ushcn.cor2, id.vars=c(1:6, 8, 10))
+ushcn.cor2 <- melt(ushcn.cor2, id.vars=c(1:7, 9, 11))
 ushcn.cor2$variable <- gsub("temp.correcty", "Corrected (w=0.40)", ushcn.cor2$variable)
 ushcn.cor2$variable <- gsub("temp", "Uncorrected", ushcn.cor2$variable)
 
