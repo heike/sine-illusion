@@ -720,9 +720,9 @@ Let again the function $f$ describe the general relationship between variables $
 
 As sketched out in figure~\ref{fig:GeneralCorrection} we want to first find the orthogonal (extant) width in a point $(x_0, f(x_o))$ on the graph, which corresponds to the  perceived width, and then correct the vertical width accordingly to match with the audience's expectation.
 
-\begin{SCfigure}
+\begin{SCfigure}[2]
 \centering
-\includegraphics[keepaspectratio=TRUE,width=.4\linewidth]{figure/fig-generalcorrectioncartoon3}
+\includegraphics[keepaspectratio=TRUE,width=.33\linewidth]{figure/fig-generalcorrectioncartoon3}
 \caption[General correction approach]{ General correction approach. This approach may require numerical optimization to obtain exact solutions for $(x_1, y_1)$ and $(x_2, y_2)$.}\label{fig:GeneralCorrection}
 \end{SCfigure}
 
@@ -879,11 +879,11 @@ qplot(data=df.real, x=x, y=y, geom="line") +
 
 
 \begin{figure}[h!]\centering
-\begin{subfigure}[t]{0.495\textwidth}\centering
+\begin{subfigure}[t]{0.4\textwidth}\centering
 \includegraphics[keepaspectratio=TRUE,width=0.9\textwidth]{figure/fig-generalcorrectioncartoon2}
 \caption{Linear Approximation}\label{fig:linear-GeneralCorrection}
 \end{subfigure}
-\begin{subfigure}[t]{0.495\textwidth}\centering
+\begin{subfigure}[t]{0.4\textwidth}\centering
 \includegraphics[keepaspectratio=TRUE,width=0.9\textwidth]{figure/fig-generalcorrectioncartoon3}
 \caption{Quadratic Approximation}\label{fig:quadratic-GeneralCorrection}
 \end{subfigure}
@@ -1107,7 +1107,7 @@ It is of additional interest to determine whether and how much these optimal wei
 %\todo{now describe the applet to collect data}
 
 \begin{figure}\centering
-\includegraphics[width=.9\linewidth]{images/shiny.pdf}
+\includegraphics[width=.8\linewidth]{images/shiny.pdf}
 \caption{\label{fig:shiny.app} Screenshot of the shiny application used to collect information of observers' preference with respect to an optimal correction for the illusion under each of the  transformations discussed in the previous section. }
 \end{figure}
 
