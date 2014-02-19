@@ -1470,7 +1470,7 @@ The following analysis is based on the cleaned data, consisting of \Sexpr{nparti
 
 \begin{SCfigure}[2][htbp]\centering
 \caption{Estimated density of participant-level means using the standard method of limits analysis described in \citet{goldstein}. The overall means are both near 0.4, however, there is quite a bit of user-level variability.}\label{fig:psycho}
-<<meanDists,echo=FALSE,out.width='.6\\linewidth', dependson='results-analysis', fig.width=8, fig.height=4, message=FALSE, warning=FALSE>>=
+<<meanDists,echo=FALSE,out.width='.5\\linewidth', dependson='results-analysis', fig.width=6, fig.height=4, message=FALSE, warning=FALSE>>=
 dt.int <- ddply(user.avg.all, .(type), summarize, overall.avg=unique(overall.avg), sd=sd(avg))
 model <- lm(avg~type-1, data=user.avg.all)
 temp <- as.data.frame(cbind(coef(model), confint(model)))
