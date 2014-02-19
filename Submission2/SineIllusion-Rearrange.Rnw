@@ -336,7 +336,7 @@ qplot(x=x, xend=xend, y = ystart*ell, yend=yend*ell, geom="segment", data=dframe
 \includegraphics[width=.5\linewidth]{figure/fig-originalgrid}
 \end{SCfigure}
 
-While it is typically a bad idea to use three-dimensional representations when two dimensions are adequate to display the data \citep{tufte, cleveland:1984}, it might present a viable avenue to counteract this  illusion. However, creating a three-dimensional projection of two-dimensional data is not simple. The projection that best resolves the illusion likely is highly subjective and influenced by choices of angle and color gradient for depth cues. \done{As there is not a single three-dimensional projection that corresponds to the two-dimensional data, this approach would only produce further visual ambiguity.}
+\done{Recreating the three-dimensional context of the sine illusion might resolve the distortion, even if increasing the dimensionality of a graph is generally not recommended \citep{tufte, cleveland:1984} (though \citet{spence:1990} suggests that in certain cases additional dimensions are not misleading). While creating a three-dimensional projection of two-dimensional data might counteract the illusion, the process of projecting the data accurately into a higher dimension is not simple. The projection that best resolves the illusion likely is highly subjective and influenced by choices of angle and color gradient for depth cues. As there is not a single three-dimensional projection that corresponds to the two-dimensional data, this approach would only produce further visual ambiguity.}
 %and would also lead to distortions and instability in the visual display. In particular, there does not seem to be an simple guideline for determining the projection angle or color gradient  to create the illusory depth to remove the optical illusion. 
 
 %That is, the illusion breaks down if the visual heuristic is pre-empted by an attempt to view the graph as if it were three dimensional or if each piece is considered without the surrounding context. 
@@ -1624,8 +1624,9 @@ ggplot()  + geom_boxplot(aes(Year+(Month-1)/12, resid/100, group=Year+(Month-1)/
   ylab("Residual temperature (in Celsius)") + theme_bw() + xlab("Time")
 # ggsave(file="figure/monthly-resid-temps.pdf", width=12, height=4.5)
 @
-\caption{Boxplots of the de-seasonalized residuals provide more insight into the seasonal variance: Winters show more variation in temperatures, while summers show much less variation in temperatures. \label{fig:boxplot-resid-temp} \todo{Do we need this figure?}}
+\caption{Boxplots of the de-seasonalized residuals provide more insight into the seasonal variance: Winters show more variation in temperatures, while summers show much less variation in temperatures. \label{fig:boxplot-resid-temp}}
 \end{figure}
+\todo{Do we need this figure?}
 
 Figure \ref{fig:raw-temp}  shows temperature data from 380 stations across the US with similar elevation and latitude. Raw monthly temperatures are overlaid by a fit from a `baseline' model. The deviations from the fit in the extremes of the fit suggest that the baseline model is not quite able to capture all of the variability in summer and winter peaks. However, the model used is actually based on averages in each time point. This model is not susceptible to shrinkage, so the question of higher variability in the peaks becomes the question of separating this perceived variability into the part introduced by the illusion and the part actually present in the data.
 
