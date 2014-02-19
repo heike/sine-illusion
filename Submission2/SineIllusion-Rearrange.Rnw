@@ -1580,7 +1580,7 @@ season.variation <- ddply(ushcn, .(Season), summarize, Variance=var(value), StdD
 
 \begin{figure}[hbtp]
 \centering
-<<rawtemp, dependson='readdata', echo=FALSE, echo=FALSE, fig.width=12, fig.height=4.5, out.width='\\textwidth',cache=TRUE>>=
+<<rawtemp, dependson='readdata', echo=FALSE, echo=FALSE, fig.width=12, fig.height=3.5, out.width='\\textwidth',cache=TRUE>>=
 ggplot()  + geom_jitter(aes(Time, value/100), data=subset(ushcn, Year>2007), size=1, shape=I(1), colour=I("grey30"), alpha=I(.90)) +
   geom_line(aes(time, avg/100), data=subset(monthly, year(time)>2007), colour="black", size=1.5) + 
   ylab("Temperature (in Celsius)") + theme_bw() + theme(plot.margin = unit(c(0,6,0,0), "cm")) + xlab("Year")
@@ -1604,7 +1604,7 @@ print(p, vp = vp1)
 \end{figure}
 
 \begin{figure}[hbtp]\centering
-<<boxtemp, dependson='readdata', echo=FALSE, fig.width=12, fig.height=4.5, out.width='\\textwidth',cache=TRUE>>=
+<<boxtemp, dependson='readdata', echo=FALSE, fig.width=12, fig.height=3.5, out.width='\\textwidth',cache=TRUE>>=
 ggplot()  + geom_boxplot(aes(Time, value/100, group=interaction(Year, Month)), outlier.size=2, fill = "grey65", data=subset(ushcn, Year>2007)) + theme_bw() + 
   #geom_line(aes(time, avg/100), data=subset(monthly, year(time)<1995), colour="steelblue", size=1.5, alpha=.5) + 
   ylab("Temperature (in Celsius)")+ xlab("Year")
@@ -1616,7 +1616,7 @@ ggplot()  + geom_boxplot(aes(Time, value/100, group=interaction(Year, Month)), o
 
 % 
 % \begin{figure}[h!tbp]\centering
-% <<residtempboxplot, dependson='residtemp', echo=FALSE, echo=FALSE, fig.width=12, fig.height=4.5, out.width='\\textwidth'>>=
+% <<residtempboxplot, dependson='residtemp', echo=FALSE, echo=FALSE, fig.width=12, fig.height=3.5, out.width='\\textwidth'>>=
 % ggplot()  + geom_boxplot(aes(Year+(Month-1)/12, resid/100, group=Year+(Month-1)/12), data=subset(ushcn, Year>1995), size=1) + 
 %   # geom_hline(yintercept=0, colour="steelblue", size=1) + 
 %   ylab("Residual temperature (in Celsius)") + theme_bw() + xlab("Time")
@@ -1679,7 +1679,7 @@ ggplot(data=ushcn.cor.x) +
   xlab("Year") +  
   ylab("Temperature (in Celsius)") + 
   theme_bw()
-ggsave(file="figure/ushcn-x-corrected.pdf", width=10, height=8)
+ggsave(file="figure/ushcn-x-corrected.pdf", width=12, height=7)
 
 ushcn.cor <- correct("time", "temp", subset(ushcn[,-c(4, 5)], Year>startyear), type="y", f=f, fprime=fprime, f2prime=f2prime, weight=1, ratio=asp)
 ushcn.cor <- melt(ushcn.cor, id.vars=c(1:7, 9, 11))
@@ -1704,7 +1704,7 @@ ggplot(aes(x=time, y=value, group=variable), data=ushcn.cor.y) +
   xlab("Year") +  
   ylab("Adjusted Temperature (in Celsius)") + 
   theme_bw()
-ggsave(file="figure/ushcn-y-corrected.pdf", width=10, height=8)
+ggsave(file="figure/ushcn-y-corrected.pdf", width=12, height=7)
 @
 
 \paragraph{Trend removal}
