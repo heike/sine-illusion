@@ -71,7 +71,6 @@ Graphical representations have to be true to the data they display. Computationa
 
 \section{Introduction}
 Graphics are powerful tools for summarizing large or complex data. But they rely on the main premise that any graphical representation of the data has to be ``true'' to the data \citep[see e.g.][]{tufte, wainer:2000, robbins:2005} i.e.~a measurable quantity of a graphical element in the representation has to  directly reflect some aspect of the underlying data. Generally, we see a lot of discussion on keeping true to the data in the framework of (ab)using three dimensional effects in graphics. \citep{tufte} goes as far as defining a {\it lie-factor} of a chart as the ratio of the size of an effect in the data compared to the size of an effect shown, with the premise that any large deviations from one indicate a misuse of graphical techniques. Computational tools help us ensure technical trueness -- but this brings up the additional question of how we deal with situations that involve innate inability or trigger learned misperceptions in the audience. In this paper we want to raise awareness for one of these situations, show that it occurs frequently in our dealings with graphics and provide a set of strategies for solving or avoiding it.
-\newdo{Main message: Sine illusion is there, and the correction provides evidence that the illusion is there. }
 
 <<example,echo=FALSE, include=FALSE>>=
 #source("./data/NewOzoneData.R")
