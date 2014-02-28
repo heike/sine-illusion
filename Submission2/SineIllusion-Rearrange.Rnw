@@ -1567,7 +1567,17 @@ monthly <- ddply(monthly, .(year), transform, avg.sd=mean(sd))
 seasonal <- ddply(gasprices, .(round.year, season), summarize, date=mean(decimal_date(date)), sd=sd(price-avg), var=var(price-avg))
 
 model <- smooth.spline(x=decimal_date(gasprices$date), y=gasprices$price, keep.data=TRUE, nknots=230)
+
+gas <- gasprices[,c("date", "price")]
+gas$date <- decimal_date(gas$date)
+gas$pred <- f(gas$date)
 gas.pred <- as.data.frame(predict(model))
+gas.full <- gas
+gas <- unique(gas[,c(1,3)])
+
+f <- function(x){as.data.frame(predict(model, x=x))$y}
+fprime <- function(x){as.data.frame(predict(model, x=x, deriv=1))$y}
+f2prime <- function(x){as.data.frame(predict(model, x=x, deriv=2))$y}
 @
 \begin{figure}
 <<gasprices-pictures,echo=F, include=T, fig.width=8, fig.height=3, out.width=".98\\textwidth", dependson='gasprices'>>=
@@ -1593,6 +1603,41 @@ ggplot(data=monthly)  +
 \caption{Monthly Range of Gas Prices, 1995 - 2014. There is some variation in the length of the lines, most notably when prices change dramatically, but the magnitude of the long-term change in variation is obscured by the trend. In fact, the standard deviation of seasonal prices in 2013 and 2014 ($0.142-$0.152) is approximately twice the standard deviation of seasonal prices in 1995 ($0.077-$0.079).}\label{fig:pricerange}
 \end{figure}
 Figure \ref{fig:pricerange} shows the monthly range of gas prices across the US. 
+
+<<gaspricesCorrection, echo=F, cache=T>>=
+asp <- .5 # image vs coordinate aspect ratio 
+startyear <- 1994
+gridlines <- seq(startyear+1, 2014, 1/6)
+minor.axis.correction <- 
+  c(correct("x", "y", data.frame(x=gridlines, y=f(gridlines)), type="x", f=f, fprime=fprime, f2prime=f2prime, weight=1)$x.correctx, 
+    correct("x", "y", data.frame(x=gridlines, y=f(gridlines)), type="x", f=f, fprime=fprime, f2prime=f2prime, weight=.36)$x.correctx
+  )
+
+dots <- data.frame(x = minor.axis.correction, 
+                   y = rep(-10, length(minor.axis.correction)), 
+                   variable = rep(c("Corrected (w=1)", "Corrected (w=0.36)"), 
+                                  each=length(gridlines)))
+
+
+gas.cor <- correct("date", "price", gas, type="x", f=f, fprime=fprime, f2prime=f2prime, weight=1)
+gas.cor <- merge(gas.cor, gas.full)
+gas.cor <- melt(gas.cor, id.vars=c(2, 4, 5))
+gas.cor$variable <- gsub("date.correctx", "Corrected (w=1)", gas.cor$variable)
+gas.cor$variable <- gsub("date", "Uncorrected", gas.cor$variable)
+
+gas.cor2 <- correct("date", "price", gas, type="x", f=f, fprime=fprime, f2prime=f2prime, weight=.36)
+gas.cor2 <- merge(gas.cor2, gas.full)
+gas.cor2 <- melt(gas.cor2, id.vars=c(2, 4, 5))
+gas.cor2$variable <- gsub("date.correctx", "Corrected (w=0.36)", gas.cor2$variable)
+gas.cor2$variable <- gsub("date", "Uncorrected", gas.cor2$variable)
+
+gas.cor.x <- rbind(gas.cor, subset(gas.cor2, variable!="Uncorrected"))
+gas.cor.x <- subset(gas.cor.x, variable!="Uncorrected")
+# gas.cor.x$variable <- factor(gas.cor.x$variable, levels=c("Corrected (w=1)", "Corrected (w=0.36)", "Uncorrected"))
+gas.cor.x$variable <- factor(gas.cor.x$variable, levels=c("Corrected (w=1)", "Corrected (w=0.36)"))
+rm(list=c("gas.cor", "gas.cor2"))
+
+@
 %\clearpage
 \section{Conclusions}
 The sine illusion is a persistent and powerful illusion that is very difficult to counteract without modifying the visual stimulus directly. While systematically modifying the data is uncommon in the statistical world, this approach is not out of place in the visual arts or architecture; as far back as 400 BC the builders of the Parthenon ensured a straight appearance of the columns from afar, by widening columns at the center, thereby counteracting the effects of the Hering illusion \citep{naturalscenes,hering}.  Similarly, painters often correct color hues used in shadows to account for color constancy in the brain. The systematic modifications we suggest here are also comparable to chloropleth maps, which scale a region's area based on some other variable. 
