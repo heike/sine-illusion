@@ -138,3 +138,5 @@ ggplot(data=gas.cor.y) +
   ylab("Adj. Price of Gasoline (USD)") + 
   theme_bw()
 ggsave(file="Submission2/figure/gas-y-corrected.pdf", width=12, height=7)
+
+save.image("Submission2/data/gasprices.RData")
