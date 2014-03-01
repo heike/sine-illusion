@@ -48,7 +48,7 @@ model <- smooth.spline(x=decimal_date(gasprices$date), y=gasprices$price, keep.d
 gas.pred <- as.data.frame(predict(model))
 ggplot(data=gasprices)  +
   geom_jitter(aes(decimal_date(date), price), data=subset(gasprices, year>=1995), size=2, alpha=.1, colour=I("grey50")) + 
-  ylab("Price per gallon (USD)") + theme_bw()+ xlab("date") + 
+  ylab("Price per gallon (USD)") + theme_bw()+ xlab("Time") + 
   ggtitle("Gasoline Prices in the US, 1995-2014") +
   geom_line(data=gas.pred, aes(x=x, y=y), inherit.aes=FALSE)
 
