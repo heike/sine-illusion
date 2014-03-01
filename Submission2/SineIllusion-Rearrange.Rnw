@@ -1543,8 +1543,6 @@ The ranges of optimal weights are similar under both transformations. Boundaries
 Bootstrap simulations for each of the coefficients suggest that the range of optimal $w$ is between \Sexpr{round(ints$x[2], 3)} and \Sexpr{round(ints$x[3], 3)} for $x$ and \Sexpr{round(ints$x[1], 3)} and \Sexpr{round(ints$x[4], 3)} for $y$, where the lower value is the estimate starting at $w=0$ and moving up, and the upper value is the estimate starting at $w=1$ and moving down. This suggests that either correction is preferrable to an uncorrected graph, and that a weighted correction is preferrable to the fully corrected graph, as neither 0 nor 1 is contained in any overall interval. In addition to showing the strength of the correction, this experiment also demonstrates the strength of the illusion itself: a correction appears more uniform than the uncorrected values. 
 
 \section{Application: US Gas Prices}
-We will demonstrate the occurrence of the sine illusion as well as the suggested transformations using data gathered from the Energy Information Administration's historical database of gas prices \citep{EIA}. This data, collected from 1995-2014, includes prices for all three grades of gasoline as well as two chemical formulations which are sold in different geographic areas (for more information, see \citep{EIA-reformulated}. Figure \ref{fig:gasprices} shows the gas prices over the period of interest; there is a clearly nonlinear trend to the data, with several dramatic price changes. 
-
 <<gasprices,echo=FALSE, cache=T, message=F, warning=F>>=
 library(lubridate)
 library(plyr)
@@ -1579,35 +1577,41 @@ f <- function(x){as.data.frame(predict(model, x=x))$y}
 fprime <- function(x){as.data.frame(predict(model, x=x, deriv=1))$y}
 f2prime <- function(x){as.data.frame(predict(model, x=x, deriv=2))$y}
 @
-\begin{figure}
-<<gasprices-pictures,echo=F, include=T, fig.width=8, fig.height=3, out.width=".98\\textwidth", dependson='gasprices'>>=
-p1 <- ggplot(data=gasprices)  +
-  geom_jitter(aes(decimal_date(date), price), data=subset(gasprices, year>=1995), size=2, alpha=.1, colour=I("grey50"))+
+\begin{figure}[h!tbp]
+<<gasprices-pictures,echo=F, include=T, fig.width=8, fig.height=2.5, out.width=".98\\textwidth", dependson='gasprices'>>=
+ggplot(data=gasprices)  +
+  geom_jitter(aes(decimal_date(date), price), data=subset(gasprices, year>=1995), size=1.5, shape=I(1), colour=I("grey40"), alpha=I(.75))+ 
   geom_line(data=gas.pred, aes(x=x, y=y), inherit.aes=FALSE) + 
   ylab("Price per gallon (USD)") + theme_bw()+ xlab("Time") + 
   ggtitle("Price of Gasoline in the US, 1995-2014")
-
-p2 <- ggplot( data=subset(monthly, year(month)>=1995) ) + geom_line(aes(month, sd)) + ylab(expression(sigma))  + xlab("Time")+ theme_bw() + ggtitle("Standard Deviation of Monthly Prices")
-
-grid.arrange(p1, p2, nrow=1)
 @
-\caption{US Gas prices, 1995-2014. The left graph shows gas prices over the time period with a trendline fit using smoothing splines, which provide first and second derivatives necessary for the corrections proposed in this paper. The nonlinear trend masks the increasing variance in daily gas prices over time shown in the right graph.}\label{fig:gasprices}
+\caption{US Gas prices, 1995-2014 with a trendline fit using smothing splines, which provide first and second derivatives necessary for the corrections proposed in this paper. The nonlinear trend masks the increasing variance in daily gas prices over time.}\label{fig:gasprices}
 \end{figure}
-\begin{figure}\centering
-<<gaspricesMonthlyRange,echo=F, fig.width=8, fig.height=3, out.width='\\textwidth'>>=
-ggplot(data=monthly)  +
-  geom_linerange(aes(x=month, ymin=min, ymax=max, y=median)) +
-  ylab("Price per gallon (USD)") + theme_bw()+ xlab("Time") + 
-  ggtitle("Monthly Range of Gas Prices, 1995-2014")
-@
-\caption{Monthly Range of Gas Prices, 1995 - 2014. There is some variation in the length of the lines, most notably when prices change dramatically, but the magnitude of the long-term change in variation is obscured by the trend. In fact, the standard deviation of seasonal prices in 2013 and 2014 ($0.142-$0.152) is approximately twice the standard deviation of seasonal prices in 1995 ($0.077-$0.079).}\label{fig:pricerange}
-\end{figure}
-Figure \ref{fig:pricerange} shows the monthly range of gas prices across the US. 
+We will demonstrate the occurrence of the sine illusion as well as the suggested transformations using data gathered from the Energy Information Administration's historical database of gas prices \citep{EIA}. This data, collected from 1995-2014, includes prices for all three grades of gasoline as well as two chemical formulations which are sold in different geographic areas (for more information, see \citep{EIA-reformulated}. Figure \ref{fig:gasprices} shows the gas prices over the period of interest; there is a clearly nonlinear trend to the data, with several dramatic price changes. This trend masks the increasing variance shown in Figure \ref{fig:gasvariance}.
 
-<<gaspricesCorrection, echo=F, cache=T>>=
+\begin{SCfigure}\centering
+\caption{Std. deviation of daily gas prices, 1995-2014. There is a clear increasing trend in the variance that is masked by the increasing price per gallon in Figure \ref{fig:gasprices}.\label{fig:gasvariance}}
+<<gaspricevariance,echo=F,include=T, fig.width=6, fig.height=2, out.width=".6\\textwidth", dependson='gasprices'>>=
+ggplot( data=subset(monthly, year(month)>=1995) ) + geom_line(aes(month, sd)) + ylab(expression(sigma))  + xlab("Time")+ theme_bw() + ggtitle("Standard Deviation of Gas Prices")
+@
+\end{SCfigure}
+
+% \begin{figure}\centering
+% <<gaspricesMonthlyRange,echo=F, fig.width=8, fig.height=3, out.width='.95\\textwidth'>>=
+% ggplot(data=monthly)  +
+%   geom_linerange(aes(x=month, ymin=min, ymax=max, y=median)) +
+%   ylab("Price per gallon (USD)") + theme_bw()+ xlab("Time") + 
+%   ggtitle("Monthly Range of Gas Prices, 1995-2014")
+% @
+% \caption{Monthly Range of Gas Prices, 1995 - 2014. There is some variation in the length of the lines, most notably when prices change dramatically, but the magnitude of the long-term change in variation is obscured by the trend. }\label{fig:pricerange}
+% %In fact, the standard deviation of seasonal prices in 2013 and 2014 ($0.142-$0.152) is approximately twice the standard deviation of seasonal prices in 1995 ($0.077-$0.079).
+% \end{figure}
+% Figure \ref{fig:pricerange} shows the monthly range of gas prices across the US. 
+
+<<gaspricesCorrection, eval=F, echo=FALSE>>=
 asp <- .5 # image vs coordinate aspect ratio 
 startyear <- 1994
-gridlines <- seq(startyear+1, 2014, 1/6)
+gridlines <- seq(startyear+1, 2014, 1/3)
 minor.axis.correction <- 
   c(correct("x", "y", data.frame(x=gridlines, y=f(gridlines)), type="x", f=f, fprime=fprime, f2prime=f2prime, weight=1)$x.correctx, 
     correct("x", "y", data.frame(x=gridlines, y=f(gridlines)), type="x", f=f, fprime=fprime, f2prime=f2prime, weight=.36)$x.correctx
@@ -1637,7 +1641,71 @@ gas.cor.x <- subset(gas.cor.x, variable!="Uncorrected")
 gas.cor.x$variable <- factor(gas.cor.x$variable, levels=c("Corrected (w=1)", "Corrected (w=0.36)"))
 rm(list=c("gas.cor", "gas.cor2"))
 
+gas.cor <- correct("date", "price", gas.full, type="y", f=f, fprime=fprime, f2prime=f2prime, weight=1)
+gas.cor <- melt(gas.cor, id.vars=c(1, 3, 5))
+gas.cor$variable <- gsub("price.correcty", "Corrected (w=1)", gas.cor$variable)
+gas.cor$variable <- gsub("price", "Uncorrected", gas.cor$variable)
+
+gas.cor2 <- correct("date", "price", gas.full, type="y", f=f, fprime=fprime, f2prime=f2prime, weight=.40)
+gas.cor2 <- melt(gas.cor2, id.vars=c(1, 3, 5))
+gas.cor2$variable <- gsub("price.correcty", "Corrected (w=0.40)", gas.cor2$variable)
+gas.cor2$variable <- gsub("price", "Uncorrected", gas.cor2$variable)
+
+gas.cor.y <- rbind(gas.cor, subset(gas.cor2, variable!="Uncorrected"))
+gas.cor.y <- subset(gas.cor.y, variable!="Uncorrected")
+# gas.cor.y$variable <- factor(gas.cor.y$variable, levels=c("Corrected (w=1)", "Corrected (w=0.40)", "Uncorrected"))
+gas.cor.y$variable <- factor(gas.cor.y$variable, levels=c("Corrected (w=1)", "Corrected (w=0.40)"))
+rm(list=c("gas.cor", "gas.cor2"))
+
+save.image("data/gasprices.RData")
 @
+<<gaspricesCorrectionPlots,echo=F,include=F,cache=T>>=
+load("data/gasprices.RData")
+ggplot(data=gas.cor.x) + 
+  geom_point(aes(x=value, y=price, group=variable), size=1.5, shape=I(1), colour=I("grey40"), alpha=I(.75))+ 
+  facet_grid(variable~.) +
+  geom_line(data=gas.cor.x, aes(x=value, y=price.fit), colour="black", size=1.5) + 
+  geom_rug(data=dots, aes(x=x))+
+  xlab("Time") +  
+  ylab("Price of Gasoline (USD)") + 
+  theme_bw()
+ggsave(file="figure/gas-x-corrected.pdf", width=8, height=4)
+
+ggplot(data=gas.cor.y) + 
+  geom_point(aes(x=date, y=value, group=variable), size=1.5, shape=I(1), colour=I("grey40"), alpha=I(.75))+ 
+  facet_grid(variable~.) +
+  geom_line(data=gas.cor.y, aes(x=date, y=price.fit), colour="black", size=1.5) + 
+  xlab("Time") +  
+  ylab("Adj. Price of Gasoline (USD)") + 
+  theme_bw()
+ggsave(file="figure/gas-y-corrected.pdf", width=8, height=4)
+
+@
+
+\paragraph{Transformation in $X$}
+We applied the $X$ transformation to the gas prices data  using the unweighted transformation and the transformation with $w=0.36$. This value was chosen as it is approximately the midpoint of the range of acceptable values determined experimentally. The corrected and uncorrected data with fitted cubic splines are shown in Figure \ref{fig:gasprices-x-correct}.
+\begin{figure}[hbtp]
+\centering
+\includegraphics[keepaspectratio=TRUE,width=.95\linewidth]{figure/gas-x-corrected}
+\caption{Gas price data corrected using the $X$ transformation with $w=1$ and with $w=0.36$. At $w=1$, the transformation is severe, but it is clear that the variance is lower between 1995 and 2000 than it is between 2009 and 2014. When $w=0.36$, the transformation is much less noticable but results in a near-constant absolute slope of the fitted line.}
+%  The weighted transformation removes the presence of the sine illusion without excessively distorting the underlying function shape.
+\label{fig:gasprices-x-correct}
+\end{figure}
+The minor effect of the weighted transformation on individual x-values contrasts with the effectiveness of the transformation in reducing the illusion; this is best seen in the fitted line, which is distinctly (piecewise) curved in the uncorrected data and appears to be much more piecewise linear in the corrected data, even at the reduced weighted value. 
+% The full, unweighted transformation does distort the $X$ axis such that data collected on monthly intervals no longer appears to be uniformly distributed in $X$. The transformation using $w=0.36$ is more moderate and still largely breaks the illusion, and as such may be preferrable to the full $w=1$ transformation. 
+
+\paragraph{Transformation of $Y$}
+We also applied the Y transformation to the gas prices data using the unweighted transformation and the weighted transformation with $w=0.40$. This value was chosen as it is approximately the midpoint of the range of acceptable values determined experimentally. The corrected and uncorrected data with fitted cubic splines are shown in Figure \ref{fig:gasprices-y-correct}. 
+\begin{figure}[hbtp]
+\centering
+\includegraphics[keepaspectratio=TRUE,width=.95\linewidth]{figure/gas-y-corrected}
+\caption{Gas price data corrected using the $Y$ transformation with $w=1$ and with $w=0.40$. At $w=1$, the transformation is severe, but it is clear that the variance is nearly constant between 1995 and 2000 and then begins to increase with the price of gas, becoming much larger between 2010 and 2014. When $w=0.40$, the transformation is much less noticable, and the resulting $y$-axis scale is much more similar to the uncorrected data. }
+\label{fig:gasprices-y-correct}
+\end{figure}
+% The $Y$ transformation does not distort the axes directly as the $X$ transformation does, but it may be more misleading because the $y$ value on the axis is not equivalent to the measured data value, and the same y value at two different points in time may not even correspond to the same measured value. This could make reading numerical values directly from the graph inaccurate. 
+
+% While both transformations successfully break the illusion, the weighted transformations in both $X$ and $Y$ accomplish the goal of counteracting the illusion with less distortion of the data. 
+
 %\clearpage
 \section{Conclusions}
 The sine illusion is a persistent and powerful illusion that is very difficult to counteract without modifying the visual stimulus directly. While systematically modifying the data is uncommon in the statistical world, this approach is not out of place in the visual arts or architecture; as far back as 400 BC the builders of the Parthenon ensured a straight appearance of the columns from afar, by widening columns at the center, thereby counteracting the effects of the Hering illusion \citep{naturalscenes,hering}.  Similarly, painters often correct color hues used in shadows to account for color constancy in the brain. The systematic modifications we suggest here are also comparable to chloropleth maps, which scale a region's area based on some other variable. 
@@ -1853,194 +1921,194 @@ The variability of the random effects for each trial type is similar; but the mo
 \end{appendix}
 
 \end{document}
-
-
-%% USHCN Example
-\section{Application: USHCN Data}
-We will demonstrate the occurrence of the sine illusion as well as the suggested transformations at the example of data from the United States Historical Climatology Network \cite[USHCN;][]{ushcn, ushcn2}.
-
-<<readdata, echo=FALSE>>=
-ushcn <- na.omit(read.csv("data/subushcn.csv"))
-monthly <- read.csv("data/monthly-avgs.csv")
-# write.table(gsub("#", "*", scan("http://cdiac.ornl.gov/ftp/ushcn_v2_monthly/ushcn-stations.txt", "character", sep="\n")), "data/stations", row.names=FALSE, quote=FALSE)
-# stations <- read.fwf("data/stations", widths=c(6, 9, 10, 7, 3, 31, 7, 7, 7, -2, 1), skip=1, stringsAsFactors=FALSE, strip.white=TRUE)
-# names(stations) <- c("ID", "Lat", "Long", "Elevation", "State", "Name", "C1", "C2", "C3", "UTCOffset")
-# stations[which(stations$ID<100000),1] <- paste("0", as.character(stations[which(stations$ID<100000),1]), sep="")
-# stations[,7:9] <- apply(stations[,7:9], 2, function(str) gsub("------", "", str))
-# # stations[,1] <- sapply(stations[,1], function(i) substr(i, nchar(i)-5, nchar(i)), USE.NAMES=FALSE)
-# stations[,c(5, 6)] <- apply(stations[,5:6], 2, factor)
-# stations[,1] <- paste("USH00", stations[,1], sep="")
-# stations[,7] <- paste("USH00", stations[,7], sep="")
-# stations[,8] <- paste("USH00", stations[,8], sep="")
-# stations[,9] <- paste("USH00", stations[,9], sep="")
-# station.sub <- subset(stations, abs(Lat-35)<5 & Elevation<500 & Long>-110)
-# write.csv(station.sub, "data/substations.csv", row.names=FALSE)
-station.sub <- read.csv("data/substations.csv")
-ushcn.full <- ushcn
-monthly.full <- monthly
-
-ushcn <- subset(ushcn, ID%in%station.sub$ID & Year>2007)
-library(plyr)
-suppressMessages(require(lubridate))
-suppressMessages(require(ggplot2))
-monthly <- ddply(ushcn, .(Time, Month), summarize, sd=sd(value), avg=mean(value), month=unique(Month))
-names(monthly) <- c("time", "Month", "sd", "avg", "month")
-seasons <- c("Winter", "Winter", "Spring", "Spring", "Spring", "Summer", "Summer", "Summer", "Fall", "Fall", "Fall", "Winter")
-
-ushcn$Season <- factor(seasons[ushcn$Month], levels=c("Spring", "Summer", "Fall", "Winter"))
-ushcn$Time <- as.Date(ushcn$Time)
-monthly$time <- as.Date(monthly$time)
-season.variation <- ddply(ushcn, .(Season), summarize, Variance=var(resid), StdDev=sd(resid), Mean=mean(value))
-@
-
-\begin{figure}[hbtp]
-\centering
-<<rawtemp, dependson='readdata', echo=FALSE, echo=FALSE, fig.width=12, fig.height=3.5, out.width='\\textwidth',cache=TRUE>>=
-ggplot()  + geom_jitter(aes(Time, value/100), data=subset(ushcn, Year>2007), size=1, shape=I(1), colour=I("grey30"), alpha=I(.90)) +
-  geom_line(aes(time, avg/100), data=subset(monthly, year(time)>2007), colour="black", size=1.5) + 
-  ylab("Temperature (in Celsius)") + theme_bw() + theme(plot.margin = unit(c(0,6,0,0), "cm")) + xlab("Year")
-# ggsave(file="figure/monthly-temps.pdf", width=12, height=4.5)
-
-suppressMessages(suppressWarnings(require(maps)))
-states <- map_data("state")
-p <- ggplot() + geom_polygon(aes(long, lat, group=group), fill="grey80", data=states) + theme_bw() + 
-  theme(panel.grid.major=element_blank(), panel.background = element_blank(),
-       panel.grid.minor=element_blank(), #panel.border = element_blank(),
-       axis.title = element_blank(), axis.ticks = element_blank(), 
-       axis.text = element_blank(), plot.margin = unit(c(-1,-1,-1,-1), "cm")) +
-  geom_point(aes(Long, Lat), colour="black", size=1.25, data=station.sub)
-
-vp1 <- viewport(x = 0.955, y = 0.91, height = unit(2.5, "cm"), width =  unit(4, "cm"), just = c("right","top"))
-  
-print(p, vp = vp1)
-@
-% \includegraphics[width=\textwidth]{monthly-temps}
-\caption{Raw monthly maximum temperatures (in Celsius) between 2008 and 2013 at 380 stations across the US (as indicated on the map) with similar elevation and latitude. The line shows fitted temperatures from a baseline model. \label{fig:raw-temp}}
-\end{figure}
-
-\begin{figure}[hbtp]\centering
-<<boxtemp, dependson='readdata', echo=FALSE, fig.width=12, fig.height=3.5, out.width='\\textwidth',cache=TRUE>>=
-ggplot()  + geom_boxplot(aes(Time, value/100, group=interaction(Year, Month)), outlier.size=2, fill = "grey65", data=subset(ushcn, Year>2007)) + theme_bw() + 
-  #geom_line(aes(time, avg/100), data=subset(monthly, year(time)<1995), colour="steelblue", size=1.5, alpha=.5) + 
-  ylab("Temperature (in Celsius)")+ xlab("Year")
-# ggsave(file="figure/monthly-temps.pdf", width=12, height=4.5)
-@
-
-\caption{Monthly boxplot of maximum temperatures (in Celsius) between 2008 and 2013 at 380 stations. The boxplots suggest that there is more variation in the winter months than in the other seasons. Summer, Fall and Spring appear to have similar temperature variability, and there are more outliers in the Summer.}\label{fig:boxplot-temp}\label{fig:box-temp}
-\end{figure}
-
 % 
-% \begin{figure}[h!tbp]\centering
-% <<residtempboxplot, dependson='residtemp', echo=FALSE, echo=FALSE, fig.width=12, fig.height=3.5, out.width='\\textwidth'>>=
-% ggplot()  + geom_boxplot(aes(Year+(Month-1)/12, resid/100, group=Year+(Month-1)/12), data=subset(ushcn, Year>1995), size=1) + 
-%   # geom_hline(yintercept=0, colour="steelblue", size=1) + 
-%   ylab("Residual temperature (in Celsius)") + theme_bw() + xlab("Time")
-% # ggsave(file="figure/monthly-resid-temps.pdf", width=12, height=4.5)
+% 
+% %% USHCN Example
+% \section{Application: USHCN Data}
+% We will demonstrate the occurrence of the sine illusion as well as the suggested transformations at the example of data from the United States Historical Climatology Network \cite[USHCN;][]{ushcn, ushcn2}.
+% 
+% <<readdata, echo=FALSE>>=
+% ushcn <- na.omit(read.csv("data/subushcn.csv"))
+% monthly <- read.csv("data/monthly-avgs.csv")
+% # write.table(gsub("#", "*", scan("http://cdiac.ornl.gov/ftp/ushcn_v2_monthly/ushcn-stations.txt", "character", sep="\n")), "data/stations", row.names=FALSE, quote=FALSE)
+% # stations <- read.fwf("data/stations", widths=c(6, 9, 10, 7, 3, 31, 7, 7, 7, -2, 1), skip=1, stringsAsFactors=FALSE, strip.white=TRUE)
+% # names(stations) <- c("ID", "Lat", "Long", "Elevation", "State", "Name", "C1", "C2", "C3", "UTCOffset")
+% # stations[which(stations$ID<100000),1] <- paste("0", as.character(stations[which(stations$ID<100000),1]), sep="")
+% # stations[,7:9] <- apply(stations[,7:9], 2, function(str) gsub("------", "", str))
+% # # stations[,1] <- sapply(stations[,1], function(i) substr(i, nchar(i)-5, nchar(i)), USE.NAMES=FALSE)
+% # stations[,c(5, 6)] <- apply(stations[,5:6], 2, factor)
+% # stations[,1] <- paste("USH00", stations[,1], sep="")
+% # stations[,7] <- paste("USH00", stations[,7], sep="")
+% # stations[,8] <- paste("USH00", stations[,8], sep="")
+% # stations[,9] <- paste("USH00", stations[,9], sep="")
+% # station.sub <- subset(stations, abs(Lat-35)<5 & Elevation<500 & Long>-110)
+% # write.csv(station.sub, "data/substations.csv", row.names=FALSE)
+% station.sub <- read.csv("data/substations.csv")
+% ushcn.full <- ushcn
+% monthly.full <- monthly
+% 
+% ushcn <- subset(ushcn, ID%in%station.sub$ID & Year>2007)
+% library(plyr)
+% suppressMessages(require(lubridate))
+% suppressMessages(require(ggplot2))
+% monthly <- ddply(ushcn, .(Time, Month), summarize, sd=sd(value), avg=mean(value), month=unique(Month))
+% names(monthly) <- c("time", "Month", "sd", "avg", "month")
+% seasons <- c("Winter", "Winter", "Spring", "Spring", "Spring", "Summer", "Summer", "Summer", "Fall", "Fall", "Fall", "Winter")
+% 
+% ushcn$Season <- factor(seasons[ushcn$Month], levels=c("Spring", "Summer", "Fall", "Winter"))
+% ushcn$Time <- as.Date(ushcn$Time)
+% monthly$time <- as.Date(monthly$time)
+% season.variation <- ddply(ushcn, .(Season), summarize, Variance=var(resid), StdDev=sd(resid), Mean=mean(value))
 % @
-% \caption{Boxplots of the de-seasonalized residuals provide more insight into the seasonal variance: Winters show more variation in temperatures, while summers show much less variation in temperatures. \label{fig:boxplot-resid-temp}}
+% 
+% \begin{figure}[hbtp]
+% \centering
+% <<rawtemp, dependson='readdata', echo=FALSE, echo=FALSE, fig.width=12, fig.height=3.5, out.width='\\textwidth',cache=TRUE>>=
+% ggplot()  + geom_jitter(aes(Time, value/100), data=subset(ushcn, Year>2007), size=1, shape=I(1), colour=I("grey30"), alpha=I(.90)) +
+%   geom_line(aes(time, avg/100), data=subset(monthly, year(time)>2007), colour="black", size=1.5) + 
+%   ylab("Temperature (in Celsius)") + theme_bw() + theme(plot.margin = unit(c(0,6,0,0), "cm")) + xlab("Year")
+% # ggsave(file="figure/monthly-temps.pdf", width=12, height=4.5)
+% 
+% suppressMessages(suppressWarnings(require(maps)))
+% states <- map_data("state")
+% p <- ggplot() + geom_polygon(aes(long, lat, group=group), fill="grey80", data=states) + theme_bw() + 
+%   theme(panel.grid.major=element_blank(), panel.background = element_blank(),
+%        panel.grid.minor=element_blank(), #panel.border = element_blank(),
+%        axis.title = element_blank(), axis.ticks = element_blank(), 
+%        axis.text = element_blank(), plot.margin = unit(c(-1,-1,-1,-1), "cm")) +
+%   geom_point(aes(Long, Lat), colour="black", size=1.25, data=station.sub)
+% 
+% vp1 <- viewport(x = 0.955, y = 0.91, height = unit(2.5, "cm"), width =  unit(4, "cm"), just = c("right","top"))
+%   
+% print(p, vp = vp1)
+% @
+% % \includegraphics[width=\textwidth]{monthly-temps}
+% \caption{Raw monthly maximum temperatures (in Celsius) between 2008 and 2013 at 380 stations across the US (as indicated on the map) with similar elevation and latitude. The line shows fitted temperatures from a baseline model. \label{fig:raw-temp}}
 % \end{figure}
-% \todo{Do we need this figure?}
-
-Figure \ref{fig:raw-temp}  shows temperature data from 380 stations across the US with similar elevation and latitude. Raw monthly temperatures are overlaid by a fit from a `baseline' model. The deviations from the fit in the summer and winter suggest that the baseline model is not quite able to capture all of the variability in summer and winter peaks. However, the model used is actually based on averages in each time point. This model is not susceptible to shrinkage, so the question of higher variability in the peaks becomes the question of separating this perceived variability into the part introduced by the illusion and the part actually present in the data. 
-
-Figures \ref{fig:raw-temp} and \ref{fig:boxplot-temp} together suggest that winter months have the most variability, while spring, summer, and fall have similar variability. In fact, the variance of fall months is greatest (\Sexpr{round(season.variation[3,3])}), followed by winter (\Sexpr{round(season.variation[4,3])}), spring (\Sexpr{round(season.variation[1,3])}) and finally summer (\Sexpr{round(season.variation[2,3])}). In fact, the winter variability is \Sexpr{round(with(season.variation, StdDev[4]/StdDev[2]), 1)} times that of the summer variation. The sine illusion hides these differences in variance effectively, and additionally minimizes the size of the variance in spring and fall. The problem here is not the graphic itself, as Figure \ref{fig:raw-temp} is true to the data, but rather that our brains cannot translate the graph into quantitative measurements with sufficient accuracy.
-
-<<correct-ushcn,echo=FALSE,cache=TRUE, include=FALSE>>=
-library(grid)
-library(gridExtra)
-library(reshape2)
-source("code/correctData.R")
-ushcn$temp <- ushcn$value/100
-ushcn$time <- decimal_date(ushcn$Time)
-model <- lm(temp~time + sin(2*pi*time) + cos(2*pi*time), data=ushcn)
-f <- function(x){37.345515048 + -0.008496204*x -0.415575133*sin(2*pi*x) -11.751984486*cos(2*pi*x)}
-fprime <- function(x){-0.008496204 -0.415575133*2*pi*cos(2*pi*x) +11.751984486*2*pi*sin(2*pi*x)}
-f2prime <- function(x){(2*pi)^2*(0.415575133*sin(2*pi*x) +11.751984486*cos(2*pi*x))}
-asp <- .0125 # image vs coordinate aspect ratio 
-startyear <- 2007
-gridlines <- seq(startyear+1, 2013, 1/6)
-minor.axis.correction <- 
-  c(correct("x", "y", data.frame(x=gridlines, y=f(gridlines)), type="x", f=f, fprime=fprime, f2prime=f2prime, weight=1)$x.correctx, 
-    correct("x", "y", data.frame(x=gridlines, y=f(gridlines)), type="x", f=f, fprime=fprime, f2prime=f2prime, weight=.36)$x.correctx
-  )
-                           
-dots <- data.frame(x = minor.axis.correction, 
-                   y = rep(-10, length(minor.axis.correction)), 
-                   variable = rep(c("Corrected (w=1)", "Corrected (w=0.36)"), 
-                                  each=length(gridlines)))
-
-
-ushcn.cor <- correct("time", "temp", subset(ushcn[,-c(4, 5)], Year>startyear), type="x", f=f, fprime=fprime, f2prime=f2prime, weight=1)
-ushcn.cor <- melt(ushcn.cor, id.vars=c(1:8, 11))
-ushcn.cor$variable <- gsub("time.correctx", "Corrected (w=1)", ushcn.cor$variable)
-ushcn.cor$variable <- gsub("time", "Uncorrected", ushcn.cor$variable)
-
-ushcn.cor2 <- correct("time", "temp", subset(ushcn[,-c(4, 5)], Year>startyear), type="x", f=f, fprime=fprime, f2prime=f2prime, weight=.36)
-ushcn.cor2 <- melt(ushcn.cor2, id.vars=c(1:8, 11))
-ushcn.cor2$variable <- gsub("time.correctx", "Corrected (w=0.36)", ushcn.cor2$variable)
-ushcn.cor2$variable <- gsub("time", "Uncorrected", ushcn.cor2$variable)
-
-ushcn.cor.x <- rbind(ushcn.cor, subset(ushcn.cor2, variable!="Uncorrected"))
-ushcn.cor.x <- subset(ushcn.cor.x, variable!="Uncorrected" & Year>startyear)
-# ushcn.cor.x$variable <- factor(ushcn.cor.x$variable, levels=c("Corrected (w=1)", "Corrected (w=0.36)", "Uncorrected"))
-ushcn.cor.x$variable <- factor(ushcn.cor.x$variable, levels=c("Corrected (w=1)", "Corrected (w=0.36)"))
-rm(list=c("ushcn.cor", "ushcn.cor2"))
-
-ggplot(data=ushcn.cor.x) + 
-  geom_jitter(aes(x=value, y=temp, group=variable), size=1.5, position = position_jitter(width = 1/36), shape=I(1), colour=I("grey30"), alpha=I(.75))+ 
-  facet_grid(variable~.) +
-  geom_line(data=ushcn.cor.x, aes(x=value, y=temp.fit), colour="black", size=1.5) + 
-  geom_rug(data=dots, aes(x=x))+
-  xlab("Year") +  
-  ylab("Temperature (in Celsius)") + 
-  theme_bw()
-ggsave(file="figure/ushcn-x-corrected.pdf", width=12, height=7)
-
-ushcn.cor <- correct("time", "temp", subset(ushcn[,-c(4, 5)], Year>startyear), type="y", f=f, fprime=fprime, f2prime=f2prime, weight=1, ratio=asp)
-ushcn.cor <- melt(ushcn.cor, id.vars=c(1:7, 9, 11))
-ushcn.cor$variable <- gsub("temp.correcty", "Corrected (w=1)", ushcn.cor$variable)
-ushcn.cor$variable <- gsub("temp", "Uncorrected", ushcn.cor$variable)
-
-ushcn.cor2 <- correct("time", "temp", subset(ushcn[,-c(4, 5)], Year>startyear), type="y", f=f, fprime=fprime, f2prime=f2prime, weight=.40, ratio=asp)
-ushcn.cor2 <- melt(ushcn.cor2, id.vars=c(1:7, 9, 11))
-ushcn.cor2$variable <- gsub("temp.correcty", "Corrected (w=0.40)", ushcn.cor2$variable)
-ushcn.cor2$variable <- gsub("temp", "Uncorrected", ushcn.cor2$variable)
-
-ushcn.cor.y <- rbind(ushcn.cor, subset(ushcn.cor2, variable!="Uncorrected"))
-ushcn.cor.y <- subset(ushcn.cor.y, variable!="Uncorrected" & Year>startyear)
-# ushcn.cor.y$variable <- factor(ushcn.cor.y$variable, levels=c("Corrected (w=1)", "Corrected (w=0.40)", "Uncorrected"))
-ushcn.cor.y$variable <- factor(ushcn.cor.y$variable, levels=c("Corrected (w=1)", "Corrected (w=0.40)"))
-rm(list=c("ushcn.cor", "ushcn.cor2"))
-
-ggplot(aes(x=time, y=value, group=variable), data=ushcn.cor.y) + 
-  geom_jitter(size=1, shape=I(1), colour=I("grey30"), alpha=I(.75))+ 
-  facet_grid(variable~.) +
-  geom_line(aes(y=temp.fit), colour="black", size=1.5) + 
-  xlab("Year") +  
-  ylab("Adjusted Temperature (in Celsius)") + 
-  theme_bw()
-ggsave(file="figure/ushcn-y-corrected.pdf", width=12, height=7)
-@
-
-\paragraph{Trend removal}
-After removing the averages in Figure \ref{fig:boxplot-temp} to yield Figure \ref{fig:boxplot-resid-temp} the impression of higher variability in the peaks is only partially confirmed: there is higher variability in the winter, and lower variability in the summer, though there are more outliers in the summer than in the winter.
-
-\paragraph{Transformation in $X$}
-We applied the X transformation to the USHCN data using the unweighted transformation and the weighted transformation with $w=0.36$. This value was chosen as it is approximately the midpoint of the range of acceptable values determined experimentally. The corrected and uncorrected data with fitted cubic splines are shown in Figure \ref{fig:ushcn-x-correct}. 
-
-\begin{figure}[hbtp]
-\centering
-\includegraphics[keepaspectratio=TRUE,width=.9\linewidth]{figure/ushcn-x-corrected}
-\caption{USHCN temperature data from 2008-2013 corrected using the $X$ transformation with $w=1$ and with $w=0.36$. At $w=1$, the transformation is severe, but it is clear that the variance decreases in the summer months and increases in the winter. When $w=0.36$, the transformation is much less noticable but results in a near-constant absolute slope of the fitted line. The weighted transformation removes the presence of the sine illusion without excessively distorting the underlying function shape.}
-\label{fig:ushcn-x-correct}
-\end{figure}
-The minor effect of the weighted transformation on individual x-values contrasts with the effectiveness of the transformation in reducing the illusion; this is best seen in the fitted line, which is distinctly (piecewise) curved in the uncorrected data and appears to be much more piecewise linear in the corrected data, even at the reduced weighted value. 
-
-\paragraph{Transformation of $Y$}
-We also applied the Y transformation to the ushcn data using the unweighted transformation and the weighted transformation with $w=0.40$. This value was chosen as it is approximately the midpoint of the range of acceptable values determined experimentally. The corrected and uncorrected data with fitted cubic splines are shown in Figure \ref{fig:ushcn-y-correct}. 
-\begin{figure}[hbtp]
-\centering
-\includegraphics[keepaspectratio=TRUE,width=.9\linewidth]{figure/ushcn-y-corrected}
-\caption{USHCN temperature data corrected using the $Y$ transformation with $w=1$ and $w=0.40$. The transformations are relatively slight but have a notable impact on the visual salience of outliers in summer temperature, allowing the viewer to recognize that summer temperatures are less variable but more prone to outliers, while winter temperatures are more variable with fewer outliers. The $w=0.40$ transformation serves as a middle ground between untransformed and fully transformed data.}
-\label{fig:ushcn-y-correct}
-\end{figure}
+% 
+% \begin{figure}[hbtp]\centering
+% <<boxtemp, dependson='readdata', echo=FALSE, fig.width=12, fig.height=3.5, out.width='\\textwidth',cache=TRUE>>=
+% ggplot()  + geom_boxplot(aes(Time, value/100, group=interaction(Year, Month)), outlier.size=2, fill = "grey65", data=subset(ushcn, Year>2007)) + theme_bw() + 
+%   #geom_line(aes(time, avg/100), data=subset(monthly, year(time)<1995), colour="steelblue", size=1.5, alpha=.5) + 
+%   ylab("Temperature (in Celsius)")+ xlab("Year")
+% # ggsave(file="figure/monthly-temps.pdf", width=12, height=4.5)
+% @
+% 
+% \caption{Monthly boxplot of maximum temperatures (in Celsius) between 2008 and 2013 at 380 stations. The boxplots suggest that there is more variation in the winter months than in the other seasons. Summer, Fall and Spring appear to have similar temperature variability, and there are more outliers in the Summer.}\label{fig:boxplot-temp}\label{fig:box-temp}
+% \end{figure}
+% 
+% % 
+% % \begin{figure}[h!tbp]\centering
+% % <<residtempboxplot, dependson='residtemp', echo=FALSE, echo=FALSE, fig.width=12, fig.height=3.5, out.width='\\textwidth'>>=
+% % ggplot()  + geom_boxplot(aes(Year+(Month-1)/12, resid/100, group=Year+(Month-1)/12), data=subset(ushcn, Year>1995), size=1) + 
+% %   # geom_hline(yintercept=0, colour="steelblue", size=1) + 
+% %   ylab("Residual temperature (in Celsius)") + theme_bw() + xlab("Time")
+% % # ggsave(file="figure/monthly-resid-temps.pdf", width=12, height=4.5)
+% % @
+% % \caption{Boxplots of the de-seasonalized residuals provide more insight into the seasonal variance: Winters show more variation in temperatures, while summers show much less variation in temperatures. \label{fig:boxplot-resid-temp}}
+% % \end{figure}
+% % \todo{Do we need this figure?}
+% 
+% Figure \ref{fig:raw-temp}  shows temperature data from 380 stations across the US with similar elevation and latitude. Raw monthly temperatures are overlaid by a fit from a `baseline' model. The deviations from the fit in the summer and winter suggest that the baseline model is not quite able to capture all of the variability in summer and winter peaks. However, the model used is actually based on averages in each time point. This model is not susceptible to shrinkage, so the question of higher variability in the peaks becomes the question of separating this perceived variability into the part introduced by the illusion and the part actually present in the data. 
+% 
+% Figures \ref{fig:raw-temp} and \ref{fig:boxplot-temp} together suggest that winter months have the most variability, while spring, summer, and fall have similar variability. In fact, the variance of fall months is greatest (\Sexpr{round(season.variation[3,3])}), followed by winter (\Sexpr{round(season.variation[4,3])}), spring (\Sexpr{round(season.variation[1,3])}) and finally summer (\Sexpr{round(season.variation[2,3])}). In fact, the winter variability is \Sexpr{round(with(season.variation, StdDev[4]/StdDev[2]), 1)} times that of the summer variation. The sine illusion hides these differences in variance effectively, and additionally minimizes the size of the variance in spring and fall. The problem here is not the graphic itself, as Figure \ref{fig:raw-temp} is true to the data, but rather that our brains cannot translate the graph into quantitative measurements with sufficient accuracy.
+% 
+% <<correct-ushcn,echo=FALSE,cache=TRUE, include=FALSE>>=
+% library(grid)
+% library(gridExtra)
+% library(reshape2)
+% source("code/correctData.R")
+% ushcn$temp <- ushcn$value/100
+% ushcn$time <- decimal_date(ushcn$Time)
+% model <- lm(temp~time + sin(2*pi*time) + cos(2*pi*time), data=ushcn)
+% f <- function(x){37.345515048 + -0.008496204*x -0.415575133*sin(2*pi*x) -11.751984486*cos(2*pi*x)}
+% fprime <- function(x){-0.008496204 -0.415575133*2*pi*cos(2*pi*x) +11.751984486*2*pi*sin(2*pi*x)}
+% f2prime <- function(x){(2*pi)^2*(0.415575133*sin(2*pi*x) +11.751984486*cos(2*pi*x))}
+% asp <- .0125 # image vs coordinate aspect ratio 
+% startyear <- 2007
+% gridlines <- seq(startyear+1, 2013, 1/6)
+% minor.axis.correction <- 
+%   c(correct("x", "y", data.frame(x=gridlines, y=f(gridlines)), type="x", f=f, fprime=fprime, f2prime=f2prime, weight=1)$x.correctx, 
+%     correct("x", "y", data.frame(x=gridlines, y=f(gridlines)), type="x", f=f, fprime=fprime, f2prime=f2prime, weight=.36)$x.correctx
+%   )
+%                            
+% dots <- data.frame(x = minor.axis.correction, 
+%                    y = rep(-10, length(minor.axis.correction)), 
+%                    variable = rep(c("Corrected (w=1)", "Corrected (w=0.36)"), 
+%                                   each=length(gridlines)))
+% 
+% 
+% ushcn.cor <- correct("time", "temp", subset(ushcn[,-c(4, 5)], Year>startyear), type="x", f=f, fprime=fprime, f2prime=f2prime, weight=1)
+% ushcn.cor <- melt(ushcn.cor, id.vars=c(1:8, 11))
+% ushcn.cor$variable <- gsub("time.correctx", "Corrected (w=1)", ushcn.cor$variable)
+% ushcn.cor$variable <- gsub("time", "Uncorrected", ushcn.cor$variable)
+% 
+% ushcn.cor2 <- correct("time", "temp", subset(ushcn[,-c(4, 5)], Year>startyear), type="x", f=f, fprime=fprime, f2prime=f2prime, weight=.36)
+% ushcn.cor2 <- melt(ushcn.cor2, id.vars=c(1:8, 11))
+% ushcn.cor2$variable <- gsub("time.correctx", "Corrected (w=0.36)", ushcn.cor2$variable)
+% ushcn.cor2$variable <- gsub("time", "Uncorrected", ushcn.cor2$variable)
+% 
+% ushcn.cor.x <- rbind(ushcn.cor, subset(ushcn.cor2, variable!="Uncorrected"))
+% ushcn.cor.x <- subset(ushcn.cor.x, variable!="Uncorrected" & Year>startyear)
+% # ushcn.cor.x$variable <- factor(ushcn.cor.x$variable, levels=c("Corrected (w=1)", "Corrected (w=0.36)", "Uncorrected"))
+% ushcn.cor.x$variable <- factor(ushcn.cor.x$variable, levels=c("Corrected (w=1)", "Corrected (w=0.36)"))
+% rm(list=c("ushcn.cor", "ushcn.cor2"))
+% 
+% ggplot(data=ushcn.cor.x) + 
+%   geom_jitter(aes(x=value, y=temp, group=variable), size=1.5, position = position_jitter(width = 1/36), shape=I(1), colour=I("grey30"), alpha=I(.75))+ 
+%   facet_grid(variable~.) +
+%   geom_line(data=ushcn.cor.x, aes(x=value, y=temp.fit), colour="black", size=1.5) + 
+%   geom_rug(data=dots, aes(x=x))+
+%   xlab("Year") +  
+%   ylab("Temperature (in Celsius)") + 
+%   theme_bw()
+% ggsave(file="figure/ushcn-x-corrected.pdf", width=12, height=7)
+% 
+% ushcn.cor <- correct("time", "temp", subset(ushcn[,-c(4, 5)], Year>startyear), type="y", f=f, fprime=fprime, f2prime=f2prime, weight=1, ratio=asp)
+% ushcn.cor <- melt(ushcn.cor, id.vars=c(1:7, 9, 11))
+% ushcn.cor$variable <- gsub("temp.correcty", "Corrected (w=1)", ushcn.cor$variable)
+% ushcn.cor$variable <- gsub("temp", "Uncorrected", ushcn.cor$variable)
+% 
+% ushcn.cor2 <- correct("time", "temp", subset(ushcn[,-c(4, 5)], Year>startyear), type="y", f=f, fprime=fprime, f2prime=f2prime, weight=.40, ratio=asp)
+% ushcn.cor2 <- melt(ushcn.cor2, id.vars=c(1:7, 9, 11))
+% ushcn.cor2$variable <- gsub("temp.correcty", "Corrected (w=0.40)", ushcn.cor2$variable)
+% ushcn.cor2$variable <- gsub("temp", "Uncorrected", ushcn.cor2$variable)
+% 
+% ushcn.cor.y <- rbind(ushcn.cor, subset(ushcn.cor2, variable!="Uncorrected"))
+% ushcn.cor.y <- subset(ushcn.cor.y, variable!="Uncorrected" & Year>startyear)
+% # ushcn.cor.y$variable <- factor(ushcn.cor.y$variable, levels=c("Corrected (w=1)", "Corrected (w=0.40)", "Uncorrected"))
+% ushcn.cor.y$variable <- factor(ushcn.cor.y$variable, levels=c("Corrected (w=1)", "Corrected (w=0.40)"))
+% rm(list=c("ushcn.cor", "ushcn.cor2"))
+% 
+% ggplot(aes(x=time, y=value, group=variable), data=ushcn.cor.y) + 
+%   geom_jitter(size=1, shape=I(1), colour=I("grey30"), alpha=I(.75))+ 
+%   facet_grid(variable~.) +
+%   geom_line(aes(y=temp.fit), colour="black", size=1.5) + 
+%   xlab("Year") +  
+%   ylab("Adjusted Temperature (in Celsius)") + 
+%   theme_bw()
+% ggsave(file="figure/ushcn-y-corrected.pdf", width=12, height=7)
+% @
+% 
+% \paragraph{Trend removal}
+% After removing the averages in Figure \ref{fig:boxplot-temp} to yield Figure \ref{fig:boxplot-resid-temp} the impression of higher variability in the peaks is only partially confirmed: there is higher variability in the winter, and lower variability in the summer, though there are more outliers in the summer than in the winter.
+% 
+% \paragraph{Transformation in $X$}
+% We applied the X transformation to the USHCN data using the unweighted transformation and the weighted transformation with $w=0.36$. This value was chosen as it is approximately the midpoint of the range of acceptable values determined experimentally. The corrected and uncorrected data with fitted cubic splines are shown in Figure \ref{fig:ushcn-x-correct}. 
+% 
+% \begin{figure}[hbtp]
+% \centering
+% \includegraphics[keepaspectratio=TRUE,width=.9\linewidth]{figure/ushcn-x-corrected}
+% \caption{USHCN temperature data from 2008-2013 corrected using the $X$ transformation with $w=1$ and with $w=0.36$. At $w=1$, the transformation is severe, but it is clear that the variance decreases in the summer months and increases in the winter. When $w=0.36$, the transformation is much less noticable but results in a near-constant absolute slope of the fitted line. The weighted transformation removes the presence of the sine illusion without excessively distorting the underlying function shape.}
+% \label{fig:ushcn-x-correct}
+% \end{figure}
+% The minor effect of the weighted transformation on individual x-values contrasts with the effectiveness of the transformation in reducing the illusion; this is best seen in the fitted line, which is distinctly (piecewise) curved in the uncorrected data and appears to be much more piecewise linear in the corrected data, even at the reduced weighted value. 
+% 
+% \paragraph{Transformation of $Y$}
+% We also applied the Y transformation to the ushcn data using the unweighted transformation and the weighted transformation with $w=0.40$. This value was chosen as it is approximately the midpoint of the range of acceptable values determined experimentally. The corrected and uncorrected data with fitted cubic splines are shown in Figure \ref{fig:ushcn-y-correct}. 
+% \begin{figure}[hbtp]
+% \centering
+% \includegraphics[keepaspectratio=TRUE,width=.9\linewidth]{figure/ushcn-y-corrected}
+% \caption{USHCN temperature data corrected using the $Y$ transformation with $w=1$ and $w=0.40$. The transformations are relatively slight but have a notable impact on the visual salience of outliers in summer temperature, allowing the viewer to recognize that summer temperatures are less variable but more prone to outliers, while winter temperatures are more variable with fewer outliers. The $w=0.40$ transformation serves as a middle ground between untransformed and fully transformed data.}
+% \label{fig:ushcn-y-correct}
+% \end{figure}
