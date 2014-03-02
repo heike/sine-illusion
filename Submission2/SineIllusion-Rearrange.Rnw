@@ -1582,17 +1582,17 @@ f2prime <- function(x){as.data.frame(predict(model, x=x, deriv=2))$y}
 ggplot(data=gasprices)  +
   geom_jitter(aes(decimal_date(date), price), data=subset(gasprices, year>=1995), size=1.5, shape=I(1), colour=I("grey40"), alpha=I(.75))+ 
   geom_line(data=gas.pred, aes(x=x, y=y), inherit.aes=FALSE) + 
-  ylab("Price per gallon (USD)") + theme_bw()+ xlab("Time") + 
-  ggtitle("Price of Gasoline in the US, 1995-2014")
+  ylab("Price per gallon (USD)") + theme_bw()+ xlab("Time")  + geom_point(aes(x=1995, y=0), size=0.1)
+#  ggtitle("Price of Gasoline in the US, 1995-2014")
 @
-\caption{US Gas prices, 1995-2014 with a trendline fit using smothing splines, which provide first and second derivatives necessary for the corrections proposed in this paper. The nonlinear trend masks the increasing variance in daily gas prices over time.}\label{fig:gasprices}
+\caption{US Gas prices from 1995 to 2014. The dark trendline fit uses smoothing splines, and provides first and second derivatives necessary for the proposed corrections. The nonlinear trend masks the increasing variance in daily gas prices over time.}\label{fig:gasprices}
 \end{figure}
-We will demonstrate the occurrence of the sine illusion as well as the suggested transformations using data gathered from the Energy Information Administration's historical database of gas prices \citep{EIA}. This data, collected from 1995-2014, includes prices for all three grades of gasoline as well as two chemical formulations which are sold in different geographic areas (for more information, see \citep{EIA-reformulated}. Figure \ref{fig:gasprices} shows the gas prices over the period of interest; there is a clearly nonlinear trend to the data, with several dramatic price changes. This trend masks the increasing variance shown in Figure \ref{fig:gasvariance}.
+We will demonstrate the occurrence of the sine illusion as well as the suggested transformations using data gathered from the Energy Information Administration's historical database of gas prices \citep{EIA}. This data, collected from 1995-2014, includes prices for all three grades of gasoline as well as two chemical formulations which are sold in different geographic areas \citep[for more information, see ][]{EIA-reformulated}. Figure \ref{fig:gasprices} shows the gas prices over the period of interest; there is a clear nonlinear trend to the data, with several dramatic price changes. This trend masks the increasing variance shown in Figure \ref{fig:gasvariance}.
 
 \begin{SCfigure}\centering
-\caption{Std. deviation of daily gas prices, 1995-2014. There is a clear increasing trend in the variance that is masked by the increasing price per gallon in Figure \ref{fig:gasprices}.\label{fig:gasvariance}}
+\caption{Standard deviation of daily gas prices between 1995 and 2014. There is a clear increasing trend in the variance that is masked by the increasing price per gallon in Figure \ref{fig:gasprices}.\label{fig:gasvariance}}
 <<gaspricevariance,echo=F,include=T, fig.width=6, fig.height=2, out.width=".6\\textwidth", dependson='gasprices'>>=
-ggplot( data=subset(monthly, year(month)>=1995) ) + geom_line(aes(month, sd)) + ylab(expression(sigma))  + xlab("Time")+ theme_bw() + ggtitle("Standard Deviation of Gas Prices")
+ggplot( data=subset(monthly, year(month)>=1995) ) + geom_line(aes(month, sd)) + ylab("Standard deviation in daily gas prices (USD)")  + xlab("Time")+ theme_bw() #+ ggtitle("Standard Deviation of Gas Prices")
 @
 \end{SCfigure}
 
@@ -1668,7 +1668,7 @@ ggplot(data=gas.cor.x) +
   geom_rug(data=dots, aes(x=x))+
   xlab("Time") +  
   ylab("Price of Gasoline (USD)") + 
-  theme_bw()
+  theme_bw() + geom_point(aes(x=1995, y=0), size=0.1)
 ggsave(file="figure/gas-x-corrected.pdf", width=8, height=4)
 
 ggplot(data=gas.cor.y) + 
@@ -1677,7 +1677,7 @@ ggplot(data=gas.cor.y) +
   geom_line(data=gas.cor.y, aes(x=date, y=price.fit), colour="black", size=1.5) + 
   xlab("Time") +  
   ylab("Adj. Price of Gasoline (USD)") + 
-  theme_bw()
+  theme_bw() + geom_point(aes(x=1995, y=0), size=0.1)
 ggsave(file="figure/gas-y-corrected.pdf", width=8, height=4)
 
 @
