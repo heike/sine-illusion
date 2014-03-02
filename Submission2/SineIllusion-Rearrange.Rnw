@@ -1591,8 +1591,9 @@ We will demonstrate the occurrence of the sine illusion as well as the suggested
 
 \begin{SCfigure}\centering
 \caption{Standard deviation of daily gas prices between 1995 and 2014. There is a clear increasing trend in the variance that is masked by the increasing price per gallon in Figure \ref{fig:gasprices}.\label{fig:gasvariance}}
-<<gaspricevariance,echo=F,include=T, fig.width=6, fig.height=2, out.width=".6\\textwidth", dependson='gasprices'>>=
-ggplot( data=subset(monthly, year(month)>=1995) ) + geom_line(aes(month, sd)) + ylab("Standard deviation in daily gas prices (USD)")  + xlab("Time")+ theme_bw() #+ ggtitle("Standard Deviation of Gas Prices")
+<<gaspricevariance,echo=F,include=T, fig.width=6, fig.height=3, out.width=".7\\textwidth", dependson='gasprices'>>=
+ggplot( data=subset(monthly, year(month)>=1995) ) + geom_line(aes(month, sd)) + ylab("Standard deviation of daily gas prices")  + xlab("Time")+ theme_bw() + #ggtitle("Standard Deviation of Gas Prices")
+  theme(plot.margin=unit(c(0,.5,0,0), "cm"))
 @
 \end{SCfigure}
 
