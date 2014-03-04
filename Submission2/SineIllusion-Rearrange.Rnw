@@ -1543,6 +1543,10 @@ The ranges of optimal weights are similar under both transformations. Boundaries
 Bootstrap simulations for each of the coefficients suggest that the range of optimal $w$ is between \Sexpr{round(ints$x[2], 3)} and \Sexpr{round(ints$x[3], 3)} for $x$ and \Sexpr{round(ints$x[1], 3)} and \Sexpr{round(ints$x[4], 3)} for $y$, where the lower value is the estimate starting at $w=0$ and moving up, and the upper value is the estimate starting at $w=1$ and moving down. This suggests that either correction is preferrable to an uncorrected graph, and that a weighted correction is preferrable to the fully corrected graph, as neither 0 nor 1 is contained in any overall interval. In addition to showing the strength of the correction, this experiment also demonstrates the strength of the illusion itself: a correction appears more uniform than the uncorrected values. 
 
 \section{Application: US Gas Prices}
+Figure~\ref{fig:gasprices} shows daily gas prices for a time frame between 1995 to 2014 %We will demonstrate the occurrence of the sine illusion as well as the suggested transformations using data gathered 
+as published in the Energy Information Administration's historical database of gas prices \citep{EIA}. This data includes prices for all three grades of gasoline as well as two chemical formulations which are sold in different geographic areas across the United States \citep[for more information, see ][]{EIA-reformulated}. There is a clear increase in daily gas prices over time 
+%Figure \ref{fig:gasprices} shows the gas prices over the period of interest; there is a clear nonlinear trend to the data, with 
+as well as several dramatic price changes. These developments mask the steady increase in variance shown in Figure~\ref{fig:gasvariance}. Instead, we perceive an increase in variability in the frequent ups and downs along the overall trend. In particular, the strong decrease in gas prices just before the U.S. elections in 2008 seems to be associated with a low variance. This is an effect of the sine illusion, and the actual variability in Oct 2008 is higher than regular (see figure~\ref{fig:gasvariance}). In order to better judge variability along the trendline we employ the two different approaches. 
 <<gasprices,echo=FALSE, cache=T, message=F, warning=F>>=
 library(lubridate)
 library(plyr)
@@ -1579,21 +1583,17 @@ gas.full <- gas
 gas <- unique(gas[,c(1,3)])
 @
 \begin{figure}[h!tbp]
-<<gasprices-pictures,echo=F, include=T, fig.width=8, fig.height=2.75, out.width=".98\\textwidth", dependson='gasprices'>>=
+<<gasprices-pictures,echo=F, include=T, fig.width=8, fig.height=2.7, out.width=".98\\textwidth", dependson='gasprices'>>=
 ggplot(data=gasprices)  +
   geom_jitter(aes(decimal_date(date), price), data=subset(gasprices, year>=1995), size=I(1), #size=I(1.5), shape=I(1), 
               colour=I("grey40"), alpha=I(.75))+ 
 #  geom_line(data=gas.pred, aes(x=x, y=y), inherit.aes=FALSE) + 
-  ylab("Price per gallon (USD)") + theme_bw()+ xlab("Time")  + geom_point(aes(x=1995, y=0), size=0.1)
+  ylab("Price per gallon (USD)") + theme_bw()+ xlab("Time")  + geom_point(aes(x=1995, y=0), size=0.1) + theme(plot.margin=unit(c(0,0.5,0,0), "cm"))
 #  ggtitle("Price of Gasoline in the US, 1995-2014")
 @
 \caption{US Gas prices from 1995 to 2014. %The dark trendline fit uses smoothing splines, and provides first and second derivatives necessary for the proposed corrections. 
 Gas prices steadily increase over the time frame, with some dramatic short-term developments. Peaks and troughs seem to exhibit more variability in daily prices than times of dramatic changes. This is an effect of the sine-illusion, which hides a fairly steady increase in variance in daily gas prices over time.}\label{fig:gasprices}
 \end{figure}
-Figure~\ref{fig:gasprices} shows daily gas prices for a time frame between 1995 to 2014 %We will demonstrate the occurrence of the sine illusion as well as the suggested transformations using data gathered 
-as published in the Energy Information Administration's historical database of gas prices \citep{EIA}. This data includes prices for all three grades of gasoline as well as two chemical formulations which are sold in different geographic areas across the United States \citep[for more information, see ][]{EIA-reformulated}. There is a clear increase in daily gas prices over time 
-%Figure \ref{fig:gasprices} shows the gas prices over the period of interest; there is a clear nonlinear trend to the data, with 
-as well as several dramatic price changes. These developments mask the steady increase in variance shown in Figure \ref{fig:gasvariance}.
 For either of the corrections we use a trendline fit based on smoothing splines, which provides the necessary first and second derivatives.
 \begin{SCfigure}\centering
 \caption{Standard deviation of daily gas prices between 1995 and 2014. The doubling of the standard deviation over the time frame is masked in Figure \ref{fig:gasprices}.\label{fig:gasvariance}}
