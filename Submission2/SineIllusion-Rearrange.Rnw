@@ -1568,27 +1568,33 @@ model <- smooth.spline(x=decimal_date(gasprices$date), y=gasprices$price, keep.d
 
 gas <- gasprices[,c("date", "price")]
 gas$date <- decimal_date(gas$date)
-gas$pred <- f(gas$date)
-gas.pred <- as.data.frame(predict(model))
-gas.full <- gas
-gas <- unique(gas[,c(1,3)])
 
 f <- function(x){as.data.frame(predict(model, x=x))$y}
 fprime <- function(x){as.data.frame(predict(model, x=x, deriv=1))$y}
 f2prime <- function(x){as.data.frame(predict(model, x=x, deriv=2))$y}
+
+gas$pred <- f(gas$date)
+gas.pred <- as.data.frame(predict(model))
+gas.full <- gas
+gas <- unique(gas[,c(1,3)])
 @
 \begin{figure}[h!tbp]
-<<gasprices-pictures,echo=F, include=T, fig.width=8, fig.height=2.5, out.width=".98\\textwidth", dependson='gasprices'>>=
+<<gasprices-pictures,echo=F, include=T, fig.width=8, fig.height=2.75, out.width=".98\\textwidth", dependson='gasprices'>>=
 ggplot(data=gasprices)  +
-  geom_jitter(aes(decimal_date(date), price), data=subset(gasprices, year>=1995), size=1.5, shape=I(1), colour=I("grey40"), alpha=I(.75))+ 
-  geom_line(data=gas.pred, aes(x=x, y=y), inherit.aes=FALSE) + 
+  geom_jitter(aes(decimal_date(date), price), data=subset(gasprices, year>=1995), size=I(1), #size=I(1.5), shape=I(1), 
+              colour=I("grey40"), alpha=I(.75))+ 
+#  geom_line(data=gas.pred, aes(x=x, y=y), inherit.aes=FALSE) + 
   ylab("Price per gallon (USD)") + theme_bw()+ xlab("Time")  + geom_point(aes(x=1995, y=0), size=0.1)
 #  ggtitle("Price of Gasoline in the US, 1995-2014")
 @
-\caption{US Gas prices from 1995 to 2014. The dark trendline fit uses smoothing splines, and provides first and second derivatives necessary for the proposed corrections. The nonlinear trend masks the increasing variance in daily gas prices over time.}\label{fig:gasprices}
+\caption{US Gas prices from 1995 to 2014. %The dark trendline fit uses smoothing splines, and provides first and second derivatives necessary for the proposed corrections. 
+Gas prices steadily increase over the time frame, with some dramatic short-term developments. Peaks and troughs seem to exhibit more variability in daily prices than times of dramatic changes. This is an effect of the sine-illusion, which hides a fairly steady increase in variance in daily gas prices over time.}\label{fig:gasprices}
 \end{figure}
-We will demonstrate the occurrence of the sine illusion as well as the suggested transformations using data gathered from the Energy Information Administration's historical database of gas prices \citep{EIA}. This data, collected from 1995-2014, includes prices for all three grades of gasoline as well as two chemical formulations which are sold in different geographic areas \citep[for more information, see ][]{EIA-reformulated}. Figure \ref{fig:gasprices} shows the gas prices over the period of interest; there is a clear nonlinear trend to the data, with several dramatic price changes. This trend masks the increasing variance shown in Figure \ref{fig:gasvariance}.
-
+Figure~\ref{fig:gasprices} shows daily gas prices for a time frame between 1995 to 2014 %We will demonstrate the occurrence of the sine illusion as well as the suggested transformations using data gathered 
+as published in the Energy Information Administration's historical database of gas prices \citep{EIA}. This data includes prices for all three grades of gasoline as well as two chemical formulations which are sold in different geographic areas across the United States \citep[for more information, see ][]{EIA-reformulated}. There is a clear increase in daily gas prices over time 
+%Figure \ref{fig:gasprices} shows the gas prices over the period of interest; there is a clear nonlinear trend to the data, with 
+as well as several dramatic price changes. These developments mask the steady increase in variance shown in Figure \ref{fig:gasvariance}.
+For either of the corrections we use a trendline fit based on smoothing splines, which provides the necessary first and second derivatives.
 \begin{SCfigure}\centering
 \caption{Standard deviation of daily gas prices between 1995 and 2014. The doubling of the standard deviation over the time frame is masked in Figure \ref{fig:gasprices}.\label{fig:gasvariance}}
 <<gaspricevariance,echo=F,include=T, fig.width=6, fig.height=3, out.width=".7\\textwidth", dependson='gasprices'>>=
@@ -1669,7 +1675,8 @@ ggplot(data=gas.cor.x) +
   geom_rug(data=dots, aes(x=x))+
   xlab("Time") +  
   ylab("Price of Gasoline (USD)") + 
-  theme_bw() + geom_point(aes(x=1995, y=0), size=0.1)
+  theme_bw() + geom_point(aes(x=1995, y=0), size=0.1) + 
+  theme(plot.margin=unit(c(0,0,0,0), "cm"))
 ggsave(file="figure/gas-x-corrected.pdf", width=8, height=4)
 
 ggplot(data=gas.cor.y) + 
@@ -1678,29 +1685,33 @@ ggplot(data=gas.cor.y) +
   geom_line(data=gas.cor.y, aes(x=date, y=price.fit), colour="black", size=1.5) + 
   xlab("Time") +  
   ylab("Adj. Price of Gasoline (USD)") + 
-  theme_bw() + geom_point(aes(x=1995, y=0), size=0.1)
+  theme_bw() + geom_point(aes(x=1995, y=0), size=0.1) + 
+  theme(plot.margin=unit(c(0,0,0,0), "cm"))
 ggsave(file="figure/gas-y-corrected.pdf", width=8, height=4)
 
 @
 
-\paragraph{Transformation in $X$}
-We applied the $X$ transformation to the gas prices data  using the unweighted transformation and the transformation with $w=0.36$. This value was chosen as it is approximately the midpoint of the range of acceptable values determined experimentally. The corrected and uncorrected data with fitted cubic splines are shown in Figure \ref{fig:gasprices-x-correct}.
+%\paragraph{Transformation in $X$}
+Figure \ref{fig:gasprices-x-correct} shows the results from the $X$ transformation applied to the gas prices. The figure on top is a fully corrected version, while the one below only uses $w=0.36$, the midpoint of the range of experimentally determined acceptable values,  for the transformation. At $w=1$, the transformation is severe, but it becomes clear that the variance between 1995 and 2000 is lower than it is between 2009 and 2014. When $w=0.36$, the transformation is much less noticable but yields a near-constant absolute slope of the fitted line.
+%We applied the {\bf $X$ transformation} to the gas prices data  using the unweighted transformation and the transformation with $w=0.36$. This value was chosen as it is approximately the midpoint of the range of acceptable values determined experimentally. The corrected and uncorrected data with fitted cubic splines are shown in Figure \ref{fig:gasprices-x-correct}.
 \begin{figure}[hbtp]
 \centering
 \includegraphics[keepaspectratio=TRUE,width=.95\linewidth]{figure/gas-x-corrected}
-\caption{Gas price data corrected using the $X$ transformation with $w=1$ and with $w=0.36$. At $w=1$, the transformation is severe, but it is clear that the variance is lower between 1995 and 2000 than it is between 2009 and 2014. When $w=0.36$, the transformation is much less noticable but results in a near-constant absolute slope of the fitted line.}
+\caption{Gas price data corrected using the $X$ transformation with $w=1$ and with $w=0.36$. }
 %  The weighted transformation removes the presence of the sine illusion without excessively distorting the underlying function shape.
 \label{fig:gasprices-x-correct}
 \end{figure}
 The minor effect of the weighted transformation on individual x-values contrasts with the effectiveness of the transformation in reducing the illusion; this is best seen in the fitted line, which is distinctly (piecewise) curved in the uncorrected data and appears to be much more piecewise linear in the corrected data, even at the reduced weighted value. 
 % The full, unweighted transformation does distort the $X$ axis such that data collected on monthly intervals no longer appears to be uniformly distributed in $X$. The transformation using $w=0.36$ is more moderate and still largely breaks the illusion, and as such may be preferrable to the full $w=1$ transformation. 
 
-\paragraph{Transformation of $Y$}
-We also applied the Y transformation to the gas prices data using the unweighted transformation and the weighted transformation with $w=0.40$. This value was chosen as it is approximately the midpoint of the range of acceptable values determined experimentally. The corrected and uncorrected data with fitted cubic splines are shown in Figure \ref{fig:gasprices-y-correct}. 
+%\paragraph{Transformation of $Y$}
+Similar to the $X$ transformation, the $Y$ transformation highlights local fluctuation in the variability of daily gas prices much more than the untransformed data. Figure~\ref{fig:gasprices-y-correct} shows $Y$ transformations for the data. Again, we show a full transformation (top) and a transformation based on the midpoint of the previously determined acceptable region of $w=0.40$.
+in the full transformation  it is clear that the variance is nearly constant between 1995 and 2000 and then begins to increase with the price of gas. When $w=0.40$, the transformation is much less noticable, and the resulting $y$-axis scale is much more similar to the uncorrected data. 
+%We also applied the Y transformation to the gas prices data using the full transformation and a weighted transformation with $w=0.40$. %This value was chosen as it is approximately the midpoint of the range of acceptable values determined experimentally. The corrected and uncorrected data with fitted cubic splines are shown in Figure \ref{fig:gasprices-y-correct}. 
 \begin{figure}[hbtp]
 \centering
 \includegraphics[keepaspectratio=TRUE,width=.95\linewidth]{figure/gas-y-corrected}
-\caption{Gas price data corrected using the $Y$ transformation with $w=1$ and with $w=0.40$. At $w=1$, the transformation is severe, but it is clear that the variance is nearly constant between 1995 and 2000 and then begins to increase with the price of gas, becoming much larger between 2010 and 2014. When $w=0.40$, the transformation is much less noticable, and the resulting $y$-axis scale is much more similar to the uncorrected data. }
+\caption{Gas price data corrected using the $Y$ transformation with $w=1$ and with $w=0.40$. }
 \label{fig:gasprices-y-correct}
 \end{figure}
 % The $Y$ transformation does not distort the axes directly as the $X$ transformation does, but it may be more misleading because the $y$ value on the axis is not equivalent to the measured data value, and the same y value at two different points in time may not even correspond to the same measured value. This could make reading numerical values directly from the graph inaccurate. 
