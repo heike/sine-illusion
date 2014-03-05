@@ -425,13 +425,16 @@ p2 <- qplot(x=x, y=y, geom="line", data=dframe, colour=I("grey50")) + theme_bw()
   xlab("") + ylab("")  +
   coord_equal(ratio=2) + scale_colour_manual("",guide="none", values=c("blue", "grey30")) + 
   geom_text(aes(label=paste("theta", "%~~%", round(abs(vangle)/pi*180), "^o", sep=""), 
-                x=pmax(xstart, xend)/2+x/2+.60 , y=y-sign(vangle)*.3+.12), colour="blue",
+                x=pmax(xstart, xend)/2+x/2+.65 + 
+                  c(.35, .35, .15, -.15, .3, .3, .3, .3, .3, .3, 0, -.05, .35, .35, .35) , 
+                y=y-sign(vangle)*.35+.17 + 
+                  c(0, -.05, -.2, .8, -.05, -0.15, -.2, -.2, -.2, -.2, 0, -.4, -.05, -0.01, 0)), colour="blue",
             data=dframe.1, parse=TRUE, hjust=.9, vjust=.5, size=3) + 
   scale_x_continuous(breaks=seq(0, 2*pi, by=pi/2), 
                      labels=c("0", expression(paste(pi,"/2")), expression(pi), 
                               expression(paste("3",pi, "/2")), expression(paste("2",pi)))) +
   scale_linetype_manual("", values=c(1,2), guide="none") + 
-  theme(legend.key.width = unit(3, "line"), plot.margin = unit(c(0,0,0,0), "cm")) 
+  theme(legend.key.width = unit(3, "line"), plot.margin = unit(c(0,0,0,0), "cm"), axis.text.y=element_blank()) 
 
 grid.arrange(p1, p2, widths=c(.9, .5), nrow=1)
 @
