@@ -1592,9 +1592,7 @@ Bootstrap simulations for each of the coefficients suggest that the range of opt
 
 \section{Application: US Gas Prices}
 Figure~\ref{fig:gasprices} shows daily gas prices for a time frame between 1995 to 2014 %We will demonstrate the occurrence of the sine illusion as well as the suggested transformations using data gathered 
-as published in the Energy Information Administration's historical database of gas prices \citep{EIA}. This data includes prices for all three grades of gasoline as well as two chemical formulations which are sold in different geographic areas across the United States \citep[for more information, see ][]{EIA-reformulated}. There is a clear increase in daily gas prices over time 
-%Figure \ref{fig:gasprices} shows the gas prices over the period of interest; there is a clear nonlinear trend to the data, with 
-as well as several dramatic price changes. These developments mask the steady increase in variance shown in Figure~\ref{fig:gasvariance}. Instead, we perceive an increase in variability in the frequent ups and downs along the overall trend. In particular, the strong decrease in gas prices at the end of 2008 seems to be associated with a low variance. This is an effect of the sine illusion, and the actual variability in Oct 2008 is higher than previous months (see figure~\ref{fig:gasvariance}). In order to better judge variability along the trendline we employ the two different approaches. 
+as published in the Energy Information Administration's historical database of gas prices \citep{EIA}. This data includes prices for all three grades of gasoline as well as two chemical formulations which are sold in different geographic areas across the United States \citep[for more information, see ][]{EIA-reformulated}. 
 <<gasprices,echo=FALSE, cache=T, message=F, warning=F>>=
 library(lubridate)
 library(plyr)
@@ -1631,7 +1629,7 @@ gas.full <- gas
 gas <- unique(gas[,c(1,3)])
 @
 \begin{figure}[h!tbp]
-<<gasprices-pictures,echo=F, include=T, fig.width=8, fig.height=2.7, out.width=".98\\textwidth", dependson='gasprices'>>=
+<<gasprices-pictures,echo=F, include=T, fig.width=8, fig.height=2.5, out.width=".98\\textwidth", dependson='gasprices'>>=
 ggplot(data=gasprices)  +
   geom_jitter(aes(decimal_date(date), price), data=subset(gasprices, year>=1995), size=I(1), #size=I(1.5), shape=I(1), 
               colour=I("grey40"), alpha=I(.75))+ 
@@ -1642,14 +1640,16 @@ ggplot(data=gasprices)  +
 \caption{US Gas prices from 1995 to 2014. %The dark trendline fit uses smoothing splines, and provides first and second derivatives necessary for the proposed corrections. 
 Gas prices steadily increase over the time frame, with some dramatic short-term developments. Peaks and troughs seem to exhibit more variability in daily prices than times of dramatic changes. This is an effect of the sine-illusion, which hides a fairly steady increase in variance in daily gas prices over time.}\label{fig:gasprices}
 \end{figure}
-For either of the corrections we use a trendline fit based on smoothing splines, which provides the necessary first and second derivatives.
 \begin{SCfigure}\centering
 \caption{Standard deviation of daily gas prices between 1995 and 2014. The doubling of the standard deviation over the time frame is masked in Figure \ref{fig:gasprices}.\label{fig:gasvariance}}
-<<gaspricevariance,echo=F,include=T, fig.width=6, fig.height=3, out.width=".7\\textwidth", dependson='gasprices'>>=
+<<gaspricevariance,echo=F,include=T, fig.width=6, fig.height=2.5, out.width=".7\\textwidth", dependson='gasprices'>>=
 ggplot( data=subset(monthly, year(month)>=1995) ) + geom_point(aes(month, sd)) + ylab("Standard deviation of daily gas prices")  + xlab("Time")+ theme_bw() + #ggtitle("Standard Deviation of Gas Prices")
   theme(plot.margin=unit(c(0,.5,0,0), "cm")) + geom_smooth(aes(month, sd), method="loess") + ylim(c(0,0.17))
 @
 \end{SCfigure}
+There is a clear increase in daily gas prices over time as well as several dramatic price changes. These developments mask the steady increase in variance shown in Figure~\ref{fig:gasvariance}. Instead, we perceive an increase in variability in the frequent ups and downs along the overall trend. In particular, the strong decrease in gas prices at the end of 2008 seems to be associated with a low variance. This is an effect of the sine illusion, and the actual variability in Oct 2008 is higher than previous months (see figure~\ref{fig:gasvariance}). In order to better judge variability along the trendline we employ the two different approaches. 
+
+For either of the corrections we use a trendline fit based on smoothing splines, which provides the necessary first and second derivatives.
 
 % \begin{figure}\centering
 % <<gaspricesMonthlyRange,echo=F, fig.width=8, fig.height=3, out.width='.95\\textwidth'>>=
@@ -1742,9 +1742,9 @@ ggsave(file="figure/gas-y-corrected.pdf", width=8, height=4)
 %\paragraph{Transformation in $X$}
 Figure \ref{fig:gasprices-x-correct} shows the results from the $X$ transformation applied to the gas prices. The figure on top is a fully corrected version, while the one below only uses $w=0.36$, the midpoint of the range of experimentally determined acceptable values,  for the transformation. At $w=1$, the transformation is severe, but it becomes clear that the variance between 1995 and 2000 is lower than it is between 2009 and 2014. When $w=0.36$, the transformation is much less noticable but yields a near-constant absolute slope of the fitted line.
 %We applied the {\bf $X$ transformation} to the gas prices data  using the unweighted transformation and the transformation with $w=0.36$. This value was chosen as it is approximately the midpoint of the range of acceptable values determined experimentally. The corrected and uncorrected data with fitted cubic splines are shown in Figure \ref{fig:gasprices-x-correct}.
-\begin{figure}[hbtp]
+\begin{figure}[h]
 \centering
-\includegraphics[keepaspectratio=TRUE,width=.95\linewidth]{figure/gas-x-corrected}
+\includegraphics[keepaspectratio=TRUE,width=.92\linewidth]{figure/gas-x-corrected}
 \caption{Gas price data corrected using the $X$ transformation with $w=1$ and with $w=0.36$. }
 %  The weighted transformation removes the presence of the sine illusion without excessively distorting the underlying function shape.
 \label{fig:gasprices-x-correct}
@@ -1756,9 +1756,9 @@ The minor effect of the weighted transformation on individual x-values contrasts
 Similar to the $X$ transformation, the $Y$ transformation highlights local fluctuation in the variability of daily gas prices much more than the untransformed data. Figure~\ref{fig:gasprices-y-correct} shows $Y$ transformations for the data. Again, we show a full transformation (top) and a transformation based on the midpoint of the previously determined acceptable region of $w=0.40$.
 in the full transformation  it is clear that the variance is nearly constant between 1995 and 2000 and then begins to increase with the price of gas. When $w=0.40$, the transformation is much less noticable, and the resulting $y$-axis scale is much more similar to the uncorrected data. 
 %We also applied the Y transformation to the gas prices data using the full transformation and a weighted transformation with $w=0.40$. %This value was chosen as it is approximately the midpoint of the range of acceptable values determined experimentally. The corrected and uncorrected data with fitted cubic splines are shown in Figure \ref{fig:gasprices-y-correct}. 
-\begin{figure}[hbtp]
+\begin{figure}[h]
 \centering
-\includegraphics[keepaspectratio=TRUE,width=.95\linewidth]{figure/gas-y-corrected}
+\includegraphics[keepaspectratio=TRUE,width=.92\linewidth]{figure/gas-y-corrected}
 \caption{Gas price data corrected using the $Y$ transformation with $w=1$ and with $w=0.40$. }
 \label{fig:gasprices-y-correct}
 \end{figure}
