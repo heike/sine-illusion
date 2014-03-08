@@ -666,7 +666,7 @@ The extent  to which we can shrink the adjustment back to the original function 
 ``optimal weighting" for specific situations which minimizes distortion and maximizes the correspondence between inferences made from the data and inferences made using the visual display.
 
 
-Note, that we only make use of the transformation $T$ in the form of $f \circ T$. This allows us to avoid an explicit calculation of the transformation $T$, which in particular  involves a computation of the inverse of $f$ leading to potentially computationally  very intensive solutions. 
+Note, that we only make use of the transformation $T$ in the form of $f \circ T$. This allows us to avoid an explicit calculation of the transformation $T$, which in particular  involves a computation of the inverse of $f$ leading to potentially computation-intense solutions. 
 
 <<xtrans-example, echo=FALSE, include=FALSE, dependson='xtransform', fig.width=6, fig.height=6>>=
 library(locfit)
