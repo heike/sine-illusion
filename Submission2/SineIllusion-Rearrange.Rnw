@@ -711,7 +711,7 @@ qplot(data=datasub, x=TmaxCorrect2, y=Ozone, geom="jitter", colour=I("grey20"), 
 
 In the example of the Ozone data shown in figure \ref{fig:exampleFull1}, we can base a transformation of the $x$-axis on a loess fit of ozone concentration in daily temperature. Loess is particularly convenient for this transformation, as it enforces continuity conditions including differentiability of the fitted function; software allows us to obtain fits of both the function values and their derivatives.
 
-Figure \ref{fig:xtrans-example} shows the original data side-by-side with the transformed $x$-axis.
+Figure \ref{fig:xtrans-example} shows the original data side-by-side with the transformed $x$-axis, demonstrating not only the effect of transformation of the $x$-axis, but also that the transformation is not overly misleading in this example. The granularity of the data in this example provides an implicit measure of the strength of the transformation along the $x$-axis and the transformation is also clearly evident in the labels along the $x$-axis. 
 %
 \begin{figure}[h!]\centering
 \begin{subfigure}[b]{.48\linewidth}\centering
@@ -724,7 +724,7 @@ Figure \ref{fig:xtrans-example} shows the original data side-by-side with the tr
 \end{subfigure}
 \caption{Original data and data after $x$-transformation. The increasing variance is easier to see when $x$ has been transformed, because the slope is now uniform.\label{fig:xtrans-example}}
 \end{figure}
-Figure \ref{fig:xtrans-example} demonstrates not only the effect of transformation of the $x$-axis, but also that the transformation is not particularly misleading in this example.The granularity of the data in this example provides an implicit measure of the strength of the transformation along the $x$-axis and the transformation is also clearly evident in the labels along the $x$-axis. 
+
 
 \subsection{Transformation in $Y$}
 Understanding the geometry of the sine illusion leads to another approach to counteracting  the conflict between the orthogonal width and the vertical length of the segment. 
