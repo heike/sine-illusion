@@ -492,10 +492,8 @@ Each of these ideas is discussed in more detail in this section.
 might result in a description such as `homogeneous variance or slightly increasing variance for  negative $x$, followed by a dramatic decrease in vertical variability for positive $x$'.  
 Once the residuals are separated from the trendline as shown on the right hand side of the figure, it becomes apparent that this first assessment of conditional variability was not correct, and the decreasing variance along the horizontal axis becomes visible.
  
-While the illusion is not apparent when trend line and variability in the  residual structure are shown separately, this separation  %Removing the trend and showing variability separately does largely remove the sine illusion, but it also 
-makes it  more difficult to evaluate the overall  pattern in the data, as we  must base any judgment on two charts; either by combining information from two graphs or by mentally re-composing the original graph (at which point, the sine-illusion becomes a factor). To minimize cognitive demands  we ideally want to tell the whole story with a single graph. 
-%Removing the trend in the example is also relatively simple, it is much harder to create a de-trended  version of Figure \ref{fig:playfair-debt} that allows for an easy and accurate assessment of  both the trend and a change in the size of the trade imbalance over time. 
-
+While the illusion is not apparent when trend line and variability in the  residual structure are shown separately, the separation 
+makes it  more difficult to evaluate the overall  pattern in the data, as we  must base any judgment on two charts; either by combining information from two graphs or by mentally re-composing the original graph (at which point, the sine illusion becomes a factor). To minimize cognitive demands we ideally want to tell the whole story with a single graph, in particular because in many situations we may not be able to show multiple graphs. 
 
 <<cleveland, echo=FALSE, fig.width=6, fig.height=6, include=FALSE>>=
 f <- function(x) -x^2
