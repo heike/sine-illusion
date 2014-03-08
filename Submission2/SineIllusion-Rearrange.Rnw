@@ -710,7 +710,7 @@ qplot(data=datasub, x=TmaxCorrect2, y=Ozone, geom="jitter", colour=I("grey20"), 
 @
 
 In the example of the Ozone data shown in figure \ref{fig:exampleFull1}, we can base a transformation of the $x$-axis on a loess fit of ozone concentration in daily temperature. Loess is particularly convenient for this transformation, as it enforces continuity conditions including differentiability of the fitted function; software allows us to obtain fits of both the function values and their derivatives.
-%the fitted $f^\prime(x)$ as well as $f(x)$. 
+
 Figure \ref{fig:xtrans-example} shows the original data side-by-side with the transformed $x$-axis.
 %
 \begin{figure}[h!]\centering
