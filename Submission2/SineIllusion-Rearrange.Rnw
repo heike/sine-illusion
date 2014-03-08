@@ -1625,7 +1625,7 @@ ggplot( data=subset(monthly, year(month)>=1995) ) + geom_point(aes(month, sd)) +
   theme(plot.margin=unit(c(0,.5,0,0), "cm")) + geom_smooth(aes(month, sd), method="loess") + ylim(c(0,0.17))
 @
 \end{SCfigure}
-There is a clear increase in daily gas prices over time as well as several dramatic price changes. These developments mask the steady increase in variance shown in figure~\ref{fig:gasvariance}. Instead, we perceive an increase in variability in the frequent ups and downs along the overall trend. In particular, the strong decrease in gas prices at the end of 2008 seems to be associated with a low variance. This is an effect of the sine illusion, and the actual variability in Oct 2008 is higher than previous months (see figure~\ref{fig:gasvariance}). In order to better judge variability along the trendline we employ the two different approaches. 
+There is a clear increase in daily gas prices over time as well as several dramatic price changes. These developments mask the steady increase in variance shown in figure~\ref{fig:gasvariance}. Instead, we perceive an increase in variability in the frequent ups and downs along the overall trend. In particular, the strong decrease in gas prices at the end of 2008 seems to be associated with a low variance. This is an effect of the sine illusion, and the actual variability in Oct 2008 is higher than previous months. In order to better judge variability along the trendline we applied the two different corrections to this data. 
 
 For either of the corrections we use a trendline fit based on smoothing splines, which provides the necessary first and second derivatives.
 
