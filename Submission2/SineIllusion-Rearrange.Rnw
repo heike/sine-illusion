@@ -543,14 +543,14 @@ y = f(x) + \varepsilon,
 \]
 where $f$ is some underlying function (either previously known or based on a model fit). Further let us assume that  $f$ is differentiable over the region of observed data.
 
-Ideally, the correction would force all lines to appear under the same slope, i.e.~we want to find a transformation $T(x)$ of $x$, such that $f(T(x))$ is a  piece-wise linear function, where each piece has the same absolute slope. 
+Ideally, the correction would force all lines to appear under the same slope, i.e.~we want to find a transformation $T(x)$ of $x$, such that $f(T(x))$ is a  piece-wise linear function, where each piece has the same absolute slope. This transformation has an effect similar to ``banking to 45$^\circ$" in a piecewise manner. 
 
 Let $a$ and $b$ be the minimum and maximum of the $x$-range under consideration. Then for any value $x \in (a,b)$ the following transformation results in a function with constant absolute slope (see appendix~\ref{app.xtrans} for a derivation of the equation):
 \begin{equation}\label{eqn.xtrans}
 (f \circ T)(x) = a + (b-a)\left(\int_{a}^x |f^\prime(z)| dz\right)/\left(\int_{a}^{b}|f^\prime(z)| dz\right),
 \end{equation}
- As the sine illusion depends on changing slope in the overall trend,  re-parametrizing the $x$-axis in terms of the slope will make the data  appear under a  constant slope, thereby removing the effect of the illusion, while the transformed $x$-axis is changed from a linear representation of the $x$ values to a `warped' axis that is continuously sped up or lowed down to make up for the changes in the slope. This transformation has an effect similar to ``banking to 45$^\circ$" in a piecewise manner. 
- To emphasize this change in speed along the $x$ axis,  dots are drawn at  the bottom of the chart  to show the transformation's effect on equally spaced points along the $x$-axis.   
+ As the sine illusion depends on changing slope in the overall trend,  re-parametrizing the $x$-axis in terms of the slope will make the data  appear under a  constant slope, thereby removing the effect of the illusion, while the transformed $x$-axis is changed from a linear representation of the $x$ values to a `warped' axis that is continuously sped up or lowed down to make up for the changes in the slope.
+ To emphasize this change in scale along the $x$ axis,  dots are drawn at  the bottom of the chart  to show the transformation's effect on equally spaced points along the $x$-axis.   
 
 Results from this transformation are demonstrated in Figure \ref{fig:xtrans1}.
 %In panel (a),  the $x$-spacing of the lines is transformed according to eqn~(\ref{eqn.xtrans}) and mitigates the sine illusion by changing the extant width such that the absolute value of the slope is uniform across the whole range of the $x$ axis.
