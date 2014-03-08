@@ -1619,7 +1619,7 @@ ggplot(data=gasprices)  +
 Gas prices steadily increase over the time frame, with some dramatic short-term developments. Peaks and troughs seem to exhibit more variability in daily prices than times of dramatic changes. This is an effect of the sine-illusion, which hides a fairly steady increase in variance in daily gas prices over time.}\label{fig:gasprices}
 \end{figure}
 \begin{SCfigure}\centering
-\caption{Standard deviation of daily gas prices between 1995 and 2014. The doubling of the standard deviation over the time frame is masked in Figure \ref{fig:gasprices}.\label{fig:gasvariance}}
+\caption{Standard deviation of daily gas prices between 1995 and 2014. The doubling of the standard deviation over the time frame is masked in figure \ref{fig:gasprices}.\label{fig:gasvariance}}
 <<gaspricevariance,echo=F,include=T, fig.width=6, fig.height=2.5, out.width=".7\\textwidth", dependson='gasprices'>>=
 ggplot( data=subset(monthly, year(month)>=1995) ) + geom_point(aes(month, sd)) + ylab("Standard deviation of daily gas prices")  + xlab("Time")+ theme_bw() + #ggtitle("Standard Deviation of Gas Prices")
   theme(plot.margin=unit(c(0,.5,0,0), "cm")) + geom_smooth(aes(month, sd), method="loess") + ylim(c(0,0.17))
