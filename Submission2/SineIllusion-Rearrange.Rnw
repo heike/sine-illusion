@@ -543,7 +543,7 @@ y = f(x) + \varepsilon,
 \]
 where $f$ is some underlying function (either previously known or based on a model fit). Further let us assume that  $f$ is differentiable over the region of observed data.
 
-The idea of correcting for the illusion is to make all lines appear under the same slope, i.e.~we want to find a transformation $T(x)$ of $x$, such that $f(T(x))$ is a  piece-wise linear function, where each piece has the same absolute slope. 
+Ideally, the correction would force all lines to appear under the same slope, i.e.~we want to find a transformation $T(x)$ of $x$, such that $f(T(x))$ is a  piece-wise linear function, where each piece has the same absolute slope. 
 
 Let $a$ and $b$ be the minimum and maximum of the $x$-range under consideration. Then for any value $x \in (a,b)$ the following transformation results in a function with constant absolute slope (see appendix~\ref{app.xtrans} for a derivation of the equation):
 \begin{equation}\label{eqn.xtrans}
