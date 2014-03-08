@@ -1176,7 +1176,7 @@ We decided to  have a higher coverage density for starting weights around 0.6 af
 
 %\done{What is the actual range of $c$ used in the analysis of the data? I thought you had cut it back to weights between 0 and 1. If that is the case the discussion here should reflect that.}
 
-\begin{figure}[h]\centering
+\begin{figure}[ht]\centering
 \includegraphics[keepaspectratio=TRUE,width=0.8\linewidth]{figure/fig-study-weight-dist}
 \caption{Overview of possible starting weights. Weight values are discrete, but staggered so as to provide fine-grained adjustments around 0.6 and more coarse discriminatory information toward the outside.}\label{fig:weightdist}
 \end{figure}
@@ -1720,7 +1720,7 @@ ggsave(file="figure/gas-y-corrected.pdf", width=8, height=4)
 %\paragraph{Transformation in $X$}
 Figure \ref{fig:gasprices-x-correct} shows the results from the $X$ transformation applied to the gas prices. The figure on top is a fully corrected version, while the one below only uses $w=0.36$, the midpoint of the range of experimentally determined acceptable values,  for the transformation. At $w=1$, the transformation is severe, but it becomes clear that the variance between 1995 and 2000 is lower than it is between 2009 and 2014. When $w=0.36$, the transformation is much less noticable but yields a near-constant absolute slope of the fitted line.
 %We applied the {\bf $X$ transformation} to the gas prices data  using the unweighted transformation and the transformation with $w=0.36$. This value was chosen as it is approximately the midpoint of the range of acceptable values determined experimentally. The corrected and uncorrected data with fitted cubic splines are shown in Figure \ref{fig:gasprices-x-correct}.
-\begin{figure}[h]
+\begin{figure}[ht]
 \centering
 \includegraphics[keepaspectratio=TRUE,width=.92\linewidth]{figure/gas-x-corrected}
 \caption{Gas price data corrected using the $X$ transformation with $w=1$ and with $w=0.36$. }
