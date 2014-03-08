@@ -344,7 +344,7 @@ Considering only two line segments at a time resolves the illusion. The bold lin
 \paragraph{Geometry of the Illusion}\hfill\newline
 %We have previously alluded to the fact that the sine illusion depends on the change in the slope of the underlying function; what follows is a geometric explanation of why this occurs. 
 %Our perceptual system is particularly well optimized for three dimensions; in figure~\ref{fig:original}  this leads us to perceive the  shortest line between the top and bottom curves as the distance between the curves, i.e. the {\it orthogonal} width,  rather than the vertical distance. 
-In Figure~\ref{fig:original} we have seen that the our preference in evaluating line width is to assess {\it orthogonal} width rather than the difference along the vertical axis. 
+In figure~\ref{fig:original} we have seen that the our preference in evaluating line width is to assess {\it orthogonal} width rather than the difference along the vertical axis. 
 Figure~\ref{fig:OrthogonalWidth} demonstrates the change in orthogonal width as the slope of the line tangent to the graph of $f$ changes; these changes correspond to our perception of apparent line length. 
 <<transform-illustration,echo=FALSE, message=FALSE, warning=FALSE, include=FALSE, fig.width=8.5, fig.height=5>>=
 f <- function(x) 2*sin(x)
