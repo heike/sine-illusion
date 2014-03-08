@@ -475,7 +475,7 @@ What follows is a compilation of several approaches to correct for or mitigate t
 % do not change this to its'
 
 \section{Breaking the Illusion}
-The linewidth  illusion is caused by a conflict between vertical width, which is the width that we want onlookers to assess visually, and orthogonal width, which is the width that the onlooker perceives. This difference can be expressed as a function in the slope of the underlying trend line. This provides the basis for adjusting the vertical width for the perceived orthogonal width. 
+The sine  illusion is caused by a conflict between vertical width, which is the width that we want onlookers to assess visually, and orthogonal width, which is the width that the onlooker perceives. This difference can be expressed as a function in the slope of the underlying trend line. This provides the basis for adjusting the vertical width for the perceived orthogonal width. 
 
 We consider the following three approaches:  
 \begin{enumerate}
