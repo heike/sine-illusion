@@ -476,7 +476,7 @@ In this  case it may be  possible to correct the graphical display for the illus
 Simply raising people's awareness of the presence of this illusion is not enough,
 as it is incredibly difficult, if not impossible, to overcome this illusion even when we are aware of its presence: our brains simply cannot ``un-see" it. 
 
-What follows is a compilation of several approaches to correct for or mitigate the effect of the illusion. Our primary intention here id to demonstrate the persaviness of the illusion is and the extreme measures necessary to remove its effect. 
+What follows is a compilation of several approaches to correct for or mitigate the effect of the illusion. Our primary intention here is to demonstrate the persaviness of the illusion is and the extreme measures necessary to remove its effect. 
 % do not change this to its'
 
 \section{Breaking the Illusion}
