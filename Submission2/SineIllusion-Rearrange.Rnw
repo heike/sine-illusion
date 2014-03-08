@@ -535,9 +535,7 @@ p
 Additionally, removing the trend requires an initial model, making any plots produced using that fit conditional on the assumptions necessary to obtain that model fit. In many situations, this may be undesireable. In particular, we typically view the data before fitting even a rudimentary model, and the sine illusion may influence even these initial modeling decisions.
 
 \subsection{Transformation of the $X$-Axis}
-As the sine illusion is driven by the changes in the slope of trends between variables, we can counteract the illusion by removing these changes by transforming the $x$ axis such that the absolute value of the slope is constant. 
-
-This  forces the corresponding orthogonal width to  represent the conditional variability.
+As the sine illusion is driven by changes in the slope of trends between variables, we can counteract the illusion by removing these changes, transforming the $x$ axis such that the absolute value of the slope is constant and forcing the corresponding orthogonal width to represent the conditional variability.
 In order to describe this transformation of the $x$ axis mathematically, 
 let us assume that the relationship between variables $X$ and $Y$ is given by a  model of the form 
 \[
