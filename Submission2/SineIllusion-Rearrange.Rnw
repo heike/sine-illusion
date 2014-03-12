@@ -76,8 +76,8 @@ Graphics are powerful tools for summarizing large or complex data, but they rely
 #source("./data/NewOzoneData.R")
 datasub <- read.csv("data/Ozone-subset.csv")
 nsite <- length(unique(datasub$SiteID))
-qplot(data=datasub, x=jitter(Tmax), y=Ozone, geom="point", colour=I("grey30"), alpha=I(.5), xlab="Temperature (F)", ylab="8-hour Average Ozone Concentration (ppm)") + geom_line(aes(x=Tmax, y=fit), size=1.25, colour="steelblue") + theme_bw()
-qplot(data=datasub, x=jitter(Tmax), y=resid, geom="point", colour=I("grey20"), alpha=I(.5), xlab="Temperature (F)", ylab="Residual Ozone Concentration (ppm)") + geom_line(aes(x=Tmax, y=0*resid), size=1.25, colour="steelblue") + theme_bw()
+qplot(data=datasub, x=jitter(Tmax), y=Ozone, geom="point", shape=I(1), colour=I("grey40"), alpha=I(.5), xlab="Temperature (F)", ylab="8-hour Average Ozone Concentration (ppm)") + geom_line(aes(x=Tmax, y=fit), size=1.25, colour="black") + theme_bw()
+qplot(data=datasub, x=jitter(Tmax), y=resid, geom="point", shape=I(1), colour=I("grey40"), alpha=I(.5), xlab="Temperature (F)", ylab="Residual Ozone Concentration (ppm)") + geom_line(aes(x=Tmax, y=0*resid), size=1.25, colour="black") + theme_bw()
 @
 
 \begin{figure}[h!tbp]\centering
