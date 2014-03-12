@@ -17,7 +17,8 @@
 \usepackage{sidecap}
 \usepackage{multirow}
 \usepackage{bbm}
-
+\usepackage{setspace}
+\doublespacing
 % test change
 % help with editing and coauthoring
 \usepackage[colorinlistoftodos]{todonotes}
