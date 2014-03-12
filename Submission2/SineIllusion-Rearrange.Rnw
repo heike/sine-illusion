@@ -694,11 +694,11 @@ nsite <- length(unique(datasub$SiteID))
 
 qplot(data=datasub, x=Tmax, y=Ozone, geom="jitter", shape=I(1), colour=I("grey40"), alpha=I(.5), 
       xlab="Temperature (F)", ylab="8-hour Average Ozone Concentration (ppm)") + 
-  geom_line(aes(x=Tmax, y=fit), size=1.25, colour="steelblue") + theme_bw()+ 
+  geom_line(aes(x=Tmax, y=fit), size=1.25, colour="black") + theme_bw()+ 
   geom_point(data=dots, aes(x=Tmax))
 qplot(data=datasub, x=TmaxCorrect, y=Ozone, geom="jitter", shape=I(1), colour=I("grey40"), alpha=I(.5), 
       xlab="Temperature (F)", ylab="8-hour Average Ozone Concentration (ppm)") + 
-  geom_line(aes(x=TmaxCorrect, y=fit), size=1.25, colour="steelblue") + theme_bw() + 
+  geom_line(aes(x=TmaxCorrect, y=fit), size=1.25, colour="black") + theme_bw() + 
   geom_point(data=dots) + 
   scale_x_continuous(breaks=breaks$breaks1, minor_breaks=dots$TmaxCorrect, labels=breaks$labels) 
 qplot(data=datasub, x=TmaxCorrect2, y=Ozone, geom="jitter", colour=I("grey20"), alpha=I(.5), 
