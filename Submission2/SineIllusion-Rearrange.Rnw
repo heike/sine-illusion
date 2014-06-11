@@ -337,8 +337,7 @@ Further complicating the situation, the illusion itself is insidious -- we trust
 
 The contextual cues of the overall trend are critical to the sine illusion's effect;  the illusion  only  holds when a substantial portion of the graph is considered simultaneously, which triggers our innate ability of perceiving one whole rather than the individual parts it consists of \citep[principle of grouping; ][]{wolfe2012sensation}.
 %without regard to the perceptual mechanisms at play. 
-Considering only two line segments at a time resolves the illusion. The bold lines in figure~\ref{fig:original-grid} are clearly of the same length.  Comparisons of individual line lengths is visually a fairly simple task, and is done with a relatively high accuracy \citep{cleveland:1984}. 
-\citet{day:1991} contains a more thorough discussion of how much surrounding context is required for the illusion to persist. 
+Considering only two line segments at a time resolves the illusion. The bold lines in figure~\ref{fig:original-grid} are clearly of the same length.  Comparisons of individual line lengths is visually a fairly simple task, and is done with a relatively high accuracy \citep{cleveland:1984}. \citet{day:1991} contains a more thorough discussion of how much surrounding context is required for the illusion to persist. 
 %The illusion arises when sufficient context is available to induce an ambiguously three-dimensional figure.
 
 %\FloatBarrier
@@ -437,9 +436,10 @@ p2 <- qplot(x=x, y=y, geom="line", data=dframe, colour=I("grey50")) + theme_bw()
 grid.arrange(p1, p2, widths=c(.9, .5), nrow=1)
 @
 \begin{figure}[h!tbp]
-\includegraphics[width=.9\linewidth, keepaspectratio=TRUE]{fig-transform-illustration}
+\includegraphics[width=.8\linewidth, keepaspectratio=TRUE]{fig-transform-illustration}
 \centering
-\caption{\label{fig:OrthogonalWidth} The sine illusion with lines orthogonal to the tangent line at $f(x)$. The perception that the vertical length changes with $f(x)$ corresponds to changes in actual orthogonal width due to the change in the visual (plotted) secant angle. The strength of the perceptual effect depends in part on the aspect ratio of the graph, as shown in the second image, which has an aspect ratio of 2 compared to the first figure's aspect ratio of 1. This correspondingly multiplies the strength of the effect by 2. 
+\caption{\label{fig:OrthogonalWidth} The sine illusion with lines orthogonal to the tangent line at $f(x)$. The perception that the vertical length changes with $f(x)$ corresponds to changes in actual orthogonal width due to the change in the visual (plotted) secant angle. The strength of the perceptual effect depends in part on the aspect ratio of the graph, as shown in the second image.
+%, which has an aspect ratio of 2 compared to the first figure's aspect ratio of 1. This correspondingly multiplies the strength of the effect by 2. 
 }
 \end{figure}
 %Secants and vertical lines are both shown  in figure~\ref{fig:OrthogonalWidth}. 
@@ -470,9 +470,7 @@ qplot(data=ribbon, x=x, ymin=ybottom, ymax=ytop, geom="ribbon", fill=I("grey")) 
 Our preference for assessing figure width based on the orthogonal width suggests that the underlying illusion may be a function of geometry rather than some unknown visual or neural process that occurs subconsciously. In this  case it may be  possible to correct the graphical display for the illusion to minimize its misleading effect. A geometrical correction that  --at least temporarily-- counteracts the illusion would be a valuable tool in visual analysis, as this illusion very persistently affects our judgment of very common tasks  such as e.g.~the assessment of conditional variability of data along a trend line.
 
 Simply raising people's awareness of the presence of this illusion is not enough,
-as it is incredibly difficult, if not impossible, to overcome this illusion even when we are aware of its presence: our brains simply cannot ``un-see" it. 
-
-What follows is a compilation of several approaches to correct for or mitigate the effect of the illusion. Our primary intention here is to demonstrate the pervasiveness of the illusion is and the extreme measures necessary to remove its effect. 
+as it is incredibly difficult, if not impossible, to overcome this illusion even when we are aware of its presence: our brains simply cannot ``un-see" it. What follows is a compilation of several approaches to correct for or mitigate the effect of the illusion. Our primary intention here is to demonstrate the pervasiveness of the illusion is and the extreme measures necessary to remove its effect. 
 % do not change this to its'
 
 \section{Breaking the Illusion}
