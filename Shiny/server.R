@@ -7,7 +7,7 @@ source("./functions.R")
 shinyServer(function(input, output) {
   suppressMessages(library(ggplot2))
   
-  output$illusion <- reactivePlot(function() {
+  output$illusion <- renderPlot({
     f <- function(x) input$amp*sin(x)
     fprime <- function(x) input$amp*cos(x)
     f2prime <- function(x) -input$amp*sin(x)
@@ -26,7 +26,7 @@ shinyServer(function(input, output) {
     print(p1)
   })
   
-  output$xcorrect <- reactivePlot(function() {
+  output$xcorrect <- renderPlot({
     f <- function(x) input$amp*sin(x)
     fprime <- function(x) input$amp*cos(x)
     f2prime <- function(x) -input$amp*sin(x)
@@ -53,7 +53,7 @@ shinyServer(function(input, output) {
     print(p1)
   })
   
-  output$ycorrect <- reactivePlot(function() {
+  output$ycorrect <- renderPlot({
     f <- function(x) input$amp*sin(x)
     fprime <- function(x) input$amp*cos(x)
     f2prime <- function(x) -input$amp*sin(x)
