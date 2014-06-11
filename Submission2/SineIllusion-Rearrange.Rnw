@@ -757,14 +757,11 @@ The function describing the orthogonal line through $(x_o, f(x_o))$ is given in 
 {x_o \choose f(x_o)} + \lambda {f^\prime(x_o) \choose 1}, 
 \]
 for any real-valued $\lambda$.
-The advantage of using point vector form is that it allows us to solve for parameter $\lambda$ easily, which gives us easy access to the extant (half-)widths,  as: 
-\begin{equation}\label{eqn.halfwidth}
-|\lambda| \sqrt{1 + f^\prime(x_o)^2}.
-\end{equation}
-Eqn. (\ref{eqn.halfwidth}) describes the quantity that we perceive rather than the quantity that we want to display ($\ell/2$), which leads us to a general expression of the correction factor as
-\begin{eqnarray*}
- \ell/2 \cdot \left(|\lambda| \sqrt{1 + f^\prime(x_o)^2}\right)^{-1}.
-\end{eqnarray*}
+The advantage of using point vector form is that it allows us to solve for parameter $\lambda$ easily, which gives us easy access to the extant (half-)widths as
+${|\lambda| \sqrt{1 + f^\prime(x_o)^2}}$. This expression describes the quantity that we perceive rather than the quantity that we want to display ($\ell/2$), which leads us to a general correction factor of
+$
+ {\ell/2 \cdot \left(|\lambda| \sqrt{1 + f^\prime(x_o)^2}\right)^{-1}}
+$.
 Note that this yields in general two solutions: one for positive, one for negative values of $\lambda$ corresponding to upper and lower (half-)extant width.
 
 In order to get  actual numeric values for $\lambda$, we need to find end points of the extant line width as solutions of intersecting the orthogonal line and  the graphs of $f_1$ and $f_2$. We find these end points  as solutions in $x$ and $\lambda$ of the system of equations:
@@ -929,12 +926,12 @@ qplot(data=df.real, x=x, y=y, geom="line") +
 
 \paragraph{Linear Approximation to $f(x)$}\hfill\newline
 For the linear approximation we make use of $f(x) \approx f(x_0) + (x - x_0) f^\prime(x_0)$, which together with  equations~\ref{eqn.general} and \ref{eqn.general.2} yields a correction factor in $x_0$ of
-\[
+$
 \ell_{\text{new}}(x_0) = \ell_{\text{old}} \sqrt{1 +  f^\prime(x_0)^2}.
-\]
+$
 % A comparison of the sketches for the linear approach (in Fig. \ref{fig:linear-GeneralCorrection}) and the trigonometric approach (in Fig. \ref{fig:trig}) shows that they are the same. They do, indeed, lead to the same correction factor.
 % 
-Note that the linear method gives the same result as a varying slope extension from a trigonometric approach  suggested by \citet{schonlau:2003} and used in \citet{marie:2013}
+Note that the linear method gives the same result as a varying slope extension from a trigonometric approach  suggested by \citet{schonlau:2003} and used in \citet{marie:2013}.
 %Previous work in \citet{schonlau:2003, marie:2013} used the adjustment in eqn.~(\ref{eqn.adjust}) for a line with constant slope. We have to extend this approach to a functional form with varying slope. This is the approach taken in the next sections.
 
 %The asymmetric nature of the distortion suggests that we may want to use 
