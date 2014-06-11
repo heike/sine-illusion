@@ -291,15 +291,15 @@ persp(x, z, data.persp,  xlab="", ylab="", zlab="", theta=0, phi=45, border="bla
 persp(x, z, data.persp,  xlab="", ylab="", zlab="", theta=0, phi=45, border="black", shade=.35, col="white", xlim=c(-pi/12, 2*pi+pi/12), ylim=c(-1.75, 1.75), scale=FALSE, box=FALSE, expand=3/pi, d=50) # , ltheta=0, lphi=-15
 
 @
-\begin{subfigure}[t]{.49\linewidth}\centering
-\includegraphics[width=\linewidth, keepaspectratio=TRUE, trim=0in 1.5in 0in 1.5in]{figure/fig-ribbon-illusion1}
+\begin{subfigure}[t]{.45\linewidth}\centering
+\includegraphics[width=3in, keepaspectratio=TRUE, trim=0in 1.75in 0in 1.75in]{figure/fig-ribbon-illusion1}
 \caption{Perspective plot of sine illusion\label{ribbon1}}
 \end{subfigure}
-\begin{subfigure}[t]{.49\linewidth}\centering
-\includegraphics[width=\linewidth, keepaspectratio=TRUE, trim=0in 1.5in 0in 1.5in]{figure/fig-ribbon-illusion2}
+\begin{subfigure}[t]{.54\linewidth}\centering
+\includegraphics[width=3in, keepaspectratio=TRUE, trim=0in 1.75in 0in 1.75in]{figure/fig-ribbon-illusion2}
 \caption{Perspective plot, vanishing point near infinity.\label{ribbon2}}
 \end{subfigure}
-\caption{Two different perspective projections of the same data responsible for the sine illusion. The first projection angles the lines and appears more natural, but the second projection suggests that the lines do not need to be angled to create the same three-dimensional impression.\label{ribbon}}
+\caption{Two different perspective projections of the same data responsible for the sine illusion. The first projection angles the lines and appears more natural, but the second projection suggests that the lines do not need to be angled to create the same 3d impression.\label{ribbon}}
 \end{figure}
 
 
