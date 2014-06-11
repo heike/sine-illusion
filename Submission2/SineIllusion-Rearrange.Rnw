@@ -1124,11 +1124,9 @@ Similar to the correction of the $x$-axis,  we can use a weighted approach to fi
 
 \section{Transformations in Practice -- a User Study}
 
-In order to more fully understand the sine illusion and test the proposed corrections, we created an applet to allow users to investigate the illusion's prominence with respect to its parameters. Users can examine the sine illusion by changing line length, the function's amplitude, and compare corrections in $x$-axis and $y$-values to uncorrected data.  All corrections proposed in this paper are  implemented in the applet located at \url{http://glimmer.rstudio.com/srvanderplas/SineIllusion/}.
+In order to more fully understand the sine illusion and test the proposed corrections, we created an applet to allow users to investigate the illusion's prominence with respect to its parameters. Users can examine the sine illusion by changing line length, the function's amplitude, and compare corrections in $x$-axis and $y$-values to uncorrected data.  All corrections proposed in this paper are implemented in a Shiny applet \citep{shiny} located at \url{http://bit.ly/1ldgujL}.
 
-We employed a second applet to collect data on users' preferences on the amount of correction used, i.e.~we are interested in identifying a range of `optimal weights' in each of the corrections. This applet presents users with a graph that is the result of a correction in $x$ or $y$ with a randomly selected starting weight value. Users are asked to adjust the graph until the illusion  (a) is no longer apparent (adjustment of weights from the bottom) or (b) becomes visible (adjustments of weights from the top).
-
-Both applets are implemented in {\tt shiny} \citep{shiny}. 
+We employed a second Shiny applet to collect data on users' preferences on the amount of correction used, i.e.~we are interested in identifying a range of `optimal weights' in each of the corrections. This applet presents users with a graph that is the result of a correction in $x$ or $y$ with a randomly selected starting weight value. Users are asked to adjust the graph until the illusion  (a) is no longer apparent (adjustment of weights from the bottom) or (b) becomes visible (adjustments of weights from the top).
 
 The graphs in the data-collection applet are adjusted using a plus/minus button to either increase or decrease the amount of correction used. Underlying this adjustment is the value of the weight $w$ as defined in eqns.~(\ref{eqn.xtrans.weighted}) and~(\ref{eqn.ytrans.weighted}). The numerical value of $w$ was hidden from the user to prevent anchoring to a specific numerical value.
 
@@ -1147,7 +1145,7 @@ It is of additional interest to determine whether and how much these optimal wei
 % 
 % Figure~\ref{fig:shiny.app} shows a screenshot of the applet used to collect user data. 
 
-This applet used to collect user data is  available online at \url{http://glimmer.rstudio.com/srvanderplas/SineIllusionShiny/}. Line length and function are controlled in this app, and we used the linear transformation for adjusting $y$ values; the transformation does not break under any combination of parameters tested in this experiment. 
+This applet used to collect user data is  available online at \url{http://bit.ly/SzDnTc}. Users control line length and function, and we used the linear transformation for adjusting $y$ values; the transformation does not break under any combination of parameters tested in this experiment. 
 
 
 \noindent
