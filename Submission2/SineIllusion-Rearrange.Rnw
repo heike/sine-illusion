@@ -167,67 +167,68 @@ dev.off()
 \includegraphics[keepaspectratio=true, width=.3\linewidth]{figure/fig-original}
 \end{SCfigure}
 %The first documentation we could find of this illusion,
-More recently the illusion has been shown in non-sinusoidal curves \citep{cleveland:1984, schonlau:2003, robbins:2005, marie:2013}, but the underlying effect seems to be the same, in the sense that the illusion is not triggered by the periodic nature of the underlying trend line but only by  changes to its slope. Figure \ref{fig:twoillusions-simulation} shows three panels, which all exhibit the illusion. From left to right, the trend stems from (a) a periodic function, (b) a periodic component added to an exponential function, and (c) an exponential function on its own.
-While all three graphs seem to show non-constant variance along the main trend; in reality, it is constant. Clearly, the illusion does not rely on the periodicity of the function for which it was named, but is a symptom of the change in curvature that comes with the periodicity.
-%, instead the ``line width illusion" and the ``sine illusion" are symptoms of the same phenomenon, even though the cognitive literature and the graphics literature refer to the illusion differently. 
+More recently the illusion has been shown in non-sinusoidal curves \citep{cleveland:1984, schonlau:2003, robbins:2005, marie:2013}, but the underlying effect seems to be the same, in the sense that the illusion is not triggered by the periodic nature of the underlying trend line but only by  changes to its slope. 
 
+% Figure \ref{fig:twoillusions-simulation} shows three panels, which all exhibit the illusion. From left to right, the trend stems from (a) a periodic function, (b) a periodic component added to an exponential function, and (c) an exponential function on its own.
+% While all three graphs seem to show non-constant variance along the main trend; in reality, it is constant. Clearly, the illusion does not rely on the periodicity of the function for which it was named, but is a symptom of the change in curvature that comes with the periodicity.
+% %, instead the ``line width illusion" and the ``sine illusion" are symptoms of the same phenomenon, even though the cognitive literature and the graphics literature refer to the illusion differently. 
+% 
+% 
+% <<simulation1Sine, echo=FALSE, fig.width=4, fig.height=4, include=FALSE>>=
+% alph <- .25
+% x <- rep(seq(0,2*pi*2, length=120), each=50)
+% y <- rnorm(n=length(x), mean=sin(x), sd=0.2)
+% qplot(x,y, geom="jitter", alpha=I(alph))+ 
+%   geom_line(y=0*x) + 
+%   scale_x_continuous(breaks=seq(0, 4*pi, by=pi), 
+%                      labels=c("0", expression(paste(pi)), 
+%                               expression(paste("2", pi)), 
+%                               expression(paste("3", pi)), 
+%                               expression(paste("4", pi)))) +
+%   theme_bw()
+% #x <- rep(seq(0,2*pi*2, length=120), each=100)
+% y <- rnorm(n=length(x), mean=1/10*(-x+pi)^2+sin(x), sd=0.2)
+% qplot(x,y, geom="jitter", alpha=I(alph))+ 
+%   geom_line(y=1/10*(-x+pi)^2) + 
+%   scale_x_continuous(breaks=seq(0, 4*pi, by=pi), 
+%                      labels=c("0", expression(paste(pi)), 
+%                               expression(paste("2", pi)), 
+%                               expression(paste("3", pi)), 
+%                               expression(paste("4", pi)))) +
+%   theme_bw()
+% #x <- rep(seq(0,2*pi*2, length=120), each=100)
+% y <- rnorm(n=length(x), mean=1/10*(-x+pi)^2, sd=0.2)
+% qplot(x,y, geom="jitter", alpha=I(alph))+ 
+%   geom_line(y=1/10*(-x+pi)^2) + 
+%   scale_x_continuous(breaks=seq(0, 4*pi, by=pi), 
+%                      labels=c("0", expression(paste(pi)), 
+%                               expression(paste("2", pi)), 
+%                               expression(paste("3", pi)), 
+%                               expression(paste("4", pi)))) +
+%   theme_bw()
+% @
+% \begin{figure}[h!tbp]\centering
+% \begin{subfigure}[b]{.31\linewidth}
+%   \centering
+%   \includegraphics[keepaspectratio=TRUE,width=\linewidth]{figure/fig-simulation1Sine1}
+%   \caption{\small Seasonality, No Trend}
+%   \label{simulation1}
+% \end{subfigure}
+% \begin{subfigure}[b]{.31\linewidth}\centering
+%   \includegraphics[keepaspectratio=TRUE,width=\linewidth]{figure/fig-simulation1Sine2}
+%   \caption{\small Seasonality and Trend}
+%   \label{simulation2}
+% \end{subfigure}
+% \begin{subfigure}[b]{.31\linewidth}\centering
+%   \includegraphics[keepaspectratio=TRUE,width=\linewidth]{figure/fig-simulation1Sine3}
+%   \caption{\small Trend, No Seasonality}
+%   \label{simulation3}
+% \end{subfigure}
+% \caption{Set of three scatterplots of simulated data with constant variance. Plot (a) shows seasonality without any underlying trend, (b) shows seasonality superimposed on a quadratic trend, and (c) shows a quadratic trend without seasonality. Though all three sets of simulated data have constant variance, none of the variances appear constant due to the sine illusion.}\label{fig:twoillusions-simulation}
+% \end{figure}
 
-<<simulation1Sine, echo=FALSE, fig.width=4, fig.height=4, include=FALSE>>=
-alph <- .25
-x <- rep(seq(0,2*pi*2, length=120), each=50)
-y <- rnorm(n=length(x), mean=sin(x), sd=0.2)
-qplot(x,y, geom="jitter", alpha=I(alph))+ 
-  geom_line(y=0*x) + 
-  scale_x_continuous(breaks=seq(0, 4*pi, by=pi), 
-                     labels=c("0", expression(paste(pi)), 
-                              expression(paste("2", pi)), 
-                              expression(paste("3", pi)), 
-                              expression(paste("4", pi)))) +
-  theme_bw()
-#x <- rep(seq(0,2*pi*2, length=120), each=100)
-y <- rnorm(n=length(x), mean=1/10*(-x+pi)^2+sin(x), sd=0.2)
-qplot(x,y, geom="jitter", alpha=I(alph))+ 
-  geom_line(y=1/10*(-x+pi)^2) + 
-  scale_x_continuous(breaks=seq(0, 4*pi, by=pi), 
-                     labels=c("0", expression(paste(pi)), 
-                              expression(paste("2", pi)), 
-                              expression(paste("3", pi)), 
-                              expression(paste("4", pi)))) +
-  theme_bw()
-#x <- rep(seq(0,2*pi*2, length=120), each=100)
-y <- rnorm(n=length(x), mean=1/10*(-x+pi)^2, sd=0.2)
-qplot(x,y, geom="jitter", alpha=I(alph))+ 
-  geom_line(y=1/10*(-x+pi)^2) + 
-  scale_x_continuous(breaks=seq(0, 4*pi, by=pi), 
-                     labels=c("0", expression(paste(pi)), 
-                              expression(paste("2", pi)), 
-                              expression(paste("3", pi)), 
-                              expression(paste("4", pi)))) +
-  theme_bw()
-@
-\begin{figure}[h!tbp]\centering
-\begin{subfigure}[b]{.31\linewidth}
-  \centering
-  \includegraphics[keepaspectratio=TRUE,width=\linewidth]{figure/fig-simulation1Sine1}
-  \caption{\small Seasonality, No Trend}
-  \label{simulation1}
-\end{subfigure}
-\begin{subfigure}[b]{.31\linewidth}\centering
-  \includegraphics[keepaspectratio=TRUE,width=\linewidth]{figure/fig-simulation1Sine2}
-  \caption{\small Seasonality and Trend}
-  \label{simulation2}
-\end{subfigure}
-\begin{subfigure}[b]{.31\linewidth}\centering
-  \includegraphics[keepaspectratio=TRUE,width=\linewidth]{figure/fig-simulation1Sine3}
-  \caption{\small Trend, No Seasonality}
-  \label{simulation3}
-\end{subfigure}
-\caption{Set of three scatterplots of simulated data with constant variance. Plot (a) shows seasonality without any underlying trend, (b) shows seasonality superimposed on a quadratic trend, and (c) shows a quadratic trend without seasonality. Though all three sets of simulated data have constant variance, none of the variances appear constant due to the sine illusion.}\label{fig:twoillusions-simulation}
-\end{figure}
+Next, we give an overview of the perceptual and statistical literature regarding this illusion.
 
-Next, %Sections  \ref{statisticalgraphics} and \ref{perceptualexplanations}
-we give an overview of the perceptual and statistical literature regarding this illusion.
-%\FloatBarrier
 \paragraph{The Sine Illusion in Statistical Graphics}\label{statisticalgraphics}\hfill\newline
 The sine illusion demonstrated in figures \ref{fig:exampleFull1} and \ref{fig:original} has been frequently noted in statistical graphics, though usually not as an optical illusion. Rather, the problem is typically identified as the difficulty of visually subtracting two curves, and the resulting erroneous conclusions when this process goes awry. Figure \ref{fig:playfair-debt} presents the possibly oldest example of this common phenomenon \citep{playfair, playfair2}: Playfair's chart of the balance of trade between England and the East Indies shows time series of the trade value for imports  and exports between the countries in the 18th century. The shaded area on the chart is named ``balance against England", suggesting that the difference between the lines is of main importance. This difference in trading values is encoded as the difference between the lines along the vertical axis. However, the vertical distance  between  two lines provides a  much less visually salient cue than the orthogonal width between the lines. This results in  an underestimation \citep{cleveland:1984} of the difference in trades around 1763, which is of a much higher (about 1.5 fold) magnitude as around 1770, but appears much smaller. In more modern visualizations, bivariate area charts and ``stream graphs'' \citep{stackedgraphs} commonly produce the illusion (see an example at \url{http://bl.ocks.org/mbostock/3894205}). 
 
