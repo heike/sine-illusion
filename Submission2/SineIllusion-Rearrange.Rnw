@@ -84,13 +84,13 @@ qplot(data=datasub, x=jitter(Tmax), y=resid, geom="point", shape=I(1), colour=I(
 \begin{figure}[h!tbp]\centering
 \begin{subfigure}[b]{.45\linewidth}
   \centering
-  \includegraphics[width=\textwidth]{figure/fig-example1}
+  \includegraphics[width=.7\textwidth]{figure/fig-example1}
   \caption{\small Scatterplot of Ozone and Temperature in Houston, 2011. A loess fit is overlaid to show the overall trend.}
   \label{fig:example1}
 \end{subfigure}\hfill
 \begin{subfigure}[b]{.45\linewidth}
   \centering
-  \includegraphics[width=\textwidth]{figure/fig-example2}
+  \includegraphics[width=.7\textwidth]{figure/fig-example2}
   \caption{\small Scatterplots of Ozone and Temperature de-trended according to the loess fit in (a). \\ \phantom{text to get to the next line}}
   \label{fig:example2}
 \end{subfigure}
@@ -164,7 +164,7 @@ dev.off()
 \begin{SCfigure}[2][hbtp]
 \centering
 \caption{The original sine illusion was demonstrated on evenly spaced vertical lines centered around a sinusoidal curve of $f(x) = \sin(x)$. The lines in the peak and trough of the curve appear to be longer than in the other regions.\label{fig:original}}
-\includegraphics[keepaspectratio=true, width=.4\linewidth]{figure/fig-original}
+\includegraphics[keepaspectratio=true, width=.3\linewidth]{figure/fig-original}
 \end{SCfigure}
 %The first documentation we could find of this illusion,
 More recently the illusion has been shown in non-sinusoidal curves \citep{cleveland:1984, schonlau:2003, robbins:2005, marie:2013}, but the underlying effect seems to be the same, in the sense that the illusion is not triggered by the periodic nature of the underlying trend line but only by  changes to its slope. Figure \ref{fig:twoillusions-simulation} shows three panels, which all exhibit the illusion. From left to right, the trend stems from (a) a periodic function, (b) a periodic component added to an exponential function, and (c) an exponential function on its own.
