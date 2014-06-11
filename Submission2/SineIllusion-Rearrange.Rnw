@@ -480,7 +480,7 @@ The sine  illusion is caused by a conflict between vertical width, which is the 
 We consider the following three approaches:  
 \begin{enumerate}
 \item separating the trend and the variability, 
-\item transformation of $x$: adjusting the slope to be constant by reparametrizing the $x$ axis, and
+\item transformation of $x$: adjusting the slope to be constant by reparameterizing the $x$ axis, and
 \item transformation of $y$: adjusting $y$ values to make conditional variability  appear correctly by adjusting according to orthogonal width. 
 \end{enumerate}
 Each of these ideas is discussed in more detail in this section.
