@@ -73,25 +73,25 @@ Graphical representations have to be true to the data they display. Computationa
 \section{Introduction}
 Graphics are powerful tools for summarizing large or complex data, but they rely on the main premise that any graphical representation of the data has to be ``true'' to the data \citep[see e.g.][]{tufte, wainer:2000, robbins:2005}. That is, a measurable quantity of a graphical element in the representation has to  directly reflect some aspect of the underlying data. Generally, we see a lot of discussion on keeping true to the data in the framework of (ab)using three dimensional effects in graphics. \citep{tufte} goes as far as defining a {\it lie-factor} of a chart as the ratio of the size of an effect in the data compared to the size of an effect shown, with the premise that any large deviations from one indicate a misuse of graphical techniques. Computational tools help us ensure technical accuracy -- but this brings up the additional question of how we deal with situations that involve innate inability or trigger learned misperceptions in the audience. In this paper we want to raise awareness for one of these situations, show that it occurs frequently in our dealings with graphics and provide a set of strategies for solving or avoiding it.
 
-<<example,echo=FALSE, include=FALSE>>=
+<<example,echo=FALSE, include=FALSE, fig.width=4, fig.height=3>>=
 #source("./data/NewOzoneData.R")
 datasub <- read.csv("data/Ozone-subset.csv")
 nsite <- length(unique(datasub$SiteID))
-qplot(data=datasub, x=jitter(Tmax), y=Ozone, geom="point", shape=I(1), colour=I("grey40"), alpha=I(.5), xlab="Temperature (F)", ylab="8-hour Average Ozone Concentration (ppm)") + geom_line(aes(x=Tmax, y=fit), size=1.25, colour="black") + theme_bw()
-qplot(data=datasub, x=jitter(Tmax), y=resid, geom="point", shape=I(1), colour=I("grey40"), alpha=I(.5), xlab="Temperature (F)", ylab="Residual Ozone Concentration (ppm)") + geom_line(aes(x=Tmax, y=0*resid), size=1.25, colour="black") + theme_bw()
+qplot(data=datasub, x=jitter(Tmax), y=Ozone, geom="point", shape=I(1), colour=I("grey40"), alpha=I(.5), xlab="Temperature (F)", ylab="8-hour Average Ozone\n Concentration (ppm)") + geom_line(aes(x=Tmax, y=fit), size=1.25, colour="black") + theme_bw()
+qplot(data=datasub, x=jitter(Tmax), y=resid, geom="point", shape=I(1), colour=I("grey40"), alpha=I(.5), xlab="Temperature (F)", ylab="Residual Ozone\n Concentration (ppm)") + geom_line(aes(x=Tmax, y=0*resid), size=1.25, colour="black") + theme_bw()
 @
 
 \begin{figure}[h!tbp]\centering
-\begin{subfigure}[b]{.45\linewidth}
+\begin{subfigure}[b]{.52\linewidth}
   \centering
-  \includegraphics[width=.7\textwidth]{figure/fig-example1}
-  \caption{\small Scatterplot of Ozone and Temperature in Houston, 2011. A loess fit is overlaid to show the overall trend.}
+  \includegraphics[width=.68\textwidth]{figure/fig-example1}
+  \caption{\small Scatterplot of Ozone and Temperature in Houston, 2011. A loess fit shows the overall trend.}
   \label{fig:example1}
 \end{subfigure}\hfill
-\begin{subfigure}[b]{.45\linewidth}
+\begin{subfigure}[b]{.44\linewidth}
   \centering
-  \includegraphics[width=.7\textwidth]{figure/fig-example2}
-  \caption{\small Scatterplots of Ozone and Temperature de-trended according to the loess fit in (a). \\ \phantom{text to get to the next line}}
+  \includegraphics[width=.8\textwidth]{figure/fig-example2}
+  \caption{\small Scatterplots of Ozone and Temperature de-trended according to the loess fit in (a). }
   \label{fig:example2}
 \end{subfigure}
 \caption{\label{fig:exampleFull1} Scatterplots of Ozone and Temperature in Houston, 2011. The increase in variability over the temperature range is more pronounced in the de-trended plot on the right.}
