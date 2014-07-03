@@ -479,7 +479,7 @@ qplot(data=ribbon, x=x, ymin=ybottom, ymax=ytop, geom="ribbon", fill=I("grey")) 
 Our preference for assessing figure width based on the orthogonal width suggests that the underlying illusion may be a function of geometry rather than some unknown visual or neural process that occurs subconsciously. In this  case it may be  possible to correct the graphical display for the illusion to minimize its misleading effect. A geometrical correction that  --at least temporarily-- counteracts the illusion would be a valuable tool in visual analysis, as this illusion very persistently affects our judgment of very common tasks  such as e.g.~the assessment of conditional variability of data along a trend line.
 
 Simply raising people's awareness of the presence of this illusion is not enough,
-as it is incredibly difficult, if not impossible, to overcome this illusion even when we are aware of its presence: our brains simply cannot ``un-see" it. What follows is a compilation of several approaches to correct for or mitigate the effect of the illusion. Our primary intention here is to demonstrate the pervasiveness of the illusion is and the extreme measures necessary to remove its effect. 
+as it is incredibly difficult, if not impossible, to overcome this illusion even when we are aware of its presence: our brains simply cannot ``un-see" it. What follows is a compilation of several approaches to correct for or mitigate the effect of the illusion. Our primary intention here is to demonstrate the pervasiveness of the illusion and the extreme measures necessary to remove its effect. 
 % do not change this to its'
 
 \section{Breaking the Illusion}
@@ -1139,7 +1139,7 @@ We employed a second Shiny applet to collect data on users' preferences on the a
 
 The graphs in the data-collection applet are adjusted using a plus/minus button to either increase or decrease the amount of correction used. Underlying this adjustment is the value of the weight $w$ as defined in eqns.~(\ref{eqn.xtrans.weighted}) and~(\ref{eqn.ytrans.weighted}). The numerical value of $w$ was hidden from the user to prevent anchoring to a specific numerical value.
 
-A low  initial weight ($w_0$ close to 0) indicates that the amount of correction is low and the response from a trial like this will give us an idea of the minimal amount of weight necessary to break the illusion, while a high initial weight ($w_0$ close to 1) indicates that the data is fully corrected. We asked participants to change the amount of adjustment until the lines appear to be the same length assumes that the correction is overcorrecting in practice, and a response from this type of trial gives us an upper boundary for the amount of weighting preferred. Generally, responses from the two different types of trials do not result in the same threshold weight, but rather lead to a range of acceptable weights.
+A low  initial weight ($w_0$ close to 0) indicates that the amount of correction is low and the response from a trial like this will give us an idea of the minimal amount of weight necessary to break the illusion, while a high initial weight ($w_0$ close to 1) indicates that the data are fully corrected. We asked participants to change the amount of adjustment until the lines appear to be the same length assumes that the correction is overcorrecting in practice, and a response from this type of trial gives us an upper boundary for the amount of weighting preferred. Generally, responses from the two different types of trials do not result in the same threshold weight, but rather lead to a range of acceptable weights.
 
 It is of additional interest to determine whether and how much these optimal weights are subject-specific or population-based, whether they depend on the initial weight, and how much within-subject variability we find compared to between-subject variability. 
 
@@ -1563,7 +1563,7 @@ ggplot( data=subset(monthly, year(month)>=1995) ) + geom_point(aes(month, sd)) +
   theme(plot.margin=unit(c(0,.5,0,0), "cm")) + geom_smooth(aes(month, sd), method="loess", colour="grey") + ylim(c(0,0.17))
 @
 \end{SCfigure}
-There is a clear increase in daily gas prices over time as well as several dramatic price changes, which mask the steady increase in variance shown in figure~\ref{fig:gasvariance}. Instead, we perceive an increase in variability in the frequent ups and downs along the overall trend. In particular, the strong decrease in gas prices at the end of 2008 seems to be associated with a low variance. This is an effect of the sine illusion, and the actual variability in Oct 2008 is higher than previous months. In order to better judge variability along the trend line we applied the two different corrections to this data, using a trend line fit based on smoothing splines to obtain the necessary first and second derivatives.
+There is a clear increase in daily gas prices over time as well as several dramatic price changes, which mask the steady increase in variance shown in figure~\ref{fig:gasvariance}. Instead, we perceive an increase in variability in the frequent ups and downs along the overall trend. In particular, the strong decrease in gas prices at the end of 2008 seems to be associated with a low variance. This is an effect of the sine illusion, and the actual variability in Oct 2008 is higher than previous months. In order to judge variability better along the trend line we applied the two different corrections to this data, using a trend line fit based on smoothing splines to obtain the necessary first and second derivatives.
 
 % \begin{figure}\centering
 % <<gaspricesMonthlyRange,echo=F, fig.width=8, fig.height=3, out.width='.95\\textwidth'>>=
@@ -1688,7 +1688,7 @@ We cannot counteract the illusion and represent the data visually without an int
 
 Our primary goal is to raise awareness of the illusion and its implications for statistics; the use of plots to guide the modeling process can leave us vulnerable to overlooking changes in the variance due to the illusion. While best practice has  been to plot the residuals separately, this removes the context of the data and is not practical before there is a model. In addition, viewer attention spans may be limited if multiple graphs are presented. The proposed transformations require only a nonparametric smooth, maintain the context of the data, and are readily interpretable. 
 
-The data for this study was collected with approval from  IRB-ID 13-257.
+The data for this study were collected with approval from  IRB-ID 13-257.
 
 \bibliographystyle{asa}
 % argument is your BibTeX string definitions and bibliography database(s)
