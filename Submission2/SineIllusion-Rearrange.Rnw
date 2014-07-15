@@ -80,7 +80,9 @@ Graphical representations have to be true to the data they display. Computationa
 
 
 \section{Introduction}
-Graphics are powerful tools for summarizing large or complex data, but they rely on the main premise that any graphical representation of the data has to be ``true'' to the data \citep[see e.g.][]{tufte, wainer:2000, robbins:2005}. That is, a measurable quantity of a graphical element in the representation has to  directly reflect some aspect of the underlying data. Generally, we see a lot of discussion on keeping true to the data in the framework of (ab)using three dimensional effects in graphics. \citet{tufte} goes as far as defining a {\it lie-factor} of a chart as the ratio of the size of an effect in the data compared to the size of an effect shown, with the premise that any large deviations from one indicate a misuse of graphical techniques. Computational tools help us ensure technical accuracy -- but this brings up the additional question of how we deal with situations that involve innate inability or trigger learned misperceptions in the audience. In this paper we want to raise awareness for one of these situations, show that it occurs frequently in our dealings with graphics and provide a set of strategies for solving or avoiding it. \todo[inline]{this is where we need to add what this paper is about: name `the situation'; describe the setup of the paper in more detail: we need to mention the study and its result.  }
+Graphics are powerful tools for summarizing large or complex data, but they rely on the main premise that any graphical representation of the data has to be ``true'' to the data \citep[see e.g.][]{tufte, wainer:2000, robbins:2005}. That is, a measurable quantity of a graphical element in the representation has to  directly reflect some aspect of the underlying data. Generally, we see a lot of discussion on keeping true to the data in the framework of (ab)using three dimensional effects in graphics. \citet{tufte} goes as far as defining a {\it lie-factor} of a chart as the ratio of the size of an effect in the data compared to the size of an effect shown, with the premise that any large deviations from a value of one indicate a misuse of graphical techniques. Computational tools help us ensure technical accuracy -- but this brings up the additional question of how we deal with situations that involve innate inability or trigger learned misperceptions in the audience. In this paper we want to raise awareness for one of these situations, \newtext{known as the {\it sine illusion} or {\it line width illusion}. Based on the results of a human subject study in section~\ref{study} we can show that this phenomenon manifests itself frequently and persistently in our dealings with statistical graphics. In section~\ref{solutions} we provide a set of strategies to mitigate the effects of the illusion. Again, results from the subject study are given to show that there is a wide range of possible values in the parameter space of the solution that provide relief from the distortive effects of the illusion in the general population.
+}
+%, show that it occurs frequently in our dealings with graphics and provide a set of strategies for solving or avoiding it. \todo[inline]{this is where we need to add what this paper is about: name `the situation'; describe the setup of the paper in more detail: we need to mention the study and its result.  }
 
 <<example,echo=FALSE, include=FALSE, fig.width=4, fig.height=3>>=
 #source("./data/NewOzoneData.R")
@@ -93,20 +95,22 @@ qplot(data=datasub, x=jitter(Tmax), y=resid, geom="point", shape=I(1), colour=I(
 \begin{figure}[h!tbp]\centering
 \begin{subfigure}[b]{.52\linewidth}
   \centering
-  \includegraphics[width=.68\textwidth]{figure/fig-example1}
+%  \includegraphics[width=.68\textwidth]{figure/fig-example1}
+  \includegraphics[height=2in]{figure/fig-example1}
   \caption{\small Scatterplot of Ozone and Temperature in Houston, 2011. A loess fit shows the overall trend.}
   \label{fig:example1}
 \end{subfigure}\hfill
 \begin{subfigure}[b]{.44\linewidth}
   \centering
-  \includegraphics[width=.8\textwidth]{figure/fig-example2}
+  \includegraphics[height=2in]{figure/fig-example2}
+%  \includegraphics[width=.8\textwidth]{figure/fig-example2}
   \caption{\small Scatterplots of Ozone and Temperature de-trended according to the loess fit in (a). }
   \label{fig:example2}
 \end{subfigure}
 \caption{\label{fig:exampleFull1} Scatterplots of Ozone and Temperature in Houston, 2011. The increase in variability over the temperature range is more pronounced in the de-trended plot on the right.}
 \end{figure}
 
-As a first example let us consider the relationship between ozone concentration and temperature. Ozone concentrations were measured from \Sexpr{nsite} locations in the Houston area \citep{epa}, and temperature data is provided by the NCDC \citep{noaa} site at Hobby International Airport, located near the center of Houston. 
+As a first example let us consider the relationship between ozone concentration and temperature. Ozone concentrations were measured from \Sexpr{nsite} locations in the Houston area \citep{epa}, and temperature data are provided by the NCDC \citep{noaa} site at Hobby International Airport, located near the center of Houston. 
 
 Figure~\ref{fig:example1} shows daily measurements of 8-hour average ozone concentration and temperature at several sites in Houston, for days in 2011 with temperatures above $45^\circ$F  and dew points of less than $60^\circ$F.
 A loess smooth line is added for reference. 
@@ -118,7 +122,7 @@ These types of plots are often used to give an overview of the relationship betw
 %\done{I like this example! But we still need to suggest that the trumpet shape in the residuals comes as a surprise to lots of people.}
 
 
-This evaluation changes when considering figure~\ref{fig:example2}: the scatterplot shows a loess based de-trended residual of temperature. A previously almost invisible increase in variability of ozone measurements with increasing temperatures now becomes apparent.
+This evaluation changes when considering figure~\ref{fig:example2}: the scatterplot shows a loess based de-trended residual of temperature. The previously almost invisible increase in variability of ozone measurements with increasing temperatures now becomes apparent.
 %The steady increase in variance over the temperature range is much more pronounced than in the  plot on the left.
 This phenomenon, caused by the change in the slope of the trend line,  is  known as the  {\it sine illusion} in the literature on cognition and human perception  or {\it line width illusion} in the statistical graphics literature. 
 
@@ -126,7 +130,6 @@ This phenomenon, caused by the change in the slope of the trend line,  is  known
 %The change in slope of the trend is causing this phenomenon, which is  known as
 % in the Figure~\ref{fig:example1} due to the changes in slope, but is very obvious in the residual plot in Figure~\ref{fig:example2}. The sine illusion is responsible for the appearance of constant variance in Figure~\ref{fig:example1}, but once the trend has been removed, and thus the corresponding changes in slope are no longer a factor, the increase variance becomes more visible.
 
-The illusion is a frequent occurrence in statistical graphics, and  displays should therefore be thoughtfully considered to minimize its effect visually and acknowledge its influence. 
 In the cognitive literature, \cite{day:1991} first documented the illusion in the context of vertical lines along a sinusoidal curve. Figure~\ref{fig:original} shows a sketch of this: line segments are centered evenly spaced along the curve. Line segments are of equal length but appear longer in the peaks and troughs due to the illusion. 
 The parameters that influence the strength of the illusion are the amplitude of the curve and the length of the line segments.
 As the length of the line segments increases,  the apparent difference in the length of the line segments decreases. Any modification that increases the change in slope under which the curve appears, such as an increase in the amplitude of the curve or a more extreme aspect ratio, reinforces the apparent difference in line lengths. 
@@ -484,7 +487,7 @@ Simply raising people's awareness of the presence of this illusion is not enough
 as it is incredibly difficult, if not impossible, to overcome this illusion even when we are aware of its presence: our brains simply cannot ``un-see" it. What follows is a compilation of several approaches to correct for or mitigate the effect of the illusion. Our primary intention here is to demonstrate the pervasiveness of the illusion and the extreme measures necessary to remove its effect. 
 % do not change this to its'
 
-\section{Breaking the Illusion}
+\section{Breaking the Illusion}\label{solutions}
 The sine  illusion is caused by a conflict between vertical width, which is the width that we want onlookers to assess visually, and orthogonal width, which is the width that the onlooker perceives. This difference can be expressed as a function in the slope of the underlying trend line. This provides the basis for adjusting the vertical width for the perceived orthogonal width. We consider the following three approaches:  
 \begin{enumerate}
 \item separating the trend and the variability, 
@@ -1133,7 +1136,7 @@ Similar to the correction of the $x$-axis,  we can use a weighted approach to fi
 % \caption{The ratio of the length of the line to amplitude of the function needs to be included in the correction. Here, the amplitude is still 1, but the length of the line is 5. The correction factor leads to a massive over correction that makes the function almost unrecognizable. The plot on the left is uncorrected, the plot on the right is `corrected'.\label{fig:linearFixOvercorrect}}
 % \end{figure}
 
-\section{Transformations in Practice -- a User Study}
+\section{Transformations in Practice -- a User Study}\label{study}
 
 In order to more fully understand the sine illusion and test the proposed corrections, we created an applet to allow users to investigate the illusion's prominence with respect to its parameters. Users can examine the sine illusion by changing line length, the function's amplitude, and compare corrections in $x$-axis and $y$-values to uncorrected data.  All corrections proposed in this paper are implemented in a Shiny applet \citep{shiny} located at \url{http://bit.ly/1ldgujL}.
 
@@ -1205,7 +1208,8 @@ We decided to  have a higher coverage density for starting weights around 0.6 af
 % This allows us to fully explore the space of plausible $w$ while focusing on weights in the $(0,1)$ interval.
 
 %The range of weight values the shiny app allows follows the full distribution of $w$ described above, so possible weight values are between $(-4, 5)$. 
-A trial begins with the presentation of a graph at the chosen starting weight $w_0$. Participants adjust the graph using increment and decrement buttons. A trial ends with the participant clicking the `submit' button, at which point the weight for the final adjustment is recorded. This provides a clear starting value and ending value, allowing us to assess the range of optimal values for each participant. In addition to starting weight, correction type, and anonymized user-specific data (partial IP address, hashed IP address, and hashed browser characteristics), each incremental user chosen weight is recorded with a corresponding time stamp. The user-specific browser data is sufficient to provide a `fingerprint' to distinguish and recognize individual users (or rather their computer settings) in an anonymous fashion. 
+A trial begins with the presentation of a graph at the chosen starting weight $w_0$. Participants adjust the graph using increment and decrement buttons. A trial ends with the participant clicking the `submit' button, at which point the weight for the final adjustment is recorded. This provides a clear starting value and ending value, allowing us to assess the range of optimal values for each participant. In addition to starting weight, correction type, and anonymized user-specific data (partial IP address, hashed IP address, and hashed browser characteristics), each incremental user chosen weight is recorded with a corresponding time stamp. %The user-specific browser data is
+Specifications of a user's browser are sufficient to provide a `fingerprint' to distinguish and recognize individuals (or rather their computer settings) in an anonymous fashion. 
 % 
 % Each participant is provided with two initial ``training'' trials in which the  graph of the underlying mean function is superimposed on the line segments to give participants some idea of the  function the lines represent. This approach was taken to reduce  incidences of extremely high  correction values under the $X$ transformation, as large adjustment values do not change the impression of same line length, but the resulting function bears little resemblance to a sine function, see figure~\ref{fig:overtransform} for examples of overcorrection. %because when $w>\!\!>1$, the lines still look to be of equal length but the underlying function bears little resemblance to $\sin(x)$, as shown in Figure~\ref{fig:overtransform}. 
 %
@@ -1467,7 +1471,7 @@ ggplot() + theme_bw() + facet_grid(type~., scales="free") + ylim(c(0, 27)) +
 
 \subsection{Results}
 %
-Participants were recruited from Amazon Mechanical Turk and the \href{http://reddit.com/r/SampleSize}{reddit} community. As this study was conducted outside a laboratory setting, we can not gauge a participant's willingness to follow the guidelines and put in their best effort. This, besides potential technical issues (server outage, speed of response) make a careful selection of data going into the analysis unavoidable. The specific data exclusion criteria are provided in appendix \ref{exclusion}. 
+Participants were recruited from Amazon Mechanical Turk and the \href{http://reddit.com/r/SampleSize}{reddit} community. As this study was conducted outside a laboratory setting, we can not gauge a participant's willingness to follow the guidelines and put in their best effort. This, besides potential technical issues (server outage, speed of response) make a careful selection of data going into the analysis unavoidable. The specific data exclusion criteria are provided in appendix~\ref{exclusion}. 
 
 The following analysis is based on the cleaned data, consisting of \Sexpr{nparticipant2} participants with \Sexpr{nrow(lm.data)} valid trial results. 
 % \newtext{After removing data according to these criteria, we noticed that there were many responses for the $x$ correction that tended towards the endpoints of the weight value. These responses indicated that the participant did not attempt to maintain the underlying function, and the trials should thus be excluded from calculation of the optimal weight. This occurs as a result of an artifact of the x correction which enables participants to more easily perceive a three-dimensional image at corrections outside of [0,1] at the expense of the underlying mean function, as shown in Figure~\ref{fig:overtransform}.}
@@ -1511,7 +1515,7 @@ Figure~\ref{fig:MixedModelResults} gives an overview of the relationship between
 Bootstrap simulations for each of the coefficients suggest that the range of optimal $w$ is between \Sexpr{round(ints$x[2], 3)} and \Sexpr{round(ints$x[3], 3)} for $x$ and \Sexpr{round(ints$x[1], 3)} and \Sexpr{round(ints$x[4], 3)} for $y$, where the lower value is the estimate starting at $w=0$ and moving up, and the upper value is the estimate starting at $w=1$ and moving down. This suggests that either correction is preferable to an uncorrected graph, and that a weighted correction is preferable to the fully corrected graph, as neither 0 nor 1 is contained in any overall interval. In addition to showing the strength of the correction, this experiment also demonstrates the strength of the illusion itself: a correction appears more uniform than the uncorrected values, even though the corrected values are not uniform and the uncorrected values are completely uniform. 
 
 \section{Application: US Gas Prices}
-Figure~\ref{fig:gasprices} shows daily gas prices for a time frame between 1995 to 2014 as published in the Energy Information Administration's historical database of gas prices \citep{EIA}. This data includes prices for all three grades of gasoline as well as two chemical formulations which are sold in different geographic areas across the United States \citep{EIA-reformulated}. 
+Figure~\ref{fig:gasprices} shows daily gas prices for a time frame between 1995 to 2014 as published in the Energy Information Administration's historical database of gas prices \citep{EIA}. This data set includes prices for all three grades of gasoline as well as two chemical formulations which are sold in different geographic areas across the United States \citep{EIA-reformulated}. 
 <<gasprices,echo=FALSE, cache=T, message=F, warning=F>>=
 library(lubridate)
 library(plyr)
@@ -1661,7 +1665,7 @@ Figure~\ref{fig:gasprices-x-correct} shows the results from the $X$ transformati
 \begin{SCfigure}[2][htbp]
 \centering
 \includegraphics[keepaspectratio=TRUE,width=.7\linewidth]{figure/gas-x-corrected}
-\caption{Gas price data corrected using the $X$ transformation with $w=1$ and with $w=0.36$. }
+\caption{Corrected gas price data using $X$-transformations with $w=1$ and  $w=0.36$. }
 %  The weighted transformation removes the presence of the sine illusion without excessively distorting the underlying function shape.
 \label{fig:gasprices-x-correct}
 \end{SCfigure}
@@ -1675,7 +1679,7 @@ in the full transformation  it is clear that the variance is nearly constant bet
 \begin{SCfigure}[2][htbp]
 \centering
 \includegraphics[keepaspectratio=TRUE,width=.7\linewidth]{figure/gas-y-corrected}
-\caption{Gas price data corrected using the $Y$ transformation with $w=1$ and with $w=0.40$. }
+\caption{Corrected gas price data using  $Y$-transformations with $w=1$ and  $w=0.40$. }
 \label{fig:gasprices-y-correct}
 \end{SCfigure}
 % The $Y$ transformation does not distort the axes directly as the $X$ transformation does, but it may be more misleading because the $y$ value on the axis is not equivalent to the measured data value, and the same y value at two different points in time may not even correspond to the same measured value. This could make reading numerical values directly from the graph inaccurate. 
@@ -1684,9 +1688,13 @@ in the full transformation  it is clear that the variance is nearly constant bet
 
 %\clearpage
 \section{Conclusions}
-The sine illusion is a persistent and powerful illusion that is very difficult to counteract without modifying the visual stimulus directly. While systematically modifying the data is uncommon in the statistical world, this approach is not out of place in the visual arts or architecture; as far back as 400 BC the builders of the Parthenon ensured a straight appearance of the columns from afar, by widening columns at the center, thereby counteracting the effects of the Hering illusion \citep{naturalscenes,hering}. Similarly, painters often exaggerate color hues used in shadows to account for color constancy in the brain. The systematic modifications we suggest here are also comparable to chloropleth maps, which scale a region's area based on some other variable. 
+The sine illusion is a frequent occurrence in statistical graphics, and  displays should therefore be thoughtfully considered to minimize its effect visually and acknowledge its influence. 
 
-We cannot counteract the illusion and represent the data visually without an intervention that is drastic enough to counteract the three-dimensional context the sine-illusion induces. The proposals in this paper for transformations in $x$ and $y$ provide the means to temporarily correct the data as a diagnostic measure, perhaps using an applet or R package for that purpose. These corrections are significant not only because of their implications for statistical graphics, but because previous attempts to resolve optical illusions using geometry have not met with success \citep{westheimer2008illusions}. These corrections are only a first step and could be improved upon; currently, the corrections break down for extreme (secant) values, but multiple iterations of the correction procedure will likely resolve some of these issues (though iteration removes the convenience of a functional form for the transformation). Similarly, the $y$ corrections proposed here extend the line lengths (or for actual data, increase the deviation from the smooth line) -- some normalization might make the necessary corrections less noticeable. 
+The sine illusion is a persistent and powerful illusion that is very difficult to counteract without modifying the visual stimulus directly. 
+While systematically modifying the data is uncommon in the statistical world, this approach is not out of place in the visual arts or architecture; as far back as 400 BC the builders of the Parthenon ensured a straight appearance of the columns from afar by widening columns at the center, thereby counteracting the effects of the Hering illusion \citep{naturalscenes,hering}. Similarly, painters often exaggerate color hues used in shadows to account for color constancy in the brain. The systematic modifications we suggest here are also comparable to chloropleth maps, which scale a region's area based on some other variable. 
+
+We cannot counteract the illusion and represent the data visually without an intervention that is drastic enough to counteract the three-dimensional context the sine-illusion induces. The proposals in this paper for transformations in $x$ and $y$ provide the means to temporarily correct the data as a diagnostic measure, perhaps using an applet or R package for that purpose. These corrections are significant not only because of their implications for statistical graphics, but because previous attempts to resolve optical illusions using geometry have not met with success \citep{westheimer2008illusions}. These corrections are only a first step and could be improved upon; currently, the corrections break down for extreme (secant) values, but multiple iterations of the correction procedure %will likely 
+resolve some of these issues (though  remove the convenience of a functional form for the transformation). Similarly, the $y$ corrections proposed here extend the line lengths (or for actual data, increase the deviation from the smooth line) -- some normalization might make the necessary corrections less noticeable. 
 
 Our primary goal is to raise awareness of the illusion and its implications for statistics; the use of plots to guide the modeling process can leave us vulnerable to overlooking changes in the variance due to the illusion. While best practice has  been to plot the residuals separately, this removes the context of the data and is not practical before there is a model. In addition, viewer attention spans may be limited if multiple graphs are presented. The proposed transformations require only a nonparametric smooth, maintain the context of the data, and are readily interpretable. 
 
