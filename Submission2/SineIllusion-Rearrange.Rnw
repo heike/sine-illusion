@@ -1691,7 +1691,7 @@ Figure~\ref{fig:gasprices-x-correct} shows the results from the $X$ transformati
 %We applied the {\bf $X$ transformation} to the gas prices data  using the unweighted transformation and the transformation with $w=0.36$. This value was chosen as it is approximately the midpoint of the range of acceptable values determined experimentally. The corrected and uncorrected data with fitted cubic splines are shown in Figure~\ref{fig:gasprices-x-correct}.
 \begin{SCfigure}[2][htbp]
 \centering
-\includegraphics[keepaspectratio=TRUE,width=.7\linewidth]{figure/gas-x-corrected}
+\includegraphics[keepaspectratio=TRUE,width=.7\linewidth,trim=0in .1in 0in 0in]{figure/gas-x-corrected}
 \caption{Corrected gas price data using $X$-transformations with $w=1$ and  $w=0.36$.}
 %  The weighted transformation removes the presence of the sine illusion without excessively distorting the underlying function shape.
 \label{fig:gasprices-x-correct}
@@ -1705,7 +1705,7 @@ in the full transformation  it is clear that the variance is nearly constant bet
 %We also applied the Y transformation to the gas prices data using the full transformation and a weighted transformation with $w=0.40$. %This value was chosen as it is approximately the midpoint of the range of acceptable values determined experimentally. The corrected and uncorrected data with fitted cubic splines are shown in Figure~\ref{fig:gasprices-y-correct}. 
 \begin{SCfigure}[2][htbp]
 \centering
-\includegraphics[keepaspectratio=TRUE,width=.7\linewidth]{figure/gas-y-corrected}
+\includegraphics[keepaspectratio=TRUE,width=.7\linewidth,trim=0in .1in 0in 0in]{figure/gas-y-corrected}
 \caption{Corrected gas price data using  $Y$-transformations with $w=1$ and  $w=0.40$.}
 \label{fig:gasprices-y-correct}
 \end{SCfigure}
