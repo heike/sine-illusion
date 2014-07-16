@@ -1680,7 +1680,7 @@ ggplot(data=gas.cor.x) +
   xlab("Time") + 
   ylab("Price of Gasoline (USD)") + 
   theme_bw() + geom_point(aes(x=1995, y=0), size=0.1) + 
-  theme(plot.margin=unit(c(0,0,0,0), "cm"), axis.text.x=element_blank(), axis.ticks.x=element_blank())
+  theme(plot.margin=unit(c(0,0,0,0), "cm"), axis.text.x=element_blank(), axis.ticks.x=element_blank(), panel.grid.major.x=element_blank(), panel.grid.minor.x=element_blank())
 ggsave(file="figure/gas-x-corrected.pdf", width=6, height=3)
 
 ggplot(data=gas.cor.y) + 
@@ -1700,7 +1700,7 @@ Figure~\ref{fig:gasprices-x-correct} shows the results from the $X$ transformati
 \begin{SCfigure}[2][htbp]
 \centering
 \includegraphics[keepaspectratio=TRUE,width=.7\linewidth]{figure/gas-x-corrected}
-\caption{Corrected gas price data using $X$-transformations with $w=1$ and  $w=0.36$. \newdo{the labels on the x axis aren't right - we need two separate x axis with labels - the vertical grid lines are also wrong. }}
+\caption{Corrected gas price data using $X$-transformations with $w=1$ and  $w=0.36$.}
 %  The weighted transformation removes the presence of the sine illusion without excessively distorting the underlying function shape.
 \label{fig:gasprices-x-correct}
 \end{SCfigure}
