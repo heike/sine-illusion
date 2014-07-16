@@ -462,7 +462,7 @@ grid.arrange(p1, p2, widths=c(.9, .5), nrow=1)
 \includegraphics[width=.85\linewidth, keepaspectratio=TRUE]{fig-transform-illustration}
 \centering
 \vspace{-.3in}
-\caption{\label{fig:OrthogonalWidth} \newdo{Should we lightly shade the area between the two hashed lines in grey?} The sine illusion with lines orthogonal to the tangent line at $f(x)$. The perception that the vertical length changes with $f(x)$ corresponds to changes in actual orthogonal width due to the change in the visual (plotted) secant angle. The strength of the perceptual effect depends in part on the aspect ratio of the graph, as shown in the second image.
+\caption{\label{fig:OrthogonalWidth} The sine illusion with lines orthogonal to the tangent line at $f(x)$. The perception that the vertical length changes with $f(x)$ corresponds to changes in actual orthogonal width due to the change in the visual (plotted) secant angle. The strength of the perceptual effect depends in part on the aspect ratio of the graph, as shown in the second image.
 %, which has an aspect ratio of 2 compared to the first figure's aspect ratio of 1. This correspondingly multiplies the strength of the effect by 2. 
 }
 \end{figure}
