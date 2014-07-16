@@ -1617,6 +1617,17 @@ dots <- data.frame(x = minor.axis.correction,
                    variable = rep(c("Corrected (w=1)", "Corrected (w=0.36)"), 
                                   each=length(gridlines)))
 
+axis.labs <- data.frame(x=rep(1995:2014, times=2), 
+                        variable=rep(c("Corrected (w=1)", "Corrected (w=0.36)"), 
+                                  each=length(1995:2014)))
+
+
+axis.labs <- merge(axis.labs, data.frame(x=gridlines, value=minor.axis.correction, variable = rep(c("Corrected (w=1)", "Corrected (w=0.36)"), each=length(gridlines))), all.x=T, all.y=F)
+axis.labs$value[axis.labs$x==1995] <- 1995
+axis.labs$color <- "grey"
+axis.labs$color[axis.labs$x%%5==0] <- "black"
+axis.labs$text <- ""
+axis.labs$text[axis.labs$x%%5==0] <- axis.labs$x[axis.labs$x%%5==0]
 
 gas.cor <- correct("date", "price", gas, type="x", f=f, fprime=fprime, f2prime=f2prime, weight=1)
 gas.cor <- merge(gas.cor, gas.full)
@@ -1632,6 +1643,8 @@ gas.cor2$variable <- gsub("date", "Uncorrected", gas.cor2$variable)
 
 gas.cor.x <- rbind(gas.cor, subset(gas.cor2, variable!="Uncorrected"))
 gas.cor.x <- subset(gas.cor.x, variable!="Uncorrected")
+
+
 # gas.cor.x$variable <- factor(gas.cor.x$variable, levels=c("Corrected (w=1)", "Corrected (w=0.36)", "Uncorrected"))
 gas.cor.x$variable <- factor(gas.cor.x$variable, levels=c("Corrected (w=1)", "Corrected (w=0.36)"))
 rm(list=c("gas.cor", "gas.cor2"))
@@ -1657,14 +1670,17 @@ save.image("data/gasprices.RData")
 <<gaspricesCorrectionPlots,echo=F,include=F,cache=T>>=
 load("data/gasprices.RData")
 ggplot(data=gas.cor.x) + 
-  geom_point(aes(x=value, y=price, group=variable), size=1.5, shape=I(1), colour=I("grey40"), alpha=I(.75))+ 
+  geom_segment(data=axis.labs, aes(x=value, xend=value,  y=.25, yend=Inf, color=color)) + 
+  scale_colour_identity() + 
+  geom_text(data=axis.labs, aes(x=value, y=0, label=text), hjust=.25) + 
+  geom_point(aes(x=value, y=price, group=variable), size=1.5, shape=I(1), colour=I("grey40"), alpha=I(.75)) + 
   facet_grid(variable~.) +
   geom_line(data=gas.cor.x, aes(x=value, y=price.fit), colour="black", size=1.5) + 
-  geom_rug(data=dots, aes(x=x))+
-  xlab("Time") +  
+#   geom_rug(data=dots, aes(x=x))+
+  xlab("Time") + 
   ylab("Price of Gasoline (USD)") + 
   theme_bw() + geom_point(aes(x=1995, y=0), size=0.1) + 
-  theme(plot.margin=unit(c(0,0,0,0), "cm"))
+  theme(plot.margin=unit(c(0,0,0,0), "cm"), axis.text.x=element_blank(), axis.ticks.x=element_blank())
 ggsave(file="figure/gas-x-corrected.pdf", width=6, height=3)
 
 ggplot(data=gas.cor.y) + 
@@ -1676,7 +1692,6 @@ ggplot(data=gas.cor.y) +
   theme_bw() + geom_point(aes(x=1995, y=0), size=0.1) + 
   theme(plot.margin=unit(c(0,0,0,0), "cm"))
 ggsave(file="figure/gas-y-corrected.pdf", width=6, height=3)
-
 @
 
 %\paragraph{Transformation in $X$}
