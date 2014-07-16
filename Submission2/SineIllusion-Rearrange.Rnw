@@ -466,7 +466,7 @@ grid.arrange(p1, p2, widths=c(.9, .5), nrow=1)
 }
 \end{figure}
 %Secants and vertical lines are both shown  in figure~\ref{fig:OrthogonalWidth}. 
-The illusion is most pronounced in regions where the angle between the orthogonal  and the vertical line is large. Changes to the aspect ratio therefore have a major impact on the strength of the sine illusion. Any measure that alleviates the difference between perceived width and the perpendicular width,  decreases the effect of the illusion but does not completely overcome it. \newtext{Banking to 45$^\circ$ \citep{cleveland:88} has been suggested as a good default aspect ratio for time series, but does not necessarily help in the situation of the sine illusion, as the example in section~\ref{example} shows, in which the illusion would only be worsened by this approach. } 
+The illusion is most pronounced in regions where the angle between the orthogonal  and the vertical line is large. Changes to the aspect ratio therefore have a major impact on the strength of the sine illusion. Any measure that alleviates the difference between perceived width and the perpendicular width,  decreases the effect of the illusion but does not completely overcome it. Banking to 45$^\circ$ \citep{cleveland:88} has been suggested as a good default aspect ratio for time series, but does not necessarily help in the situation of the sine illusion, as the example in section~\ref{example} shows, as the illusion would only be worsened by banking to 45$^\circ$. 
 The perceived length of the vertical line changes with the angle of the line perpendicular to the slope of $\sin(x)$, suggesting that the sine illusion stems from a conflict between the visual system's perception of figure width and the mathematical judgment necessary to determine the length of the vertical lines. 
 
 <<geometry,echo=FALSE, fig.height=2.1, fig.width=3.5, include=FALSE>>=
@@ -495,7 +495,7 @@ Our preference for assessing figure width based on the orthogonal width suggests
 %Simply raising people's awareness of the presence of this illusion is not enough,
 %as it is incredibly difficult, if not impossible, to overcome this illusion even when we are aware of its presence: our brains simply cannot ``un-see" it. 
 What follows is a compilation of several approaches to correct for or mitigate the effect of the illusion. 
-Our primary intention here is to demonstrate the pervasiveness of the illusion and the extreme measures necessary to remove its effect. 
+Our primary intent here is to demonstrate the pervasiveness of the illusion and the extreme measures necessary to remove its effect. 
 % do not change this to its'
 
 \section{Breaking the Illusion}\label{solutions}
