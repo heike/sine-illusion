@@ -1503,7 +1503,7 @@ The following analysis is based on the cleaned data, consisting of \Sexpr{nparti
 
 %\newdo{I'm still not convinced that we need to go there. Rather, you could put the whole discussion in a one sentence paragraph in the conclusions section. The model is worse than the stats approach, its results are less interpretable, and it doesn't allow us to use the full data. That's three strikes and out.}
 
-The results from the standard psychophysics model (provided in appendix \ref{psychophysics}) suggest that some transformation is necessary to break the illusion, yet a complete transformation is not needed. For aan estimate of the range of acceptable transformation weights we use a linear model that  incorporates starting points other than 0 and 1, and  allows for user-specific variability.  % as well as data from users that completed a sufficient number of trials but did not complete a trial starting at one of the endpoints. 
+The results from the standard psychophysics model (provided in appendix \ref{psychophysics}) suggest that some transformation is necessary to break the illusion, yet a complete transformation is not needed. For an estimate of the range of acceptable transformation weights we use a linear model that  incorporates starting points other than 0 and 1, and  allows for user-specific variability.  % as well as data from users that completed a sufficient number of trials but did not complete a trial starting at one of the endpoints. 
 
 %\newdo{My attempt at a summary of this whole paragraph: A traditional approach from psychometrics (citation) to analyze this kind of data would be a XXX model (citation). However, the analysis would only allows us to make use of starting weights 0 and 1, while the results are a single estimate of an optimal adjustment under each transformation. XXX results. 
 %However, this approach is too limiting, and we will instead make use of a random effects model, that not only allows us to produce a range of acceptable adjustments but also helps us with adjustment for user-specific ability and variability.}
@@ -1666,7 +1666,7 @@ load("data/gasprices.RData")
 ggplot(data=gas.cor.x) + 
   geom_segment(data=axis.labs, aes(x=value, xend=value,  y=.25, yend=Inf, color=color)) + 
   scale_colour_identity() + 
-  geom_text(data=axis.labs, aes(x=value, y=0, label=text), hjust=.25) + 
+  geom_text(data=axis.labs, aes(x=value, y=0, label=text), hjust=.25, size=3) + 
   geom_point(aes(x=value, y=price, group=variable), size=1.5, shape=I(1), colour=I("grey40"), alpha=I(.75)) + 
   facet_grid(variable~.) +
   geom_line(data=gas.cor.x, aes(x=value, y=price.fit), colour="black", size=1.5) + 
