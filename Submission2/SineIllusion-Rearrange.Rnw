@@ -651,7 +651,7 @@ ggplot(aes(x=xtrans4, xend=xtrans4, y = ystart, yend=yend), data=dframe) +
 \begin{figure}[h!tbp]\centering
 \begin{subfigure}[b]{.45\linewidth}\centering 
 \includegraphics[keepaspectratio=TRUE,width=\linewidth]{figure/fig-xtransform1}
-\caption[$X$ axis transformation]{$X$ axis transformation based on eqn.~(\ref{eqn.xtrans}), corresponding to weighting of $w=0$.}
+\caption[$X$ axis transformation]{$X$ axis transformation based on eqn.~(\ref{eqn.xtrans}), corresponding to weighting of $w=1$.}
 \label{fig:xtrans1}
 \end{subfigure} \hfill\hfill
 \begin{subfigure}[b]{.45\linewidth}\centering
