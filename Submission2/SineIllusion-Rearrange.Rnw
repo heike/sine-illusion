@@ -1693,13 +1693,13 @@ The minor effect of the weighted transformation on individual x-values contrasts
 % The full, unweighted transformation does distort the $X$ axis such that data collected on monthly intervals no longer appears to be uniformly distributed in $X$. The transformation using $w=0.36$ is more moderate and still largely breaks the illusion, and as such may be preferable to the full $w=1$ transformation. 
 
 %\paragraph{Transformation of $Y$}
-Similar to the $X$ transformation, the $Y$ transformation highlights local fluctuation in the variability of daily gas prices much more than the untransformed data. Figure~\ref{fig:gasprices-y-correct} shows $Y$ transformations for the data. Again, we show a full transformation (top) and a transformation based on the midpoint of the previously determined acceptable region of $w=0.40$.
+Similar to the $X$ transformation, the $Y$ transformation highlights local fluctuation in the variability of daily gas prices much more than the untransformed data (the trend line is not adjusted, but the individual data points are not accurate and are negative in the $w=1$ transformation). Figure~\ref{fig:gasprices-y-correct} shows $Y$ transformations for the data. Again, we show a full transformation (top) and a transformation based on the midpoint of the previously determined acceptable region of $w=0.40$.
 in the full transformation  it is clear that the variance is nearly constant between 1995 and 2000 and then begins to increase with the price of gas. When $w=0.40$, the transformation is much less noticeable, and the resulting $y$-axis scale is much more similar to the uncorrected data. 
 %We also applied the Y transformation to the gas prices data using the full transformation and a weighted transformation with $w=0.40$. %This value was chosen as it is approximately the midpoint of the range of acceptable values determined experimentally. The corrected and uncorrected data with fitted cubic splines are shown in Figure~\ref{fig:gasprices-y-correct}. 
 \begin{SCfigure}[2][htbp]
 \centering
 \includegraphics[keepaspectratio=TRUE,width=.7\linewidth]{figure/gas-y-corrected}
-\caption{Corrected gas price data using  $Y$-transformations with $w=1$ and  $w=0.40$. \newdo{The y axis are not showing the right values - for the fully corrected values it would suggest that there were negative prices involved. I'm not sure how to fix this, though, except for taking off horizontal lines and any labelling.}}
+\caption{Corrected gas price data using  $Y$-transformations with $w=1$ and  $w=0.40$.}
 \label{fig:gasprices-y-correct}
 \end{SCfigure}
 % The $Y$ transformation does not distort the axes directly as the $X$ transformation does, but it may be more misleading because the $y$ value on the axis is not equivalent to the measured data value, and the same y value at two different points in time may not even correspond to the same measured value. This could make reading numerical values directly from the graph inaccurate. 
