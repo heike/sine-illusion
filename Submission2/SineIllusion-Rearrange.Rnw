@@ -19,6 +19,12 @@
 \usepackage{bbm}
 \usepackage{setspace}
 \doublespacing
+
+% 
+% \renewcommand{\includegraphics}[2][]{%
+%     \fbox{#2}% print file name in a small box
+% }
+
 % test change
 % help with editing and coauthoring
 \usepackage[colorinlistoftodos]{todonotes}
