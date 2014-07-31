@@ -21,7 +21,7 @@ source("code/functions.r")
 
 ```
 
-```{r origillusion, fig.width=5, fig.height=4, out.width='50%', echo=FALSE}
+```{r origillusion, fig.width=5, fig.height=4, out.width='50%', echo=FALSE, include=FALSE}
 f <- function(x) 2*sin(x)
 fprime <- function(x) 2*cos(x)
 f2prime <- function(x) -2*sin(x)
@@ -33,6 +33,8 @@ qplot(x=x, xend=xend, y = ystart, yend=yend, geom="segment", data=createSine(40,
        axis.title = element_blank(), axis.ticks = element_blank(), 
        axis.text = element_blank()) + coord_equal(ratio=1)
 ```
+
+<img src="figure/fig-origillusion.png", width='50%', title='Sine Illusion', alt='Image of the original sine illusion'>
 
 This repository contains the files and writeup for an experiment conducted in Summer 2013 to measure the strength of the Sine Illusion and the correction necessary to alleviate its' effects. 
 

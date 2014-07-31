@@ -4,7 +4,9 @@ Susan Vanderplas
 
 
 
-<img src="figure/fig-origillusion.png" title="plot of chunk origillusion" alt="plot of chunk origillusion" width="50%" style="display: block; margin: auto;" />
+
+
+<img src="figure/fig-origillusion.png", width='50%', title='Sine Illusion', alt='Image of the original sine illusion'>
 
 This repository contains the files and writeup for an experiment conducted in Summer 2013 to measure the strength of the Sine Illusion and the correction necessary to alleviate its' effects. 
 
