@@ -1,4 +1,5 @@
 # Signs of the Sine Illusion: Why We Need to Care
+Susan VanderPlas and Heike Hofmann  
 
 
 

@@ -1,5 +1,7 @@
 ---
 title: "Signs of the Sine Illusion: Why We Need to Care"
+author: Susan VanderPlas and Heike Hofmann
+
 output: 
   html_document:
     keep_md: true
