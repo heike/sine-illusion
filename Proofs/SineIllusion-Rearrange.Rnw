@@ -616,18 +616,20 @@ ggplot(aes(x=xtrans, xend=xtrans, y = ystart, yend=yend), data=dframe) +
 dots$x2 <- correctx(seq(0, 2*pi, pi/8), fprime, w=.5)
 
 dframe$xtrans2 <- correctx(dframe$x, fprime=fprime, w=.5)
+minor.axis.correction2 <- correctx(seq(0, 2*pi, pi/8), fprime, w=.5)
 
 ggplot(aes(x=xtrans2, xend=xtrans2, y = ystart, yend=yend), data=dframe) +
   geom_abline(aes(slope = 0, intercept=0), colour="grey70") +
   geom_segment(colour="grey20") +
   theme_bw() + coord_fixed(ratio=1) + 
   xlab("x") + ylab("y")+ 
-  scale_x_continuous(breaks=seq(0, 2*pi, by=pi/2), minor_breaks=minor.axis.correction,
+  scale_x_continuous(breaks=seq(0, 2*pi, by=pi/2), minor_breaks=minor.axis.correction2,
                      labels=c("0", expression(paste(pi,"/2")), expression(pi), expression(paste("3",pi, "/2")), expression(paste("2",pi)))) + 
   geom_point(data=dots, aes(x=x2, y=y), inherit.aes=FALSE)  + 
   theme(plot.margin = unit(c(.1,.1,-.5,.1), "cm"))
 
 dots$x3 <- correctx(seq(0, 2*pi, pi/8), fprime, w=1/3)
+minor.axis.correction3 <- correctx(seq(0, 2*pi, pi/8), fprime, w=1/3)
 
 dframe$xtrans3 <- correctx(dframe$x, fprime=fprime, w=1/3)
 
@@ -636,12 +638,13 @@ ggplot(aes(x=xtrans3, xend=xtrans3, y = ystart, yend=yend), data=dframe) +
   geom_segment(colour="grey20") +
   theme_bw() + coord_fixed(ratio=1) + 
   xlab("x") + ylab("y")+  
-  scale_x_continuous(breaks=seq(0, 2*pi, by=pi/2), minor_breaks=minor.axis.correction,
+  scale_x_continuous(breaks=seq(0, 2*pi, by=pi/2), minor_breaks=minor.axis.correction3,
                      labels=c("0", expression(paste(pi,"/2")), expression(pi), expression(paste("3",pi, "/2")), expression(paste("2",pi))))+ 
   geom_point(data=dots, aes(x=x3, y=y), inherit.aes=FALSE) + 
   theme(plot.margin = unit(c(.1,.1,-.5,.1), "cm"))
 
 dots$x4 <- correctx(seq(0, 2*pi, pi/8), fprime, w=1/4)
+minor.axis.correction4 <- correctx(seq(0, 2*pi, pi/8), fprime, w=1/4)
 
 dframe$xtrans4 <- correctx(dframe$x, fprime=fprime, w=1/4)
 
@@ -650,7 +653,8 @@ ggplot(aes(x=xtrans4, xend=xtrans4, y = ystart, yend=yend), data=dframe) +
   geom_segment(colour="grey20") +
   theme_bw() + coord_fixed(ratio=1) + 
   xlab("x") + ylab("y") +
-  scale_x_continuous(breaks=seq(0, 2*pi, by=pi/2), minor_breaks=minor.axis.correction,
+  scale_x_continuous(breaks=seq(0, 2*pi, by=pi/2), 
+                     minor_breaks=minor.axis.correction4,
                      labels=c("0", expression(paste(pi,"/2")), expression(pi), expression(paste("3",pi, "/2")), expression(paste("2",pi))))+ 
   geom_point(data=dots, aes(x=x4, y=y), inherit.aes=FALSE) + 
   theme(plot.margin = unit(c(.1,.1,-.5,.1), "cm"))
