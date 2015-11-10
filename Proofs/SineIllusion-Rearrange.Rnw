@@ -1675,7 +1675,7 @@ load("data/gasprices.RData")
 ggplot(data=gas.cor.x) + 
   geom_segment(data=axis.labs, aes(x=value, xend=value,  y=.25, yend=Inf, color=color)) + 
   scale_colour_identity() + 
-  geom_text(data=axis.labs, aes(x=value, y=0, label=text), hjust=.25, size=3) + 
+  geom_text(data=axis.labs, aes(value, y=0, label=text), hjust=.5, size=3) + 
   geom_point(aes(x=value, y=price, group=variable), size=1.5, shape=I(1), colour=I("grey40"), alpha=I(.75)) + 
   facet_grid(variable~.) +
   geom_line(data=gas.cor.x, aes(x=value, y=price.fit), colour="black", size=1.5) + 
