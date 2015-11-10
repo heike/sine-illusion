@@ -1015,7 +1015,7 @@ dframe <- createSine(40,1, f=f, fprime=fprime, f2prime=f2prime)
    theme(axis.title = element_blank(), plot.margin=unit(rep(0,4), "lines")) + 
    coord_equal(ratio=1)+ 
    xlab("x") + ylab("y") +
-   scale_x_continuous(breaks=seq(0, 2*pi, by=pi/2), minor_breaks=minor.axis.correction,
+   scale_x_continuous(breaks=seq(0, 2*pi, by=pi/2), #minor_breaks=minor.axis.correction,
                       labels=c("0", expression(paste(pi,"/2")), expression(pi), expression(paste("3",pi, "/2")), expression(paste("2",pi))))
 @
 \caption{Linear correction}
@@ -1029,7 +1029,7 @@ qplot(x=x, xend=x, y=y+ellx4.u, yend=y-ellx4.l, geom="segment", data=dframe, lin
    theme(axis.title = element_blank(), plot.margin=unit(rep(0,4), "lines")) + 
    coord_equal(ratio=1)+ 
    xlab("x") + ylab("y") +
-   scale_x_continuous(breaks=seq(0, 2*pi, by=pi/2), minor_breaks=minor.axis.correction,
+   scale_x_continuous(breaks=seq(0, 2*pi, by=pi/2), #minor_breaks=minor.axis.correction,
                       labels=c("0", expression(paste(pi,"/2")), expression(pi), expression(paste("3",pi, "/2")), expression(paste("2",pi))))
 @
 \caption{Quadratic correction}
