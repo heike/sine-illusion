@@ -11,4 +11,4 @@ This repository contains the files and writeup for an experiment conducted in Su
 
 ## Repository Structure
 
-The final revision of the paper is located in the ./Revision2 subdirectory. The original version is contained in the ./OriginalSubmission/ folder, and ./Revision1 contains the first revision of the paper after comments from reviewers. 
+The final revision of the paper is [here](Final Draft/SineIllusion.pdf). The original version is contained in the ./OriginalSubmission/ folder, and ./Revision1 and ./Revision2 contain revisions of the paper after comments from reviewers. 
